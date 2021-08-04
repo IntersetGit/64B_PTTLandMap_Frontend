@@ -1,12 +1,18 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
+import 'antd/dist/antd.css';
 import './index.css';
 import RouteRoot from './routes/rootRoute'
 import reportWebVitals from './reportWebVitals';
+import { ConfigProvider } from 'antd';
+import thTH from 'antd/lib/locale/th_TH';
+
 
 ReactDOM.render(
   <React.StrictMode>
-    <RouteRoot />
+    <ConfigProvider locale={thTH}>
+      <RouteRoot />
+    </ConfigProvider>
   </React.StrictMode>,
   document.getElementById('root')
 );
