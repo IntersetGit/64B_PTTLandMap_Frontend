@@ -1,11 +1,11 @@
 import React, { Component } from 'react'
 import { BrowserRouter as Router, Route, Switch } from 'react-router-dom'
-
 import PrivateRoute from './privateRoute'
 import Login from '../pages/Login'
 import Axios from 'axios';
 import Config from '../config';
 import Swal from 'sweetalert2'
+import GoogleMap from '../pages/GoogleMap.js'
 class RouteRoot extends Component {
   constructor(props) {
     super(props);
@@ -98,7 +98,7 @@ class RouteRoot extends Component {
       <Router>
         <Switch>
           <Route exact path={`${process.env.PUBLIC_URL}/login`} component={Login} />
-          <PrivateRoute path={`${process.env.PUBLIC_URL}/`} component={Login} />
+          <Route exact path={`${process.env.PUBLIC_URL}/googlemap`} component={GoogleMap} />
         </Switch>
       </Router>
     )
