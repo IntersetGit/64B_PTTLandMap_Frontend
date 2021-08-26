@@ -82,16 +82,15 @@ class RouteRoot extends Component {
         method: 'post',
         url: process.env.REACT_APP_API_URL + "/masters/manageCommunicationStation",
         headers: { Authorization: "Bearer " + JSON.parse(sessionStorage.getItem("token")).access_token },
+      }).then((res) => {
+        if (res.status === 200) {
+          window.sessionStorage.clear();
+          window.location.reload();
+        } else {
+          window.sessionStorage.clear();
+          window.location.reload();
+        }
       })
-        .then((res) => {
-          if (res.status === 200) {
-            window.sessionStorage.clear();
-            window.location.reload();
-          } else {
-            window.sessionStorage.clear();
-            window.location.reload();
-          }
-        })
         .catch((err) => {
           window.sessionStorage.clear();
           window.location.reload();
