@@ -1,10 +1,19 @@
 import React, { Component } from 'react'
 import { BrowserRouter as Router, Route, Switch } from 'react-router-dom'
 import PrivateRoute from './privateRoute'
-import Login from '../pages/Login'
 import Axios from 'axios';
 import Swal from 'sweetalert2'
-import GoogleMap from '../pages/GoogleMap.js'
+
+/* Page */
+const Main = React.lazy(() => import('../pages/Main'));
+const Login = React.lazy(() => import('../pages/Login'));
+const GoogleMap = React.lazy(() => import('../pages/GoogleMap.js'));
+
+const loading = (
+  <div className="pt-3 text-center">
+    <div className="sk-spinner sk-spinner-pulse"></div>
+  </div>
+)
 class RouteRoot extends Component {
   constructor(props) {
     super(props);
@@ -95,10 +104,13 @@ class RouteRoot extends Component {
   render() {
     return (
       <Router>
-        <Switch>
-          <Route exact path={`/login`} component={Login} />
-          <Route exact path={`/googlemap`} component={GoogleMap} />
-        </Switch>
+        <React.Suspense fallback={loading}>
+          <Switch>
+            <Route exact path={`/login`} component={Login} />
+            <Route exact path={`/googlemap`} component={GoogleMap} />
+            <PrivateRoute path="/" component={Main}></PrivateRoute>
+          </Switch>
+        </React.Suspense>
       </Router>
     )
   }
