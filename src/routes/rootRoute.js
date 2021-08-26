@@ -97,8 +97,8 @@ class RouteRoot extends Component {
     return (
       <Router>
         <Switch>
-          <Route exact path={`${process.env.PUBLIC_URL}/login`} component={Login} />
-          <Route exact path={`${process.env.PUBLIC_URL}/googlemap`} component={GoogleMap} />
+          <Route exact path={`/login`} component={Login} />
+          <Route exact path={`/googlemap`} component={GoogleMap} />
         </Switch>
       </Router>
     )
