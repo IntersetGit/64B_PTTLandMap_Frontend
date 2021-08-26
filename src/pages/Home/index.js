@@ -1,10 +1,9 @@
 import React from 'react'
 
+
 function HomePage() {
     return (
-        <div>
-            Hello Home
-        </div>
+        <div>Hello Home</div>
     )
 }
 

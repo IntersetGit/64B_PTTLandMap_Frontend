@@ -14,6 +14,7 @@ export default axios.create({
         // Do whatever you want to transform the data
         const token = cookies.get('token');
         const refresh_token = cookies.get('refresh_token');
+        // console.log('token :>> ', token);
         if (token) {
             const token_decode = jwt_decode(token);
             if (token_decode.exp < Date.now() / 1000) {
@@ -29,16 +30,16 @@ export default axios.create({
 const logout = () => {
     cookies.remove("token");
     cookies.remove("refresh_token");
-    window.location.href = "/signin";
+    window.location.href = "/login";
 }
 
 const RefreshToken = async (refreshtokenval) => {
     try {
         if (refreshtokenval) {
-            const { data } = await axios.post(process.env.REACT_APP_SERVICE + '/auth/refreshToken', { token: refreshtokenval })
+            const { data } = await axios.post(process.env.REACT_APP_SERVICE + '/provider/refreshToken', { token: refreshtokenval })
             const token = data.items
             cookies.set('token', token, { path: '/' });
-            location.reload();
+            window.location.reload();
         } else {
             logout()
         }

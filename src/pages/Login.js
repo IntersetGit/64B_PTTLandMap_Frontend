@@ -1,25 +1,53 @@
-import React, { useState, useEffect } from 'react';
-import { Row, Col, Image, Input, Button, Form, Checkbox } from 'antd';
+import React, { useEffect } from 'react';
+import { useHistory } from "react-router-dom";
+import { Row, Col, Image, Input, Button, Form, Checkbox, message } from 'antd';
 import { UserOutlined, LockOutlined } from '@ant-design/icons';
-import axios from 'axios';
+import API from '../util/Api';
+import { Cookies } from 'react-cookie'
+import { Decrypt } from '../util/SecretCode';
+import jwt_decode from "jwt-decode";
+
+/* redux */
+import { useDispatch } from 'react-redux';
+import { setToken, setAuthUser } from '../redux/actions/authActions';
 
 
-function App() {
-  const onFinish = (values) => {
-    console.log('Received values of form: ', values);
-    axios.post("http://localhost:9000/provider/login", {
-      username: values.username,
-      password: values.password
-    })
-      .then(res => {
-        console.log(res.data)
-      })
-      .catch(error => {
-        console.log(error)
-      })
+const LoginPage = () => {
 
-  };
+  const history = useHistory();
+  const dispatch = useDispatch();
+  const cookies = new Cookies();
+
   const [form] = Form.useForm();
+
+  useEffect(() => {
+    const token = cookies.get('token');
+    if (token) {
+      history.push("/");
+    }
+  }, [])
+
+  const onFinish = (values) => {
+    // console.log('values ====================: ', values);
+    const { username, password } = values
+    API.post(`/provider/login`, { username, password }).then(({ data: { items: { access_token, refresh_token } } }) => {
+
+      cookies.set('token', access_token, { path: '/' });
+      if (refresh_token) cookies.set('refresh_token', refresh_token, { path: '/' });
+      const { token } = jwt_decode(access_token)
+      const dataUser = Decrypt(token);
+
+      dispatch(setToken(token))
+      dispatch(setAuthUser(dataUser))
+      history.push("/");
+    }).catch((error) => {
+      // console.log('error :>> ', error.response.status);
+      message.error(error.response && error.response.status == 500 ? error.response.data.error.message : "มีบางอย่างผิดพลาด !");
+      cookies.remove("token");
+      cookies.remove("refresh_token");
+    })
+  };
+
 
   return (
     <>
@@ -75,7 +103,7 @@ function App() {
                   </Form.Item>
 
                   <Form.Item>
-                    <Button type="primary" htmlType="submit" className="login-form-button" style={{ width: '100%' }} onClick={() => form.submit()}>
+                    <Button type="primary" htmlType="submit" className="login-form-button" style={{ width: '100%' }}>
                       Sing in
                     </Button>
 
@@ -97,4 +125,4 @@ function App() {
   );
 }
 
-export default App;
+export default LoginPage;
