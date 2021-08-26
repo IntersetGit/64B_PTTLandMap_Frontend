@@ -3,7 +3,6 @@ import { BrowserRouter as Router, Route, Switch } from 'react-router-dom'
 import PrivateRoute from './privateRoute'
 import Login from '../pages/Login'
 import Axios from 'axios';
-import Config from '../config';
 import Swal from 'sweetalert2'
 import GoogleMap from '../pages/GoogleMap.js'
 class RouteRoot extends Component {

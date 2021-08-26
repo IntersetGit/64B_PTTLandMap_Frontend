@@ -2,7 +2,6 @@
 import React, { useState, useEffect } from 'react'
 import { Route, Redirect } from 'react-router-dom'
 import Axios from 'axios';
-import Config from '../config';
 import Swal from 'sweetalert2'
 
 const PrivateRoute = ({ component: Component, ...rest }) => {
