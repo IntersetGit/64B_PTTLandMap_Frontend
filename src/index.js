@@ -3,17 +3,31 @@ import ReactDOM from 'react-dom';
 import 'antd/dist/antd.css';
 import RouteRoot from './routes/rootRoute'
 import reportWebVitals from './reportWebVitals';
-import { ConfigProvider } from 'antd';
-import thTH from 'antd/lib/locale/th_TH';
 
+/* redux */
+import { createStore } from 'redux';
+import { Provider } from 'react-redux';
+import allReducer from './redux/reducers'
+
+
+import th_TH from "antd/es/locale/th_TH";
+import "moment/locale/th";
+
+import { ConfigProvider } from 'antd';
 import './assets/scss/main.scss';
 
+const store = createStore(
+  allReducer,
+  window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__()/*เอาออกกรณีระบบเสร็จสมบูรณ์*/
+);
 ReactDOM.render(
-  <React.StrictMode>
-    <ConfigProvider locale={thTH}>
-      <RouteRoot />
-    </ConfigProvider>
-  </React.StrictMode>,
+  <Provider store={store}>
+    <React.StrictMode>
+      <ConfigProvider locale={th_TH}>
+        <RouteRoot />
+      </ConfigProvider>
+    </React.StrictMode>
+  </Provider>,
   document.getElementById('root')
 );
 
