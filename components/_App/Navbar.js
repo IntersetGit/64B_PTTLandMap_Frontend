@@ -38,13 +38,23 @@ const Navbar = ({ isMap, setslideNav, slideNav }) => {
             <div className="page-title-box">
                 <h3><b>PTT Land Map</b></h3>
             </div>
-            
+
             {/* id="mobile_btn" */}
             <a className="mobile_btn" href="#sidebar" onClick={() => {
                 setslideNav(slideNav ? "" : "slide-nav")
             }}><i className="fa fa-bars" /></a>
 
             <ul className="nav user-menu">
+
+                <Tooltip placement="bottom" title={"แผนที่"}>
+                    <li className="nav-item dropdown">
+                        <Link href={`/`} >
+                            <a className="dropdown-toggle nav-link" >
+                                <i className="fa fa-map" />
+                            </a>
+                        </Link>
+                    </li>
+                </Tooltip>
 
                 {/* ระบบหลังบ้าน */}
                 {
@@ -57,7 +67,8 @@ const Navbar = ({ isMap, setslideNav, slideNav }) => {
                                     </a>
                                 </Link>
                             </li>
-                        </Tooltip> : null
+                        </Tooltip>
+                        : null
                 }
 
                 <li className="nav-item dropdown has-arrow main-drop">
@@ -77,9 +88,14 @@ const Navbar = ({ isMap, setslideNav, slideNav }) => {
                 <div className="dropdown-menu dropdown-menu-right">
                     {
                         (user && user.roles_id === "8a97ac7b-01dc-4e06-81c2-8422dffa0ca2") ? (
-                            <Link href={`/settings/dashboard/`} >
-                                <a className="dropdown-item">ระบบหลังบ้าน</a>
-                            </Link>
+                            <>
+                                <Link href={`/`} >
+                                    <a className="dropdown-item">หน้าแรก</a>
+                                </Link>
+                                <Link href={`/settings/dashboard/`} >
+                                    <a className="dropdown-item">ระบบหลังบ้าน</a>
+                                </Link>
+                            </>
                         ) : null
                     }
                     <a className="dropdown-item" onClick={logout}>ออกการระบบ</a>

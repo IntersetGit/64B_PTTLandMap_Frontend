@@ -28,6 +28,31 @@
   }
 }
 
+.sidebar-menu li:hover {
+  a {
+    color: #000;
+    background-color: #d3f0fa;
+  }
+  h5 {
+    color: #000;
+  }
+}
+
 .sidebar-overlay {
   z-index: 0;
+}
+
+.menu-title {
+  color: $heading-color;
+}
+
+.nav-item {
+  i {
+    color: $heading-color;
+  }
+}
+.page-title-box {
+  h3 {
+    color: $heading-color;
+  }
 }
