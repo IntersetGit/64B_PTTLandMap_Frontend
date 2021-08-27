@@ -1,11 +1,11 @@
-// import { useDispatch, useSelector } from "react-redux";
-// import { delToken } from '../../redux/actions/userActions'
+import { useDispatch, useSelector } from "react-redux";
+import { delToken } from '../../redux/actions/userActions'
 import { useRouter } from 'next/dist/client/router';
 import Link from 'next/link';
 
 const Navbar = ({ isMap }) => {
-    // const { user } = useSelector(({ user }) => user);
-    // const dispatch = useDispatch();
+    const { user } = useSelector(({ user }) => user);
+    const dispatch = useDispatch();
     const route = useRouter()
 
     const logout = () => {
@@ -43,7 +43,7 @@ const Navbar = ({ isMap }) => {
             <ul className="nav user-menu">
                 <li className="nav-item dropdown has-arrow main-drop">
                     <a href="#" className="dropdown-toggle nav-link" data-toggle="dropdown">
-                        <span><i className="la la-user" /> sdsd</span>
+                        <span><i className="la la-user" /> {user ? `${user.username}` : "-"}</span>
                     </a>
                     <div className="dropdown-menu">
                         <a className="dropdown-item" onClick={logout}>ออกการระบบ</a>

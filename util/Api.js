@@ -5,7 +5,7 @@ import jwt_decode from "jwt-decode";
 const cookies = new Cookies();
 
 export default axios.create({
-    baseURL: process.env.REACT_APP_SERVICE,
+    baseURL: process.env.NEXT_PUBLIC_SERVICE,
     headers: {
         'Content-Type': 'application/json',
     },
@@ -36,7 +36,7 @@ const logout = () => {
 const RefreshToken = async (refreshtokenval) => {
     try {
         if (refreshtokenval) {
-            const { data } = await axios.post(process.env.REACT_APP_SERVICE + '/provider/refreshToken', { token: refreshtokenval })
+            const { data } = await axios.post(process.env.NEXT_PUBLIC_SERVICE + '/provider/refreshToken', { token: refreshtokenval })
             const token = data.items
             cookies.set('token', token, { path: '/' });
             window.location.reload();

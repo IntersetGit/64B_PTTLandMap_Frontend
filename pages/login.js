@@ -1,29 +1,47 @@
-import React from 'react'
+import { useEffect, useRef } from 'react'
 import { Row, Col, Image, Input, Button, Form, Checkbox, message } from 'antd';
 import { UserOutlined, LockOutlined } from '@ant-design/icons';
 import { Cookies } from 'react-cookie'
 import jwt_decode from "jwt-decode";
 import API from '../util/Api';
 import { Decrypt } from '../util/SecretCode';
+import { setAuthUser, setToken } from '../redux/actions/userActions';
+import { useRouter } from 'next/router';
 
 const LoginPage = () => {
 
     const [form] = Form.useForm();
     const cookies = new Cookies();
+    const route = useRouter()
+
+    const isComponentMounted = useRef(true)
+
+    useEffect(() => {
+        if (isComponentMounted.current) {
+            (() => {
+                const cookies = new Cookies();
+                const token = cookies.get('token');
+                /* จ้องเช็คว่า Token หมด อายุยัง */
+                if (token) route.push("/")
+            })();
+        }
+
+        return () => {
+            isComponentMounted.current = false
+        }
+    })
+
 
     const onFinish = (values) => {
         // console.log('values ====================: ', values);
         const { username, password } = values
         API.post(`/provider/login`, { username, password }).then(({ data: { items: { access_token, refresh_token } } }) => {
 
-            cookies.set('token', access_token, { path: '/' });
-            if (refresh_token) cookies.set('refresh_token', refresh_token, { path: '/' });
             const { token } = jwt_decode(access_token)
             const dataUser = Decrypt(token);
-
-            // dispatch(setToken(token))
-            // dispatch(setAuthUser(dataUser))
-            // history.push("/");
+            dispatch(setToken(access_token , refresh_token))
+            dispatch(setAuthUser(dataUser))
+            route.push("/login")
         }).catch((error) => {
             // console.log('error :>> ', error.response.status);
             message.error(error.response && error.response.status == 500 ? error.response.data.error.message : "มีบางอย่างผิดพลาด !");

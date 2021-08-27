@@ -17,7 +17,7 @@ function Layout({ children, isMap = false }) {
     useEffect(() => {
         const cookies = new Cookies();
         const token = cookies.get('token');
-        // if (!token) route.push("/login")
+        if (!token) route.push("/login")
     })
 
     useEffect(() => {
