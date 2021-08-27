@@ -6,7 +6,9 @@
     "dev": "node server/index.js",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "export": "next export -o out",
+    "deploy": "npm run build && npm run export"
   },
   "dependencies": {
     "@ant-design/icons": "^4.6.3",
