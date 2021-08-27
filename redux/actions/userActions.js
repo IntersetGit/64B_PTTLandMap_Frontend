@@ -1,5 +1,6 @@
 import jwt_decode from "jwt-decode";
 import { Cookies } from 'react-cookie'
+import { Decrypt } from '../../util/SecretCode'
 // Action Creator
 
 export const setAuthUser = (user) => {
@@ -13,16 +14,18 @@ export const setAuthUser = (user) => {
 };
 
 
-export const setToken = (token, refreshToken) => {
+export const setToken = (access_token, refreshToken) => {
     return dispatch => {
         const cookies = new Cookies();
-        cookies.set('token', token, { path: '/' });
+        const { token } = jwt_decode(access_token)
+        const dataUser = Decrypt(token);
+        cookies.set('token', access_token, { path: '/' });
         if (refreshToken) cookies.set('refresh_token', refreshToken, { path: '/' });
-        const dataUser = jwt_decode(token);
+
         dispatch(setAuthUser(dataUser));
         dispatch({
             type: "USER_TOKEN_SET",
-            payload: token,
+            payload: access_token,
         });
     };
 };
@@ -30,8 +33,8 @@ export const setToken = (token, refreshToken) => {
 export const delToken = () => {
     return dispatch => {
         const cookies = new Cookies();
-        cookies.remove("token");
-        cookies.remove("refresh_token");
+        cookies.remove("token", { path: '/' });
+        cookies.remove("refresh_token", { path: '/' });
         dispatch({
             type: "SET_AUTH_USER_DATA",
             payload: null,

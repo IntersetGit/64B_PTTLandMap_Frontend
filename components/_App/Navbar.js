@@ -10,7 +10,7 @@ const Navbar = ({ isMap }) => {
 
     const logout = () => {
         dispatch(delToken())
-        route.push("/signin")
+        route.push("/login")
     }
 
     return (
@@ -43,7 +43,7 @@ const Navbar = ({ isMap }) => {
             <ul className="nav user-menu">
                 <li className="nav-item dropdown has-arrow main-drop">
                     <a href="#" className="dropdown-toggle nav-link" data-toggle="dropdown">
-                        <span><i className="la la-user" /> {user ? `${user.username}` : "-"}</span>
+                        <span><i className="la la-user" /> {user ? `${user.user_name} (${user.roles_name}) ` : "-"}</span>
                     </a>
                     <div className="dropdown-menu">
                         <a className="dropdown-item" onClick={logout}>ออกการระบบ</a>

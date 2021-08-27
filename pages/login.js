@@ -2,28 +2,38 @@ import { useEffect, useRef } from 'react'
 import { Row, Col, Image, Input, Button, Form, Checkbox, message } from 'antd';
 import { UserOutlined, LockOutlined } from '@ant-design/icons';
 import { Cookies } from 'react-cookie'
-import jwt_decode from "jwt-decode";
 import API from '../util/Api';
-import { Decrypt } from '../util/SecretCode';
-import { setAuthUser, setToken } from '../redux/actions/userActions';
+
+import { useDispatch } from 'react-redux';
+import { setToken } from '../redux/actions/userActions';
 import { useRouter } from 'next/router';
+import Head from 'next/head';
+import { Encrypt, Decrypt } from '../util/SecretCode';
 
 const LoginPage = () => {
 
     const [form] = Form.useForm();
     const cookies = new Cookies();
     const route = useRouter()
+    const dispatch = useDispatch();
 
     const isComponentMounted = useRef(true)
 
     useEffect(() => {
         if (isComponentMounted.current) {
             (() => {
-                const cookies = new Cookies();
                 const token = cookies.get('token');
                 /* จ้องเช็คว่า Token หมด อายุยัง */
                 if (token) route.push("/")
             })();
+
+        }
+        const remember = Decrypt(cookies.get('remember'));
+        if (remember) {
+            form.setFieldsValue({
+                username: remember.username,
+                password: null
+            })
         }
 
         return () => {
@@ -34,14 +44,20 @@ const LoginPage = () => {
 
     const onFinish = (values) => {
         // console.log('values ====================: ', values);
-        const { username, password } = values
-        API.post(`/provider/login`, { username, password }).then(({ data: { items: { access_token, refresh_token } } }) => {
+        const { username, password, remember } = values
 
-            const { token } = jwt_decode(access_token)
-            const dataUser = Decrypt(token);
-            dispatch(setToken(access_token , refresh_token))
-            dispatch(setAuthUser(dataUser))
-            route.push("/login")
+
+
+        const token = Encrypt({ username, password })
+        API.post(`/provider/login`, { token }).then(({ data: { items: { access_token, refresh_token } } }) => {
+            if (remember) {
+                cookies.set('remember', Encrypt({ username }), { path: '/' });
+            } else {
+                if (cookies.get('remember'))
+                    cookies.remove("remember", { path: '/' });
+            }
+            dispatch(setToken(access_token, refresh_token))
+            route.push("/")
         }).catch((error) => {
             // console.log('error :>> ', error.response.status);
             message.error(error.response && error.response.status == 500 ? error.response.data.error.message : "มีบางอย่างผิดพลาด !");
@@ -53,6 +69,9 @@ const LoginPage = () => {
 
     return (
         <div className="bodycard">
+            <Head>
+                <title>เข้าสู่ระบบ</title>
+            </Head>
             <Row >
                 <Col xs={2} sm={2} md={2} lg={2} xl={6} ></Col>
                 <Col className="flex-items-1" xs={20} sm={20} md={20} lg={20} xl={12} style={{ marginTop: 200 }} >
@@ -62,7 +81,7 @@ const LoginPage = () => {
                                 form={form}
                                 name="normal_login"
                                 className="login-form" initialValues={{
-                                    remember: true,
+                                    remember: false,
                                 }}
                                 onFinish={onFinish}
                                 style={{ width: '100%' }}
