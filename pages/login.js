@@ -28,12 +28,15 @@ const LoginPage = () => {
             })();
 
         }
-        const remember = Decrypt(cookies.get('remember'));
-        if (remember) {
-            form.setFieldsValue({
-                username: remember.username,
-                password: null
-            })
+        
+        if (cookies.get('remember')) {
+            const remember = Decrypt(cookies.get('remember'));
+            if (remember) {
+                form.setFieldsValue({
+                    username: remember.username,
+                    password: null
+                })
+            }
         }
 
         return () => {

@@ -48,7 +48,7 @@ const Navbar = ({ isMap }) => {
                     user && user.roles_id === "8a97ac7b-01dc-4e06-81c2-8422dffa0ca2" ?
                         <Tooltip placement="bottom" title={"ระบบหลังบ้าน"}>
                             <li className="nav-item dropdown">
-                                <Link href={`/home`} >
+                                <Link href={`/settings/dashboard/`} >
                                     <a className="dropdown-toggle nav-link" >
                                         <i className="fa fa-cog" />
                                     </a>
