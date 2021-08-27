@@ -4,7 +4,6 @@ import { setToken } from '../redux/actions/userActions'
 
 import { useEffect, useRef } from 'react';
 import { Cookies } from 'react-cookie';
-import API from '../util/Api';
 
 import 'antd/dist/antd.css';
 import '../public/assets/css/style.css';
