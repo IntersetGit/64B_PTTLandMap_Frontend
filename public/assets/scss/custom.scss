@@ -17,3 +17,17 @@
 .action-icon {
   padding: 0 20px 0 20px;
 }
+
+.sidebar-menu li.active {
+  a {
+    color: #000;
+    background-color: #bcedff;
+  }
+  h5 {
+    color: #000;
+  }
+}
+
+.sidebar-overlay {
+  z-index: 0;
+}

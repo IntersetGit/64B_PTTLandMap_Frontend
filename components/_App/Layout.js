@@ -13,6 +13,7 @@ import "moment/locale/th";
 function Layout({ children, isMap = false }) {
     const route = useRouter()
     const [loader, setLoader] = useState(true);
+    const [slideNav, setslideNav] = useState("") //slide-nav
 
     useEffect(() => {
         const cookies = new Cookies();
@@ -30,8 +31,8 @@ function Layout({ children, isMap = false }) {
                 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
             </Head>
             {!isMap ? (
-                <div className="main-wrapper">
-                    <Navbar />
+                <div className={`main-wrapper ${slideNav}`}>
+                    <Navbar slideNav={slideNav} setslideNav={setslideNav} />
                     <Sidebar />
 
                     <div className="page-wrapper">

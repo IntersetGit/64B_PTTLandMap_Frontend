@@ -4,7 +4,7 @@ import { useRouter } from 'next/dist/client/router';
 import { Tooltip } from 'antd';
 import Link from 'next/link';
 
-const Navbar = ({ isMap }) => {
+const Navbar = ({ isMap, setslideNav, slideNav }) => {
     const { user } = useSelector(({ user }) => user);
     const dispatch = useDispatch();
     const route = useRouter()
@@ -38,14 +38,17 @@ const Navbar = ({ isMap }) => {
             <div className="page-title-box">
                 <h3><b>PTT Land Map</b></h3>
             </div>
-
-            <a id="mobile_btn" className="mobile_btn" href="#sidebar"><i className="fa fa-bars" /></a>
+            
+            {/* id="mobile_btn" */}
+            <a className="mobile_btn" href="#sidebar" onClick={() => {
+                setslideNav(slideNav ? "" : "slide-nav")
+            }}><i className="fa fa-bars" /></a>
 
             <ul className="nav user-menu">
 
                 {/* ระบบหลังบ้าน */}
                 {
-                    user && user.roles_id === "8a97ac7b-01dc-4e06-81c2-8422dffa0ca2" ?
+                    (user && user.roles_id === "8a97ac7b-01dc-4e06-81c2-8422dffa0ca2") ?
                         <Tooltip placement="bottom" title={"ระบบหลังบ้าน"}>
                             <li className="nav-item dropdown">
                                 <Link href={`/settings/dashboard/`} >
@@ -72,11 +75,18 @@ const Navbar = ({ isMap }) => {
             <div className="dropdown mobile-user-menu">
                 <a href="#" className="nav-link dropdown-toggle" data-toggle="dropdown" aria-expanded="false"><i className="fa fa-ellipsis-v" /></a>
                 <div className="dropdown-menu dropdown-menu-right">
+                    {
+                        (user && user.roles_id === "8a97ac7b-01dc-4e06-81c2-8422dffa0ca2") ? (
+                            <Link href={`/settings/dashboard/`} >
+                                <a className="dropdown-item">ระบบหลังบ้าน</a>
+                            </Link>
+                        ) : null
+                    }
                     <a className="dropdown-item" onClick={logout}>ออกการระบบ</a>
                 </div>
             </div>
 
-        </div>
+        </div >
     )
 }
 
