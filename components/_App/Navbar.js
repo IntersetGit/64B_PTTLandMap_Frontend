@@ -1,6 +1,7 @@
 import { useDispatch, useSelector } from "react-redux";
 import { delToken } from '../../redux/actions/userActions'
 import { useRouter } from 'next/dist/client/router';
+import { Tooltip } from 'antd';
 import Link from 'next/link';
 
 const Navbar = ({ isMap }) => {
@@ -41,6 +42,21 @@ const Navbar = ({ isMap }) => {
             <a id="mobile_btn" className="mobile_btn" href="#sidebar"><i className="fa fa-bars" /></a>
 
             <ul className="nav user-menu">
+
+                {/* ระบบหลังบ้าน */}
+                {
+                    user && user.roles_id === "8a97ac7b-01dc-4e06-81c2-8422dffa0ca2" ?
+                        <Tooltip placement="bottom" title={"ระบบหลังบ้าน"}>
+                            <li className="nav-item dropdown">
+                                <Link href={`/home`} >
+                                    <a className="dropdown-toggle nav-link" >
+                                        <i className="fa fa-cog" />
+                                    </a>
+                                </Link>
+                            </li>
+                        </Tooltip> : null
+                }
+
                 <li className="nav-item dropdown has-arrow main-drop">
                     <a href="#" className="dropdown-toggle nav-link" data-toggle="dropdown">
                         <span><i className="la la-user" /> {user ? `${user.user_name} (${user.roles_name}) ` : "-"}</span>
@@ -49,6 +65,8 @@ const Navbar = ({ isMap }) => {
                         <a className="dropdown-item" onClick={logout}>ออกการระบบ</a>
                     </div>
                 </li>
+
+
             </ul>
 
             <div className="dropdown mobile-user-menu">

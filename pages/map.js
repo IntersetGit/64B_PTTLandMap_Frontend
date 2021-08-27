@@ -1,6 +1,7 @@
 import Layout from '../components/_App/Layout'
 import { useEffect, useRef } from 'react';
 import { Loader } from '@googlemaps/js-api-loader';
+import Head from 'next/head';
 
 const HomePage = () => {
 
@@ -39,6 +40,9 @@ const HomePage = () => {
 
     return (
         <Layout isMap={true}>
+            <Head>
+                <title>PTT Land Map</title>
+            </Head>
             <div id="map" ref={googlemap} />
         </Layout>
     )
