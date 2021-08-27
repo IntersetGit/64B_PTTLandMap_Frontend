@@ -9,7 +9,7 @@ const System = ({ children }) => {
     const route = useRouter()
 
     useEffect(() => {
-        if (user.roles_id !== "8a97ac7b-01dc-4e06-81c2-8422dffa0ca2") {
+        if (user && user.roles_id !== "8a97ac7b-01dc-4e06-81c2-8422dffa0ca2") {
             route.push("/")
         }
     }, [user])
