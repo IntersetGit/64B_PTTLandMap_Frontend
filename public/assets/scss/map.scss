@@ -21,3 +21,12 @@ body {
 #map {
   height: 100%;
 }
+
+.basemapAndToolsArea {
+  position: absolute !important;
+  left: 205px;
+  top: 75px;
+  z-index: 2;
+
+ 
+}

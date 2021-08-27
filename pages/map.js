@@ -1,6 +1,7 @@
 import Layout from '../components/_App/Layout'
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Loader } from '@googlemaps/js-api-loader';
+import { Drawer } from 'antd';
 import Head from 'next/head';
 
 const HomePage = () => {
@@ -38,12 +39,32 @@ const HomePage = () => {
         });
     }
 
+
+    /*  */
+    const [visible, setVisible] = useState(false)
+
     return (
         <Layout isMap={true}>
             <Head>
                 <title>PTT Land Map</title>
             </Head>
+            <div className="basemapAndToolsArea">
+                <button className="btn btn-light btn-sm" onClick={() => setVisible(true)}><i className="fa fa-window-restore" /></button>
+            </div>
             <div id="map" ref={googlemap} />
+
+            <Drawer
+               title="Create a new account"
+               width={350}
+                placement={'left'}
+                visible={visible}
+                onClose={() => setVisible(false)}
+            >
+                <p>Some contents...</p>
+                <p>Some contents...</p>
+                <p>Some contents...</p>
+            </Drawer>
+
         </Layout>
     )
 }
