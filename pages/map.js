@@ -26,6 +26,10 @@ const HomePage = () => {
             google.maps.event.addListener(map, "click", (event) => {
                 addMarker(event.latLng, map);
             });
+
+            google.maps.event.addListener(map, "mousemove", (event) => {
+                getLatLon(event)
+            });
         });
     });
 
@@ -39,6 +43,14 @@ const HomePage = () => {
         });
     }
 
+    function getLatLon(event) {
+        let _lat = event.latLng.lat();
+        let _lng = event.latLng.lng();
+        // const utm = (new LatLng(lat, lng)).toUTMRef().toString().replace(/([0-9.]+) ([0-9.]+)/, '$1, $2');
+        $('#latLong').text(`${_lat} ${_lng}`)
+    }
+
+
 
     /*  */
     const [visible, setVisible] = useState(false)
@@ -51,6 +63,12 @@ const HomePage = () => {
 
             <div className="tools-group-layer">
                 <button className="btn btn-light btn-sm" onClick={() => setVisible(true)}><i className="fa fa-window-restore" /></button>
+            </div>
+
+            <div className="map-info-area">
+                <div class="map-info-detail">
+                    <span>Lat/Long <span id="latLong" /></span>
+                </div>
             </div>
 
             <div className="tools-map-cog">
