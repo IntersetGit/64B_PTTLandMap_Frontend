@@ -4,7 +4,7 @@ import { Loader } from '@googlemaps/js-api-loader';
 import { Drawer, Row, Col } from 'antd';
 import Head from 'next/head';
 
-const HomePage = () => {
+const mapPage = () => {
 
     const googlemap = useRef(null);
     const labels = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
@@ -124,4 +124,4 @@ const HomePage = () => {
     )
 }
 
-export default HomePage
+export default mapPage
