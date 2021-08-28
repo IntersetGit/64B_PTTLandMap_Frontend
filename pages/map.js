@@ -46,8 +46,9 @@ const HomePage = () => {
     function getLatLon(event) {
         let _lat = event.latLng.lat();
         let _lng = event.latLng.lng();
-        // const utm = (new LatLng(lat, lng)).toUTMRef().toString().replace(/([0-9.]+) ([0-9.]+)/, '$1, $2');
-        $('#latLong').text(`${_lat} ${_lng}`)
+        let _utm = (new LatLng(_lat, _lng)).toUTMRef().toString().replace(/([0-9.]+) ([0-9.]+)/, '$1, $2');
+        $('#latLong').text(`${_lat} / ${_lng}`)
+        $('#utm').text(` [${_utm}] `)
     }
 
 
@@ -67,7 +68,8 @@ const HomePage = () => {
 
             <div className="map-info-area">
                 <div class="map-info-detail">
-                    <span>Lat/Long <span id="latLong" /></span>
+                    <span>Lat/Long <span id="latLong" /> UTM <span id="utm" /></span>
+                    
                 </div>
             </div>
 
