@@ -39,10 +39,32 @@ body {
   }
 }
 
-.tools-map-area {
+.tools-map-cog {
   position: absolute !important;
   right: 5px;
   top: 125px;
+  background-color: #00aeefad;
+  color: aliceblue;
+  padding: 10px;
+  border-radius: 15px;
+  z-index: 30 !important;
+  button {
+    color: aliceblue;
+    background-color: #4b5159;
+    width: 30px;
+    text-align: center;
+  }
+
+  button:hover {
+    background-color: #34373d;
+    color: aliceblue;
+  }
+}
+
+.tools-map-area {
+  position: absolute !important;
+  right: 5px;
+  top: 190px;
   background-color: #00aeefad;
   color: aliceblue;
   padding: 10px;

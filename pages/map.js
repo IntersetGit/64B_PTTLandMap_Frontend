@@ -53,12 +53,36 @@ const HomePage = () => {
                 <button className="btn btn-light btn-sm" onClick={() => setVisible(true)}><i className="fa fa-window-restore" /></button>
             </div>
 
+            <div className="tools-map-cog">
+                <Col span={6}>
+                    <button className="btn btn-light btn-sm"><i className="fa fa-cog" /></button>
+                </Col>
+            </div>
+
             <div className="tools-map-area">
-                <Col span={6} >
+                <Col span={6}>
+                    <button className="btn btn-light btn-sm"><i className="fa fa-search" /></button>
+                </Col>
+                <Col span={6} className="pt-2">
                     <button className="btn btn-light btn-sm"><i className="fa fa-home" /></button>
                 </Col>
                 <Col span={6} className="pt-2">
+                    <button className="btn btn-light btn-sm"><i className="fa fa-window-minimize" /></button>
+                </Col>
+                <Col span={6} className="pt-2">
                     <button className="btn btn-light btn-sm"><i className="fa fa-i-cursor" /></button>
+                </Col>
+                <Col span={6} className="pt-2">
+                    <button className="btn btn-light btn-sm"><i className="fa fa-stop" /></button>
+                </Col>
+                <Col span={6} className="pt-2">
+                    <button className="btn btn-light btn-sm"><i className="fa fa-refresh" /></button>
+                </Col>
+                <Col span={6} className="pt-2">
+                    <button className="btn btn-light btn-sm"><i className="fa fa-times" /></button>
+                </Col>
+                <Col span={6} className="pt-2">
+                    <button className="btn btn-light btn-sm"><i className="fa fa-arrows-alt" /></button>
                 </Col>
             </div>
 

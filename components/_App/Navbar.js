@@ -36,7 +36,9 @@ const Navbar = ({ isMap, setslideNav, slideNav }) => {
 
 
             <div className="page-title-box">
-                <h3><b>PTT Land Map</b></h3>
+                <Link href={`/`} >
+                    <a><h3><b>PTT Land Map</b></h3></a>
+                </Link>
             </div>
 
             {/* id="mobile_btn" */}
@@ -53,6 +55,16 @@ const Navbar = ({ isMap, setslideNav, slideNav }) => {
                                 <i className="fa fa-map" />
                             </a>
                         </Link>
+                    </li>
+                </Tooltip>
+
+                <Tooltip placement="bottom" title={"คู่มือการใช้งาน"}>
+                    <li className="nav-item dropdown">
+
+                        <a className="dropdown-toggle nav-link" >
+                            <i className="fa fa-book" />
+                        </a>
+
                     </li>
                 </Tooltip>
 
@@ -90,8 +102,11 @@ const Navbar = ({ isMap, setslideNav, slideNav }) => {
                         (user && user.roles_id === "8a97ac7b-01dc-4e06-81c2-8422dffa0ca2") ? (
                             <>
                                 <Link href={`/`} >
-                                    <a className="dropdown-item">หน้าแรก</a>
+                                    <a className="dropdown-item">แผนที่</a>
                                 </Link>
+
+                                <a className="dropdown-item">คู่มือการใช้งาน</a>
+
                                 <Link href={`/settings/dashboard/`} >
                                     <a className="dropdown-item">ระบบหลังบ้าน</a>
                                 </Link>
