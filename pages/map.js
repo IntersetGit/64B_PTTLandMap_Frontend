@@ -52,7 +52,7 @@ const mapPage = () => {
             </div>
 
             <div className="map-info-area">
-                <div class="map-info-detail">
+                <div className="map-info-detail">
                     <span>Lat/Long <span id="latLong" /> UTM <span id="utm" /></span>
 
                 </div>
