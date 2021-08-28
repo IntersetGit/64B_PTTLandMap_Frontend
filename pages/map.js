@@ -1,7 +1,7 @@
 import Layout from '../components/_App/Layout'
 import { useEffect, useRef, useState } from 'react';
 import { Loader } from '@googlemaps/js-api-loader';
-import { Drawer } from 'antd';
+import { Drawer, Row, Col } from 'antd';
 import Head from 'next/head';
 
 const HomePage = () => {
@@ -48,14 +48,25 @@ const HomePage = () => {
             <Head>
                 <title>PTT Land Map</title>
             </Head>
-            <div className="basemapAndToolsArea">
+
+            <div className="tools-group-layer">
                 <button className="btn btn-light btn-sm" onClick={() => setVisible(true)}><i className="fa fa-window-restore" /></button>
             </div>
+
+            <div className="tools-map-area">
+                <Col span={6} >
+                    <button className="btn btn-light btn-sm"><i className="fa fa-home" /></button>
+                </Col>
+                <Col span={6} className="pt-2">
+                    <button className="btn btn-light btn-sm"><i className="fa fa-i-cursor" /></button>
+                </Col>
+            </div>
+
             <div id="map" ref={googlemap} />
 
             <Drawer
-               title="Create a new account"
-               width={350}
+                title="Create a new account"
+                width={350}
                 placement={'left'}
                 visible={visible}
                 onClose={() => setVisible(false)}

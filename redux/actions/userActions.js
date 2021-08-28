@@ -35,6 +35,7 @@ export const delToken = () => {
         const cookies = new Cookies();
         cookies.remove("token", { path: '/' });
         cookies.remove("refresh_token", { path: '/' });
+        location.reload();
         dispatch({
             type: "SET_AUTH_USER_DATA",
             payload: null,

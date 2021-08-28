@@ -22,11 +22,41 @@ body {
   height: 100%;
 }
 
-.basemapAndToolsArea {
+.tools-group-layer {
   position: absolute !important;
   left: 205px;
   top: 75px;
-  z-index: 2;
+  z-index: 30 !important;
+  button {
+    color: aliceblue;
+    background-color: #4b5159;
+    width: 40px;
+    text-align: center;
+  }
+  button:hover {
+    background-color: #34373d;
+    color: aliceblue;
+  }
+}
 
- 
+.tools-map-area {
+  position: absolute !important;
+  right: 5px;
+  top: 125px;
+  background-color: #00aeefad;
+  color: aliceblue;
+  padding: 10px;
+  border-radius: 15px;
+  z-index: 30 !important;
+  button {
+    color: aliceblue;
+    background-color: #4b5159;
+    width: 30px;
+    text-align: center;
+  }
+
+  button:hover {
+    background-color: #34373d;
+    color: aliceblue;
+  }
 }
