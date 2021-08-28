@@ -1,10 +1,41 @@
 import Layout from '../components/_App/Layout'
-import { useState } from 'react';
-import { Drawer, Col } from 'antd';
+import { useEffect, useRef, useState } from 'react';
+import { Loader } from '@googlemaps/js-api-loader';
+import { Drawer, Row, Col } from 'antd';
 import Head from 'next/head';
-import Maps from '../components/Maps'
 
-const MapPage = () => {
+const mapPage = () => {
+
+    const googlemap = useRef(null);
+
+    useEffect(() => {
+        const loader = new Loader({
+            apiKey: "AIzaSyArK9veHmyKP3QdYMPW1381JzFHqUwDg9U",
+            version: 'weekly',
+        });
+        let map;
+        loader.load().then(() => {
+            const google = window.google;
+            map = new google.maps.Map(googlemap.current, {
+                center: { lat: 13.78, lng: 100.55 },
+                zoom: 8,
+            });
+
+            google.maps.event.addListener(map, "mousemove", (event) => {
+                getLatLon(event)
+            });
+        });
+    });
+
+
+    const getLatLon = (event) => {
+        let _lat = event.latLng.lat();
+        let _lng = event.latLng.lng();
+        let _utm = (new LatLng(_lat, _lng)).toUTMRef().toString().replace(/([0-9.]+) ([0-9.]+)/, '$1, $2');
+        $('#latLong').text(`${_lat} / ${_lng}`)
+        $('#utm').text(` [${_utm}] `)
+    }
+
 
 
     /*  */
@@ -18,6 +49,13 @@ const MapPage = () => {
 
             <div className="tools-group-layer">
                 <button className="btn btn-light btn-sm" onClick={() => setVisible(true)}><i className="fa fa-window-restore" /></button>
+            </div>
+
+            <div className="map-info-area">
+                <div class="map-info-detail">
+                    <span>Lat/Long <span id="latLong" /> UTM <span id="utm" /></span>
+
+                </div>
             </div>
 
             <div className="tools-map-cog">
@@ -53,7 +91,7 @@ const MapPage = () => {
                 </Col>
             </div>
 
-            <Maps center={{ lat: 13.78, lng: 100.55 }} zoom={8} />
+            <div id="map" ref={googlemap} />
 
             <Drawer
                 title="Create a new account"
@@ -71,4 +109,4 @@ const MapPage = () => {
     )
 }
 
-export default MapPage
+export default mapPage
