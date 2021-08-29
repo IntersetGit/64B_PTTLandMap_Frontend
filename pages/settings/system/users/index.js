@@ -2,8 +2,8 @@ import React, { useState, useEffect } from "react";
 import Head from "next/head";
 import System from "../../../../components/_App/System";
 import axios from "axios";
-import { EyeOutlined } from "@ant-design/icons";
-import { Table, Input } from "antd";
+import { EyeOutlined,RedoOutlined } from "@ant-design/icons";
+import { Table, Input ,Row,Col,Button} from "antd";
 const { Search } = Input;
 const usersSystemPage = () => {
   const [data, setData] = useState([]);
@@ -58,6 +58,7 @@ const usersSystemPage = () => {
       render: (id) => {
         return <EyeOutlined />;
       },
+      responsive:['md']
     },
   ];
 
@@ -71,6 +72,7 @@ const usersSystemPage = () => {
           <h3>จัดการผู้ใช้งานระบบ</h3>
           <br />
           <Search placeholder="input search text" style={{ width: 200 }} />
+          <Button style={{marginLeft:"15px"}}><RedoOutlined /></Button>
           <br />
           <br />
           <Table
