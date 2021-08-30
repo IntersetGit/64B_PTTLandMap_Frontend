@@ -34,10 +34,8 @@ const GroupLayerSystemPage = () => {
   ];
 
   const search = (value) => {
-    // console.log(value);
     Api.get("/masterdata/masLayersname",{params:{search:value}})
     .then(data=>{
-      console.log(data)
       setData(data.data.items)
     })
   };
@@ -60,7 +58,7 @@ const GroupLayerSystemPage = () => {
             </Button>
           </Col>
           <Col span={3} offset={11} >
-            <Button type="primary" style={{}}>+ เพิ่ม group</Button>
+            <Button type="primary" >+ เพิ่ม group</Button>
           </Col>
           <Col span={24}>
             <Table

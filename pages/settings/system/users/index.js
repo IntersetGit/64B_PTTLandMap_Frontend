@@ -9,7 +9,7 @@ const usersSystemPage = () => {
   const [data, setData] = useState([]);
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(5);
-  useEffect(() => {
+  const reload=()=>{
     Api.get("http://localhost:9000/provider/getUser").then((data) => {
       let tempDataArray = [];
       data.data.forEach((data, key) => {
@@ -22,8 +22,10 @@ const usersSystemPage = () => {
         ];
       });
       setData(tempDataArray);
-      console.log(tempDataArray);
     });
+  }
+  useEffect(() => {
+    reload()
   }, []);
   const columns = [
     {
@@ -79,7 +81,7 @@ const usersSystemPage = () => {
                 <Search placeholder="input search text" onSearch={search}/>
           </Col>
           <Col span={5}>
-            <Button>
+            <Button onClick={()=>{reload()}}>
               <RedoOutlined />
             </Button>
           </Col>
