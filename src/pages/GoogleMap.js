@@ -33,7 +33,7 @@ class MyFancyComponent extends React.PureComponent {
     setTimeout(() => {
       this.setState({ isMarkerShown: true })
     }, 3000)
-  }
+  } 
 
   handleMarkerClick = () => {
     this.setState({ isMarkerShown: false })
