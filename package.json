@@ -22,7 +22,13 @@
     "next-redux-wrapper": "^7.0.2",
     "react": "17.0.2",
     "react-cookie": "^4.1.1",
+<<<<<<< HEAD
+    "react-dom": "^17.0.2",
+    "react-github-fork-ribbon": "^0.6.0",
+    "react-google-maps": "^9.4.5",
+=======
     "react-dom": "17.0.2",
+>>>>>>> 45c6c481957d6a978eb34c5db6323f2ef8a50c4d
     "react-redux": "^7.2.4",
     "redux": "^4.1.1",
     "redux-thunk": "^2.3.0",
