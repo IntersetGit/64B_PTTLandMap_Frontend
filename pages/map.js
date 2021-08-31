@@ -66,28 +66,28 @@ const mapPage = () => {
 
             <div className="tools-map-area">
                 <Col span={6}>
-                    <button className="btn btn-light btn-sm"><i className="fa fa-search" /></button>
+                    <button className="btn btn-light btn-sm"><img width="100%"src="/assets/images/search.png"/></button>
                 </Col>
                 <Col span={6} className="pt-2">
-                    <button className="btn btn-light btn-sm"><i className="fa fa-home" /></button>
+                    <button className="btn btn-light btn-sm"><img width="100%"src="/assets/images/home.png"/></button>
                 </Col>
                 <Col span={6} className="pt-2">
-                    <button className="btn btn-light btn-sm"><i className="fa fa-window-minimize" /></button>
+                    <button className="btn btn-light btn-sm"><img width="100%"src="/assets/images/Line.png"/></button>
                 </Col>
                 <Col span={6} className="pt-2">
-                    <button className="btn btn-light btn-sm"><i className="fa fa-i-cursor" /></button>
+                    <button className="btn btn-light btn-sm"><img width="100%"src="/assets/images/-line_icon.png"/></button>
                 </Col>
                 <Col span={6} className="pt-2">
-                    <button className="btn btn-light btn-sm"><i className="fa fa-stop" /></button>
+                    <button className="btn btn-light btn-sm"><img width="100%"src="/assets/images/polegon.png"/></button>
                 </Col>
                 <Col span={6} className="pt-2">
-                    <button className="btn btn-light btn-sm"><i className="fa fa-refresh" /></button>
+                    <button className="btn btn-light btn-sm"><img width="100%"src="/assets/images/arrow_back_time.png"/></button>
                 </Col>
                 <Col span={6} className="pt-2">
-                    <button className="btn btn-light btn-sm"><i className="fa fa-times" /></button>
+                    <button className="btn btn-light btn-sm"><img width="100%"src="/assets/images/cross.png"/></button>
                 </Col>
                 <Col span={6} className="pt-2">
-                    <button className="btn btn-light btn-sm"><i className="fa fa-arrows-alt" /></button>
+                    <button className="btn btn-light btn-sm"><img width="100%"src="/assets/images/arrows.png"/></button>
                 </Col>
             </div>
 
