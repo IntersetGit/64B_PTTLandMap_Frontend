@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import Head from "next/head";
 import System from "../../../../components/_App/System";
-import { EyeOutlined, RedoOutlined } from "@ant-design/icons";
+import {  RedoOutlined } from "@ant-design/icons";
 import { Table, Input, Row, Col, Button } from "antd";
 import Api from "../../../../util/Api";
 const { Search } = Input;
@@ -11,8 +11,9 @@ const GroupLayerSystemPage = () => {
   const [pageSize, setPageSize] = useState(5);
   const [data, setData] = useState([]);
   const reload =()=>{
-    Api.get("/masterdata/masLayers").then((data) => {
+    Api.post("/masterdata/getMasLayers").then((data) => {
       setData(data.data.items);
+      console.log(data)
     });
   }
   useEffect(() => {
@@ -20,21 +21,24 @@ const GroupLayerSystemPage = () => {
   }, []);
   const columns = [
     {
+      key:"1",
       title: "ลำดับ",
       dataIndex: "order_by",
     },
     {
+      key:"2",
       title: "group Layer",
       dataIndex: "group_name",
     },
     {
+      key:"3",
       title: "ความหมาย",
       dataIndex: "address",
     },
   ];
 
   const search = (value) => {
-    Api.get("/masterdata/masLayersname",{params:{search:value}})
+    Api.post("/masterdata/getMasLayers",{search:value})
     .then(data=>{
       setData(data.data.items)
     })
@@ -62,6 +66,7 @@ const GroupLayerSystemPage = () => {
           </Col>
           <Col span={24}>
             <Table
+              size="middle"
               columns={columns}
               dataSource={data}
               pagination={{

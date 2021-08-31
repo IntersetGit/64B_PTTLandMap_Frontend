@@ -100,6 +100,7 @@ const usersSystemPage = () => {
           </Col>
           <Col span={24}>
             <Table
+            size="middle"
               columns={columns}
               dataSource={data}
               pagination={{
