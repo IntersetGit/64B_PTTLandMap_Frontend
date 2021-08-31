@@ -1,16 +1,16 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import Head from "next/head";
 import System from "../../../../components/_App/System";
-import axios from "axios";
-import { EyeOutlined,RedoOutlined } from "@ant-design/icons";
-import { Table, Input ,Row,Col,Button} from "antd";
+import Api from "../../../../util/Api";
+import { EyeOutlined, RedoOutlined } from "@ant-design/icons";
+import { Table, Input, Row, Col, Button } from "antd";
 const { Search } = Input;
 const usersSystemPage = () => {
   const [data, setData] = useState([]);
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(5);
-  useEffect(() => {
-    axios.get("http://localhost:9000/provider/getUser").then((data) => {
+  const reload=(search=null)=>{
+    Api.post("/provider/getSearchUser").then((data) => {
       let tempDataArray = [];
       data.data.forEach((data, key) => {
         tempDataArray = [
@@ -22,8 +22,10 @@ const usersSystemPage = () => {
         ];
       });
       setData(tempDataArray);
-      console.log(tempDataArray);
     });
+  }
+  useEffect(() => {
+    reload()
   }, []);
   const columns = [
     {
@@ -58,36 +60,59 @@ const usersSystemPage = () => {
       render: (id) => {
         return <EyeOutlined />;
       },
-      responsive:['md']
+      responsive: ["md"],
     },
   ];
 
+  const search = (value)=>{
+    Api.post("/provider/getSearchUser",{search:value})
+    .then(data=>{
+      let tempDataArray = [];
+      data.data.forEach((data, key) => {
+        tempDataArray = [
+          ...tempDataArray,
+          {
+            number: key + 1,
+            ...data,
+          },
+        ];
+      });
+      setData(tempDataArray);
+    })
+  }
   return (
     <>
       <Head>
         <title>จัดการผู้ใช้ระบบ</title>
       </Head>
       <System>
-        <div style={{ background: "white", padding: "20px" }}>
-          <h3>จัดการผู้ใช้งานระบบ</h3>
-          <br />
-          <Search placeholder="input search text" style={{ width: 200 }} />
-          <Button style={{marginLeft:"15px"}}><RedoOutlined /></Button>
-          <br />
-          <br />
-          <Table
-            columns={columns}
-            dataSource={data}
-            pagination={{
-              current: page,
-              pageSize: pageSize,
-              onChange: (page, pageSize) => {
-                setPage(page);
-                setPageSize(pageSize);
-              },
-            }}
-          />
-        </div>
+        <Row gutter={[10, 10]} style={{ background: "white", padding: "16px" }}>
+          <Col span={24}>
+            <h3>จัดการผู้ใช้งานระบบ</h3>
+          </Col>
+          <Col span={5}>
+                <Search placeholder="input search text" onSearch={search}/>
+          </Col>
+          <Col span={5}>
+            <Button onClick={()=>{reload()}}>
+              <RedoOutlined />
+            </Button>
+          </Col>
+          <Col span={24}>
+            <Table
+              columns={columns}
+              dataSource={data}
+              pagination={{
+                current: page,
+                pageSize: pageSize,
+                onChange: (page, pageSize) => {
+                  setPage(page);
+                  setPageSize(pageSize);
+                },
+              }}
+            />
+          </Col>
+        </Row>
       </System>
     </>
   );
