@@ -9,8 +9,8 @@ const usersSystemPage = () => {
   const [data, setData] = useState([]);
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(5);
-  const reload=()=>{
-    Api.get("http://localhost:9000/provider/getUser").then((data) => {
+  const reload=(search=null)=>{
+    Api.post("/provider/getSearchUser").then((data) => {
       let tempDataArray = [];
       data.data.forEach((data, key) => {
         tempDataArray = [
@@ -65,7 +65,20 @@ const usersSystemPage = () => {
   ];
 
   const search = (value)=>{
-    console.log(value)
+    Api.post("/provider/getSearchUser",{search:value})
+    .then(data=>{
+      let tempDataArray = [];
+      data.data.forEach((data, key) => {
+        tempDataArray = [
+          ...tempDataArray,
+          {
+            number: key + 1,
+            ...data,
+          },
+        ];
+      });
+      setData(tempDataArray);
+    })
   }
   return (
     <>
