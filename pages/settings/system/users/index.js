@@ -32,26 +32,41 @@ const usersSystemPage = () => {
       key: "1",
       title: "ลำดับ",
       dataIndex: "number",
+      sorter:(record1,record2)=>{
+        return record1.number>record2.number
+      }
     },
     {
       key: "2",
       title: "ชื่อเข้าใช้ระบบ",
       dataIndex: "user_name",
+      sorter:(record1,record2)=>{
+        return record1.user_name>record2.user_name
+      }
     },
     {
       key: "3",
       title: "ชื่อ-นามสกุล",
       dataIndex: "firstlast",
+      sorter:(record1,record2)=>{
+        return record1.firstlast>record2.firstlast
+      }
     },
     {
       key: "4",
       title: "อีเมล",
       dataIndex: "e_mail",
+      sorter:(record1,record2)=>{
+        return record1.e_mail>record2.e_mail
+      }
     },
     {
       key: "5",
       title: "กลุ่มผู้ใช้งาน",
       dataIndex: "roles_name",
+      sorter:(record1,record2)=>{
+        return record1.roles_name>record2.roles_name
+      }
     },
     {
       key: "6",
