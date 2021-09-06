@@ -38,7 +38,7 @@ const mapPage = () => {
 
 
 
-    /*  */
+    /* map */
     const [visible, setVisible] = useState(false)
 
     return (
