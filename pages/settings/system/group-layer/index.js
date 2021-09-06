@@ -11,9 +11,11 @@ const GroupLayerSystemPage = () => {
   const [pageSize, setPageSize] = useState(5);
   const [data, setData] = useState([]);
   const reload =()=>{
-    Api.get("/masterdata/masLayers").then((data) => {
+    Api.post("/masterdata/getmasLayers").then((data) => {
       setData(data.data.items);
-    });
+    }).catch((error)=>{
+      console.log(error)
+    })
   }
   useEffect(() => {
    reload()
@@ -34,7 +36,7 @@ const GroupLayerSystemPage = () => {
   ];
 
   const search = (value) => {
-    Api.get("/masterdata/masLayersname",{params:{search:value}})
+    Api.post("/masterdata/getmasLayers",{search:value})
     .then(data=>{
       setData(data.data.items)
     })
