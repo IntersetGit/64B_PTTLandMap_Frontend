@@ -64,9 +64,9 @@ const mapPage = () => {
                 </Col>
             </div>
 
-            <div className="tools-map-area">
-                <Col span={6}>
-                    <button className="btn btn-light btn-sm"><img width="100%"src="/assets/images/search.png"/></button>
+            <div className="tools-map-area" style={{height:"40vh"}}>
+                <Col span={6} >
+                    <button  className="btn btn-light btn-sm"><img width="100%" height="100%" src="/assets/images/search.png"/></button>
                 </Col>
                 <Col span={6} className="pt-2">
                     <button className="btn btn-light btn-sm"><img width="100%"src="/assets/images/home.png"/></button>
@@ -91,7 +91,7 @@ const mapPage = () => {
                 </Col>
             </div>
 
-            <div id="map" ref={googlemap} />
+            <div id="map" ref={googlemap} width="100%" />
 
             <Drawer
                 title="Create a new account"
