@@ -86,7 +86,7 @@ const LoginPage = () => {
           <img src="/assets/images/digital.png" preview={false} style={{ height: "100vh", width: '100%', objectFit: 'cover' }} />
         </Col>
         <Col xs={24} sm={14} mg={14} lg={14} xl={9} style={{ padding: '5%', marginTop: "-2%", }}>
-          <Col style={{padding:'0 0 15%'}}>
+          <Col style={{ padding: '0 0 15%' }}>
             <img width="50%" src="/assets/images/logo_PTT.png" preview={false} />
           </Col>
           <h2><b>Sing in</b></h2>
@@ -144,7 +144,7 @@ const LoginPage = () => {
                 className="login-form-button"
                 style={{ width: "100%" }}
               >
-                
+
                 Log in
               </Button>
             </Form.Item>
