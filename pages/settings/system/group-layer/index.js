@@ -59,13 +59,6 @@ const GroupLayerSystemPage = () => {
         return record1.group_name > record2.group_name;
       },
     },
-    {
-      title: "ความหมาย",
-      dataIndex: "address",
-      sorter: (record1, record2) => {
-        return record1.address > record2.address;
-      },
-    },
   ];
 
   const search = (value) => {
@@ -138,13 +131,6 @@ const GroupLayerSystemPage = () => {
             rules={[
               { required: true, message: "Please input your grouplayer!" },
             ]}
-          >
-            <Input />
-          </Form.Item>
-          <Form.Item
-            name="mean"
-            label="ความหมาย"
-            rules={[{ required: true, message: "Please input your mean!" }]}
           >
             <Input />
           </Form.Item>
