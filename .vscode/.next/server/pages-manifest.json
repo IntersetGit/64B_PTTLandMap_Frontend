@@ -1,0 +1,7 @@
+{
+  "/_app": "pages/_app.js",
+  "/_document": "pages/_document.js",
+  "/_error": "pages/_error.js",
+  "/settings/system/group-layer": "pages/settings/system/group-layer.js",
+  "/settings/system/users": "pages/settings/system/users.js"
+}
