@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import Head from "next/head";
 import System from "../../../../components/_App/System";
-import {  RedoOutlined } from "@ant-design/icons";
+import { RedoOutlined } from "@ant-design/icons";
 import { Table, Modal, Input, Row, Col, Button, Form } from "antd";
 import Api from "../../../../util/Api";
 const { Search } = Input;
@@ -76,7 +76,7 @@ const GroupLayerSystemPage = () => {
         <title>จัดการ Group Layer</title>
       </Head>
       <System>
-        <Row gutter={[10, 10]} style={{ background: "white", padding: "16px" }}>
+        <Row gutter={[10, 10]} style={{ background: "white", padding: "16px", boxShadow: " rgba(0, 0, 0, 0.12) 0px 1px 3px, rgba(0, 0, 0, 0.24) 0px 1px 2px" }}>
           <Col span={24}>
             <h3>จัดการผู้ใช้งานระบบ</h3>
           </Col>
@@ -92,24 +92,26 @@ const GroupLayerSystemPage = () => {
               <RedoOutlined />
             </Button>
           </Col>
-          <Col span={3} offset={11}>
-            <Button type="primary" onClick={showModal}>
+          <Col span={3} offset={11} >
+            <Button type="primary" onClick={showModal} style={{ float: "right" }}>
               + เพิ่ม group
             </Button>
           </Col>
           <Col span={24}>
-            <Table
-              columns={columns}
-              dataSource={data}
-              pagination={{
-                current: page,
-                pageSize: pageSize,
-                onChange: (page, pageSize) => {
-                  setPage(page);
-                  setPageSize(pageSize);
-                },
-              }}
-            />
+            <div className="table-responsive">
+              <Table
+                columns={columns}
+                dataSource={data}
+                pagination={{
+                  current: page,
+                  pageSize: pageSize,
+                  onChange: (page, pageSize) => {
+                    setPage(page);
+                    setPageSize(pageSize);
+                  },
+                }}
+              />
+            </div>
           </Col>
         </Row>
       </System>
