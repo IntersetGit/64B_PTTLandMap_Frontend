@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import Head from "next/head";
 import System from "../../../../components/_App/System";
 import Api from "../../../../util/Api";
-import { EyeOutlined, RedoOutlined } from "@ant-design/icons";
+import { MoreOutlined, RedoOutlined } from "@ant-design/icons";
 import { Table, Input, Row, Col, Button } from "antd";
 const { Search } = Input;
 const usersSystemPage = () => {
@@ -73,7 +73,7 @@ const usersSystemPage = () => {
       title: "จัดการ",
       dataIndex: "id",
       render: (id) => {
-        return <EyeOutlined />;
+        return <MoreOutlined />;
       },
       responsive: ["md"],
     },
@@ -101,9 +101,9 @@ const usersSystemPage = () => {
         <title>จัดการผู้ใช้ระบบ</title>
       </Head>
       <System>
-        <Row gutter={[10, 10]} style={{ background: "white", padding: "16px" }}>
+        <Row gutter={[10, 10]} style={{ background: "white", padding: "16px",boxShadow:" rgba(0, 0, 0, 0.12) 0px 1px 3px, rgba(0, 0, 0, 0.24) 0px 1px 2px" }}>
           <Col span={24}>
-            <h3>จัดการผู้ใช้งานระบบ</h3>
+            <h3 className="mb-4">จัดการผู้ใช้งานระบบ</h3>
           </Col>
           <Col span={5}>
                 <Search placeholder="input search text" onSearch={search}/>
@@ -114,6 +114,7 @@ const usersSystemPage = () => {
             </Button>
           </Col>
           <Col span={24}>
+            <div className="table-responsive">
             <Table
               columns={columns}
               dataSource={data}
@@ -126,6 +127,7 @@ const usersSystemPage = () => {
                 },
               }}
             />
+            </div>
           </Col>
         </Row>
       </System>
