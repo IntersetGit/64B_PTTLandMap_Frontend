@@ -89,7 +89,8 @@ const SatelliteAerialPhotographsPage = () => {
               </Form.Item>
               <Form.Item
                 name="radio-group"
-                wrapperCol={{ offset: 8, span: 6 }}
+                label=" "
+                wrapperCol={{ span: 12 }}
                 rules={[{ required: true }]}
               >
                 <Radio.Group>

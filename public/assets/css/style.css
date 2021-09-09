@@ -7915,7 +7915,7 @@ ul.comment-list li ul.children {
 		height: unset;
 	}
 }
-@media only screen and (max-width: 575.98px) {
+@media only screen and (max-width: 849px) {
 	.contact-cat {
 		padding-right: 70px;
 	}

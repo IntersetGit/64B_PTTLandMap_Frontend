@@ -7,6 +7,7 @@ import Api from "../../../../util/Api";
 const { Search } = Input;
 
 const GroupLayerSystemPage = () => {
+  const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(5);
   const [data, setData] = useState([]);
@@ -18,7 +19,6 @@ const GroupLayerSystemPage = () => {
 
   const handleOk = () => {
     form.submit();
-    setIsModalVisible(false);
   };
 
   const handleCancel = () => {
@@ -26,8 +26,11 @@ const GroupLayerSystemPage = () => {
     form.resetFields();
   };
   const onFinish = async (value) => {
+    setLoading(true);
     Api.post("/masterdata/masLayers", { group_name: value.groupLayer })
       .then((data) => {
+        setIsModalVisible(false);
+        setLoading(false);
         reload();
       })
       .catch((error) => {
@@ -39,6 +42,7 @@ const GroupLayerSystemPage = () => {
     Api.post("/masterdata/getmasLayers")
       .then((data) => {
         setData(data.data.items);
+        setLoading(false);
       })
       .catch((error) => {
         console.log(error);
@@ -62,13 +66,15 @@ const GroupLayerSystemPage = () => {
   ];
 
   const search = (value) => {
+    setLoading(true);
     Api.post("/masterdata/getmasLayers", { search: value }).then((data) => {
       setData(data.data.items);
+      setLoading(false);
     });
   };
-  
+
   const normFile = (e) => {
-    console.log('Upload event:', e);
+    console.log("Upload event:", e);
     if (Array.isArray(e)) {
       return e;
     }
@@ -121,6 +127,7 @@ const GroupLayerSystemPage = () => {
           <Col span={24}>
             <div className="table-responsive">
               <Table
+                loading={loading}
                 columns={columns}
                 dataSource={data}
                 pagination={{
