@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
 import Head from "next/head";
 import System from "../../../../components/_App/System";
-import { RedoOutlined } from "@ant-design/icons";
-import { Table, Modal, Input, Row, Col, Button, Form } from "antd";
+import { RedoOutlined, UploadOutlined } from "@ant-design/icons";
+import { Table, Modal, Input, Row, Col, Button, Form, Upload } from "antd";
 import Api from "../../../../util/Api";
 const { Search } = Input;
 
@@ -66,6 +66,15 @@ const GroupLayerSystemPage = () => {
       setData(data.data.items);
     });
   };
+  
+  const normFile = (e) => {
+    console.log('Upload event:', e);
+    if (Array.isArray(e)) {
+      return e;
+    }
+    return e && e.fileList;
+  };
+
   useEffect(() => {
     reload();
   }, []);
@@ -76,9 +85,17 @@ const GroupLayerSystemPage = () => {
         <title>จัดการ Group Layer</title>
       </Head>
       <System>
-        <Row gutter={[10, 10]} style={{ background: "white", padding: "16px", boxShadow: " rgba(0, 0, 0, 0.12) 0px 1px 3px, rgba(0, 0, 0, 0.24) 0px 1px 2px" }}>
+        <Row
+          gutter={[10, 10]}
+          style={{
+            background: "white",
+            padding: "16px",
+            boxShadow:
+              " rgba(0, 0, 0, 0.12) 0px 1px 3px, rgba(0, 0, 0, 0.24) 0px 1px 2px",
+          }}
+        >
           <Col span={24}>
-            <h3>จัดการผู้ใช้งานระบบ</h3>
+            <h3 className="mb-4">จัดการผู้ใช้งานระบบ</h3>
           </Col>
           <Col span={5}>
             <Search placeholder="input search text" onSearch={search} />
@@ -92,8 +109,12 @@ const GroupLayerSystemPage = () => {
               <RedoOutlined />
             </Button>
           </Col>
-          <Col span={3} offset={11} >
-            <Button type="primary" onClick={showModal} style={{ float: "right" }}>
+          <Col span={3} offset={11}>
+            <Button
+              type="primary"
+              onClick={showModal}
+              style={{ float: "right" }}
+            >
               + เพิ่ม group
             </Button>
           </Col>
@@ -130,11 +151,20 @@ const GroupLayerSystemPage = () => {
           <Form.Item
             name="groupLayer"
             label="Group Layer"
-            rules={[
-              { required: true, message: "Please input your grouplayer!" },
-            ]}
+            rules={[{ required: true }]}
           >
-            <Input />
+            <Input placeholder="Group Layer" />
+          </Form.Item>
+          <Form.Item
+            name="symbol"
+            label="Symbol"
+            rules={[{ required: true }]}
+            extra="ขนาดที่ recommend 50x50 pixcel"
+            getValueFromEvent={normFile}
+          >
+            <Upload>
+              <Button icon={<UploadOutlined />}>Select File</Button>
+            </Upload>
           </Form.Item>
         </Form>
       </Modal>

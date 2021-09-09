@@ -103,7 +103,7 @@ const usersSystemPage = () => {
       <System>
         <Row gutter={[10, 10]} style={{ background: "white", padding: "16px",boxShadow:" rgba(0, 0, 0, 0.12) 0px 1px 3px, rgba(0, 0, 0, 0.24) 0px 1px 2px" }}>
           <Col span={24}>
-            <h3>จัดการผู้ใช้งานระบบ</h3>
+            <h3 className="mb-4">จัดการผู้ใช้งานระบบ</h3>
           </Col>
           <Col span={5}>
                 <Search placeholder="input search text" onSearch={search}/>
