@@ -72,7 +72,7 @@ const Navbar = ({ isMap, setslideNav, slideNav }) => {
 
                 {/* ระบบหลังบ้าน */}
                 {
-                    (user && user.roles_id === "8a97ac7b-01dc-4e06-81c2-8422dffa0ca2") ?
+                    (user && user.roles_id !== "0678bba5-a371-417f-9734-aec46b9579ad") ?
                         <Tooltip placement="bottom" title={"ระบบหลังบ้าน"}>
                             <li className="nav-item dropdown">
                                 <Link href={`/settings/dashboard/`} >
@@ -101,7 +101,7 @@ const Navbar = ({ isMap, setslideNav, slideNav }) => {
                 <a href="#" className="nav-link dropdown-toggle" data-toggle="dropdown" aria-expanded="false"><i className="fa fa-ellipsis-v" /></a>
                 <div className="dropdown-menu dropdown-menu-right">
                     {
-                        (user && user.roles_id === "8a97ac7b-01dc-4e06-81c2-8422dffa0ca2") ? (
+                        (user && user.roles_id !== "0678bba5-a371-417f-9734-aec46b9579ad") ? (
                             <>
                                 <Link href={`/`} >
                                     <a className="dropdown-item">แผนที่</a>
