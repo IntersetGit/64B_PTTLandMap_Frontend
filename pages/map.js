@@ -10,13 +10,15 @@ const mapPage = () => {
 
     useEffect(() => {
         const loader = new Loader({
-            apiKey: "AIzaSyArK9veHmyKP3QdYMPW1381JzFHqUwDg9U",
+            apiKey: process.env.NEXT_PUBLIC_GOOGLE_API_KEY,
             version: 'weekly',
         });
         let map;
         loader.load().then(() => {
             const google = window.google;
             map = new google.maps.Map(googlemap.current, {
+                mapTypeControl: false,
+                fullscreenControl: false,
                 center: { lat: 13.78, lng: 100.55 },
                 zoom: 8,
             });
@@ -49,6 +51,9 @@ const mapPage = () => {
             <div className="tools-group-layer">
                 <button className="btn btn-light btn-sm" onClick={() => setVisible(true)}><i className="fa fa-window-restore" /></button>
             </div>
+            <div className="tools-dashboard">
+                <button className="btn btn-light btn-sm" onClick={() => setVisible(true)}><i className="fa fa-dashboard" /></button>
+            </div>
 
             <div className="map-info-area">
                 <div className="map-info-detail">
@@ -65,28 +70,28 @@ const mapPage = () => {
 
             <div className="tools-map-area">
                 <Col span={6}>
-                    <button className="btn btn-light btn-sm"><img width="100%"src="/assets/images/search.png"/></button>
+                    <button className="btn btn-light btn-sm"><img width="100%" src="/assets/images/search.png" /></button>
                 </Col>
                 <Col span={6} className="pt-2">
-                    <button className="btn btn-light btn-sm"><img width="100%"src="/assets/images/home.png"/></button>
+                    <button className="btn btn-light btn-sm"><img width="100%" src="/assets/images/home.png" /></button>
                 </Col>
                 <Col span={6} className="pt-2">
-                    <button className="btn btn-light btn-sm"><img width="100%"src="/assets/images/Line.png"/></button>
+                    <button className="btn btn-light btn-sm"><img width="100%" src="/assets/images/Line.png" /></button>
                 </Col>
                 <Col span={6} className="pt-2">
-                    <button className="btn btn-light btn-sm"><img width="100%"src="/assets/images/-line_icon.png"/></button>
+                    <button className="btn btn-light btn-sm"><img width="100%" src="/assets/images/-line_icon.png" /></button>
                 </Col>
                 <Col span={6} className="pt-2">
-                    <button className="btn btn-light btn-sm"><img width="100%"src="/assets/images/polegon.png"/></button>
+                    <button className="btn btn-light btn-sm"><img width="100%" src="/assets/images/polegon.png" /></button>
                 </Col>
                 <Col span={6} className="pt-2">
-                    <button className="btn btn-light btn-sm"><img width="100%"src="/assets/images/arrow_back_time.png"/></button>
+                    <button className="btn btn-light btn-sm"><img width="100%" src="/assets/images/arrow_back_time.png" /></button>
                 </Col>
                 <Col span={6} className="pt-2">
-                    <button className="btn btn-light btn-sm"><img width="100%"src="/assets/images/cross.png"/></button>
+                    <button className="btn btn-light btn-sm"><img width="100%" src="/assets/images/cross.png" /></button>
                 </Col>
                 <Col span={6} className="pt-2">
-                    <button className="btn btn-light btn-sm"><img width="100%"src="/assets/images/arrows.png"/></button>
+                    <button className="btn btn-light btn-sm"><img width="100%" src="/assets/images/arrows.png" /></button>
                 </Col>
             </div>
 

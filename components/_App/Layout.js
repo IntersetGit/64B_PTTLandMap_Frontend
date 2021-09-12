@@ -12,7 +12,7 @@ import "moment/locale/th";
 
 function Layout({ children, isMap = false }) {
     const route = useRouter()
-    const [loader, setLoader] = useState(true);
+    const [loader, setLoader] = useState(false);
     const [slideNav, setslideNav] = useState("") //slide-nav
 
     useEffect(() => {
@@ -21,9 +21,9 @@ function Layout({ children, isMap = false }) {
         if (!token) route.push("/login")
     })
 
-    useEffect(() => {
-        setTimeout(() => setLoader(false), 500);
-    }, [])
+    // useEffect(() => {
+    //     setTimeout(() => setLoader(false), 500);
+    // }, [])
 
     return (
         <ConfigProvider locale={locale}>

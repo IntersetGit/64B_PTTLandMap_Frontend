@@ -3,6 +3,7 @@ import { delToken } from '../../redux/actions/userActions'
 import { useRouter } from 'next/dist/client/router';
 import { Tooltip } from 'antd';
 import Link from 'next/link';
+import { useEffect, useState } from "react";
 
 const Navbar = ({ isMap, setslideNav, slideNav }) => {
     const { user } = useSelector(({ user }) => user);
@@ -21,7 +22,7 @@ const Navbar = ({ isMap, setslideNav, slideNav }) => {
             <div className="header-left">
                 <Link href={`/`} >
                     <a className="logo">
-                        <img src="/assets/images/logo_PTT.png" width={100} />
+                        {!isMap ? <img src="/assets/images/logo_PTT.png" width={100} /> : <img src="/assets/images/logo_map_PTT.png" width={100} />}
                     </a>
                 </Link>
             </div>
@@ -34,12 +35,13 @@ const Navbar = ({ isMap, setslideNav, slideNav }) => {
                 </span>
             </a> : null}
 
-
-            <div className="page-title-box">
-                <Link href={`/`} >
-                    <a><h3><b>PTT Land Map</b></h3></a>
-                </Link>
-            </div>
+            {!isMap ? <a id="toggle_btn" href="javascript:void(0);">
+                <div className="page-title-box">
+                    <Link href={`/`} >
+                        <a><h3><b>PTT Land Map</b></h3></a>
+                    </Link>
+                </div>
+            </a> : null}
 
             {/* id="mobile_btn" */}
             <a className="mobile_btn" href="#sidebar" onClick={() => {
@@ -117,6 +119,25 @@ const Navbar = ({ isMap, setslideNav, slideNav }) => {
                 </div>
             </div>
 
+            <style global jsx>
+                {`
+                    .header {
+                        background: ${isMap ? '#5a7e8e' : '#fff'};
+                    } 
+
+                    .nav-item i {
+                        color: ${isMap ? '#fff' : '#00aeef'};
+                    }
+
+                    .user-menu.nav > li > a {
+                        color: ${isMap ? '#fff' : '#333'};
+                    }
+                        
+                `
+
+
+                }
+            </style>
         </div >
     )
 }
