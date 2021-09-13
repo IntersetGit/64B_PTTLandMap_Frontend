@@ -7,13 +7,13 @@ import { Table, Input, Row, Col, Button, Modal, Form, Select } from "antd";
 const { Search } = Input;
 const { Option } = Select;
 const usersSystemPage = () => {
-  const [loading, setLoading] = useState(true);
-  const [data, setData] = useState([]);
+  const [loading, setLoading] = useState(true); 
+  const [roles, setRoles] = useState([]);
+  const [data, setData] = useState([]); 
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(5);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [form] = Form.useForm();
-
   const columns = [
     {
       key: "1",
@@ -78,6 +78,9 @@ const usersSystemPage = () => {
             },
           ];
         });
+        Api.get("/system/getUser").then((data) => {
+          setRoles(data.data.items);
+        });
         setData(tempDataArray);
         setLoading(false);
       })
@@ -108,6 +111,7 @@ const usersSystemPage = () => {
   };
 
   const showModal = () => {
+    console.log(roles)
     setIsModalVisible(true);
   };
   const handleOk = () => {
@@ -119,16 +123,17 @@ const usersSystemPage = () => {
   };
   const onFinish = async (value) => {
     setLoading(true);
-    console.log(value);
-    Api.post("/system/addUserAD", { username:value.username,roles_id:value.roles_id })
+    Api.post("/system/addUserAD", {
+      username: value.username,
+      roles_id: value.roles_id,
+    })
       .then((data) => {
         setIsModalVisible(false);
         setLoading(false);
         reload();
       })
       .catch((error) => {
-        console.log(error);
-        alert("มีบางอย่างผิดพลาด หรือมีผู้ใช้ในระบบแล้ว")
+        alert("มีบางอย่างผิดพลาด หรือมีผู้ใช้ในระบบแล้ว");
         setIsModalVisible(false);
         setLoading(false);
       });
@@ -170,7 +175,7 @@ const usersSystemPage = () => {
               onClick={showModal}
               style={{ float: "right" }}
             >
-              + เพิ่ม user
+              + เพิ่มผู้ใช้ระบบ
             </Button>
           </Col>
           <Col span={24}>
@@ -211,10 +216,13 @@ const usersSystemPage = () => {
           >
             <Input placeholder="Username" />
           </Form.Item>
-          <Form.Item name="roles_id" label="Role" rules={[{ required: true }]}>
-            <Select placeholder="Role">
-              <Option value="8a97ac7b-01dc-4e06-81c2-8422dffa0ca2">Administrator</Option>
-             
+          <Form.Item name="roles_id" label="กลุ่มผู้ใช้งาน" rules={[{ required: true,message: 'กรุณากรอกข้อมูล กลุ่มผู้ใช้งาน' }]}>
+            <Select placeholder="กลุ่มผู้ใช้งาน">
+              {roles.map((data) => (
+                <Option value={data.id}>
+                  {data.roles_name}
+                </Option>
+              ))}
             </Select>
           </Form.Item>
         </Form>
