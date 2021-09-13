@@ -1988,10 +1988,10 @@ table.dataTable thead > tr > td.sorting {
 }
 .action-label > a {
 	display: inline-block;
-	min-width: 103px;
+	min-width: 100%;
 }
 .action-label .btn-sm {
-	padding: 4px;
+	padding: 0;
 }
 
 /*-----------------
@@ -7915,7 +7915,7 @@ ul.comment-list li ul.children {
 		height: unset;
 	}
 }
-@media only screen and (max-width: 575.98px) {
+@media only screen and (max-width: 849px) {
 	.contact-cat {
 		padding-right: 70px;
 	}
@@ -8064,5 +8064,8 @@ ul.comment-list li ul.children {
 	.add-btn {
 		font-size: 14px;
 		min-width: inherit;
+	}
+	.header {
+		z-index: 1;
 	}
 }
