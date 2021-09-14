@@ -121,6 +121,7 @@ const GroupLayerSystemPage = () => {
                 onChange: (page, pageSize) => {
                   setPage(page);
                   setPageSize(pageSize);
+
                 },
               }}
             />
@@ -149,8 +150,10 @@ const GroupLayerSystemPage = () => {
             <Input />
           </Form.Item>
         </Form>
+        
       </Modal>
     </>
+    
   );
 };
 
