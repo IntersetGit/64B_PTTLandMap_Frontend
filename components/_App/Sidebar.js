@@ -12,10 +12,14 @@ function Sidebar() {
                 <div id="sidebar-menu" className="sidebar-menu">
                     <ul>
                         <li className="menu-title">
-                            <span>Dashboard</span>
+                            <span>Report/Dashboard</span>
                         </li>
-
-                        <li className={activeHref(`/settings/dashboard/`)}>
+                        <li className={activeHref(`/settings/dashboard/report-summary/`)}>
+                            <Link href={`/settings/dashboard/report-summary/`} >
+                                <a><i className="la la-pie-chart pb-2" /> <span >รายงานการสรุปผล <br /><h5 className="pt-2">การดำเนินงาน</h5></span></a>
+                            </Link>
+                        </li>
+                        {/* <li className={activeHref(`/settings/dashboard/`)}>
                             <Link href={`/settings/dashboard/`} >
                                 <a><i className="la la-pie-chart pb-2" /> <span >กราฟแสดง การส่งมอบ <br /><h5 className="pt-2">พื้นที่โครงการ</h5></span></a>
                             </Link>
@@ -25,13 +29,7 @@ function Sidebar() {
                             <Link href={`/settings/dashboard/progress/`} >
                                 <a><i className="la la-area-chart pb-2" /> <span >Progress การส่งมอบ<h5 className="pt-2">พื้นที่โครงการ</h5></span></a>
                             </Link>
-                        </li>
-
-                        <li className={activeHref(`/settings/dashboard/export-excel/`)}>
-                            <Link href={`/settings/dashboard/export-excel/`} >
-                                <a><i className="la la-file-excel-o" /> <span >Export To Excel</span></a>
-                            </Link>
-                        </li>
+                        </li> */}
 
                         <li className="menu-title">
                             <span>จัดการข้อมูล</span>
@@ -39,19 +37,29 @@ function Sidebar() {
 
                         <li className={activeHref(`/settings/system/users/`)}>
                             <Link href={`/settings/system/users/`} >
-                                <a><i className="la la-user" /> <span>จัดการผู้ใช้ระบบ</span></a>
+                                <a><img src="/assets/images/icon/11.png" alt=""  width={25}/><span>จัดการผู้ใช้ระบบ</span></a>
                             </Link>
                         </li>
 
                         <li className={activeHref(`/settings/system/group-layer/`)}>
                             <Link href={`/settings/system/group-layer/`} >
-                                <a><i className="la la-object-group" /> <span>จัดการ Group Layer</span></a>
+                                <a><img src="/assets/images/icon/5.png" alt=""  width={25}/><span>จัดการ Group Layer</span></a>
                             </Link>
                         </li>
 
+                        <li className={activeHref(`/settings/system/control-gis-layer/`)}>
+                            <Link href={`/settings/system/control-gis-layer/`} >
+                                <a><img src="/assets/images/icon/4.png" alt=""  width={23}/> <span >จัดการ ข้อมูล GIS Layer</span></a>
+                            </Link>
+                        </li>
                         <li className={activeHref(`/settings/system/satellite-aerial-photographs/`)}>
                             <Link href={`/settings/system/satellite-aerial-photographs/`} >
-                                <a><i className="la la-map-o pb-2" /> <span >จัดการ ภาพถ่ายดาวเทียม<h5 className="pt-2">และภาพถ่ายทางอากาศ</h5></span></a>
+                                <a><img src="/assets/images/icon/7.png" alt="" width={25}  /> <span >จัดการ ภาพถ่ายดาวเทียม<h5 className="pt-2">และภาพถ่ายทางอากาศ</h5></span></a>
+                            </Link>
+                        </li>
+                        <li className={activeHref(`/settings/system/control-status-project/`)}>
+                            <Link href={`/settings/system/control-status-project/`} >
+                                <a><img src="/assets/images/icon/6.png" alt=""  width={24}/><span > จัดการ Status โครงการ</span></a>
                             </Link>
                         </li>
 

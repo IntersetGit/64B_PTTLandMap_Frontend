@@ -3,6 +3,7 @@ import { delToken } from '../../redux/actions/userActions'
 import { useRouter } from 'next/dist/client/router';
 import { Tooltip } from 'antd';
 import Link from 'next/link';
+import { useEffect, useState } from "react";
 
 const Navbar = ({ isMap, setslideNav, slideNav }) => {
     const { user } = useSelector(({ user }) => user);
@@ -21,25 +22,26 @@ const Navbar = ({ isMap, setslideNav, slideNav }) => {
             <div className="header-left">
                 <Link href={`/`} >
                     <a className="logo">
-                        <img src="/assets/images/logo_PTT.png" width={100} />
+                        {!isMap ? <img src="/assets/images/logo_PTT.png" width={100} /> : <img src="/assets/images/logo_map_PTT.png" width={100} />}
                     </a>
                 </Link>
             </div>
 
             {!isMap ? <a id="toggle_btn" href="javascript:void(0);">
-                <span className="bar-icon">
+                <span className="bar-icon ml-3">
                     <span />
                     <span />
                     <span />
                 </span>
             </a> : null}
 
-
-            <div className="page-title-box">
-                <Link href={`/`} >
-                    <a><h3><b>PTT Land Map</b></h3></a>
-                </Link>
-            </div>
+            {!isMap ? <a id="toggle_btn" href="javascript:void(0);">
+                <div className="page-title-box">
+                    <Link href={`/`} >
+                        <a><h3><b>PTT Land Map</b></h3></a>
+                    </Link>
+                </div>
+            </a> : null}
 
             {/* id="mobile_btn" */}
             <a className="mobile_btn" href="#sidebar" onClick={() => {
@@ -52,7 +54,7 @@ const Navbar = ({ isMap, setslideNav, slideNav }) => {
                     <li className="nav-item dropdown">
                         <Link href={`/`} >
                             <a className="dropdown-toggle nav-link" >
-                                <i className="fa fa-map" />
+                                <i className="fa fa-map" style={{background:"linear-gradient(141deg, #0fb8ad 0%, #1fc8db 51%, #2cb5e8 75%)",WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent"}} />
                             </a>
                         </Link>
                     </li>
@@ -61,8 +63,8 @@ const Navbar = ({ isMap, setslideNav, slideNav }) => {
                 <Tooltip placement="bottom" title={"คู่มือการใช้งาน"}>
                     <li className="nav-item dropdown">
 
-                        <a className="dropdown-toggle nav-link" >
-                            <i className="fa fa-book" />
+                        <a className="dropdown-toggle nav-link">
+                            <i className="fa fa-book" style={{background:"linear-gradient(141deg, #0fb8ad 0%, #1fc8db 51%, #2cb5e8 75%)",WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent"}}/>
                         </a>
 
                     </li>
@@ -70,12 +72,12 @@ const Navbar = ({ isMap, setslideNav, slideNav }) => {
 
                 {/* ระบบหลังบ้าน */}
                 {
-                    (user && user.roles_id === "8a97ac7b-01dc-4e06-81c2-8422dffa0ca2") ?
+                    (user && user.roles_id !== "0678bba5-a371-417f-9734-aec46b9579ad") ?
                         <Tooltip placement="bottom" title={"ระบบหลังบ้าน"}>
                             <li className="nav-item dropdown">
                                 <Link href={`/settings/dashboard/`} >
                                     <a className="dropdown-toggle nav-link" >
-                                        <i className="fa fa-cog" />
+                                        <i className="fa fa-cog" style={{background:"linear-gradient(141deg, #0fb8ad 0%, #1fc8db 51%, #2cb5e8 75%)",WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent"}}/>
                                     </a>
                                 </Link>
                             </li>
@@ -99,7 +101,7 @@ const Navbar = ({ isMap, setslideNav, slideNav }) => {
                 <a href="#" className="nav-link dropdown-toggle" data-toggle="dropdown" aria-expanded="false"><i className="fa fa-ellipsis-v" /></a>
                 <div className="dropdown-menu dropdown-menu-right">
                     {
-                        (user && user.roles_id === "8a97ac7b-01dc-4e06-81c2-8422dffa0ca2") ? (
+                        (user && user.roles_id !== "0678bba5-a371-417f-9734-aec46b9579ad") ? (
                             <>
                                 <Link href={`/`} >
                                     <a className="dropdown-item">แผนที่</a>
@@ -117,6 +119,25 @@ const Navbar = ({ isMap, setslideNav, slideNav }) => {
                 </div>
             </div>
 
+            <style global jsx>
+                {`
+                    .header {
+                        background: ${isMap ? '#5a7e8e' : '#fff'};
+                    } 
+
+                    .nav-item i {
+                        color: ${isMap ? '#fff' : '#00aeef'};
+                    }
+
+                    .user-menu.nav > li > a {
+                        color: ${isMap ? '#fff' : '#333'};
+                    }
+                        
+                `
+
+
+                }
+            </style>
         </div >
     )
 }
