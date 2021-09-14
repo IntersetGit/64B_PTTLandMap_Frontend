@@ -28,7 +28,7 @@ const Navbar = ({ isMap, setslideNav, slideNav }) => {
             </div>
 
             {!isMap ? <a id="toggle_btn" href="javascript:void(0);">
-                <span className="bar-icon">
+                <span className="bar-icon ml-3">
                     <span />
                     <span />
                     <span />
@@ -54,7 +54,7 @@ const Navbar = ({ isMap, setslideNav, slideNav }) => {
                     <li className="nav-item dropdown">
                         <Link href={`/`} >
                             <a className="dropdown-toggle nav-link" >
-                                <i className="fa fa-map" />
+                                <i className="fa fa-map" style={{background:"linear-gradient(141deg, #0fb8ad 0%, #1fc8db 51%, #2cb5e8 75%)",WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent"}} />
                             </a>
                         </Link>
                     </li>
@@ -63,8 +63,8 @@ const Navbar = ({ isMap, setslideNav, slideNav }) => {
                 <Tooltip placement="bottom" title={"คู่มือการใช้งาน"}>
                     <li className="nav-item dropdown">
 
-                        <a className="dropdown-toggle nav-link" >
-                            <i className="fa fa-book" />
+                        <a className="dropdown-toggle nav-link">
+                            <i className="fa fa-book" style={{background:"linear-gradient(141deg, #0fb8ad 0%, #1fc8db 51%, #2cb5e8 75%)",WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent"}}/>
                         </a>
 
                     </li>
@@ -77,7 +77,7 @@ const Navbar = ({ isMap, setslideNav, slideNav }) => {
                             <li className="nav-item dropdown">
                                 <Link href={`/settings/dashboard/`} >
                                     <a className="dropdown-toggle nav-link" >
-                                        <i className="fa fa-cog" />
+                                        <i className="fa fa-cog" style={{background:"linear-gradient(141deg, #0fb8ad 0%, #1fc8db 51%, #2cb5e8 75%)",WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent"}}/>
                                     </a>
                                 </Link>
                             </li>
