@@ -36,7 +36,11 @@ const logout = () => {
 const RefreshToken = async (refreshtokenval) => {
     try {
         if (refreshtokenval) {
-            const { data } = await axios.post(process.env.NEXT_PUBLIC_SERVICE + '/provider/refreshToken', { token: refreshtokenval })
+            const { data } = await axios({
+                method: "get",
+                url: `${process.env.NEXT_PUBLIC_SERVICE}/provider/refreshToken`,
+                headers: { Authorization: "Bearer " + refreshtokenval },
+            })
             const token = data.items
             cookies.set('token', token, { path: '/' });
             window.location.reload();

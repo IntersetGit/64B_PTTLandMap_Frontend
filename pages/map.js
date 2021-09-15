@@ -5,6 +5,8 @@ import { Drawer, Tabs, Col, Collapse, Checkbox, Row } from 'antd';
 import Head from 'next/head';
 import { useSelector } from 'react-redux';
 import { SketchPicker } from 'react-color';
+import { UnorderedListOutlined } from '@ant-design/icons';
+import API from '../util/Api'
 
 const { TabPane } = Tabs;
 const { Panel } = Collapse;
@@ -31,7 +33,7 @@ const mapPage = () => {
                 getLatLon(event)
             });
         });
-    });
+    }, []);
 
 
     const getLatLon = (event) => {
@@ -46,10 +48,37 @@ const mapPage = () => {
 
     /*  Shape File */
     const [visibleShapeFile, setVisibleShapeFile] = useState(false)
+    const [groupLayerList, setGroupLayerList] = useState([])
+
+    const openShapeFile = async () => {
+        try {
+            const { data } = await API.get(`/shp/getDataLayer`)
+            // console.log('data :>> ', data.items);
+            setGroupLayerList(data.items)
+            setVisibleShapeFile(true)
+        } catch (error) {
+
+        }
+    }
+
+    const handleChangeShapeFile = ({ rgb, hex }, index1, index2) => {
+        const arr = [...groupLayerList]
+        arr[index1].children[index2].color_layer = `rgb(${rgb.r},${rgb.g},${rgb.b},${rgb.a})`;
+        arr[index1].children[index2].rgb = rgb;
+        console.log('rgb :>> ', rgb);
+        setGroupLayerList(arr)
+    };
+
+    const openColor = (index1, index2) => {
+        const arr = [...groupLayerList]
+        arr[index1].children[index2].open = !arr[index1].children[index2].open;
+        setGroupLayerList(arr)
+    };
 
 
     /*  Dashboard */
     const [visibleDashboard, setVisibleDashboard] = useState(false)
+    const [input, setinput] = useState("ssss")
 
     /*  Search */
     const [visibleSearch, setVisibleSearch] = useState(false)
@@ -61,7 +90,7 @@ const mapPage = () => {
             </Head>
 
             <div className="tools-group-layer">
-                <button className="btn btn-light btn-sm" onClick={() => setVisibleShapeFile(true)}><i className="fa fa-window-restore" /></button>
+                <button className="btn btn-light btn-sm" onClick={openShapeFile}><i className="fa fa-window-restore" /></button>
             </div>
             <div className="tools-dashboard">
                 <button className="btn btn-light btn-sm" onClick={() => setVisibleDashboard(true)}><i className="fa fa-dashboard" /></button>
@@ -120,19 +149,51 @@ const mapPage = () => {
                 <Tabs>
                     <TabPane tab="ชั้นข้อมูล" key="1" >
                         <Collapse ghost>
-                            <Panel header="แปลงที่ดิน" key="1">
-                                <div className="pt-2">
-                                    <Row>
-                                        <Col>
-                                            <Checkbox>ลำดับแปลงที่ดิน</Checkbox>
-                                        </Col>
-                                        <Col>
-                                            <SketchPicker />
-                                        </Col>
-                                    </Row>
 
-                                </div>
-                            </Panel>
+                            {groupLayerList.map((e, i) => Object.assign(
+                                <Panel header={e.group_name} key={i}>
+                                    {e.children ? e.children.map((x, index) => Object.assign(
+                                        <div className="pt-2" key={e.id}>
+                                            <Row>
+                                                <Col xs={18}>
+                                                    <Checkbox>{x.name_layer}</Checkbox>
+                                                </Col>
+                                                <Col xs={3}>
+                                                    <a><UnorderedListOutlined /></a>
+                                                </Col>
+                                                <Col xs={3} style={{ paddingTop: 3 }}>
+                                                    <a onClick={() => openColor(i, index)}>
+                                                        <div style={
+                                                            {
+                                                                width: '36px',
+                                                                height: '20px',
+                                                                borderRadius: '2px',
+                                                                background: x.color_layer,
+                                                                border: '1px solid black'
+                                                            }
+                                                        } />
+                                                    </a>
+                                                    {x.open ? (
+                                                        <div div style={{
+                                                            position: 'fixed',
+                                                            zIndex: '2',
+                                                            textAlign: "end"
+                                                        }}>
+                                                            <SketchPicker color={!x.rgb ? x.color_layer : x.rgb} onChange={(value) => handleChangeShapeFile(value, i, index)} />
+                                                            <footer className="footer-color">
+                                                                <button className="btn btn-primary btn-sm">save</button>
+                                                            </footer>
+
+                                                        </div>
+                                                    ) : null}
+
+                                                </Col>
+                                            </Row>
+                                        </div>
+                                    )) : null}
+                                </Panel>
+                            ))}
+
 
                         </Collapse>
                     </TabPane>
@@ -157,7 +218,8 @@ const mapPage = () => {
             >
                 <p>Some contents...</p>
                 <p>Some contents...</p>
-                <p>Some contents...</p>
+                <p>{input}</p>
+                <input type="text" value={input} onChange={(e) => setinput(e.target.value)} />
             </Drawer>
 
             {/* Search */}
@@ -190,7 +252,7 @@ const mapPage = () => {
                 `
                 }
             </style>
-        </Layout>
+        </Layout >
     )
 }
 
