@@ -12,6 +12,7 @@ import {
   Form,
   Upload,
   message,
+  Dropdown,
 } from "antd";
 import Api from "../../../../util/Api";
 
@@ -50,6 +51,7 @@ const GroupLayerSystemPage = () => {
     Api.post("/masterdata/getmasLayers")
       .then((data) => {
         setData(data.data.items);
+        console.log(data)
       })
       .catch((error) => {
         console.log(error);
@@ -60,6 +62,7 @@ const GroupLayerSystemPage = () => {
     {
       title: "ลำดับ",
       dataIndex: "order_by",
+      width: 100,
       sorter: (record1, record2) => {
         return record1.order_by > record2.order_by;
       },
@@ -81,11 +84,16 @@ const GroupLayerSystemPage = () => {
     {
       title: "จัดการ",
       dataIndex: "id",
+      width: 150,
       render: (id) => {
-        return <MoreOutlined />;
+        return <MoreOutlined showDrop={(e)=>showDrop}/>;
       },
     },
   ];
+
+  const showDrop = async (items) => {
+    Dropdown("show" , items)
+  }
 
   const search = (value) => {
     Api.post("/masterdata/getmasLayers", { search: value }).then((data) => {
@@ -102,7 +110,7 @@ const GroupLayerSystemPage = () => {
         <title>จัดการ Group Layer</title>
       </Head>
       <System>
-        <Row gutter={[10, 10]} style={{ background: "white", padding: "16px" }}>
+        <Row gutter={[20, 20]} style={{ background: "white", padding: "50px" }}>
           <Col span={24}>
             <h3>จัดการ Group Layer</h3>
           </Col>
@@ -148,6 +156,7 @@ const GroupLayerSystemPage = () => {
       >
         <Form labelCol={{ span: 8 }}
               wrapperCol={{ span: 16 }}
+              colon={false}
           form={form}
           labelCol={{ span: 7 }}
           wrapperCol={{ span: 14 }}
@@ -164,7 +173,7 @@ const GroupLayerSystemPage = () => {
           </Form.Item>
           <Form.Item 
           name="Symbol"
-          label="Symbol"
+          label="Sybol"
           valuePropName="fileList"
           rules={[{ required: true }]}
           extra="ขนาดที่ recommend 50*50 pixcel"
