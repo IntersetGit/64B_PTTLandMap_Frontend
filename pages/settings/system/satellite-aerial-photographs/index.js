@@ -15,7 +15,16 @@ import { UploadOutlined } from "@ant-design/icons";
 const { Option } = Select;
 const SatelliteAerialPhotographsPage = () => {
   const onFinish = (value) => {
-    console.log(value["date-picker"].format("YYYY-MM-DD"));
+    const data = {
+      typeName:value.typename,
+      nameWms:value.nameWms,
+      url:value.url,
+      layerName:value.layerName,
+      upload:value.upload,
+      typeserver:value.typeserver,
+      date:value['date'].format("YYYY-MM-DD")
+    }
+    console.log(data);
   };
   const normFile = (e) => {
     console.log("Upload event:", e);
@@ -83,20 +92,20 @@ const SatelliteAerialPhotographsPage = () => {
                 rules={[{ required: true }]}
                 extra="ขนาดที่ recommend 80x80 pixcel"
               >
-                <Upload name="logo" action="/upload.do" listType="picture">
+                <Upload name="logo"  listType="picture">
                   <Button icon={<UploadOutlined />}>Select File</Button>
                 </Upload>
               </Form.Item>
               <Form.Item
-                name="radio-group"
+                name="typeserver"
                 label=" "
                 wrapperCol={{ span: 12 }}
                 rules={[{ required: true }]}
               >
                 <Radio.Group>
-                  <Radio value="a">ArcGIS Server</Radio>
-                  <Radio value="b">Image Server</Radio>
-                  <Radio value="c">Geoserver</Radio>
+                  <Radio value="arcgisserver">ArcGIS Server</Radio>
+                  <Radio value="imageserver">Image Server</Radio>
+                  <Radio value="geoserver">Geoserver</Radio>
                 </Radio.Group>
               </Form.Item>
               <Form.Item name="date" label="Date" rules={[{ required: true }]}>
