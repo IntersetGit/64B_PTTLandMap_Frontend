@@ -1,11 +1,11 @@
 import Layout from '../components/_App/Layout'
 import { useEffect, useRef, useState } from 'react';
 import { Loader } from '@googlemaps/js-api-loader';
-import { Drawer, Tabs, Col, Collapse, Checkbox, Row } from 'antd';
+import { Drawer, Tabs, Col, Collapse, Checkbox, Row, Card, Form, Input, Select, Upload, Button } from 'antd';
 import Head from 'next/head';
 import { useSelector } from 'react-redux';
 import { SketchPicker } from 'react-color';
-import { UnorderedListOutlined } from '@ant-design/icons';
+import { UnorderedListOutlined, UploadOutlined } from '@ant-design/icons';
 import API from '../util/Api'
 
 const { TabPane } = Tabs;
@@ -49,6 +49,56 @@ const mapPage = () => {
     /*  Shape File */
     const [visibleShapeFile, setVisibleShapeFile] = useState(false)
     const [groupLayerList, setGroupLayerList] = useState([])
+    const [FileList, setFileList] = useState([])
+    const [FileUpload, setFileUpload] = useState(null)
+    const [openColorUpload, setOpenColorUpload] = useState(false)
+    const [colorUpload, setColorUpload] = useState({
+        hex: "red",
+        rgb: "red",
+    })
+
+
+    const [formUpload] = Form.useForm();
+
+    const handleChange = (info) => {
+        let fileList = [...info.fileList];
+        // 1. Limit the number of uploaded files
+        // Only to show two recent uploaded files, and old ones will be replaced by the new
+        fileList = fileList.slice(-1);
+
+        if (fileList.length > 0) {
+            const infoFileList = fileList[0]
+            if (infoFileList.status === 'done') {
+                // Get this url from response in real world.
+                // console.log(`infoFileList.type`, infoFileList.originFileObj)
+                // const blob = new Blob([infoFileList.originFileObj], { type: infoFileList.type });
+                // const blobUrl = URL.createObjectURL(blob);
+                fileList = fileList.map(file => {
+                    // console.log('file file:>> ', file);
+                    if (file.response) {
+                        // Component will show file.url as link
+                        // file.url = blobUrl;
+                    }
+                    return file;
+                });
+            }
+        }
+
+        // console.log('fileList :>> ', fileList);
+        setFileList(fileList);
+        if (fileList.length > 0) setFileUpload(fileList[0]); else {
+            setFileUpload(null)
+        }
+
+    }
+
+    const onFinishUpload = (value) => {
+
+    }
+
+    const onFinishFailedUpload = (error) => {
+
+    }
 
     const openShapeFile = async () => {
         try {
@@ -65,7 +115,7 @@ const mapPage = () => {
         const arr = [...groupLayerList]
         arr[index1].children[index2].color_layer = `rgb(${rgb.r},${rgb.g},${rgb.b},${rgb.a})`;
         arr[index1].children[index2].rgb = rgb;
-        console.log('rgb :>> ', rgb);
+        // console.log('rgb :>> ', rgb);
         setGroupLayerList(arr)
     };
 
@@ -78,7 +128,7 @@ const mapPage = () => {
 
     /*  Dashboard */
     const [visibleDashboard, setVisibleDashboard] = useState(false)
-    const [input, setinput] = useState("ssss")
+
 
     /*  Search */
     const [visibleSearch, setVisibleSearch] = useState(false)
@@ -200,7 +250,78 @@ const mapPage = () => {
 
                     {(user && user.roles_id !== "0678bba5-a371-417f-9734-aec46b9579ad") ? (
                         <TabPane tab="Upload ชั้นข้อมูล" key="2">
-                            Content of Tab Pane 3
+                            <Card>
+                                <Form
+                                    form={formUpload}
+                                    labelCol={{ span: 7 }}
+                                    wrapperCol={{ span: 18 }}
+                                    onFinish={onFinishUpload}
+                                    onFinishFailed={onFinishFailedUpload}
+                                    autoComplete="off"
+                                    size={"small"}
+                                >
+                                    <Form.Item
+                                        label="ชั้นข้อมูล"
+                                        name="name"
+                                        rules={[{ required: true, message: 'Please input your name!' }]}
+                                    >
+                                        <Select>
+                                            <Option value="1">Lucy1</Option>
+                                            <Option value="2">Lucy2</Option>
+                                            <Option value="3">Lucy3</Option>
+                                        </Select>
+                                    </Form.Item>
+
+                                    <Form.Item
+                                        label="ชื่อ"
+                                        name="name"
+                                        rules={[{ required: true, message: 'Please input your name!' }]}
+                                    >
+                                        <Input />
+                                    </Form.Item>
+
+                                    <Form.Item label="เอกสาร/รูป" >
+                                        <Upload
+                                            onChange={handleChange}
+                                            fileList={FileList}
+                                            multiple={false}
+                                        >
+                                            <Button icon={<UploadOutlined />}>Upload</Button>
+                                        </Upload>
+                                    </Form.Item>
+
+                                    <Form.Item label="ประเภทไฟล์" >
+                                       Type
+                                    </Form.Item>
+
+                                    <Form.Item label="สีชั้นข้อมูล">
+                                        <a onClick={() => setOpenColorUpload(!openColorUpload)}>
+                                            <div style={
+                                                {
+                                                    width: '36px',
+                                                    height: '20px',
+                                                    borderRadius: '2px',
+                                                    background: colorUpload.hex,
+                                                    border: '1px solid black'
+                                                }
+                                            } />
+                                        </a>
+                                        {openColorUpload ? (
+                                            <div div style={{
+                                                position: 'fixed',
+                                                zIndex: '2',
+                                                textAlign: "end"
+                                            }}>
+                                                <SketchPicker color={colorUpload.rgb} onChange={({ rgb, hex }) => setColorUpload({ ...colorUpload, rgb, hex })} />
+                                                <footer className="footer-color">
+                                                    <button type="button" className="btn btn-primary btn-sm" onClick={() => setOpenColorUpload(!openColorUpload)}>save</button>
+                                                </footer>
+                                            </div>
+                                        ) : null}
+                                    </Form.Item>
+
+                                </Form>
+                            </Card>
                         </TabPane>
                     ) : null}
 
@@ -218,8 +339,6 @@ const mapPage = () => {
             >
                 <p>Some contents...</p>
                 <p>Some contents...</p>
-                <p>{input}</p>
-                <input type="text" value={input} onChange={(e) => setinput(e.target.value)} />
             </Drawer>
 
             {/* Search */}
