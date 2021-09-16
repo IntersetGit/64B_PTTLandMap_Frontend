@@ -1,12 +1,22 @@
 import { useState, useEffect } from "react";
 import Head from "next/head";
 import System from "../../../../components/_App/System";
-import {  MoreOutlined,RedoOutlined,UploadOutlined } from "@ant-design/icons";
-import { Table, Modal, Input, Row, Col, Button, Form,Upload,message } from "antd";
+import { MoreOutlined, RedoOutlined, UploadOutlined } from "@ant-design/icons";
+import {
+  Table,
+  Modal,
+  Input,
+  Row,
+  Col,
+  Button,
+  Form,
+  Upload,
+  message,
+  Dropdown,
+} from "antd";
 import Api from "../../../../util/Api";
 
 const { Search } = Input;
-
 
 const GroupLayerSystemPage = () => {
   const [page, setPage] = useState(1);
@@ -41,16 +51,18 @@ const GroupLayerSystemPage = () => {
     Api.post("/masterdata/getmasLayers")
       .then((data) => {
         setData(data.data.items);
+        console.log(data)
       })
       .catch((error) => {
         console.log(error);
       });
   };
-      
+
   const columns = [
     {
       title: "ลำดับ",
       dataIndex: "order_by",
+      width: 100,
       sorter: (record1, record2) => {
         return record1.order_by > record2.order_by;
       },
@@ -72,11 +84,16 @@ const GroupLayerSystemPage = () => {
     {
       title: "จัดการ",
       dataIndex: "id",
+      width: 150,
       render: (id) => {
-        return <MoreOutlined />;
+        return <MoreOutlined showDrop={(e)=>showDrop}/>;
       },
     },
   ];
+
+  const showDrop = async (items) => {
+    Dropdown("show" , items)
+  }
 
   const search = (value) => {
     Api.post("/masterdata/getmasLayers", { search: value }).then((data) => {
@@ -87,15 +104,13 @@ const GroupLayerSystemPage = () => {
     reload();
   }, []);
 
-  
-
   return (
     <>
       <Head>
         <title>จัดการ Group Layer</title>
       </Head>
       <System>
-        <Row gutter={[10, 10]} style={{ background: "white", padding: "16px" }}>
+        <Row gutter={[20, 20]} style={{ background: "white", padding: "50px" }}>
           <Col span={24}>
             <h3>จัดการ Group Layer</h3>
           </Col>
@@ -139,7 +154,9 @@ const GroupLayerSystemPage = () => {
         onOk={handleOk}
         onCancel={handleCancel}
       >
-        <Form
+        <Form labelCol={{ span: 8 }}
+              wrapperCol={{ span: 16 }}
+              colon={false}
           form={form}
           labelCol={{ span: 7 }}
           wrapperCol={{ span: 14 }}
@@ -152,24 +169,22 @@ const GroupLayerSystemPage = () => {
               { required: true, message: "Please input your grouplayer!" },
             ]}
           >
-            
             <Input />
           </Form.Item>
+          <Form.Item 
+          name="Symbol"
+          label="Sybol"
+          valuePropName="fileList"
+          rules={[{ required: true }]}
+          extra="ขนาดที่ recommend 50*50 pixcel"
+        >  
+          <Upload name="logo" action="/upload.do" listType="picture">
+            <Button icon={<UploadOutlined />}>Select File</Button>
+          </Upload>
+        </Form.Item>
         </Form>
-        <Form.Item
-                name="Symbol"
-                label="Symbol"
-                valuePropName="fileList"
-                rules={[{ required: true }]}
-                extra="ขนาดที่ recommend 50*50 pixcel"
-              >
-                <Upload name="logo" action="/upload.do" listType="picture">
-                  <Button icon={<UploadOutlined />}>Select File</Button>
-                </Upload>
-              </Form.Item>
       </Modal>
     </>
-    
   );
 };
 
