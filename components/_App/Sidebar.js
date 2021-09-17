@@ -16,7 +16,7 @@ function Sidebar() {
                         </li>
                         <li className={activeHref(`/settings/dashboard/report-summary/`)}>
                             <Link href={`/settings/dashboard/report-summary/`} >
-                                <a><img src="/assets/images/icon/4.png" className=" pb-2" alt=""  width={23}/> <span >รายงานการสรุปผล <br /><h5 className="pt-2">การดำเนินงาน</h5></span></a>
+                                <a><img src="/assets/images/icon/8.png" className=" pb-2" alt=""  width={23}/> <span >รายงานการสรุปผล <br /><h5 className="pt-2">การดำเนินงาน</h5></span></a>
                             </Link>
                         </li>
                         {/* <li className={activeHref(`/settings/dashboard/`)}>

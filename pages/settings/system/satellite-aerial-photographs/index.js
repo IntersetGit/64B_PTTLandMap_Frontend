@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import Head from "next/head";
 import System from "../../../../components/_App/System";
 import {
@@ -10,29 +11,124 @@ import {
   DatePicker,
   Select,
   Upload,
+  Table,
+  Modal,
 } from "antd";
-import { UploadOutlined } from "@ant-design/icons";
+import Api from "../../../../util/Api";
+import { UploadOutlined, RedoOutlined } from "@ant-design/icons";
 const { Option } = Select;
+const { Search } = Input;
 const SatelliteAerialPhotographsPage = () => {
-  const onFinish = (value) => {
+  const [loading, setLoading] = useState(true);
+  const [data, setData] = useState([]);
+  const [typePhoto, setTypePhoto] = useState([]);
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(5);
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [form] = Form.useForm();
+  const [test,setTest]=useState('asfasfsa')
+  const columns = [
+    {
+      key: "1",
+      title: "ลำดับ",
+      dataIndex: "number",
+      sorter: (record1, record2) => {
+        return record1.number > record2.number;
+      },
+    },
+    {
+      key: "2",
+      title: "layer_name",
+      dataIndex: "layer_name",
+      sorter: (record1, record2) => {
+        return record1.user_name > record2.user_name;
+      },
+    },
+    {
+      key: "3",
+      title: "wms",
+      dataIndex: "wms",
+      sorter: (record1, record2) => {
+        return record1.firstlast > record2.firstlast;
+      },
+    },
+    {
+      key: "4",
+      title: "url",
+      dataIndex: "url",
+      sorter: (record1, record2) => {
+        return record1.e_mail > record2.e_mail;
+      },
+    },
+    {
+      key: "5",
+      title: "wms_url",
+      dataIndex: "wms_url",
+      sorter: (record1, record2) => {
+        return record1.roles_name > record2.roles_name;
+      },
+    },
+    {
+      key: "6",
+      title: "type_server",
+      dataIndex: "type_server",
+      render: (id) => {
+        return <MoreOutlined />;
+      },
+      responsive: ["md"],
+    },
+  ];
+  const showModal = () => {
+    setIsModalVisible(true);
+  };
+  const handleOk = () => {
+    form.submit();
+  };
+  const handleCancel = () => {
+    setIsModalVisible(false);
+    form.resetFields();
+  };
+  const onFinish = async(value) => {
+    const fs = new FormData()
     const data = {
-      typeName:value.typename,
-      nameWms:value.nameWms,
-      url:value.url,
-      layerName:value.layerName,
-      upload:value.upload,
-      typeserver:value.typeserver,
-      date:value['date'].format("YYYY-MM-DD")
+      typeName: value.typename,
+      nameWms: value.nameWms,
+      url: value.url,
+      layerName: value.layerName,
+      typeserver: value.typeserver,
+      wms_url:value.wms_url,
+      upload:value.upload[0],
+      date: value["date"].format("YYYY-MM-DD"),
+    };
+    fs.append("test",test)
+    console.log(fs)
+    try {
+      const resp = await Api.post("/masterdata/datLayers",data)
+      console.log(resp.data)
+    } catch (error) {
+      console.log(error)
+      alert(error)
     }
-    console.log(data);
+    
+  };
+  const reload = async () => {
+    try {
+      const resTypePhoto = await Api.post("/masterdata/getmasLayers");
+      setTypePhoto(resTypePhoto.data.items);
+    } catch (error) {
+      console.log(error);
+    }
   };
   const normFile = (e) => {
-    console.log("Upload event:", e);
+    console.log('Upload event:', e);
     if (Array.isArray(e)) {
       return e;
     }
     return e && e.fileList;
   };
+  useEffect(() => {
+    reload();
+  }, []);
   return (
     <>
       <Head>
@@ -50,75 +146,120 @@ const SatelliteAerialPhotographsPage = () => {
         >
           <Col span={24}>
             <h3>จัดการ ภาพถ่ายดาวเทียม และภาพถ่ายทางอากาศ</h3>
-            <Form
-              onFinish={onFinish}
-              labelCol={{ span: 8 }}
-              wrapperCol={{ span: 6 }}
-              className="mt-5"
+          </Col>
+          <Col span={5}>
+            <Search placeholder="input search text" />
+          </Col>
+          <Col span={5}>
+            <Button>
+              <RedoOutlined />
+            </Button>
+          </Col>
+          <Col span={3} offset={11}>
+            <Button
+              type="primary"
+              style={{ float: "right" }}
+              onClick={showModal}
             >
-              <Form.Item
-                name="typename"
-                label="ประเภทของภาพ"
-                hasFeedback
-                rules={[{ required: true }]}
-              >
-                <Select placeholder="ประเภทของภาพ">
-                  <Option value="china">ภาพถ่ายดาวเทียม</Option>
-                  <Option value="usa">ภาพถ่ายจากโดรน</Option>
-                </Select>
-              </Form.Item>
-              <Form.Item
-                name="nameWms"
-                label="ชื่อข้อมูล (WMS)"
-                rules={[{ required: true }]}
-              >
-                <Input placeholder="ชื่อข้อมูล (WMS)" />
-              </Form.Item>
-              <Form.Item name="url" label="Url" rules={[{ required: true }]}>
-                <Input placeholder="Url" />
-              </Form.Item>
-              <Form.Item
-                name="layerName"
-                label="Layer Name"
-                rules={[{ required: true }]}
-              >
-                <Input placeholder="Layer Name" />
-              </Form.Item>
-              <Form.Item
-                name="upload"
-                label="Upload"
-                valuePropName="fileList"
-                getValueFromEvent={normFile}
-                rules={[{ required: true }]}
-                extra="ขนาดที่ recommend 80x80 pixcel"
-              >
-                <Upload name="logo"  listType="picture">
-                  <Button icon={<UploadOutlined />}>Select File</Button>
-                </Upload>
-              </Form.Item>
-              <Form.Item
-                name="typeserver"
-                label=" "
-                wrapperCol={{ span: 12 }}
-                rules={[{ required: true }]}
-              >
-                <Radio.Group>
-                  <Radio value="arcgisserver">ArcGIS Server</Radio>
-                  <Radio value="imageserver">Image Server</Radio>
-                  <Radio value="geoserver">Geoserver</Radio>
-                </Radio.Group>
-              </Form.Item>
-              <Form.Item name="date" label="Date" rules={[{ required: true }]}>
-                <DatePicker />
-              </Form.Item>
-              <Form.Item wrapperCol={{ offset: 8, span: 16 }}>
-                <Button type="primary" htmlType="submit">
-                  Submit
-                </Button>
-              </Form.Item>
-            </Form>
+              + เพิ่มภาพถ่าย
+            </Button>
+          </Col>
+          <Col span={24}>
+            <Table
+              loading={loading}
+              columns={columns}
+              dataSource={data}
+              pagination={{
+                current: page,
+                pageSize: pageSize,
+                onChange: (page, pageSize) => {
+                  setPage(page);
+                  setPageSize(pageSize);
+                },
+              }}
+            />
           </Col>
         </Row>
+
+
+
+
+
+
+
+        <Modal
+          title="เพิ่มผู้ใช้ระบบ"
+          visible={isModalVisible}
+          onOk={handleOk}
+          onCancel={handleCancel}
+          centered
+        >
+          <Form
+            form={form}
+            labelCol={{ span: 7 }}
+            wrapperCol={{ span: 14 }}
+            onFinish={onFinish}
+          >
+            <Form.Item
+              name="typename"
+              label="ประเภทของภาพ"
+              rules={[{ required: true }]}
+            >
+              <Select placeholder="ประเภทของภาพ">
+                {
+                  typePhoto.map(data=><Option value={data.id}>{data.group_name}</Option>)
+                }
+              </Select>
+            </Form.Item>
+            <Form.Item
+              name="nameWms"
+              label="ชื่อข้อมูล (WMS)"
+              rules={[{ required: true }]}
+            >
+              <Input placeholder="ชื่อข้อมูล (WMS)" />
+            </Form.Item>
+            <Form.Item name="url" label="Url" rules={[{ required: true }]}>
+              <Input placeholder="Url" />
+            </Form.Item>
+            <Form.Item name="wms_url" label="wms_url" rules={[{ required: true }]}>
+              <Input placeholder="wms_url" />
+            </Form.Item>
+            <Form.Item
+              name="layerName"
+              label="Layer Name"
+              rules={[{ required: true }]}
+            >
+              <Input placeholder="Layer Name" />
+            </Form.Item>
+            <Form.Item
+              name="upload"
+              label="Upload"
+              rules={[{ required: true }]}
+              extra="ขนาดที่ recommend 80x80 pixcel"
+              getValueFromEvent={normFile}
+              
+            >
+              <Upload name="logo"  maxCount={1} >
+                <Button icon={<UploadOutlined />}>Select File</Button>
+              </Upload>
+            </Form.Item>
+            <Form.Item
+              name="typeserver"
+              label=" "
+              wrapperCol={{ span: 12 }}
+              rules={[{ required: true }]}
+            >
+              <Radio.Group>
+                <Radio value="arcgisserver">ArcGIS Server</Radio>
+                <Radio value="imageserver">Image Server</Radio>
+                <Radio value="geoserver">Geoserver</Radio>
+              </Radio.Group>
+            </Form.Item>
+            <Form.Item name="date" label="Date" rules={[{ required: true }]}>
+              <DatePicker />
+            </Form.Item>
+          </Form>
+        </Modal>
       </System>
     </>
   );
