@@ -149,7 +149,6 @@ const mapPage = () => {
             <div className="map-info-area">
                 <div className="map-info-detail">
                     <span>Lat/Long <span id="latLong" /> UTM <span id="utm" /></span>
-
                 </div>
             </div>
 
@@ -160,9 +159,14 @@ const mapPage = () => {
             </div>
 
             <div className="tools-map-area">
-                <Col span={6}>
-                    <button className="btn btn-light btn-sm" onClick={() => setVisibleDashboard(true)}><img width="100%" src="/assets/images/search.png" /></button>
-                </Col>
+                
+                {/* Administrator And Editor */}
+                {(user && user.roles_id === "8a97ac7b-01dc-4e06-81c2-8422dffa0ca2" || user.roles_id === "cec6617f-b593-4ebc-9604-3059dfee0ac4") ? (
+                    <Col span={6}>
+                        <button className="btn btn-light btn-sm" onClick={() => setVisibleDashboard(true)}><img width="100%" src="/assets/images/search.png" /></button>
+                    </Col>
+                ) : null}
+
                 <Col span={6} className="pt-2">
                     <button className="btn btn-light btn-sm"><img width="100%" src="/assets/images/home.png" /></button>
                 </Col>
@@ -248,7 +252,8 @@ const mapPage = () => {
                         </Collapse>
                     </TabPane>
 
-                    {(user && user.roles_id !== "0678bba5-a371-417f-9734-aec46b9579ad") ? (
+                    {/* Administrator And Editor */}
+                    {(user && user.roles_id === "8a97ac7b-01dc-4e06-81c2-8422dffa0ca2" || user.roles_id === "cec6617f-b593-4ebc-9604-3059dfee0ac4") ? (
                         <TabPane tab="Upload ชั้นข้อมูล" key="2">
                             <Card>
                                 <Form
@@ -291,7 +296,7 @@ const mapPage = () => {
                                     </Form.Item>
 
                                     <Form.Item label="ประเภทไฟล์" >
-                                       Type
+                                        Type
                                     </Form.Item>
 
                                     <Form.Item label="สีชั้นข้อมูล">
