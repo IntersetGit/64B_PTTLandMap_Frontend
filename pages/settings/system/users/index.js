@@ -155,6 +155,7 @@ const usersSystemPage = () => {
         setIsModalVisible(false);
         setLoading(false);
         reload();
+        form.resetFields();
       })
       .catch((error) => {
         alert("มีบางอย่างผิดพลาด หรือมีผู้ใช้ในระบบแล้ว");

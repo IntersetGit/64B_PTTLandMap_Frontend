@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import Head from "next/head";
 import System from "../../../../components/_App/System";
+import { MoreOutlined } from "@ant-design/icons";
 import {
   Col,
   Row,
@@ -13,6 +14,8 @@ import {
   Upload,
   Table,
   Modal,
+  Dropdown,
+  Menu,
 } from "antd";
 import Api from "../../../../util/Api";
 import { UploadOutlined, RedoOutlined } from "@ant-design/icons";
@@ -26,7 +29,6 @@ const SatelliteAerialPhotographsPage = () => {
   const [pageSize, setPageSize] = useState(5);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [form] = Form.useForm();
-  const [test,setTest]=useState('asfasfsa')
   const columns = [
     {
       key: "1",
@@ -72,10 +74,48 @@ const SatelliteAerialPhotographsPage = () => {
       key: "6",
       title: "type_server",
       dataIndex: "type_server",
-      render: (id) => {
-        return <MoreOutlined />;
+      sorter: (record1, record2) => {
+        return record1.roles_name > record2.roles_name;
       },
-      responsive: ["md"],
+    },
+    {
+      key: "7",
+      title: "date",
+      dataIndex: "date",
+      sorter: (record1, record2) => {
+        return record1.roles_name > record2.roles_name;
+      },
+    },
+    {
+      key: "8",
+      title: "config",
+      dataIndex: "id",
+      render: (id) => {
+        return (
+          <Dropdown
+            overlay={
+              <Menu>
+                <Menu.Item key="1" onClick={() => editHandle(id)}>
+                  แก้ไข
+                </Menu.Item>
+                <Menu.Item
+                  key="2"
+                  onClick={() => {
+                    deleteHandle(id);
+                  }}
+                >
+                  ลบ
+                </Menu.Item>
+              </Menu>
+            }
+            placement="bottomLeft"
+            trigger={["click"]}
+            arrow
+          >
+            <MoreOutlined />
+          </Dropdown>
+        );
+      },
     },
   ];
   const showModal = () => {
@@ -88,47 +128,76 @@ const SatelliteAerialPhotographsPage = () => {
     setIsModalVisible(false);
     form.resetFields();
   };
-  const onFinish = async(value) => {
-    const fs = new FormData()
+  const onFinish = (value) => {
+    setLoading(true);
     const data = {
-      typeName: value.typename,
-      nameWms: value.nameWms,
+      group_layer_id: value.typename,
+      wms: value.nameWms,
       url: value.url,
-      layerName: value.layerName,
-      typeserver: value.typeserver,
-      wms_url:value.wms_url,
-      upload:value.upload[0],
+      layer_name: value.layerName,
+      type_server: value.typeserver,
+      wms_url: value.wms_url,
+      // upload: value.upload[0],
       date: value["date"].format("YYYY-MM-DD"),
     };
-    fs.append("test",test)
-    console.log(fs)
-    try {
-      const resp = await Api.post("/masterdata/datLayers",data)
-      console.log(resp.data)
-    } catch (error) {
-      console.log(error)
-      alert(error)
-    }
-    
+    Api.post("/masterdata/datLayers", data)
+      .then((data) => {
+        setIsModalVisible(false);
+        setLoading(false);
+        reload();
+        form.resetFields();
+      })
+      .catch((error) => console.log(error));
+  };
+
+  const search = async (value) => {
+    alert("ยังไม่ได้ทำ");
   };
   const reload = async () => {
     try {
       const resTypePhoto = await Api.post("/masterdata/getmasLayers");
       setTypePhoto(resTypePhoto.data.items);
+      const respData = await Api.get("/masterdata/datLayers");
+      let tempDataArray = [];
+      respData.data.items.forEach((data, key) => {
+        tempDataArray = [
+          ...tempDataArray,
+          {
+            number: key + 1,
+            ...data,
+          },
+        ];
+      });
+      setData(tempDataArray);
+      setLoading(false);
     } catch (error) {
       console.log(error);
     }
   };
   const normFile = (e) => {
-    console.log('Upload event:', e);
+    console.log("Upload event:", e);
     if (Array.isArray(e)) {
       return e;
     }
     return e && e.fileList;
   };
+
+  const deleteHandle = (id) => {
+    if (confirm("คุณแน่ใจหรือไม่ว่าต้องการลบข้อมูล")) {
+      Api.delete("/masterdata/datLayers", { data: { id: id } })
+        .then((data) => {
+          alert("ลบข้อมูลเรียบร้อย");
+          setLoading();
+        })
+        .catch((error) => alert("มีบางอย่างผิดพลาด ไม่สามารถลบข้อมูลได้"));
+    }
+  };
+  const editHandle = () => {
+    alert("ยังไม่ได้ทำ");
+  };
   useEffect(() => {
     reload();
-  }, []);
+  }, loading);
   return (
     <>
       <Head>
@@ -148,10 +217,10 @@ const SatelliteAerialPhotographsPage = () => {
             <h3>จัดการ ภาพถ่ายดาวเทียม และภาพถ่ายทางอากาศ</h3>
           </Col>
           <Col span={5}>
-            <Search placeholder="input search text" />
+            <Search placeholder="input search text" onSearch={search} />
           </Col>
           <Col span={5}>
-            <Button>
+            <Button onClick={() => reload()}>
               <RedoOutlined />
             </Button>
           </Col>
@@ -181,12 +250,6 @@ const SatelliteAerialPhotographsPage = () => {
           </Col>
         </Row>
 
-
-
-
-
-
-
         <Modal
           title="เพิ่มผู้ใช้ระบบ"
           visible={isModalVisible}
@@ -206,9 +269,9 @@ const SatelliteAerialPhotographsPage = () => {
               rules={[{ required: true }]}
             >
               <Select placeholder="ประเภทของภาพ">
-                {
-                  typePhoto.map(data=><Option value={data.id}>{data.group_name}</Option>)
-                }
+                {typePhoto.map((data) => (
+                  <Option value={data.id}>{data.group_name}</Option>
+                ))}
               </Select>
             </Form.Item>
             <Form.Item
@@ -221,7 +284,11 @@ const SatelliteAerialPhotographsPage = () => {
             <Form.Item name="url" label="Url" rules={[{ required: true }]}>
               <Input placeholder="Url" />
             </Form.Item>
-            <Form.Item name="wms_url" label="wms_url" rules={[{ required: true }]}>
+            <Form.Item
+              name="wms_url"
+              label="wms_url"
+              rules={[{ required: true }]}
+            >
               <Input placeholder="wms_url" />
             </Form.Item>
             <Form.Item
@@ -237,9 +304,8 @@ const SatelliteAerialPhotographsPage = () => {
               rules={[{ required: true }]}
               extra="ขนาดที่ recommend 80x80 pixcel"
               getValueFromEvent={normFile}
-              
             >
-              <Upload name="logo"  maxCount={1} >
+              <Upload name="logo" maxCount={1}>
                 <Button icon={<UploadOutlined />}>Select File</Button>
               </Upload>
             </Form.Item>
