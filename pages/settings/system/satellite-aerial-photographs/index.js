@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import Head from "next/head";
 import System from "../../../../components/_App/System";
+import moment from 'moment';
 import { MoreOutlined } from "@ant-design/icons";
 import {
   Col,
@@ -24,11 +25,14 @@ const { Search } = Input;
 const SatelliteAerialPhotographsPage = () => {
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState([]);
+  const [dataEdit, setDataEdit] = useState([]);
   const [typePhoto, setTypePhoto] = useState([]);
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(5);
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const [isModal2Visible, setIsModal2Visible] = useState(false);
   const [form] = Form.useForm();
+  const [form2] = Form.useForm();
   const columns = [
     {
       key: "1",
@@ -95,7 +99,7 @@ const SatelliteAerialPhotographsPage = () => {
           <Dropdown
             overlay={
               <Menu>
-                <Menu.Item key="1" onClick={() => editHandle(id)}>
+                <Menu.Item key="1" onClick={() => showModal2(id)}>
                   แก้ไข
                 </Menu.Item>
                 <Menu.Item
@@ -121,12 +125,28 @@ const SatelliteAerialPhotographsPage = () => {
   const showModal = () => {
     setIsModalVisible(true);
   };
+  const showModal2 =  async(id) => {
+    let filterData = await data.find((data) => data.id === id)
+    setDataEdit(filterData)
+    console.log(dataEdit)
+    setIsModal2Visible(true);
+  };
   const handleOk = () => {
     form.submit();
+  };
+  const handleOk2 = () => {
+    form2.submit();
+    alert("555");
+    console.log(form2);
   };
   const handleCancel = () => {
     setIsModalVisible(false);
     form.resetFields();
+  };
+  const handleCancel2 = () => {
+    setIsModal2Visible(false);
+    form2.resetFields();
+
   };
   const onFinish = (value) => {
     setLoading(true);
@@ -137,7 +157,7 @@ const SatelliteAerialPhotographsPage = () => {
       layer_name: value.layerName,
       type_server: value.typeserver,
       wms_url: value.wms_url,
-      // upload: value.upload[0],
+      upload: value.upload[0],
       date: value["date"].format("YYYY-MM-DD"),
     };
     Api.post("/masterdata/datLayers", data)
@@ -148,6 +168,28 @@ const SatelliteAerialPhotographsPage = () => {
         form.resetFields();
       })
       .catch((error) => console.log(error));
+  };
+  const onFinish2 = (value) => {
+    setLoading(true);
+    alert("rr");
+    // const data = {
+    //   group_layer_id: value.typename,
+    //   wms: value.nameWms,
+    //   url: value.url,
+    //   layer_name: value.layerName,
+    //   type_server: value.typeserver,
+    //   wms_url: value.wms_url,
+    //   upload: value.upload[0],
+    //   date: value["date"].format("YYYY-MM-DD"),
+    // };
+    // Api.post("/masterdata/datLayers", data)
+    //   .then((data) => {
+    //     setIsModalVisible(false);
+    //     setLoading(false);
+    //     reload();
+    //     form.resetFields();
+    //   })
+    //   .catch((error) => console.log(error));
   };
 
   const search = async (value) => {
@@ -169,6 +211,7 @@ const SatelliteAerialPhotographsPage = () => {
         ];
       });
       setData(tempDataArray);
+
       setLoading(false);
     } catch (error) {
       console.log(error);
@@ -192,9 +235,7 @@ const SatelliteAerialPhotographsPage = () => {
         .catch((error) => alert("มีบางอย่างผิดพลาด ไม่สามารถลบข้อมูลได้"));
     }
   };
-  const editHandle = () => {
-    alert("ยังไม่ได้ทำ");
-  };
+
   useEffect(() => {
     reload();
   }, loading);
@@ -251,7 +292,7 @@ const SatelliteAerialPhotographsPage = () => {
         </Row>
 
         <Modal
-          title="เพิ่มผู้ใช้ระบบ"
+          title="เพิ่มภาพถ่ายดาวเทียม และภาพถ่ายทางอากาศ"
           visible={isModalVisible}
           onOk={handleOk}
           onCancel={handleCancel}
@@ -323,6 +364,85 @@ const SatelliteAerialPhotographsPage = () => {
             </Form.Item>
             <Form.Item name="date" label="Date" rules={[{ required: true }]}>
               <DatePicker />
+            </Form.Item>
+          </Form>
+        </Modal>
+
+        <Modal
+          title="แก้ไข ภาพถ่ายดาวเทียม และภาพถ่ายทางอากาศ"
+          visible={isModal2Visible}
+          onOk={handleOk2}
+          onCancel={handleCancel2}
+          centered
+        >
+          <Form
+            form={form2}
+            labelCol={{ span: 7 }}
+            wrapperCol={{ span: 14 }}
+            onFinish={onFinish2}
+          >
+            
+            <Form.Item
+              name="typename"
+              label="ประเภทของภาพ"
+              rules={[{ required: true }]}
+            >
+              
+              <Select placeholder="ประเภทของภาพ" defaultValue={dataEdit.group_layer_id}>
+                {typePhoto.map((data) => (
+                  <Option value={data.id}>{data.group_name}</Option>
+                ))}
+              </Select>
+            </Form.Item>
+            <Form.Item
+              name="nameWms"
+              label="ชื่อข้อมูล (WMS)"
+              rules={[{ required: true }]}
+            >
+              <Input placeholder="ชื่อข้อมูล (WMS)" defaultValue={dataEdit.wms}/>
+            </Form.Item>
+            <Form.Item name="url" label="Url" rules={[{ required: true }]}>
+              <Input placeholder="Url" defaultValue={dataEdit.url}/>
+            </Form.Item>
+            <Form.Item
+              name="wms_url"
+              label="wms_url"
+              rules={[{ required: true }]}
+            >
+              <Input placeholder="wms_url" defaultValue={dataEdit.wms_url}/>
+            </Form.Item>
+            <Form.Item
+              name="layerName"
+              label="Layer Name"
+              rules={[{ required: true }]}
+            >
+              <Input placeholder="Layer Name" defaultValue={dataEdit.layer_name}/>
+            </Form.Item>
+            <Form.Item
+              name="upload"
+              label="Upload"
+              rules={[{ required: true }]}
+              extra="ขนาดที่ recommend 80x80 pixcel"
+              getValueFromEvent={normFile}
+            >
+              <Upload name="logo" maxCount={1}>
+                <Button icon={<UploadOutlined />}>Select File</Button>
+              </Upload>
+            </Form.Item>
+            <Form.Item
+              name="typeserver"
+              label=" "
+              wrapperCol={{ span: 12 }}
+              rules={[{ required: true }]}
+            >
+              <Radio.Group defaultValue={dataEdit.type_server}>
+                <Radio value="arcgisserver">ArcGIS Server</Radio>
+                <Radio value="imageserver">Image Server</Radio>
+                <Radio value="geoserver">Geoserver</Radio>
+              </Radio.Group>
+            </Form.Item>
+            <Form.Item name="date" label="Date" rules={[{ required: true }]}>
+              <DatePicker  defaultValue={moment(dataEdit.date)}/>
             </Form.Item>
           </Form>
         </Modal>
