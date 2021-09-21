@@ -1,62 +1,107 @@
 import { useState } from "react";
 import Head from "next/head";
 import System from "../../../../components/_App/System";
-import { Row, Col, Form, Input, InputNumber, Button, Upload, Radio, DatePicker, Space, Card } from "antd";
-import { UploadOutlined } from '@ant-design/icons';
+import { Row, Col, Table, Card, Button, Modal, Form, Input } from "antd";
+import { DeleteOutlined,ToolOutlined } from '@ant-design/icons';
+
 
 const layout = {
-  labelCol: {
-    span: 6,
-  },
-  labelAlign: 'left',
-  wrapperCol: {
-    span: 14,
-  },
+  labelCol: { span: 7 },
+  wrapperCol: { span: 18 },
 };
-
 
 const index = () => {
 
-  const props = {
-    action: 'https://www.mocky.io/v2/5cc8019d300000980a055e76',
-    listType: 'picture',
-    beforeUpload(file) {
-      return new Promise(resolve => {
-        const reader = new FileReader();
-        reader.readAsDataURL(file);
-        reader.onload = () => {
-          const img = document.createElement('img');
-          img.src = reader.result;
-          img.onload = () => {
-            const canvas = document.createElement('canvas');
-            canvas.width = img.naturalWidth;
-            canvas.height = img.naturalHeight;
-            const ctx = canvas.getContext('2d');
-            ctx.drawImage(img, 0, 0);
-            ctx.fillStyle = 'red';
-            ctx.textBaseline = 'middle';
-            ctx.font = '33px Arial';
-            ctx.fillText('Ant Design', 20, 20);
-            canvas.toBlob(resolve);
-          };
-        };
-      });
+  const [visible, setVisible] = useState(false);
+  const [confirmLoading, setConfirmLoading] = useState(false);
+  const [modalText, setModalText] = useState('Content of the modal');
+
+  const showModal = () => {
+    setVisible(true);
+  };
+
+  const handleOk = () => {
+    setModalText('The modal will be closed after two seconds');
+    setConfirmLoading(true);
+    setTimeout(() => {
+      setVisible(false);
+      setConfirmLoading(false);
+    }, 2000);
+  };
+
+  const handleCancel = () => {
+    console.log('Clicked cancel button');
+    setVisible(false);
+  };
+
+  const columns = [
+    {
+      title: 'ชื่อ GIS Layer',
+      dataIndex: 'name',
     },
-  };
+    {
+      title: 'กลุ่มของ Group Layer',
+      dataIndex: 'chinese',
+      sorter: {
+        compare: (a, b) => a.chinese - b.chinese,
+        multiple: 3,
+      },
+    },
+    {
+      title: 'สีของ Gis Layer',
+      dataIndex: 'math',
+      sorter: {
+        compare: (a, b) => a.math - b.math,
+        multiple: 2,
+      },
+    },
+    {
+      title: 'จัดการ',
+      dataIndex: 'english',
+      align:'center',
+      sorter: {
+        compare: (a, b) => a.english - b.english,
+        multiple: 1,
+      },
+      render: (id) => {
+        return <div><DeleteOutlined/> <ToolOutlined/></div>;
+      },
+    },
+  ];
 
-  const onFinish = (values) => {
-    console.log(values);
-  };
+  const data = [
+    {
+      key: '1',
+      name: 'John Brown',
+      chinese: 98,
+      math: 60,
+      english: 70,
+    },
+    {
+      key: '2',
+      name: 'Jim Green',
+      chinese: 98,
+      math: 66,
+      english: 89,
+    },
+    {
+      key: '3',
+      name: 'Joe Black',
+      chinese: 98,
+      math: 90,
+      english: 70,
+    },
+    {
+      key: '4',
+      name: 'Jim Red',
+      chinese: 88,
+      math: 99,
+      english: 89,
+    },
+  ];
 
-  const [value, setValue] = useState(1);
-
-  const onChange = e => {
-    console.log('radio checked', e.target.value);
-    setValue(e.target.value);
-  };
-
-  function onChange2(date, dateString) {
-    console.log(date, dateString);
+  function onChange(pagination, filters, sorter, extra) {
+    console.log('params', pagination, filters, sorter, extra);
   }
 
 
@@ -80,94 +125,39 @@ const index = () => {
             <h3 className="mb-4">จัดการ ภาพถ่ายดาวเทียมและภาพถ่ายทางอากาศ</h3>
           </Col>
 
-          <Col span={13}>
-            <Card style={{borderRadius:20}}>
-              <Form {...layout} name="nest-messages" onFinish={onFinish} colon={false} style={{marginLeft:'10%'}} >
-                <Form.Item
-                  name="type_image"
-                  label="ประเภทของภาพ"
-                  rules={[
-                    {
-                      required: true,
-                    },
-                  ]}
+          <Col span={24}>
+
+            <Card style={{ borderRadius: 20 }}>
+              <Col className="butto">
+                <Button type="primary" onClick={showModal} >เพิ่ม Layer</Button>
+                <Modal
+                  title="Title"
+                  visible={visible}
+                  onOk={handleOk}
+                  confirmLoading={confirmLoading}
+                  onCancel={handleCancel}
                 >
-                  <Input />
-                </Form.Item>
-                <Form.Item
-                  name="data_wms"
-                  label="ชื่อข้อมูล (WMS)"
-                  rules={[
-                    {
-                      required: true,
-                    },
-                  ]}
-                >
-                  <Input />
-                </Form.Item>
-                <Form.Item
-                  name="URL"
-                  label="URL"
-                  rules={[
-                    {
-                      required: true,
-                    },
-                  ]}
-                >
-                  <Input />
-                </Form.Item>
-                <Form.Item
-                  name="Layer_name"
-                  label="Layer Name"
-                  rules={[
-                    {
-                      required: true,
-                    },
-                  ]}
-                >
-                  <Input />
-                </Form.Item>
-                <Form.Item
-                  name="Picture"
-                  label="Picture"
-                  rules={[
-                    {
-                      required: true,
-                    },
-                  ]}
-                >
-                  <Upload {...props}>
-                    <Button icon={<UploadOutlined />}>Select File</Button>
-                  </Upload>
-                  <p style={{ marginTop: '4%', color: 'blue' }}> ขนาดที่ recommend 80x80 pixcel</p>
-                </Form.Item>
-                <Form.Item label="       "
-                  name="slect"
-                >
-                  <Radio.Group onChange={onChange} value={value}>
-                    <Radio value={1}>ArcGIS Server</Radio>
-                    <Radio value={2}>Image Server</Radio>
-                    <Radio value={3}>Geoserver</Radio>
-                  </Radio.Group>
-                </Form.Item>
-                <Form.Item label="Date"
-                  name="Date"
-                  rules={[
-                    {
-                      required: true,
-                    },
-                  ]}
-                >
-                  <Space direction="vertical">
-                    <DatePicker onChange={onChange2} />
-                  </Space>
-                </Form.Item>
-                <Form.Item wrapperCol={{ ...layout.wrapperCol, offset: 8 }}>
-                  <Button type="primary" htmlType="submit">
-                    Submit
-                  </Button>
-                </Form.Item>
-              </Form>
+                  <Form
+                    {...layout}
+                  >
+                    <Form.Item label="ชื่อ GIS Layer">
+                      <Input />
+                    </Form.Item>
+                    <Form.Item label="กลุ่มของ Group Layer">
+                      <Input />
+                    </Form.Item>
+                    <Form.Item label="สีของ Gis Layer">
+                      <Input type="color" style={{width:'20%'}} />
+                    </Form.Item>
+                  </Form>
+
+                </Modal>
+
+              </Col>
+
+              <Col>
+                <Table columns={columns} dataSource={data} onChange={onChange} />
+              </Col>
             </Card>
           </Col>
 
