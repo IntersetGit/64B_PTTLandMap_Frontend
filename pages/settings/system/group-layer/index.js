@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import Head from "next/head";
 import System from "../../../../components/_App/System";
-import { MoreOutlined, RedoOutlined, UploadOutlined } from "@ant-design/icons";
+import { MoreOutlined, RedoOutlined, UploadOutlined ,DeleteOutlined, ScissorOutlined } from "@ant-design/icons";
 import {
   Table,
   Modal,
@@ -13,10 +13,16 @@ import {
   Upload,
   message,
   Dropdown,
+  Select,
+  Menu,
+  Space,
+  Tooltip 
 } from "antd";
 import Api from "../../../../util/Api";
 
 const { Search } = Input;
+
+const { Option } = Select;
 
 const GroupLayerSystemPage = () => {
   const [page, setPage] = useState(1);
@@ -58,6 +64,26 @@ const GroupLayerSystemPage = () => {
       });
   };
 
+  const menu = (
+    <Menu >
+      <Menu.Item onClick={handleMenuClick1} key="1" icon={<DeleteOutlined />}>
+        ลบ
+      </Menu.Item>
+      <Menu.Item onClick={handleMenuClick2} key="2" icon={<ScissorOutlined />}>
+        แก้ไข
+      </Menu.Item>
+    </Menu>
+  );
+
+  function handleMenuClick1(e) {
+  message.warning('เมนู ลบ.');
+  console.log('click', e);
+}
+  function handleMenuClick2(e) {
+  message.info('เมนู แก้ไข.');
+  console.log('click', e);
+}
+
   const columns = [
     {
       title: "ลำดับ",
@@ -85,14 +111,17 @@ const GroupLayerSystemPage = () => {
       title: "จัดการ",
       dataIndex: "id",
       width: 150,
+      align: "center",
       render: (id) => {
-        return <MoreOutlined showDrop={(e)=>showDrop}/>;
+        // return <MoreOutlined />
+        return <Dropdown.Button  overlay={menu}  icon={<MoreOutlined />}>
+        </Dropdown.Button>;
       },
     },
   ];
 
   const showDrop = async (items) => {
-    Dropdown("show" , items)
+    Dropdown("show", items)
   }
 
   const search = (value) => {
@@ -155,8 +184,8 @@ const GroupLayerSystemPage = () => {
         onCancel={handleCancel}
       >
         <Form labelCol={{ span: 8 }}
-              wrapperCol={{ span: 16 }}
-              colon={false}
+          wrapperCol={{ span: 16 }}
+          colon={false}
           form={form}
           labelCol={{ span: 7 }}
           wrapperCol={{ span: 14 }}
@@ -171,17 +200,17 @@ const GroupLayerSystemPage = () => {
           >
             <Input />
           </Form.Item>
-          <Form.Item 
-          name="Symbol"
-          label="Sybol"
-          valuePropName="fileList"
-          rules={[{ required: true }]}
-          extra="ขนาดที่ recommend 50*50 pixcel"
-        >  
-          <Upload name="logo" action="/upload.do" listType="picture">
-            <Button icon={<UploadOutlined />}>Select File</Button>
-          </Upload>
-        </Form.Item>
+          <Form.Item
+            name="Symbol"
+            label="Sybol"
+            valuePropName="fileList"
+            rules={[{ required: true }]}
+            extra="ขนาดที่ recommend 50*50 pixcel"
+          >
+            <Upload name="logo" action="/upload.do" listType="picture">
+              <Button icon={<UploadOutlined />}>Select File</Button>
+            </Upload>
+          </Form.Item>
         </Form>
       </Modal>
     </>
