@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import Head from "next/head";
 import System from "../../../../components/_App/System";
-import moment from 'moment';
+import moment from "moment";
 import { MoreOutlined } from "@ant-design/icons";
 import {
   Col,
@@ -125,10 +125,10 @@ const SatelliteAerialPhotographsPage = () => {
   const showModal = () => {
     setIsModalVisible(true);
   };
-  const showModal2 =  async(id) => {
-    let filterData = await data.find((data) => data.id === id)
-    setDataEdit(filterData)
-    console.log(dataEdit)
+  const showModal2 = async (id) => {
+    let filterData = await data.find((data) => data.id === id);
+    setDataEdit(filterData);
+    console.log(dataEdit);
     setIsModal2Visible(true);
   };
   const handleOk = () => {
@@ -136,8 +136,6 @@ const SatelliteAerialPhotographsPage = () => {
   };
   const handleOk2 = () => {
     form2.submit();
-    alert("555");
-    console.log(form2);
   };
   const handleCancel = () => {
     setIsModalVisible(false);
@@ -146,7 +144,6 @@ const SatelliteAerialPhotographsPage = () => {
   const handleCancel2 = () => {
     setIsModal2Visible(false);
     form2.resetFields();
-
   };
   const onFinish = (value) => {
     setLoading(true);
@@ -170,26 +167,25 @@ const SatelliteAerialPhotographsPage = () => {
       .catch((error) => console.log(error));
   };
   const onFinish2 = (value) => {
-    setLoading(true);
-    alert("rr");
-    // const data = {
-    //   group_layer_id: value.typename,
-    //   wms: value.nameWms,
-    //   url: value.url,
-    //   layer_name: value.layerName,
-    //   type_server: value.typeserver,
-    //   wms_url: value.wms_url,
-    //   upload: value.upload[0],
-    //   date: value["date"].format("YYYY-MM-DD"),
-    // };
-    // Api.post("/masterdata/datLayers", data)
-    //   .then((data) => {
-    //     setIsModalVisible(false);
-    //     setLoading(false);
-    //     reload();
-    //     form.resetFields();
-    //   })
-    //   .catch((error) => console.log(error));
+    const data = {
+      id:value.id,
+      group_layer_id: value.typename,
+      wms: value.nameWms,
+      url: value.url,
+      layer_name: value.layerName,
+      type_server: value.typeserver,
+      wms_url: value.wms_url,
+      // upload: value.upload[0],
+      date: value["date"].format("YYYY-MM-DD"),
+    };
+    Api.put("/masterdata/datLayers",data)
+      .then((data) => {
+        setIsModal2Visible(false);
+        setLoading(false);
+        reload();
+        form2.resetFields();
+      })
+      .catch((error) => console.log(error));
   };
 
   const search = async (value) => {
@@ -380,15 +376,32 @@ const SatelliteAerialPhotographsPage = () => {
             labelCol={{ span: 7 }}
             wrapperCol={{ span: 14 }}
             onFinish={onFinish2}
+            initialValues={{
+              id:dataEdit.id,
+              nameWms: dataEdit.wms,
+              wms_url: dataEdit.wms_url,
+              layerName: dataEdit.layer_name,
+              url: dataEdit.url,
+              date: moment(dataEdit.date),
+              typeserver: dataEdit.type_server,
+              typename:dataEdit.group_layer_id
+            }}
           >
-            
+            <Form.Item
+            name="id"
+            label="id"
+            hidden
+            >
+              <Input/>
+            </Form.Item>
             <Form.Item
               name="typename"
               label="ประเภทของภาพ"
               rules={[{ required: true }]}
             >
-              
-              <Select placeholder="ประเภทของภาพ" defaultValue={dataEdit.group_layer_id}>
+              <Select
+                placeholder="ประเภทของภาพ"
+              >
                 {typePhoto.map((data) => (
                   <Option value={data.id}>{data.group_name}</Option>
                 ))}
@@ -399,24 +412,24 @@ const SatelliteAerialPhotographsPage = () => {
               label="ชื่อข้อมูล (WMS)"
               rules={[{ required: true }]}
             >
-              <Input placeholder="ชื่อข้อมูล (WMS)" defaultValue={dataEdit.wms}/>
+              <Input placeholder="ชื่อข้อมูล (WMS)" />
             </Form.Item>
             <Form.Item name="url" label="Url" rules={[{ required: true }]}>
-              <Input placeholder="Url" defaultValue={dataEdit.url}/>
+              <Input placeholder="Url" />
             </Form.Item>
             <Form.Item
               name="wms_url"
               label="wms_url"
               rules={[{ required: true }]}
             >
-              <Input placeholder="wms_url" defaultValue={dataEdit.wms_url}/>
+              <Input placeholder="wms_url" />
             </Form.Item>
             <Form.Item
               name="layerName"
               label="Layer Name"
               rules={[{ required: true }]}
             >
-              <Input placeholder="Layer Name" defaultValue={dataEdit.layer_name}/>
+              <Input placeholder="Layer Name" />
             </Form.Item>
             <Form.Item
               name="upload"
@@ -435,14 +448,14 @@ const SatelliteAerialPhotographsPage = () => {
               wrapperCol={{ span: 12 }}
               rules={[{ required: true }]}
             >
-              <Radio.Group defaultValue={dataEdit.type_server}>
+              <Radio.Group>
                 <Radio value="arcgisserver">ArcGIS Server</Radio>
                 <Radio value="imageserver">Image Server</Radio>
                 <Radio value="geoserver">Geoserver</Radio>
               </Radio.Group>
             </Form.Item>
             <Form.Item name="date" label="Date" rules={[{ required: true }]}>
-              <DatePicker  defaultValue={moment(dataEdit.date)}/>
+              <DatePicker />
             </Form.Item>
           </Form>
         </Modal>
