@@ -156,15 +156,13 @@ const SatelliteAerialPhotographsPage = () => {
   const onFinish = (value) => {
     setLoading(true);
     const data = {
-      group_layer_id: value.typename,
-      wms: value.nameWms,
-      url: value.url,
-      layer_name: value.layerName,
+      image_type: value.typename,
+      layer_name: value.layerName??null,
       type_server: value.typeserver,
       wms_url: value.wms_url,
-      upload: value.upload[0],
       date: value["date"].format("YYYY-MM-DD"),
     };
+    console.log(data)
     let fd = new FormData();
     fd.append("file0", value.upload[0].originFileObj)
     Api.post("/masterdata/datLayers", data)
@@ -181,7 +179,10 @@ const SatelliteAerialPhotographsPage = () => {
           }
         )
       })
-      .catch((error) => console.log(error));
+      .catch((error) =>{
+        console.log(error)
+        setLoading(false)
+      });
   };
   const onFinish2 = (value) => {
     const data = {
@@ -199,7 +200,7 @@ const SatelliteAerialPhotographsPage = () => {
     fd.append("file0", value.upload[0].originFileObj)
     Api.put("/masterdata/datLayers", data)
       .then(async (data) => {
-        
+
         const upload = await axios.post(`${process.env.NEXT_PUBLIC_SERVICE}/upload?Path=satellite-aerial-photographs&Length=1&Name=${value.id}&SetType=jpg`, fd
           ,
           {
@@ -239,8 +240,6 @@ const SatelliteAerialPhotographsPage = () => {
   };
   const reload = async () => {
     try {
-      const resTypePhoto = await Api.post("/masterdata/getmasLayers");
-      setTypePhoto(resTypePhoto.data.items);
       const respData = await Api.get("/masterdata/datLayers");
       let tempDataArray = [];
       respData.data.items.forEach((data, key) => {
@@ -277,6 +276,29 @@ const SatelliteAerialPhotographsPage = () => {
         .catch((error) => alert("มีบางอย่างผิดพลาด ไม่สามารถลบข้อมูลได้"));
     }
   };
+
+  const [menuItem, setMenuItem] = useState([])
+
+  const geoServerAndImageServer = () => {
+    return (
+      <>
+        <Form.Item
+          name="layerName"
+          label="Layer Name"
+          rules={[{ required: true }]}
+        >
+          <Input placeholder="Layer Name" />
+        </Form.Item>
+      </>
+    )
+  }
+  const changeTypeServer = (e) => {
+    const type = e.target.value
+    setMenuItem([])
+    if (type !== 'arcgisserver') {
+      setMenuItem(geoServerAndImageServer)
+    }
+  }
 
   useEffect(() => {
     reload();
@@ -332,7 +354,6 @@ const SatelliteAerialPhotographsPage = () => {
             />
           </Col>
         </Row>
-
         <Modal
           title="เพิ่มภาพถ่ายดาวเทียม และภาพถ่ายทางอากาศ"
           visible={isModalVisible}
@@ -352,20 +373,11 @@ const SatelliteAerialPhotographsPage = () => {
               rules={[{ required: true }]}
             >
               <Select placeholder="ประเภทของภาพ">
-                {typePhoto.map((data) => (
-                  <Option value={data.id}>{data.group_name}</Option>
-                ))}
+
+                <Option value="ภาพถ่ายจากดาวเทียม">ภาพถ่ายจากดาวเทียม</Option>
+                <Option value="ภาพถ่ายทางอากาศจากโดรน">ภาพถ่ายทางอากาศจากโดรน</Option>
+
               </Select>
-            </Form.Item>
-            <Form.Item
-              name="nameWms"
-              label="ชื่อข้อมูล (WMS)"
-              rules={[{ required: true }]}
-            >
-              <Input placeholder="ชื่อข้อมูล (WMS)" />
-            </Form.Item>
-            <Form.Item name="url" label="Url" rules={[{ required: true }]}>
-              <Input placeholder="Url" />
             </Form.Item>
             <Form.Item
               name="wms_url"
@@ -374,13 +386,7 @@ const SatelliteAerialPhotographsPage = () => {
             >
               <Input placeholder="wms_url" />
             </Form.Item>
-            <Form.Item
-              name="layerName"
-              label="Layer Name"
-              rules={[{ required: true }]}
-            >
-              <Input placeholder="Layer Name" />
-            </Form.Item>
+            {menuItem}
             <Form.Item
               name="upload"
               label="Upload"
@@ -388,7 +394,7 @@ const SatelliteAerialPhotographsPage = () => {
               extra="ขนาดที่ recommend 80x80 pixcel"
               getValueFromEvent={normFile}
             >
-              <Upload name="logo" maxCount={1}>
+              <Upload  maxCount={1}>
                 <Button icon={<UploadOutlined />}>Select File</Button>
               </Upload>
             </Form.Item>
@@ -398,7 +404,7 @@ const SatelliteAerialPhotographsPage = () => {
               wrapperCol={{ span: 12 }}
               rules={[{ required: true }]}
             >
-              <Radio.Group>
+              <Radio.Group  onChange={(e) => { changeTypeServer(e) }}>
                 <Radio value="arcgisserver">ArcGIS Server</Radio>
                 <Radio value="imageserver">Image Server</Radio>
                 <Radio value="geoserver">Geoserver</Radio>
@@ -410,7 +416,7 @@ const SatelliteAerialPhotographsPage = () => {
           </Form>
         </Modal>
 
-        <Modal
+        {/* <Modal
           title="แก้ไข ภาพถ่ายดาวเทียม และภาพถ่ายทางอากาศ"
           visible={isModal2Visible}
           onOk={handleOk2}
@@ -504,7 +510,7 @@ const SatelliteAerialPhotographsPage = () => {
               <DatePicker />
             </Form.Item>
           </Form>
-        </Modal>
+        </Modal> */}
       </System>
     </>
   );
