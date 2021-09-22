@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import axios from 'axios'
 import Head from "next/head";
 import System from "../../../../components/_App/System";
 import moment from "moment";
@@ -44,6 +45,14 @@ const SatelliteAerialPhotographsPage = () => {
     },
     {
       key: "2",
+      title: "img",
+      dataIndex: "id",
+      render: (id) => {
+        return <img width={80} height={80} src={`${process.env.NEXT_PUBLIC_SERVICE}/uploads/satellite-aerial-photographs/${id}.jpg`} />
+      }
+    },
+    {
+      key: "3",
       title: "layer_name",
       dataIndex: "layer_name",
       sorter: (record1, record2) => {
@@ -51,7 +60,7 @@ const SatelliteAerialPhotographsPage = () => {
       },
     },
     {
-      key: "3",
+      key: "4",
       title: "wms",
       dataIndex: "wms",
       sorter: (record1, record2) => {
@@ -59,7 +68,7 @@ const SatelliteAerialPhotographsPage = () => {
       },
     },
     {
-      key: "4",
+      key: "5",
       title: "url",
       dataIndex: "url",
       sorter: (record1, record2) => {
@@ -67,7 +76,7 @@ const SatelliteAerialPhotographsPage = () => {
       },
     },
     {
-      key: "5",
+      key: "6",
       title: "wms_url",
       dataIndex: "wms_url",
       sorter: (record1, record2) => {
@@ -75,7 +84,7 @@ const SatelliteAerialPhotographsPage = () => {
       },
     },
     {
-      key: "6",
+      key: "7",
       title: "type_server",
       dataIndex: "type_server",
       sorter: (record1, record2) => {
@@ -83,7 +92,7 @@ const SatelliteAerialPhotographsPage = () => {
       },
     },
     {
-      key: "7",
+      key: "8",
       title: "date",
       dataIndex: "date",
       sorter: (record1, record2) => {
@@ -91,7 +100,7 @@ const SatelliteAerialPhotographsPage = () => {
       },
     },
     {
-      key: "8",
+      key: "9",
       title: "config",
       dataIndex: "id",
       render: (id) => {
@@ -128,7 +137,6 @@ const SatelliteAerialPhotographsPage = () => {
   const showModal2 = async (id) => {
     let filterData = await data.find((data) => data.id === id);
     setDataEdit(filterData);
-    console.log(dataEdit);
     setIsModal2Visible(true);
   };
   const handleOk = () => {
@@ -157,17 +165,25 @@ const SatelliteAerialPhotographsPage = () => {
       upload: value.upload[0],
       date: value["date"].format("YYYY-MM-DD"),
     };
+    let fd = new FormData();
+    fd.append("file0", value.upload[0].originFileObj)
     Api.post("/masterdata/datLayers", data)
-      .then((data) => {
+      .then(async (data) => {
         setIsModalVisible(false);
         setLoading(false);
         reload();
         form.resetFields();
+        const upload = await axios.post(`${process.env.NEXT_PUBLIC_SERVICE}/upload?Path=satellite-aerial-photographs&Length=1&Name=${data.data.items.id}&SetType=jpg`, fd,
+          {
+            headers: {
+              'Content-Type': 'multipart/form-data',
+            },
+          }
+        )
       })
       .catch((error) => console.log(error));
   };
   const onFinish2 = (value) => {
-    // console.log(value)
     const data = {
       id: value.id,
       group_layer_id: value.typename,
@@ -179,27 +195,26 @@ const SatelliteAerialPhotographsPage = () => {
       upload: value.upload[0],
       date: value["date"].format("YYYY-MM-DD"),
     };
+    let fd = new FormData()
+    fd.append("file0", value.upload[0].originFileObj)
     Api.put("/masterdata/datLayers", data)
-      .then((data) => {
+      .then(async (data) => {
+        
+        const upload = await axios.post(`${process.env.NEXT_PUBLIC_SERVICE}/upload?Path=satellite-aerial-photographs&Length=1&Name=${value.id}&SetType=jpg`, fd
+          ,
+          {
+            headers: {
+              'Content-Type': 'multipart/form-data',
+            },
+          }
+        )
         setIsModal2Visible(false);
         setLoading(false);
         reload();
+        window.location.reload()
         form2.resetFields();
       })
       .catch((error) => console.log(error));
-    //   let test = [1]
-    // const fd = new FormData()
-    // test.forEach(data=>{
-    //   fd.append("file0",value.upload[0])
-    // })
-    // Api.post("/upload?Path=symbol_group&Length=1&Name=f942a946-3bcb-4062-9207-d78ab437edf3&SetType=jpg",  fd
-    // , {
-    //   headers: {
-    //     'Content-Type': 'multipart/form-data',
-    //   },
-    // }).then(data=>{
-    //   console.log(data)
-    // }).catch(err=>console.log(err))
   };
 
 
@@ -265,7 +280,7 @@ const SatelliteAerialPhotographsPage = () => {
 
   useEffect(() => {
     reload();
-  }, loading);
+  }, [loading]);
   return (
     <>
       <Head>
