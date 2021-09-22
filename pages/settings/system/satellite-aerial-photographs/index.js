@@ -167,18 +167,19 @@ const SatelliteAerialPhotographsPage = () => {
       .catch((error) => console.log(error));
   };
   const onFinish2 = (value) => {
+    // console.log(value)
     const data = {
-      id:value.id,
+      id: value.id,
       group_layer_id: value.typename,
       wms: value.nameWms,
       url: value.url,
       layer_name: value.layerName,
       type_server: value.typeserver,
       wms_url: value.wms_url,
-      // upload: value.upload[0],
+      upload: value.upload[0],
       date: value["date"].format("YYYY-MM-DD"),
     };
-    Api.put("/masterdata/datLayers",data)
+    Api.put("/masterdata/datLayers", data)
       .then((data) => {
         setIsModal2Visible(false);
         setLoading(false);
@@ -186,10 +187,40 @@ const SatelliteAerialPhotographsPage = () => {
         form2.resetFields();
       })
       .catch((error) => console.log(error));
+    //   let test = [1]
+    // const fd = new FormData()
+    // test.forEach(data=>{
+    //   fd.append("file0",value.upload[0])
+    // })
+    // Api.post("/upload?Path=symbol_group&Length=1&Name=f942a946-3bcb-4062-9207-d78ab437edf3&SetType=jpg",  fd
+    // , {
+    //   headers: {
+    //     'Content-Type': 'multipart/form-data',
+    //   },
+    // }).then(data=>{
+    //   console.log(data)
+    // }).catch(err=>console.log(err))
   };
 
+
   const search = async (value) => {
-    alert("ยังไม่ได้ทำ");
+    try {
+      const respData = await Api.get("/masterdata/datLayers?search=" + value)
+      let tempDataArray = [];
+      respData.data.items.forEach((data, key) => {
+        tempDataArray = [
+          ...tempDataArray,
+          {
+            number: key + 1,
+            ...data,
+          },
+        ];
+      });
+      setData(tempDataArray);
+      setLoading(false);
+    } catch (error) {
+      console.log(error)
+    }
   };
   const reload = async () => {
     try {
@@ -377,22 +408,22 @@ const SatelliteAerialPhotographsPage = () => {
             wrapperCol={{ span: 14 }}
             onFinish={onFinish2}
             initialValues={{
-              id:dataEdit.id,
+              id: dataEdit.id,
               nameWms: dataEdit.wms,
               wms_url: dataEdit.wms_url,
               layerName: dataEdit.layer_name,
               url: dataEdit.url,
               date: moment(dataEdit.date),
               typeserver: dataEdit.type_server,
-              typename:dataEdit.group_layer_id
+              typename: dataEdit.group_layer_id
             }}
           >
             <Form.Item
-            name="id"
-            label="id"
-            hidden
+              name="id"
+              label="id"
+              hidden
             >
-              <Input/>
+              <Input />
             </Form.Item>
             <Form.Item
               name="typename"
@@ -438,7 +469,7 @@ const SatelliteAerialPhotographsPage = () => {
               extra="ขนาดที่ recommend 80x80 pixcel"
               getValueFromEvent={normFile}
             >
-              <Upload name="logo" maxCount={1}>
+              <Upload maxCount={1}>
                 <Button icon={<UploadOutlined />}>Select File</Button>
               </Upload>
             </Form.Item>
