@@ -1,7 +1,13 @@
 import { useState, useEffect } from "react";
 import Head from "next/head";
 import System from "../../../../components/_App/System";
-import { MoreOutlined, RedoOutlined, UploadOutlined ,DeleteOutlined, ScissorOutlined } from "@ant-design/icons";
+import {
+  MoreOutlined,
+  RedoOutlined,
+  UploadOutlined,
+  DeleteOutlined,
+  ScissorOutlined,
+} from "@ant-design/icons";
 import {
   Table,
   Modal,
@@ -16,10 +22,10 @@ import {
   Select,
   Menu,
   Space,
-  Tooltip 
+  Tooltip,
 } from "antd";
 import Api from "../../../../util/Api";
-
+import axios from "axios";
 const { Search } = Input;
 
 const { Option } = Select;
@@ -43,10 +49,17 @@ const GroupLayerSystemPage = () => {
     setIsModalVisible(false);
     form.resetFields();
   };
+
   const onFinish = async (value) => {
+    console.log(value);
+    let fd = new FormData();
+    //console.log(value.Symbol[0].originFileObj)
+    fd.append("file0",value.Symbol[0].originFileObj);
     Api.post("/masterdata/masLayers", { group_name: value.groupLayer })
-      .then((data) => {
+      .then(async(data) => {
         reload();
+        const upload = await axios.post(`http://localhost:9000/upload?Path=symbol_group&Length=1&Name=${data.data.items.id}&SetType=jpg`,fd)
+
       })
       .catch((error) => {
         console.log(error);
@@ -57,7 +70,6 @@ const GroupLayerSystemPage = () => {
     Api.post("/masterdata/getmasLayers")
       .then((data) => {
         setData(data.data.items);
-        console.log(data)
       })
       .catch((error) => {
         console.log(error);
@@ -70,8 +82,8 @@ const GroupLayerSystemPage = () => {
     }
     return e && e.fileList;
   };
-  const menu = (                  
-    <Menu >
+  const menu = (
+    <Menu>
       <Menu.Item onClick={handleMenuClick1} key="1" icon={<DeleteOutlined />}>
         ลบ
       </Menu.Item>
@@ -82,13 +94,13 @@ const GroupLayerSystemPage = () => {
   );
 
   function handleMenuClick1(e) {
-  message.warning('เมนู ลบ.');
-  console.log('click', e);
-}
+    message.warning("เมนู ลบ.");
+    console.log("click", e);
+  }
   function handleMenuClick2(e) {
-  message.info('เมนู แก้ไข.');
-  console.log('click', e);
-}
+    message.info("เมนู แก้ไข.");
+    console.log("click", e);
+  }
 
   const columns = [
     {
@@ -101,9 +113,12 @@ const GroupLayerSystemPage = () => {
     },
     {
       title: "Symbol",
-      dataIndex: "Symbaol",
-      sorter: (record1, record2) => {
-        return record1.Symbaol > record2.Symbaol;
+      dataIndex:'id' ,
+      render: (id) => {
+        // return <MoreOutlined />
+        return (
+          <img width={50} height={50} src={`http://localhost:9000/uploads/symbol_group/${id}.jpg`}/>
+        );
       },
     },
     {
@@ -120,15 +135,19 @@ const GroupLayerSystemPage = () => {
       align: "center",
       render: (id) => {
         // return <MoreOutlined />
-        return <Dropdown.Button  overlay={menu}  icon={<MoreOutlined />}>
-        </Dropdown.Button>;
+        return (
+          <Dropdown.Button
+            overlay={menu}
+            icon={<MoreOutlined />}
+          ></Dropdown.Button>
+        );
       },
     },
   ];
 
   const showDrop = async (items) => {
-    Dropdown("show", items)
-  }
+    Dropdown("show", items);
+  };
 
   const search = (value) => {
     Api.post("/masterdata/getmasLayers", { search: value }).then((data) => {
@@ -189,7 +208,8 @@ const GroupLayerSystemPage = () => {
         onOk={handleOk}
         onCancel={handleCancel}
       >
-        <Form labelCol={{ span: 8 }}
+        <Form
+          labelCol={{ span: 8 }}
           wrapperCol={{ span: 16 }}
           colon={false}
           form={form}
@@ -225,3 +245,13 @@ const GroupLayerSystemPage = () => {
 };
 
 export default GroupLayerSystemPage;
+
+
+
+
+
+
+
+
+
+
