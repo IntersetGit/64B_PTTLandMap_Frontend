@@ -1,9 +1,10 @@
 import { useState } from "react";
 import Head from "next/head";
 import System from "../../../../components/_App/System";
-import { Row, Col, Table, Card, Button, Modal, Form, Input } from "antd";
-import { DeleteOutlined,ToolOutlined } from '@ant-design/icons';
+import { Row, Col, Table, Card, Button, Modal, Form, Input,Dropdown,Menu } from "antd";
+import { DeleteOutlined, ToolOutlined , MoreOutlined} from '@ant-design/icons';
 
+const { Search } = Input;
 
 const layout = {
   labelCol: { span: 7 },
@@ -58,13 +59,27 @@ const index = () => {
     {
       title: 'จัดการ',
       dataIndex: 'english',
-      align:'center',
+      align: 'center',
       sorter: {
         compare: (a, b) => a.english - b.english,
         multiple: 1,
       },
       render: (id) => {
-        return <div><DeleteOutlined/> <ToolOutlined/></div>;
+        return (
+          <Dropdown
+            overlay={
+              <Menu>
+                <Menu.Item key="1">แก้ไข</Menu.Item>
+                <Menu.Item key="2">ลบ</Menu.Item>
+              </Menu>
+            }
+            placement="bottomLeft"
+            trigger={["click"]}
+            arrow
+          >
+            <MoreOutlined />
+          </Dropdown>
+        );
       },
     },
   ];
@@ -124,7 +139,9 @@ const index = () => {
           <Col span={24}>
             <h3 className="mb-4">จัดการ ภาพถ่ายดาวเทียมและภาพถ่ายทางอากาศ</h3>
           </Col>
-
+          <Col span={5}>
+            <Search placeholder="input search text"  />
+          </Col>
           <Col span={24}>
 
             <Card style={{ borderRadius: 20 }}>
@@ -147,7 +164,7 @@ const index = () => {
                       <Input />
                     </Form.Item>
                     <Form.Item label="สีของ Gis Layer">
-                      <Input type="color" style={{width:'20%'}} />
+                      <Input type="color" style={{ width: '20%' }} />
                     </Form.Item>
                   </Form>
 
