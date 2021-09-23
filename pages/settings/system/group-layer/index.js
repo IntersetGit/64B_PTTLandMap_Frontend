@@ -63,8 +63,14 @@ const GroupLayerSystemPage = () => {
         console.log(error);
       });
   };
-
-  const menu = (
+  const normFile = (e) => {
+    console.log("Upload event:", e);
+    if (Array.isArray(e)) {
+      return e;
+    }
+    return e && e.fileList;
+  };
+  const menu = (                  
     <Menu >
       <Menu.Item onClick={handleMenuClick1} key="1" icon={<DeleteOutlined />}>
         ลบ
@@ -205,6 +211,7 @@ const GroupLayerSystemPage = () => {
             label="Sybol"
             valuePropName="fileList"
             rules={[{ required: true }]}
+            getValueFromEvent={normFile}
             extra="ขนาดที่ recommend 50*50 pixcel"
           >
             <Upload name="logo" action="/upload.do" listType="picture">
