@@ -572,8 +572,8 @@ const index = () => {
       render: (id) => {
         return (
           <img
-            width={80}
-            height={80}
+            width={50}
+            height={50}
             src={`${process.env.NEXT_PUBLIC_SERVICE}/uploads/satellite-aerial-photographs/${id}.jpg`}
           />
         );
