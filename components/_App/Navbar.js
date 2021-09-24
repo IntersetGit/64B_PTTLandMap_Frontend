@@ -54,7 +54,7 @@ const Navbar = ({ isMap, setslideNav, slideNav }) => {
                     <li className="nav-item dropdown">
                         <Link href={`/`} >
                             <a className="dropdown-toggle nav-link" >
-                                <i className="fa fa-map" style={{background:"linear-gradient(141deg, #0fb8ad 0%, #1fc8db 51%, #2cb5e8 75%)",WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent"}} />
+                                <i className="fa fa-map" style={!isMap?{background:"linear-gradient(141deg, #0fb8ad 0%, #1fc8db 51%, #2cb5e8 75%)",WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent"}:null} />
                             </a>
                         </Link>
                     </li>
@@ -64,7 +64,7 @@ const Navbar = ({ isMap, setslideNav, slideNav }) => {
                     <li className="nav-item dropdown">
 
                         <a className="dropdown-toggle nav-link">
-                            <i className="fa fa-book" style={{background:"linear-gradient(141deg, #0fb8ad 0%, #1fc8db 51%, #2cb5e8 75%)",WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent"}}/>
+                            <i className="fa fa-book" style={!isMap?{background:"linear-gradient(141deg, #0fb8ad 0%, #1fc8db 51%, #2cb5e8 75%)",WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent"}:null}/>
                         </a>
 
                     </li>
@@ -77,7 +77,7 @@ const Navbar = ({ isMap, setslideNav, slideNav }) => {
                             <li className="nav-item dropdown">
                                 <Link href={`/settings/dashboard/`} >
                                     <a className="dropdown-toggle nav-link" >
-                                        <i className="fa fa-cog" style={{background:"linear-gradient(141deg, #0fb8ad 0%, #1fc8db 51%, #2cb5e8 75%)",WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent"}}/>
+                                        <i className="fa fa-cog" style={!isMap?{background:"linear-gradient(141deg, #0fb8ad 0%, #1fc8db 51%, #2cb5e8 75%)",WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent"}:null}/>
                                     </a>
                                 </Link>
                             </li>

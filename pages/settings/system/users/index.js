@@ -3,13 +3,24 @@ import Head from "next/head";
 import System from "../../../../components/_App/System";
 import Api from "../../../../util/Api";
 import { MoreOutlined, RedoOutlined } from "@ant-design/icons";
-import { Table, Input, Row, Col, Button, Modal, Form, Select } from "antd";
+import {
+  Table,
+  Input,
+  Row,
+  Col,
+  Button,
+  Modal,
+  Form,
+  Select,
+  Menu,
+  Dropdown,
+} from "antd";
 const { Search } = Input;
 const { Option } = Select;
 const usersSystemPage = () => {
-  const [loading, setLoading] = useState(true); 
+  const [loading, setLoading] = useState(true);
   const [roles, setRoles] = useState([]);
-  const [data, setData] = useState([]); 
+  const [data, setData] = useState([]);
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(5);
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -60,12 +71,26 @@ const usersSystemPage = () => {
       title: "จัดการ",
       dataIndex: "id",
       render: (id) => {
-        return <MoreOutlined />;
+        return (
+          <Dropdown
+            overlay={
+              <Menu>
+                <Menu.Item key="1">แก้ไข</Menu.Item>
+                <Menu.Item key="2">ลบ</Menu.Item>
+              </Menu>
+            }
+            placement="bottomLeft"
+            trigger={["click"]}
+            arrow
+          >
+            <MoreOutlined />
+          </Dropdown>
+        );
       },
       responsive: ["md"],
     },
   ];
-  const reload = (search = null) => {
+  const reload = () => {
     Api.post("/provider/getSearchUser")
       .then((data) => {
         let tempDataArray = [];
@@ -111,7 +136,6 @@ const usersSystemPage = () => {
   };
 
   const showModal = () => {
-    console.log(roles)
     setIsModalVisible(true);
   };
   const handleOk = () => {
@@ -131,6 +155,7 @@ const usersSystemPage = () => {
         setIsModalVisible(false);
         setLoading(false);
         reload();
+        form.resetFields();
       })
       .catch((error) => {
         alert("มีบางอย่างผิดพลาด หรือมีผู้ใช้ในระบบแล้ว");
@@ -216,10 +241,16 @@ const usersSystemPage = () => {
           >
             <Input placeholder="Username" />
           </Form.Item>
-          <Form.Item name="roles_id" label="กลุ่มผู้ใช้งาน" rules={[{ required: true,message: 'กรุณากรอกข้อมูล กลุ่มผู้ใช้งาน' }]}>
+          <Form.Item
+            name="roles_id"
+            label="กลุ่มผู้ใช้งาน"
+            rules={[
+              { required: true, message: "กรุณากรอกข้อมูล กลุ่มผู้ใช้งาน" },
+            ]}
+          >
             <Select placeholder="กลุ่มผู้ใช้งาน">
-              {roles.map((data) => (
-                <Option value={data.id}>
+              {roles.map((data, index) => (
+                <Option key={index} value={data.id}>
                   {data.roles_name}
                 </Option>
               ))}
