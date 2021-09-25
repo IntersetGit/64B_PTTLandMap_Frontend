@@ -1,15 +1,23 @@
 import Layout from '../components/_App/Layout'
 import { useEffect, useRef, useState } from 'react';
 import { Loader } from '@googlemaps/js-api-loader';
-import { Drawer, Tabs, Col, Collapse, Checkbox, Row, Card, Form, Input, Select, Upload, Button } from 'antd';
+import { Drawer, Tabs, Col, Collapse, Checkbox, Row, Card, Form, Input, Select, Upload, Button, message } from 'antd';
 import Head from 'next/head';
 import { useSelector } from 'react-redux';
 import { SketchPicker } from 'react-color';
 import { UnorderedListOutlined, UploadOutlined } from '@ant-design/icons';
 import API from '../util/Api'
+import axios from 'axios';
+import { Cookies } from 'react-cookie'
+import jwt_decode from "jwt-decode";
+
+const cookies = new Cookies();
+
 
 const { TabPane } = Tabs;
 const { Panel } = Collapse;
+
+const { Option } = Select;
 
 const mapPage = () => {
 
@@ -35,7 +43,6 @@ const mapPage = () => {
         });
     }, []);
 
-
     const getLatLon = (event) => {
         let _lat = event.latLng.lat();
         let _lng = event.latLng.lng();
@@ -51,12 +58,12 @@ const mapPage = () => {
     const [groupLayerList, setGroupLayerList] = useState([])
     const [FileList, setFileList] = useState([])
     const [FileUpload, setFileUpload] = useState(null)
+    const [FileType, setFileType] = useState(null)
     const [openColorUpload, setOpenColorUpload] = useState(false)
     const [colorUpload, setColorUpload] = useState({
         hex: "red",
-        rgb: "red",
+        rgb: { "r": 255, "g": 0, "b": 0, "a": 1 },
     })
-
 
     const [formUpload] = Form.useForm();
 
@@ -74,10 +81,13 @@ const mapPage = () => {
                 // const blob = new Blob([infoFileList.originFileObj], { type: infoFileList.type });
                 // const blobUrl = URL.createObjectURL(blob);
                 fileList = fileList.map(file => {
-                    // console.log('file file:>> ', file);
+
                     if (file.response) {
                         // Component will show file.url as link
                         // file.url = blobUrl;
+                        const type = `${(file.name.substring(file.name.lastIndexOf(".") + 1).toLowerCase()).toLowerCase()}`;
+                        const nameType = (type == "zip" || type == "rar") ? "shape file" : type
+                        setFileType(nameType)
                     }
                     return file;
                 });
@@ -88,26 +98,110 @@ const mapPage = () => {
         setFileList(fileList);
         if (fileList.length > 0) setFileUpload(fileList[0]); else {
             setFileUpload(null)
+            setFileType(null)
         }
 
     }
 
-    const onFinishUpload = (value) => {
+    const onFinishUpload = async (value) => {
+        try {
+            // console.log('value :>> ', value);
+            // console.log('FileType :>> ', FileType);
+            // console.log('colorUpload :>> ', colorUpload.hex);
+            if (FileUpload) {
+                const formData = new FormData();
+                formData.append("file", FileUpload.originFileObj);
+                const { name_layer, group_layer_id } = value;
+                const token = cookies.get('token');
 
+                if (token) {
+                    const token_decode = jwt_decode(token);
+                    if (token_decode.exp < Date.now() / 1000) {
+                        console.log("หมดเวลาtoken")
+                        await RefreshToken(refresh_token);
+                    }
+
+                    await axios({
+                        method: "post",
+                        url: `${process.env.NEXT_PUBLIC_SERVICE}/shp/add?name_layer=${name_layer}&type=${FileType}&group_layer_id=${group_layer_id}&color=${JSON.stringify(colorUpload.rgb)}`,
+                        config: { headers: { "Content-Type": "multipart/form-data" } },
+                        headers: { Authorization: "Bearer " + token },
+                        data: formData,
+                    })
+                    await openShapeFile();
+                    setFileList([])
+                    setFileUpload(null)
+                    setFileType(null)
+                    setOpenColorUpload(false)
+                    setColorUpload({
+                        hex: "red",
+                        rgb: { "r": 255, "g": 0, "b": 0, "a": 1 },
+                    })
+                    formUpload.resetFields()
+
+                    message.success("บันทึกสำเร็จ");
+                }
+
+
+
+            } else {
+                message.error("กรุณาเลือกไฟล์!");
+            }
+
+        } catch (error) {
+            message.error("มีบางอย่างผิดพลาด !");
+        }
+    }
+
+    const RefreshToken = async (refreshtokenval) => {
+        try {
+            if (refreshtokenval) {
+                const { data } = await axios({
+                    method: "get",
+                    url: `${process.env.NEXT_PUBLIC_SERVICE}/provider/refreshToken`,
+                    headers: { Authorization: "Bearer " + refreshtokenval },
+                })
+                const token = data.items
+                cookies.set('token', token, { path: '/' });
+                // window.location.reload();
+            } else {
+                logout()
+            }
+        } catch (error) {
+            logout()
+        }
+    }
+
+    const logout = () => {
+        cookies.remove("token");
+        cookies.remove("refresh_token");
+        window.location.href = "/login";
     }
 
     const onFinishFailedUpload = (error) => {
-
+        message.error("มีบางอย่างผิดพลาด !");
     }
 
     const openShapeFile = async () => {
         try {
             const { data } = await API.get(`/shp/getDataLayer`)
+           
+            data.items.forEach(e => {
+                if (e.children) {
+                    e.children.forEach(x => {
+                        if (x.color_layer) {
+                            const rgb = JSON.parse(x.color_layer)
+                            x.color_layer = `rgb(${rgb.r},${rgb.g},${rgb.b},${rgb.a})`;
+                            x.rgb = rgb;
+                        }
+                    });
+                }
+            });
             // console.log('data :>> ', data.items);
             setGroupLayerList(data.items)
             setVisibleShapeFile(true)
         } catch (error) {
-
+            // message.error("มีบางอย่างผิดพลาด !");
         }
     }
 
@@ -159,7 +253,7 @@ const mapPage = () => {
             </div>
 
             <div className="tools-map-area">
-                
+
                 {/* Administrator And Editor */}
                 {(user && (user.roles_id === "8a97ac7b-01dc-4e06-81c2-8422dffa0ca2" || user.roles_id === "cec6617f-b593-4ebc-9604-3059dfee0ac4")) ? (
                     <Col span={6}>
@@ -267,25 +361,23 @@ const mapPage = () => {
                                 >
                                     <Form.Item
                                         label="ชั้นข้อมูล"
-                                        name="name"
-                                        rules={[{ required: true, message: 'Please input your name!' }]}
+                                        name="group_layer_id"
+                                        rules={[{ required: true, message: 'กรุณาเลือกชั้นข้อมูล!' }]}
                                     >
                                         <Select>
-                                            <Option value="1">Lucy1</Option>
-                                            <Option value="2">Lucy2</Option>
-                                            <Option value="3">Lucy3</Option>
+                                            {groupLayerList.map((e, i) => <Option key={e.id} value={e.id}>{e.group_name}</Option>)}
                                         </Select>
                                     </Form.Item>
 
                                     <Form.Item
                                         label="ชื่อ"
-                                        name="name"
-                                        rules={[{ required: true, message: 'Please input your name!' }]}
+                                        name="name_layer"
+                                        rules={[{ required: true, message: 'กรุณากรอกข้อมูล!' }]}
                                     >
                                         <Input />
                                     </Form.Item>
 
-                                    <Form.Item label="เอกสาร/รูป" >
+                                    <Form.Item label="เลือกไฟล์" rules={[{ required: true, message: 'กรุณาเลือกไฟล์!' }]}>
                                         <Upload
                                             onChange={handleChange}
                                             fileList={FileList}
@@ -296,7 +388,7 @@ const mapPage = () => {
                                     </Form.Item>
 
                                     <Form.Item label="ประเภทไฟล์" >
-                                        Type
+                                        {FileType}
                                     </Form.Item>
 
                                     <Form.Item label="สีชั้นข้อมูล">
@@ -323,6 +415,12 @@ const mapPage = () => {
                                                 </footer>
                                             </div>
                                         ) : null}
+                                    </Form.Item>
+
+                                    <Form.Item wrapperCol={{ offset: 8, span: 16 }}>
+                                        <Button type="primary" htmlType="submit">
+                                            บันทึก
+                                        </Button>
                                     </Form.Item>
 
                                 </Form>

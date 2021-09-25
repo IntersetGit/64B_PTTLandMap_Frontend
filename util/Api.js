@@ -43,7 +43,7 @@ const RefreshToken = async (refreshtokenval) => {
             })
             const token = data.items
             cookies.set('token', token, { path: '/' });
-            window.location.reload();
+            // window.location.reload();
         } else {
             logout()
         }
