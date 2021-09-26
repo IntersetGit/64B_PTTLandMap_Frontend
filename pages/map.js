@@ -18,25 +18,26 @@ const { TabPane } = Tabs;
 const { Panel } = Collapse;
 
 const { Option } = Select;
-
 const mapPage = () => {
-
+    const [map, setMap] = useState(null)
     const googlemap = useRef(null);
     const { user } = useSelector(({ user }) => user);
     useEffect(() => {
         const loader = new Loader({
             apiKey: process.env.NEXT_PUBLIC_GOOGLE_API_KEY,
             version: 'weekly',
+            libraries: ["drawing", "places"]
         });
-        let map;
+
         loader.load().then(() => {
             const google = window.google;
-            map = new google.maps.Map(googlemap.current, {
+            var _map = new google.maps.Map(googlemap.current, {
                 mapTypeControl: false,
                 fullscreenControl: false,
                 center: { lat: 13.78, lng: 100.55 },
                 zoom: 8,
             });
+            setMap(_map)
             google.maps.event.addListener(map, "mousemove", (event) => {
                 getLatLon(event)
             });
@@ -185,7 +186,7 @@ const mapPage = () => {
     const openShapeFile = async () => {
         try {
             const { data } = await API.get(`/shp/getDataLayer`)
-           
+
             data.items.forEach(e => {
                 if (e.children) {
                     e.children.forEach(x => {
@@ -212,6 +213,31 @@ const mapPage = () => {
         // console.log('rgb :>> ', rgb);
         setGroupLayerList(arr)
     };
+
+    const checkboxLayer = async (value, index1, index2) => {
+        const arr = [...groupLayerList]
+        console.clear();
+        console.log(' checked  :>> ', value.target.checked);
+        if (value.target.checked) {
+            console.log(' data  :>> ', arr[index1].children[index2]);
+            const item = arr[index1].children[index2];
+            await getDeoJson(item.id)
+        } else {
+
+        }
+    };
+
+
+    const getDeoJson = async (id) => {
+        try {
+            const { data } = await API.get(`/shp/shapeData?id=${id}`)
+            const GeoJson = data.items.shape
+            console.log('GeoJson :>> ', GeoJson);
+            map.data.addGeoJson(GeoJson);
+        } catch (error) {
+
+        }
+    }
 
     const openColor = (index1, index2) => {
         const arr = [...groupLayerList]
@@ -304,7 +330,7 @@ const mapPage = () => {
                                         <div className="pt-2" key={e.id}>
                                             <Row>
                                                 <Col xs={18}>
-                                                    <Checkbox>{x.name_layer}</Checkbox>
+                                                    <Checkbox onClick={(value) => checkboxLayer(value, i, index)}>{x.name_layer}</Checkbox>
                                                 </Col>
                                                 <Col xs={3}>
                                                     <a><UnorderedListOutlined /></a>
