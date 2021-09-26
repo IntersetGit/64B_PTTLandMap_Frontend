@@ -217,14 +217,26 @@ const mapPage = () => {
     const checkboxLayer = async (value, index1, index2) => {
         const arr = [...groupLayerList]
         console.clear();
-        console.log(' checked  :>> ', value.target.checked);
+        // console.log(' checked  :>> ', value.target.checked);
+        arr[index1].children[index2].checked = value.target.checked
+        setGroupLayerList(arr)
         if (value.target.checked) {
-            console.log(' data  :>> ', arr[index1].children[index2]);
+            // console.log(' data  :>> ', arr[index1].children[index2]);
             const item = arr[index1].children[index2];
             await getDeoJson(item.id)
         } else {
-
+            arr.forEach(e => {
+                if (e.children) {
+                    e.children.forEach((x, i) => {
+                        x.checked = value.target.checked
+                    });
+                }
+            });
+            map.data.forEach((feature) => {
+                map.data.remove(feature);
+            });
         }
+
     };
 
 
@@ -232,8 +244,14 @@ const mapPage = () => {
         try {
             const { data } = await API.get(`/shp/shapeData?id=${id}`)
             const GeoJson = data.items.shape
-            console.log('GeoJson :>> ', GeoJson);
             map.data.addGeoJson(GeoJson);
+            const bounds = new google.maps.LatLngBounds();
+            map.data.forEach((feature) => {
+                feature.getGeometry().forEachLatLng((latlng) => {
+                    bounds.extend(latlng);
+                });
+            });
+            map.fitBounds(bounds);
         } catch (error) {
 
         }
@@ -330,7 +348,7 @@ const mapPage = () => {
                                         <div className="pt-2" key={e.id}>
                                             <Row>
                                                 <Col xs={18}>
-                                                    <Checkbox onClick={(value) => checkboxLayer(value, i, index)}>{x.name_layer}</Checkbox>
+                                                    <Checkbox checked={x.checked} onClick={(value) => checkboxLayer(value, i, index)}>{x.name_layer}</Checkbox>
                                                 </Col>
                                                 <Col xs={3}>
                                                     <a><UnorderedListOutlined /></a>
