@@ -1,69 +1,59 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Head from "next/head";
 import System from "../../../../components/_App/System";
-import { Row, Col, Table, Card, Button, Modal, Form, Input,Dropdown,Menu } from "antd";
-import { DeleteOutlined, ToolOutlined , MoreOutlined} from '@ant-design/icons';
-
+import Api from "../../../../util/Api";
+import { MoreOutlined, RedoOutlined } from "@ant-design/icons";
+import {
+  Table,
+  Input,
+  Row,
+  Col,
+  Button,
+  Modal,
+  Form,
+  Select,
+  Menu,
+  Dropdown,
+} from "antd";
 const { Search } = Input;
-
-const layout = {
-  labelCol: { span: 7 },
-  wrapperCol: { span: 18 },
-};
-
-const index = () => {
-
-  const [visible, setVisible] = useState(false);
-  const [confirmLoading, setConfirmLoading] = useState(false);
-  const [modalText, setModalText] = useState('Content of the modal');
-
-  const showModal = () => {
-    setVisible(true);
-  };
-
-  const handleOk = () => {
-    setModalText('The modal will be closed after two seconds');
-    setConfirmLoading(true);
-    setTimeout(() => {
-      setVisible(false);
-      setConfirmLoading(false);
-    }, 2000);
-  };
-
-  const handleCancel = () => {
-    console.log('Clicked cancel button');
-    setVisible(false);
-  };
-
+const { Option } = Select;
+const usersSystemPage = () => {
+  const [loading, setLoading] = useState(true);
+  const [roles, setRoles] = useState([]);
+  const [data, setData] = useState([]);
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(5);
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [form] = Form.useForm();
   const columns = [
     {
-      title: 'ชื่อ GIS Layer',
-      dataIndex: 'name',
-    },
-    {
-      title: 'กลุ่มของ Group Layer',
-      dataIndex: 'chinese',
-      sorter: {
-        compare: (a, b) => a.chinese - b.chinese,
-        multiple: 3,
+      key: "1",
+      title: "ลำดับ",
+      dataIndex: "number",
+      sorter: (record1, record2) => {
+        return record1.number > record2.number;
       },
     },
     {
-      title: 'สีของ Gis Layer',
-      dataIndex: 'math',
-      sorter: {
-        compare: (a, b) => a.math - b.math,
-        multiple: 2,
+      key: "2",
+      title: "Group Layer",
+      dataIndex: "user_name",
+      sorter: (record1, record2) => {
+        return record1.user_name > record2.user_name;
       },
     },
     {
-      title: 'จัดการ',
-      dataIndex: 'english',
-      align: 'center',
-      sorter: {
-        compare: (a, b) => a.english - b.english,
-        multiple: 1,
+      key: "3",
+      title: "Color GIS Layer",
+      dataIndex: "firstlast",
+      sorter: (record1, record2) => {
+        return record1.firstlast > record2.firstlast;
       },
+    },
+    {
+      key: "4",
+      title: "จัดการ",
+      dataIndex: "id",
       render: (id) => {
         return (
           <Dropdown
@@ -81,50 +71,87 @@ const index = () => {
           </Dropdown>
         );
       },
+      responsive: ["md"],
     },
   ];
+  const reload = () => {
+    Api.post("/provider/getSearchUser")
+      .then((data) => {
+        let tempDataArray = [];
+        data.data.forEach((data, key) => {
+          tempDataArray = [
+            ...tempDataArray,
+            {
+              number: key + 1,
+              ...data,
+            },
+          ];
+        });
+        Api.get("/system/getUser").then((data) => {
+          setRoles(data.data.items);
+        });
+        setData(tempDataArray);
+        setLoading(false);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
+  useEffect(() => {
+    reload();
+  }, []);
 
-  const data = [
-    {
-      key: '1',
-      name: 'John Brown',
-      chinese: 98,
-      math: 60,
-      english: 70,
-    },
-    {
-      key: '2',
-      name: 'Jim Green',
-      chinese: 98,
-      math: 66,
-      english: 89,
-    },
-    {
-      key: '3',
-      name: 'Joe Black',
-      chinese: 98,
-      math: 90,
-      english: 70,
-    },
-    {
-      key: '4',
-      name: 'Jim Red',
-      chinese: 88,
-      math: 99,
-      english: 89,
-    },
-  ];
+  // const search = (value) => {
+  //   setLoading(true);
+  //   Api.post("/provider/getSearchUser", { search: value }).then((data) => {
+  //     let tempDataArray = [];
+  //     data.data.forEach((data, key) => {
+  //       tempDataArray = [
+  //         ...tempDataArray,
+  //         {
+  //           number: key + 1,
+  //           ...data,
+  //         },
+  //       ];
+  //     });
+  //     setData(tempDataArray);
+  //     setLoading(true);
+  //   });
+  // };
 
-  function onChange(pagination, filters, sorter, extra) {
-    console.log('params', pagination, filters, sorter, extra);
-  }
-
-
-
+  const showModal = () => {
+    setIsModalVisible(true);
+  };
+  const handleOk = () => {
+    form.submit();
+  };
+  const handleCancel = () => {
+    setIsModalVisible(false);
+    form.resetFields();
+  };
+  const onFinish = async (value) => {
+    setLoading(true);
+    Api.post("/system/addUserAD", {
+      username: value.username,
+      roles_id: value.roles_id,
+    })
+      .then((data) => {
+        setIsModalVisible(false);
+        setLoading(false);
+        reload();
+        form.resetFields();
+      })
+      .catch((error) => {
+        alert("มีบางอย่างผิดพลาด หรือมีผู้ใช้ในระบบแล้ว");
+        setIsModalVisible(false);
+        setLoading(false);
+      });
+    form.resetFields();
+  };
   return (
     <>
       <Head>
-        <title>จัดการ ข้อมูล GIS Layer</title>
+        <title>จัดการผู้ใช้ระบบ</title>
       </Head>
       <System>
         <Row
@@ -137,51 +164,87 @@ const index = () => {
           }}
         >
           <Col span={24}>
-            <h3 className="mb-4">จัดการ ภาพถ่ายดาวเทียมและภาพถ่ายทางอากาศ</h3>
+            <h3 className="mb-4">จัดการข้อมูล GIS Layer</h3>
           </Col>
           <Col span={5}>
-            <Search placeholder="input search text"  />
+            <Search placeholder="input search text" />
+          </Col>
+          <Col span={5}>
+            <Button
+              onClick={() => {
+                reload();
+              }}
+            >
+              <RedoOutlined />
+            </Button>
+          </Col>
+          <Col span={3} offset={11}>
+            <Button
+              type="primary"
+              onClick={showModal}
+              style={{ float: "right" }}
+            >
+              + เพิ่มผู้ใช้ใหม่
+            </Button>
           </Col>
           <Col span={24}>
-
-            <Card style={{ borderRadius: 20 }}>
-              <Col className="butto">
-                <Button type="primary" onClick={showModal} >เพิ่ม Layer</Button>
-                <Modal
-                  title="Title"
-                  visible={visible}
-                  onOk={handleOk}
-                  confirmLoading={confirmLoading}
-                  onCancel={handleCancel}
-                >
-                  <Form
-                    {...layout}
-                  >
-                    <Form.Item label="ชื่อ GIS Layer">
-                      <Input />
-                    </Form.Item>
-                    <Form.Item label="กลุ่มของ Group Layer">
-                      <Input />
-                    </Form.Item>
-                    <Form.Item label="สีของ Gis Layer">
-                      <Input type="color" style={{ width: '20%' }} />
-                    </Form.Item>
-                  </Form>
-
-                </Modal>
-
-              </Col>
-
-              <Col>
-                <Table columns={columns} dataSource={data} onChange={onChange} />
-              </Col>
-            </Card>
+            <div className="table-responsive">
+              <Table
+                // loading={loading}
+                columns={columns}
+                dataSource={data}
+                pagination={{
+                  current: page,
+                  pageSize: pageSize,
+                  onChange: (page, pageSize) => {
+                    setPage(page);
+                    setPageSize(pageSize);
+                  },
+                }}
+              />
+            </div>
           </Col>
-
         </Row>
       </System>
+      <Modal
+        title="เพิ่มผู้ใช้ระบบ"
+        visible={isModalVisible}
+        onOk={handleOk}
+        onCancel={handleCancel}
+      >
+        <Form
+          form={form}
+          labelCol={{ span: 7 }}
+          wrapperCol={{ span: 14 }}
+          onFinish={onFinish}
+        >
+          
+          <Form.Item
+            name="roles_id"
+            label="Group Layer"
+            rules={[
+              { required: true, message: "กรุณากรอกข้อมูล กลุ่มผู้ใช้งาน" },
+            ]}
+          >
+            <Select placeholder="กรุณาเลือก">
+              {roles.map((data, index) => (
+                <Option key={index} value={data.id}>
+                  {data.roles_name}
+                </Option>
+              ))}
+            </Select>
+          </Form.Item>
+          <Form.Item
+            name="typecolor"
+            label="สี GIS Layer"
+            rules={[{ required: true }]}
+          >
+            <Input type="color" style={{width:'15%'}}/>
+          </Form.Item>
+        </Form>
+      </Modal>
     </>
   );
 };
 
-export default index;
+export default usersSystemPage;
