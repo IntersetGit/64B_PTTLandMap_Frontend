@@ -212,6 +212,10 @@ const mapPage = () => {
         arr[index1].children[index2].rgb = rgb;
         // console.log('rgb :>> ', rgb);
         setGroupLayerList(arr)
+
+        map.data.setStyle({
+            fillColor: arr[index1].children[index2].color_layer
+        });
     };
 
     const checkboxLayer = async (value, index1, index2) => {
@@ -223,7 +227,7 @@ const mapPage = () => {
         if (value.target.checked) {
             // console.log(' data  :>> ', arr[index1].children[index2]);
             const item = arr[index1].children[index2];
-            await getDeoJson(item.id)
+            await getDeoJson(item.id, item.color_layer)
         } else {
             arr.forEach(e => {
                 if (e.children) {
@@ -240,8 +244,9 @@ const mapPage = () => {
     };
 
 
-    const getDeoJson = async (id) => {
+    const getDeoJson = async (id, color) => {
         try {
+            console.log('color :>> ', color);
             const { data } = await API.get(`/shp/shapeData?id=${id}`)
             const GeoJson = data.items.shape
             map.data.addGeoJson(GeoJson);
@@ -252,6 +257,10 @@ const mapPage = () => {
                 });
             });
             map.fitBounds(bounds);
+
+            map.data.setStyle({
+                fillColor: color
+            });
         } catch (error) {
 
         }
