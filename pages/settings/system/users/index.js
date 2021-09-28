@@ -21,10 +21,17 @@ const usersSystemPage = () => {
   const [loading, setLoading] = useState(true);
   const [roles, setRoles] = useState([]);
   const [data, setData] = useState([]);
+  const [dataEdit, setDataEdit] = useState([]);
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(5);
-  const [isModalVisible, setIsModalVisible] = useState(false);
-  const [form] = Form.useForm();
+  const [isModalVisible, setIsModalVisible] = useState({
+    create: false,
+    edit: false,
+  });
+  const [buttonCreate, setButtonCreate] = useState(true); //สถานะเปิดปิดsubmit ตอนmodal create
+  const [statusValidation, setStatusValidation] = useState([]);
+  const [formCreate] = Form.useForm();
+  const [formEdit] = Form.useForm();
   const columns = [
     {
       key: "1",
@@ -75,8 +82,19 @@ const usersSystemPage = () => {
           <Dropdown
             overlay={
               <Menu>
-                <Menu.Item key="1">แก้ไข</Menu.Item>
-                <Menu.Item key="2">ลบ</Menu.Item>
+                <Menu.Item
+                  key="1"
+                  onClick={async () => {
+                    await handleEdit(id),
+                      await handleCancel(),
+                      await handleEdit(id);
+                  }}
+                >
+                  แก้ไข
+                </Menu.Item>
+                <Menu.Item key="2" onClick={() => handleDelete(id)}>
+                  ลบ
+                </Menu.Item>
               </Menu>
             }
             placement="bottomLeft"
@@ -87,11 +105,13 @@ const usersSystemPage = () => {
           </Dropdown>
         );
       },
-      responsive: ["md"],
     },
   ];
-  const reload = () => {
-    Api.post("/provider/getSearchUser")
+  const reload = (search = null) => {
+    Api.post(
+      "/provider/getSearchUser",
+      search != null ? { search: search } : {}
+    )
       .then((data) => {
         let tempDataArray = [];
         data.data.forEach((data, key) => {
@@ -117,52 +137,107 @@ const usersSystemPage = () => {
     reload();
   }, []);
 
-  const search = (value) => {
-    setLoading(true);
-    Api.post("/provider/getSearchUser", { search: value }).then((data) => {
-      let tempDataArray = [];
-      data.data.forEach((data, key) => {
-        tempDataArray = [
-          ...tempDataArray,
-          {
-            number: key + 1,
-            ...data,
-          },
-        ];
-      });
-      setData(tempDataArray);
-      setLoading(false);
+  const showModal = (value) => {
+    setIsModalVisible((data) => {
+      return { ...data, [value]: true };
     });
   };
-
-  const showModal = () => {
-    setIsModalVisible(true);
-  };
-  const handleOk = () => {
-    form.submit();
+  const handleOk = (form) => {
+    if (form === "formCreate") {
+      formCreate.submit();
+    }
+    if (form === "formEdit") {
+      formEdit.submit();
+    }
   };
   const handleCancel = () => {
-    setIsModalVisible(false);
-    form.resetFields();
+    setIsModalVisible({ create: false, edit: false });
+    setStatusValidation({
+      validateStatus: "",
+      help: "",
+    });
+    formCreate.resetFields();
+    formEdit.resetFields();
+    setButtonCreate(true);
   };
-  const onFinish = async (value) => {
+  const onFinishCreate = async (value) => {
+    let filterRoles = await roles.find(
+      (data) => data.roles_name === value.roles_id
+    );
     setLoading(true);
     Api.post("/system/addUserAD", {
       username: value.username,
-      roles_id: value.roles_id,
+      roles_id: filterRoles.id,
     })
       .then((data) => {
-        setIsModalVisible(false);
+        alert("บันทึกข้อมูลเรียบร้อย")
+        setStatusValidation([]);
+        setIsModalVisible({ create: false, edit: false });
         setLoading(false);
+        formCreate.resetFields();
         reload();
-        form.resetFields();
+        setButtonCreate(true);
       })
       .catch((error) => {
         alert("มีบางอย่างผิดพลาด หรือมีผู้ใช้ในระบบแล้ว");
-        setIsModalVisible(false);
+        console.log(error);
+        setStatusValidation([]);
+        setIsModalVisible({ create: false, edit: false });
         setLoading(false);
+        formCreate.resetFields();
+        reload();
+        setButtonCreate(true);
       });
-    form.resetFields();
+  };
+  const onFinishEdit = async (value) => {
+    try {
+      let filterRoles = await roles.find(
+        (data) => data.roles_name === value.roles_id
+      );
+      let resp = await Api.post("/system/updateRoleUser", {
+        User_id: dataEdit.id,
+        roles_id: filterRoles.id,
+      });
+      alert("เปลี่ยนกลุ่มผู้ใช้งานเรียบร้อยแล้ว");
+      reload();
+      handleCancel();
+    } catch (error) {
+      console.log(error);
+      alert("มีบางอย่างผิดพลาด");
+    }
+  };
+  const onSearch = async (value) => {
+    Api.get(`/system/findUserAD?username=${value}`)
+      .then((data) => {
+        setStatusValidation({
+          help: "พบรหัสผู้ใช้ใน AD",
+        });
+        setButtonCreate(false);
+      })
+      .catch((error) => {
+        console.log(error);
+        setButtonCreate(true);
+        setStatusValidation({
+          validateStatus: "error",
+          help: "ไม่พบรหัสผู้ใช้ใน AD ",
+        });
+      });
+  };
+  const handleEdit = async (id) => {
+    let filterData = await data.find((data) => data.id === id);
+    setDataEdit(filterData);
+    showModal("edit");
+  };
+  const handleDelete = async (id) => {
+    try {
+      const resp = await Api.post("/system/delUserAD/" + id);
+      console.log(resp);
+      alert("ลบข้อมูลเรีนยร้อยแล้ว");
+      reload();
+    } catch (error) {
+      console.log(error);
+      alert("มีบางอย่างผิดพลาด");
+    }
   };
   return (
     <>
@@ -183,7 +258,12 @@ const usersSystemPage = () => {
             <h3 className="mb-4">จัดการผู้ใช้งานระบบ</h3>
           </Col>
           <Col span={5}>
-            <Search placeholder="input search text" onSearch={search} />
+            <Search
+              placeholder="input search text"
+              onSearch={(search) => {
+                reload(search);
+              }}
+            />
           </Col>
           <Col span={5}>
             <Button
@@ -197,7 +277,7 @@ const usersSystemPage = () => {
           <Col span={3} offset={11}>
             <Button
               type="primary"
-              onClick={showModal}
+              onClick={() => showModal("create")}
               style={{ float: "right" }}
             >
               + เพิ่มผู้ใช้ระบบ
@@ -224,22 +304,31 @@ const usersSystemPage = () => {
       </System>
       <Modal
         title="เพิ่มผู้ใช้ระบบ"
-        visible={isModalVisible}
-        onOk={handleOk}
+        visible={isModalVisible.create}
+        onOk={() => handleOk("formCreate")}
         onCancel={handleCancel}
+        okButtonProps={{ disabled: buttonCreate }}
       >
         <Form
-          form={form}
+          form={formCreate}
           labelCol={{ span: 7 }}
           wrapperCol={{ span: 14 }}
-          onFinish={onFinish}
+          onFinish={onFinishCreate}
+          initialValues={{
+            roles_id: "Editor",
+          }}
         >
           <Form.Item
             name="username"
             label="Username"
             rules={[{ required: true }]}
+            {...statusValidation}
           >
-            <Input placeholder="Username" />
+            <Search
+              placeholder="ีUsername"
+              enterButton="ค้นหา"
+              onSearch={onSearch}
+            />
           </Form.Item>
           <Form.Item
             name="roles_id"
@@ -248,9 +337,49 @@ const usersSystemPage = () => {
               { required: true, message: "กรุณากรอกข้อมูล กลุ่มผู้ใช้งาน" },
             ]}
           >
-            <Select placeholder="กลุ่มผู้ใช้งาน">
+            <Select placeholder="กลุ่มผู้ใช้งาน" defaultValue="Editor">
               {roles.map((data, index) => (
-                <Option key={index} value={data.id}>
+                <Option key={index} value={data.roles_name}>
+                  {data.roles_name}
+                </Option>
+              ))}
+            </Select>
+          </Form.Item>
+        </Form>
+      </Modal>
+
+      <Modal
+        title="แก้ไขผู้ใช้"
+        visible={isModalVisible.edit}
+        onOk={() => handleOk("formEdit")}
+        onCancel={handleCancel}
+      >
+        <Form
+          form={formEdit}
+          labelCol={{ span: 7 }}
+          wrapperCol={{ span: 14 }}
+          onFinish={onFinishEdit}
+          initialValues={{
+            user_name: dataEdit.user_name,
+            roles_id: dataEdit.roles_name,
+          }}
+        >
+          <Form.Item label="รหัสผู้ใช้ (AD)" name="user_name">
+            <Input disabled={true} />
+          </Form.Item>
+          <Form.Item
+            name="roles_id"
+            label="กลุ่มผู้ใช้งาน"
+            rules={[
+              { required: true, message: "กรุณากรอกข้อมูล กลุ่มผู้ใช้งาน" },
+            ]}
+          >
+            <Select
+              placeholder="กลุ่มผู้ใช้งาน"
+              defaultValue={dataEdit.roles_name}
+            >
+              {roles.map((data, index) => (
+                <Option key={index} value={data.roles_name}>
                   {data.roles_name}
                 </Option>
               ))}
