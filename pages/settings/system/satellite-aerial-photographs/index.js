@@ -48,7 +48,7 @@ const index = () => {
     },
     {
       key: "2",
-      title: "img",
+      title: "รูปภาพ",
       dataIndex: "id",
       render: (id) => {
         return (
@@ -77,15 +77,7 @@ const index = () => {
       },
     },
     {
-      key: "5",
-      title: "url",
-      dataIndex: "url",
-      sorter: (record1, record2) => {
-        return record1.roles_name > record2.roles_name;
-      },
-    },
-    {
-      key: "6",
+      key: "ถ",
       title: "type_server",
       dataIndex: "type_server",
       sorter: (record1, record2) => {
@@ -93,7 +85,7 @@ const index = () => {
       },
     },
     {
-      key: "7",
+      key: "6",
       title: "date",
       dataIndex: "date",
       sorter: (record1, record2) => {
@@ -101,7 +93,7 @@ const index = () => {
       },
     },
     {
-      key: "8",
+      key: "7",
       title: "config",
       dataIndex: "id",
       render: (id) => {
@@ -382,7 +374,7 @@ const index = () => {
             label="url"
             rules={[{ required: true }]}
           >
-            <Input placeholder="wms_url" />
+            <Input placeholder="url" />
           </Form.Item>
           {menuItem}
           <Form.Item

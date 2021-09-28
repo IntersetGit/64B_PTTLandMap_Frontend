@@ -29,10 +29,7 @@ const usersSystemPage = () => {
     edit: false,
   });
   const [buttonCreate, setButtonCreate] = useState(true); //สถานะเปิดปิดsubmit ตอนmodal create
-  const [statusValidation, setStatusValidation] = useState({
-    validateStatus: "",
-    help: "",
-  });
+  const [statusValidation, setStatusValidation] = useState([]);
   const [formCreate] = Form.useForm();
   const [formEdit] = Form.useForm();
   const columns = [
@@ -161,67 +158,85 @@ const usersSystemPage = () => {
     });
     formCreate.resetFields();
     formEdit.resetFields();
+    setButtonCreate(true);
   };
   const onFinishCreate = async (value) => {
-    // setLoading(true);
-    // Api.post("/system/addUserAD", {
-    //   username: value.username,
-    //   roles_id: value.roles_id,
-    // })
-    //   .then((data) => {
-    //     setIsModalVisible(false);
-    //     setLoading(false);
-    //     reload();
-    //     form.resetFields();
-    //   })
-    //   .catch((error) => {
-    //     alert("มีบางอย่างผิดพลาด หรือมีผู้ใช้ในระบบแล้ว");
-    //     setIsModalVisible(false);
-    //     setLoading(false);
-    //   });
-    // formCreate.resetFields();
-    console.log(value);
+    let filterRoles = await roles.find(
+      (data) => data.roles_name === value.roles_id
+    );
+    setLoading(true);
+    Api.post("/system/addUserAD", {
+      username: value.username,
+      roles_id: filterRoles.id,
+    })
+      .then((data) => {
+        alert("บันทึกข้อมูลเรียบร้อย")
+        setStatusValidation([]);
+        setIsModalVisible({ create: false, edit: false });
+        setLoading(false);
+        formCreate.resetFields();
+        reload();
+        setButtonCreate(true);
+      })
+      .catch((error) => {
+        alert("มีบางอย่างผิดพลาด หรือมีผู้ใช้ในระบบแล้ว");
+        console.log(error);
+        setStatusValidation([]);
+        setIsModalVisible({ create: false, edit: false });
+        setLoading(false);
+        formCreate.resetFields();
+        reload();
+        setButtonCreate(true);
+      });
   };
   const onFinishEdit = async (value) => {
     try {
-      let filterRoles = await roles.find(data=>data.roles_name===value.roles_id)
-      let resp = await Api.post("/system/updateRoleUser",{User_id:dataEdit.id, roles_id:filterRoles.id })
-      alert("เปลี่ยนกลุ่มผู้ใช้งานเรียบร้อยแล้ว")
-      reload()
-      handleCancel()
+      let filterRoles = await roles.find(
+        (data) => data.roles_name === value.roles_id
+      );
+      let resp = await Api.post("/system/updateRoleUser", {
+        User_id: dataEdit.id,
+        roles_id: filterRoles.id,
+      });
+      alert("เปลี่ยนกลุ่มผู้ใช้งานเรียบร้อยแล้ว");
+      reload();
+      handleCancel();
     } catch (error) {
-      console.log(error)
-      alert("มีบางอย่างผิดพลาด")
+      console.log(error);
+      alert("มีบางอย่างผิดพลาด");
     }
   };
-  const onSearch = async(value) => {
-    // alert("รอApi backend");
-    // // setButtonCreate(false)
-    alert(value)
-    // setStatusValidation({
-    //   validateStatus: "error",
-    //   help: "ไม่พบรหัสผู้ใช้ในAD หรือมีชื่อผู้ใช้ในระบบแล้ว",
-    // });
-    try {
-      const resp = await Api.get(`/system/findUserAD?username=${value}`)
-      console.log(resp)
-    } catch (error) {
-      
-    }
+  const onSearch = async (value) => {
+    Api.get(`/system/findUserAD?username=${value}`)
+      .then((data) => {
+        setStatusValidation({
+          help: "พบรหัสผู้ใช้ใน AD",
+        });
+        setButtonCreate(false);
+      })
+      .catch((error) => {
+        console.log(error);
+        setButtonCreate(true);
+        setStatusValidation({
+          validateStatus: "error",
+          help: "ไม่พบรหัสผู้ใช้ใน AD ",
+        });
+      });
   };
   const handleEdit = async (id) => {
     let filterData = await data.find((data) => data.id === id);
     setDataEdit(filterData);
     showModal("edit");
   };
-  const handleDelete = async(id) => {
+  const handleDelete = async (id) => {
     try {
-      const resp = await Api.post("/system/delUserAD/"+id)
-      alert("ลบข้อมูลเรีนยร้อยแล้ว")
-      reload()
+      const resp = await Api.post("/system/delUserAD/" + id);
+      console.log(resp);
+      alert("ลบข้อมูลเรีนยร้อยแล้ว");
+      reload();
     } catch (error) {
-      console.log(error)
-      alert("มีบางอย่างผิดพลาด")
+      console.log(error);
+      alert("มีบางอย่างผิดพลาด");
     }
   };
   return (
@@ -313,7 +328,6 @@ const usersSystemPage = () => {
               placeholder="ีUsername"
               enterButton="ค้นหา"
               onSearch={onSearch}
-              rules={[{ required: true, message: "กรุณากรอกข้อมูล ผู้ใช้งาน" }]}
             />
           </Form.Item>
           <Form.Item
@@ -323,9 +337,9 @@ const usersSystemPage = () => {
               { required: true, message: "กรุณากรอกข้อมูล กลุ่มผู้ใช้งาน" },
             ]}
           >
-            <Select placeholder="กลุ่มผู้ใช้งาน">
+            <Select placeholder="กลุ่มผู้ใช้งาน" defaultValue="Editor">
               {roles.map((data, index) => (
-                <Option key={index} value={data.id}>
+                <Option key={index} value={data.roles_name}>
                   {data.roles_name}
                 </Option>
               ))}
@@ -347,7 +361,7 @@ const usersSystemPage = () => {
           onFinish={onFinishEdit}
           initialValues={{
             user_name: dataEdit.user_name,
-            roles_id:dataEdit.roles_name
+            roles_id: dataEdit.roles_name,
           }}
         >
           <Form.Item label="รหัสผู้ใช้ (AD)" name="user_name">
@@ -360,7 +374,10 @@ const usersSystemPage = () => {
               { required: true, message: "กรุณากรอกข้อมูล กลุ่มผู้ใช้งาน" },
             ]}
           >
-            <Select placeholder="กลุ่มผู้ใช้งาน" defaultValue={dataEdit.roles_name}>
+            <Select
+              placeholder="กลุ่มผู้ใช้งาน"
+              defaultValue={dataEdit.roles_name}
+            >
               {roles.map((data, index) => (
                 <Option key={index} value={data.roles_name}>
                   {data.roles_name}
