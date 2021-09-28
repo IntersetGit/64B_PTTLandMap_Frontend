@@ -194,13 +194,13 @@ const usersSystemPage = () => {
       let filterRoles = await roles.find(
         (data) => data.roles_name === value.roles_id
       );
-      let resp = await Api.post("/system/updateRoleUser", {
-        User_id: dataEdit.id,
-        roles_id: filterRoles.id,
+      let resp = await Api.put("/system/updateRoleUser", {
+        id: dataEdit.id,
+        roles_id:filterRoles.id,
       });
       alert("เปลี่ยนกลุ่มผู้ใช้งานเรียบร้อยแล้ว");
       reload();
-      handleCancel();
+      handleCancel()
     } catch (error) {
       console.log(error);
       alert("มีบางอย่างผิดพลาด");
@@ -233,7 +233,7 @@ const usersSystemPage = () => {
       const resp = await Api.post("/system/delUserAD/" + id);
       console.log(resp);
       alert("ลบข้อมูลเรีนยร้อยแล้ว");
-      reload();
+      reload()
     } catch (error) {
       console.log(error);
       alert("มีบางอย่างผิดพลาด");
