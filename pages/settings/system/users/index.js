@@ -183,25 +183,46 @@ const usersSystemPage = () => {
     console.log(value);
   };
   const onFinishEdit = async (value) => {
-    console.log(value);
-    alert("รอApi backend");
+    try {
+      let filterRoles = await roles.find(data=>data.roles_name===value.roles_id)
+      let resp = await Api.post("/system/updateRoleUser",{User_id:dataEdit.id, roles_id:filterRoles.id })
+      alert("เปลี่ยนกลุ่มผู้ใช้งานเรียบร้อยแล้ว")
+      reload()
+      handleCancel()
+    } catch (error) {
+      console.log(error)
+      alert("มีบางอย่างผิดพลาด")
+    }
   };
-  const onSearch = (value) => {
-    alert("รอApi backend");
-    // setButtonCreate(false)
-    setStatusValidation({
-      validateStatus: "error",
-      help: "ไม่พบรหัสผู้ใช้ในAD หรือมีชื่อผู้ใช้ในระบบแล้ว",
-    });
+  const onSearch = async(value) => {
+    // alert("รอApi backend");
+    // // setButtonCreate(false)
+    alert(value)
+    // setStatusValidation({
+    //   validateStatus: "error",
+    //   help: "ไม่พบรหัสผู้ใช้ในAD หรือมีชื่อผู้ใช้ในระบบแล้ว",
+    // });
+    try {
+      const resp = await Api.get(`/system/findUserAD?username=${value}`)
+      console.log(resp)
+    } catch (error) {
+      
+    }
   };
   const handleEdit = async (id) => {
     let filterData = await data.find((data) => data.id === id);
     setDataEdit(filterData);
     showModal("edit");
-    console.log(filterData);
   };
-  const handleDelete = (id) => {
-    alert("รอ Api backend");
+  const handleDelete = async(id) => {
+    try {
+      const resp = await Api.post("/system/delUserAD/"+id)
+      alert("ลบข้อมูลเรีนยร้อยแล้ว")
+      reload()
+    } catch (error) {
+      console.log(error)
+      alert("มีบางอย่างผิดพลาด")
+    }
   };
   return (
     <>
@@ -325,8 +346,8 @@ const usersSystemPage = () => {
           wrapperCol={{ span: 14 }}
           onFinish={onFinishEdit}
           initialValues={{
-            roles_id: dataEdit.roles_name,
             user_name: dataEdit.user_name,
+            roles_id:dataEdit.roles_name
           }}
         >
           <Form.Item label="รหัสผู้ใช้ (AD)" name="user_name">
@@ -339,9 +360,9 @@ const usersSystemPage = () => {
               { required: true, message: "กรุณากรอกข้อมูล กลุ่มผู้ใช้งาน" },
             ]}
           >
-            <Select placeholder="กลุ่มผู้ใช้งาน">
+            <Select placeholder="กลุ่มผู้ใช้งาน" defaultValue={dataEdit.roles_name}>
               {roles.map((data, index) => (
-                <Option key={index} value={data.id}>
+                <Option key={index} value={data.roles_name}>
                   {data.roles_name}
                 </Option>
               ))}
