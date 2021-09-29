@@ -283,11 +283,11 @@ const GroupLayerSystemPage = () => {
           </Form.Item>
           <Form.Item
             name="Symbol"
-            label="Sybol"
+            label="Symbol"
             valuePropName="fileList"
             rules={[{ required: true }]}
             getValueFromEvent={normFile}
-            extra="ขนาดที่ recommend 50*50 pixcel"
+            extra="ขนาดรูปภาพไม่เกิน 50*50 pixcel"
           >
             <Upload name="logo" action="/upload.do" listType="picture">
               <Button icon={<UploadOutlined />}>Select File</Button>
