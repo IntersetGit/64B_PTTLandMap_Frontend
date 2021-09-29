@@ -325,7 +325,7 @@ const usersSystemPage = () => {
             {...statusValidation}
           >
             <Search
-              placeholder="ีUsername"
+              placeholder="+Username"
               enterButton="ค้นหา"
               onSearch={onSearch}
             />
