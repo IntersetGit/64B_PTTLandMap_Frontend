@@ -132,8 +132,8 @@ const GroupLayerSystemPage = () => {
       render: (id) => {
         return (
           <img
-            width={20}
-            height={20}
+            width={16}
+            height={16}
             src={id}
           />
         );
