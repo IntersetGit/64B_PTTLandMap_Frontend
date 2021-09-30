@@ -8069,3 +8069,11 @@ ul.comment-list li ul.children {
 		z-index: 1;
 	}
 }
+
+.ant-image-preview-operations-operation:not(:first-child) {
+    display: none;
+}
+
+.ant-image-mask-info{
+	display: none;
+}

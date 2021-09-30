@@ -171,11 +171,7 @@ const usersSystemPage = () => {
       roles_id: filterRoles.id,
     })
       .then((data) => {
-        Swal.fire(
-          '',
-          'บันทึกข้อมูลเรียบร้อย',
-          'success'
-        )
+        Swal.fire("", "บันทึกข้อมูลเรียบร้อย", "success");
         setStatusValidation([]);
         setIsModalVisible({ create: false, edit: false });
         setLoading(false);
@@ -184,11 +180,7 @@ const usersSystemPage = () => {
         setButtonCreate(true);
       })
       .catch((error) => {
-        Swal.fire(
-          '',
-          'มีบางอย่างผิดพลาด หรือมีผู้ใช้ในระบบแล้ว',
-          'error'
-        )
+        Swal.fire("", "มีบางอย่างผิดพลาด หรือมีผู้ใช้ในระบบแล้ว", "error");
         console.log(error);
         setStatusValidation([]);
         setIsModalVisible({ create: false, edit: false });
@@ -203,20 +195,28 @@ const usersSystemPage = () => {
       let filterRoles = await roles.find(
         (data) => data.roles_name === value.roles_id
       );
-      let resp = await Api.put("/system/updateRoleUser", {
-        id: dataEdit.id,
-        roles_id: filterRoles.id,
+      Swal.fire({
+        title: "กรุณายืนยันการแก้ไขข้อมูล",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#218838",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "ยืนยัน",
+        cancelButtonText: "ยกเลิก",
+      }).then(async (result) => {
+        if (result.isConfirmed) {
+          let resp = await Api.put("/system/updateRoleUser", {
+            id: dataEdit.id,
+            roles_id: filterRoles.id,
+          });
+          await Swal.fire("", "แก้ไขข้อมูลเรียบร้อยแล้ว", "success");
+          reload();
+          handleCancel();
+        }
       });
-      Swal.fire(
-        '',
-        'เปลี่ยนกลุ่มผู้ใช้งานเรียบร้อยแล้ว',
-        'success'
-      )
-      reload();
-      handleCancel();
     } catch (error) {
       console.log(error);
-      alert("มีบางอย่างผิดพลาด");
+      Swal.fire("", "มีบางอย่างผิดพลาด", "success");
     }
   };
   const onSearch = async (value) => {
@@ -262,11 +262,7 @@ const usersSystemPage = () => {
       });
     } catch (error) {
       console.log(error);
-      Swal.fire(
-        '',
-        'มีบางอย่างผิดพลาด',
-        'error'
-      )
+      Swal.fire("", "มีบางอย่างผิดพลาด", "error");
     }
   };
   return (
