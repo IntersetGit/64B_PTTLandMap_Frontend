@@ -19,6 +19,7 @@ import {
   Modal,
   Dropdown,
   Menu,
+  Image
 } from "antd";
 import Api from "../../../../util/Api";
 import { UploadOutlined, RedoOutlined } from "@ant-design/icons";
@@ -52,9 +53,10 @@ const index = () => {
       dataIndex: "id",
       render: (id) => {
         return (
-          <img
+          <Image
             width={50}
             height={50}
+            preview={true}
             src={`${process.env.NEXT_PUBLIC_SERVICE}/uploads/satellite-aerial-photographs/${id}.jpg`}
           />
         );
