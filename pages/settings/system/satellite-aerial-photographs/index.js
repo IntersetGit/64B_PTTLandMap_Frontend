@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import Swal from "sweetalert2";
 import axios from "axios";
 import Head from "next/head";
 import System from "../../../../components/_App/System";
@@ -23,7 +24,6 @@ import Api from "../../../../util/Api";
 import { UploadOutlined, RedoOutlined } from "@ant-design/icons";
 const { Option } = Select;
 const { Search } = Input;
-
 const index = () => {
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState([]);
@@ -62,7 +62,7 @@ const index = () => {
     },
     {
       key: "3",
-      title: "layer_name",
+      title: "Layer Name",
       dataIndex: "layer_name",
       sorter: (record1, record2) => {
         return record1.user_name > record2.user_name;
@@ -70,7 +70,7 @@ const index = () => {
     },
     {
       key: "4",
-      title: "ชื่อผู้ใช้ (WMS)",
+      title: "ชื่อข้อมูล (WMS)",
       dataIndex: "wms",
       sorter: (record1, record2) => {
         return record1.roles_name > record2.roles_name;
@@ -78,7 +78,7 @@ const index = () => {
     },
     {
       key: "ถ",
-      title: "type_server",
+      title: "Type Server",
       dataIndex: "type_server",
       sorter: (record1, record2) => {
         return record1.roles_name > record2.roles_name;
@@ -86,7 +86,7 @@ const index = () => {
     },
     {
       key: "6",
-      title: "date",
+      title: "Date",
       dataIndex: "date",
       sorter: (record1, record2) => {
         return record1.roles_name > record2.roles_name;
@@ -94,7 +94,7 @@ const index = () => {
     },
     {
       key: "7",
-      title: "config",
+      title: "จัดการ",
       dataIndex: "id",
       render: (id) => {
         return (
@@ -180,6 +180,11 @@ const index = () => {
             },
           }
         );
+        await Swal.fire(
+          '',
+          'บันทึกข้อมูลเรียบร้อย',
+          'success'
+        )
         window.location.reload()
       })
       .catch((error) => {
@@ -211,23 +216,54 @@ const index = () => {
             )
             setIsModalVisible({create:false,edit:false});
             setLoading(false);
-            reload();
+            await Swal.fire(
+              '',
+              'แก้ไขข้อมูลเรียบร้อยแล้ว',
+              'success'
+            )
             window.location.reload()
             formEdit.resetFields();
           })
           .catch((error) => console.log(error));
   };
   const deleteHandle = (id) => {
-    if (confirm("คุณแน่ใจหรือไม่ว่าต้องการลบข้อมูล")) {
-      setLoading(true);
-      Api.delete("/masterdata/datLayers", { data: { id: id } })
-        .then((data) => {
-          alert("ลบข้อมูลเรียบร้อย");
+    try {
+      Swal.fire({
+        title: "กรุณายืนยันการลบข้อมูล?",
+        text: "เมื่อยืนยันแล้วจะไม่สามารถเรียกคืนได้",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#218838",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "ยืนยัน",
+        cancelButtonText: "ยกเลิก",
+      }).then(async (result) => {
+        if (result.isConfirmed) {
+          setLoading(true);
+          const resp = await Api.delete("/masterdata/datLayers", { data: { id: id } })
+          Swal.fire("", "ลบข้อมูลเรียบร้อยแล้ว", "success");
           reload();
-        })
-        .catch((error) => alert("มีบางอย่างผิดพลาด ไม่สามารถลบข้อมูลได้"));
+        }
+      });
+    } catch (error) {
+      console.log(error);
+      Swal.fire(
+        '',
+        'มีบางอย่างผิดพลาด ไม่สามารถลบข้อมูลได้',
+        'error'
+      )
       setLoading(false);
     }
+    // if (confirm("คุณแน่ใจหรือไม่ว่าต้องการลบข้อมูล")) {
+    //   setLoading(true);
+    //   Api.delete("/masterdata/datLayers", { data: { id: id } })
+    //     .then((data) => {
+    //       alert("ลบข้อมูลเรียบร้อย");
+    //       reload();
+    //     })
+    //     .catch((error) => alert("มีบางอย่างผิดพลาด ไม่สามารถลบข้อมูลได้"));
+    //   setLoading(false);
+    // }
   };
   const handleEdit = async (id)=>{
     let filterData =  await  data.find((data) => data.id === id);
