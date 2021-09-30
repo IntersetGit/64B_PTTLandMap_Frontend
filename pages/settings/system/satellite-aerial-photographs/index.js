@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import Swal from "sweetalert2";
 import axios from "axios";
 import Head from "next/head";
 import System from "../../../../components/_App/System";
@@ -18,16 +19,16 @@ import {
   Modal,
   Dropdown,
   Menu,
+  Image
 } from "antd";
 import Api from "../../../../util/Api";
 import { UploadOutlined, RedoOutlined } from "@ant-design/icons";
 const { Option } = Select;
 const { Search } = Input;
-
 const index = () => {
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState([]);
-  const [dataEdit,setDataEdit]=useState([])
+  const [dataEdit, setDataEdit] = useState([]);
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(5);
   const [isModalVisible, setIsModalVisible] = useState({
@@ -52,9 +53,10 @@ const index = () => {
       dataIndex: "id",
       render: (id) => {
         return (
-          <img
+          <Image
             width={50}
             height={50}
+            preview={true}
             src={`${process.env.NEXT_PUBLIC_SERVICE}/uploads/satellite-aerial-photographs/${id}.jpg`}
           />
         );
@@ -62,7 +64,7 @@ const index = () => {
     },
     {
       key: "3",
-      title: "layer_name",
+      title: "Layer Name",
       dataIndex: "layer_name",
       sorter: (record1, record2) => {
         return record1.user_name > record2.user_name;
@@ -70,7 +72,7 @@ const index = () => {
     },
     {
       key: "4",
-      title: "ชื่อผู้ใช้ (WMS)",
+      title: "ชื่อข้อมูล (WMS)",
       dataIndex: "wms",
       sorter: (record1, record2) => {
         return record1.roles_name > record2.roles_name;
@@ -78,7 +80,7 @@ const index = () => {
     },
     {
       key: "ถ",
-      title: "type_server",
+      title: "Type Server",
       dataIndex: "type_server",
       sorter: (record1, record2) => {
         return record1.roles_name > record2.roles_name;
@@ -86,7 +88,7 @@ const index = () => {
     },
     {
       key: "6",
-      title: "date",
+      title: "Date",
       dataIndex: "date",
       sorter: (record1, record2) => {
         return record1.roles_name > record2.roles_name;
@@ -94,7 +96,7 @@ const index = () => {
     },
     {
       key: "7",
-      title: "config",
+      title: "จัดการ",
       dataIndex: "id",
       render: (id) => {
         return (
@@ -103,8 +105,10 @@ const index = () => {
               <Menu>
                 <Menu.Item
                   key="1"
-                  onClick={async() => {
-                    await handleEdit(id),await handleCancel(),await handleEdit(id)
+                  onClick={async () => {
+                    await handleEdit(id),
+                      await handleCancel(),
+                      await handleEdit(id);
                   }}
                 >
                   แก้ไข
@@ -160,7 +164,7 @@ const index = () => {
       layer_name: value.layerName ?? null,
       type_server: value.typeserver,
       wms: value.wms,
-      url:value.url,
+      url: value.url,
       date: value["date"].format("YYYY-MM-DD"),
     };
     let fd = new FormData();
@@ -180,64 +184,106 @@ const index = () => {
             },
           }
         );
+        await Swal.fire("", "บันทึกข้อมูลเรียบร้อย", "success");
+        window.location.reload();
       })
       .catch((error) => {
         console.log(error);
         setLoading(false);
       });
   };
-  const onFinishEdit = (value) => {
-        const data = {
-          id: value.id,
-          image_type: value.image_type,
-          layer_name: value.layerName??null,
-          type_server: value.typeserver,
-          wms: value.wms,
-          url:value.url,
-          date: value["date"].format("YYYY-MM-DD"),
-        };
-        let fd = new FormData()
-        fd.append("file0", value.upload[0].originFileObj)
-        Api.put("/masterdata/datLayers", data)
-          .then(async (data) => {
-            const upload = await axios.post(`${process.env.NEXT_PUBLIC_SERVICE}/upload?Path=satellite-aerial-photographs&Length=1&Name=${value.id}&SetType=jpg`, fd
-              ,
-              {
-                headers: {
-                  'Content-Type': 'multipart/form-data',
-                },
-              }
-            )
-            setIsModalVisible({create:false,edit:false});
-            setLoading(false);
-            reload();
-            window.location.reload()
-            formEdit.resetFields();
-          })
-          .catch((error) => console.log(error));
-  };
-  const deleteHandle = (id) => {
-    if (confirm("คุณแน่ใจหรือไม่ว่าต้องการลบข้อมูล")) {
-      setLoading(true);
-      Api.delete("/masterdata/datLayers", { data: { id: id } })
-        .then((data) => {
-          alert("ลบข้อมูลเรียบร้อย");
-          reload();
-        })
-        .catch((error) => alert("มีบางอย่างผิดพลาด ไม่สามารถลบข้อมูลได้"));
-      setLoading(false);
+  const onFinishEdit = async (value) => {
+    try {
+      Swal.fire({
+        title: "กรุณายืนยันการแก้ไขข้อมูล",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#218838",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "ยืนยัน",
+        cancelButtonText: "ยกเลิก",
+      }).then(async (result) => {
+        if (result.isConfirmed) {
+          const data = {
+            id: value.id,
+            image_type: value.image_type,
+            layer_name: value.layerName ?? null,
+            type_server: value.typeserver,
+            wms: value.wms,
+            url: value.url,
+            date: value["date"].format("YYYY-MM-DD"),
+          };
+          let fd = new FormData();
+          fd.append("file0", value.upload[0].originFileObj);
+          const respData = await Api.put("/masterdata/datLayers", data);
+          const respImage = await axios.post(
+            `${process.env.NEXT_PUBLIC_SERVICE}/upload?Path=satellite-aerial-photographs&Length=1&Name=${value.id}&SetType=jpg`,
+            fd,
+            {
+              headers: {
+                "Content-Type": "multipart/form-data",
+              },
+            }
+          );
+          setIsModalVisible({ create: false, edit: false });
+          setLoading(false);
+          await Swal.fire("", "แก้ไขข้อมูลเรียบร้อยแล้ว", "success");
+          window.location.reload();
+          formEdit.resetFields();
+        }
+      });
+    } catch (error) {
+      console.log(error);
+      Swal.fire("", "มีบางอย่างผิดพลาด", "success");
     }
   };
-  const handleEdit = async (id)=>{
-    let filterData =  await  data.find((data) => data.id === id);
+  const deleteHandle = (id) => {
+    try {
+      Swal.fire({
+        title: "กรุณายืนยันการลบข้อมูล?",
+        text: "เมื่อยืนยันแล้วจะไม่สามารถเรียกคืนได้",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#218838",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "ยืนยัน",
+        cancelButtonText: "ยกเลิก",
+      }).then(async (result) => {
+        if (result.isConfirmed) {
+          setLoading(true);
+          const resp = await Api.delete("/masterdata/datLayers", {
+            data: { id: id },
+          });
+          Swal.fire("", "ลบข้อมูลเรียบร้อยแล้ว", "success");
+          reload();
+        }
+      });
+    } catch (error) {
+      console.log(error);
+      Swal.fire("", "มีบางอย่างผิดพลาด ไม่สามารถลบข้อมูลได้", "error");
+      setLoading(false);
+    }
+    // if (confirm("คุณแน่ใจหรือไม่ว่าต้องการลบข้อมูล")) {
+    //   setLoading(true);
+    //   Api.delete("/masterdata/datLayers", { data: { id: id } })
+    //     .then((data) => {
+    //       alert("ลบข้อมูลเรียบร้อย");
+    //       reload();
+    //     })
+    //     .catch((error) => alert("มีบางอย่างผิดพลาด ไม่สามารถลบข้อมูลได้"));
+    //   setLoading(false);
+    // }
+  };
+  const handleEdit = async (id) => {
+    let filterData = await data.find((data) => data.id === id);
     setDataEdit(filterData);
-    showModal("edit")
-    $(window).ready(function(){
-      $(`#arcgisserver`).click()
-      $(`#imageserver`).click()
-      $(`#${filterData.type_server}`).click()
-    })
-  }
+    showModal("edit");
+    $(window).ready(function () {
+      $(`#arcgisserver`).click();
+      $(`#imageserver`).click();
+      $(`#${filterData.type_server}`).click();
+    });
+  };
   const changeTypeServer = (e) => {
     const type = e.target.value;
     setMenuItem([]);
@@ -319,20 +365,20 @@ const index = () => {
           </Button>
         </Col>
         <Col span={24}>
-        <div className="table-responsive">
-          <Table
-            loading={loading}
-            columns={columns}
-            dataSource={data}
-            pagination={{
-              current: page,
-              pageSize: pageSize,
-              onChange: (page, pageSize) => {
-                setPage(page);
-                setPageSize(pageSize);
-              },
-            }}
-          />
+          <div className="table-responsive">
+            <Table
+              loading={loading}
+              columns={columns}
+              dataSource={data}
+              pagination={{
+                current: page,
+                pageSize: pageSize,
+                onChange: (page, pageSize) => {
+                  setPage(page);
+                  setPageSize(pageSize);
+                },
+              }}
+            />
           </div>
         </Col>
       </Row>
@@ -340,7 +386,7 @@ const index = () => {
       <Modal
         title="เพิ่มภาพถ่ายดาวเทียม และภาพถ่ายทางอากาศ"
         visible={isModalVisible.create}
-        onOk={()=>handleOk("formCreate")}
+        onOk={() => handleOk("formCreate")}
         onCancel={handleCancel}
         centered
       >
@@ -369,11 +415,7 @@ const index = () => {
           >
             <Input placeholder="wms_url" />
           </Form.Item>
-          <Form.Item
-            name="url"
-            label="url"
-            rules={[{ required: true }]}
-          >
+          <Form.Item name="url" label="url" rules={[{ required: true }]}>
             <Input placeholder="url" />
           </Form.Item>
           {menuItem}
@@ -413,7 +455,9 @@ const index = () => {
       <Modal
         title="แก้ไข ภาพถ่ายดาวเทียม และภาพถ่ายทางอากาศ"
         visible={isModalVisible.edit}
-        onOk={()=>{handleOk("formEdit")}}
+        onOk={() => {
+          handleOk("formEdit");
+        }}
         onCancel={handleCancel}
         centered
       >
@@ -426,7 +470,7 @@ const index = () => {
             id: dataEdit.id,
             nameWms: dataEdit.wms,
             wms: dataEdit.wms,
-            url:dataEdit.url,
+            url: dataEdit.url,
             layerName: dataEdit.layer_name,
             date: moment(dataEdit.date),
             typeserver: dataEdit.type_server,
@@ -455,11 +499,7 @@ const index = () => {
           >
             <Input placeholder="wms_url" />
           </Form.Item>
-          <Form.Item
-            name="url"
-            label="url"
-            rules={[{ required: true }]}
-          >
+          <Form.Item name="url" label="url" rules={[{ required: true }]}>
             <Input placeholder="wms_url" />
           </Form.Item>
           {menuItem}
@@ -480,12 +520,20 @@ const index = () => {
             wrapperCol={{ span: 12 }}
             rules={[{ required: true }]}
           >
-            <Radio.Group onChange={(e) => {
+            <Radio.Group
+              onChange={(e) => {
                 changeTypeServer(e);
-              }} >
-              <Radio value="arcgisserver" id="arcgisserver">ArcGIS Server</Radio>
-              <Radio value="imageserver" id="imageserver">Image Server</Radio>
-              <Radio value="geoserver" id="geoserver">Geoserver</Radio>
+              }}
+            >
+              <Radio value="arcgisserver" id="arcgisserver">
+                ArcGIS Server
+              </Radio>
+              <Radio value="imageserver" id="imageserver">
+                Image Server
+              </Radio>
+              <Radio value="geoserver" id="geoserver">
+                Geoserver
+              </Radio>
             </Radio.Group>
           </Form.Item>
           <Form.Item name="date" label="Date" rules={[{ required: true }]}>
