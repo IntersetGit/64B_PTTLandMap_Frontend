@@ -19,7 +19,7 @@ import {
   Modal,
   Dropdown,
   Menu,
-  Image
+  Image,
 } from "antd";
 import Api from "../../../../util/Api";
 import { UploadOutlined, RedoOutlined } from "@ant-design/icons";
@@ -213,18 +213,20 @@ const index = () => {
             url: value.url,
             date: value["date"].format("YYYY-MM-DD"),
           };
-          let fd = new FormData();
-          fd.append("file0", value.upload[0].originFileObj);
+          const fd = new FormData();
           const respData = await Api.put("/masterdata/datLayers", data);
-          const respImage = await axios.post(
-            `${process.env.NEXT_PUBLIC_SERVICE}/upload?Path=satellite-aerial-photographs&Length=1&Name=${value.id}&SetType=jpg`,
-            fd,
-            {
-              headers: {
-                "Content-Type": "multipart/form-data",
-              },
-            }
-          );
+          if (!!value.upload) {
+            fd.append("file0", value.upload[0].originFileObj);
+            const respImage = await axios.post(
+              `${process.env.NEXT_PUBLIC_SERVICE}/upload?Path=satellite-aerial-photographs&Length=1&Name=${value.id}&SetType=jpg`,
+              fd,
+              {
+                headers: {
+                  "Content-Type": "multipart/form-data",
+                },
+              }
+            );
+          }
           setIsModalVisible({ create: false, edit: false });
           setLoading(false);
           await Swal.fire("", "แก้ไขข้อมูลเรียบร้อยแล้ว", "success");
@@ -263,16 +265,6 @@ const index = () => {
       Swal.fire("", "มีบางอย่างผิดพลาด ไม่สามารถลบข้อมูลได้", "error");
       setLoading(false);
     }
-    // if (confirm("คุณแน่ใจหรือไม่ว่าต้องการลบข้อมูล")) {
-    //   setLoading(true);
-    //   Api.delete("/masterdata/datLayers", { data: { id: id } })
-    //     .then((data) => {
-    //       alert("ลบข้อมูลเรียบร้อย");
-    //       reload();
-    //     })
-    //     .catch((error) => alert("มีบางอย่างผิดพลาด ไม่สามารถลบข้อมูลได้"));
-    //   setLoading(false);
-    // }
   };
   const handleEdit = async (id) => {
     let filterData = await data.find((data) => data.id === id);
@@ -320,6 +312,7 @@ const index = () => {
       setLoading(false);
     } catch (error) {
       console.log(error);
+      setLoading(false);
     }
   };
   useEffect(() => {
@@ -506,11 +499,18 @@ const index = () => {
           <Form.Item
             name="upload"
             label="Upload"
-            rules={[{ required: true }]}
             extra="ขนาดที่ recommend 80x80 pixcel"
             getValueFromEvent={normFile}
           >
-            <Upload maxCount={1}>
+            <Upload
+              maxCount={1}
+              defaultFileList={[
+                {
+                  name: `${dataEdit.id}.jpg`,
+                  url: `${process.env.NEXT_PUBLIC_SERVICE}/uploads/satellite-aerial-photographs/${dataEdit.id}.jpg`,
+                },
+              ]}
+            >
               <Button icon={<UploadOutlined />}>Select File</Button>
             </Upload>
           </Form.Item>
