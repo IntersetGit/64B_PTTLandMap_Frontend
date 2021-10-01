@@ -272,6 +272,10 @@ const mapPage = () => {
         setGroupLayerList(arr)
     };
 
+    const saveColor = (index1, index2) => {
+        openColor(index1, index2)
+    };
+
 
     /*  Dashboard */
     const [visibleDashboard, setVisibleDashboard] = useState(false)
@@ -382,7 +386,7 @@ const mapPage = () => {
                                                         }}>
                                                             <SketchPicker color={!x.rgb ? x.color_layer : x.rgb} onChange={(value) => handleChangeShapeFile(value, i, index)} />
                                                             <footer className="footer-color">
-                                                                <button className="btn btn-primary btn-sm">save</button>
+                                                                <button className="btn btn-primary btn-sm" onClick={() => saveColor(i, index)} >save</button>
                                                             </footer>
 
                                                         </div>

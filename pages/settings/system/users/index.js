@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import Swal from "sweetalert2";
 import Head from "next/head";
 import System from "../../../../components/_App/System";
 import Api from "../../../../util/Api";
@@ -170,7 +171,7 @@ const usersSystemPage = () => {
       roles_id: filterRoles.id,
     })
       .then((data) => {
-        alert("บันทึกข้อมูลเรียบร้อย")
+        Swal.fire("", "บันทึกข้อมูลเรียบร้อย", "success");
         setStatusValidation([]);
         setIsModalVisible({ create: false, edit: false });
         setLoading(false);
@@ -179,7 +180,7 @@ const usersSystemPage = () => {
         setButtonCreate(true);
       })
       .catch((error) => {
-        alert("มีบางอย่างผิดพลาด หรือมีผู้ใช้ในระบบแล้ว");
+        Swal.fire("", "มีบางอย่างผิดพลาด หรือมีผู้ใช้ในระบบแล้ว", "error");
         console.log(error);
         setStatusValidation([]);
         setIsModalVisible({ create: false, edit: false });
@@ -194,16 +195,28 @@ const usersSystemPage = () => {
       let filterRoles = await roles.find(
         (data) => data.roles_name === value.roles_id
       );
-      let resp = await Api.put("/system/updateRoleUser", {
-        id: dataEdit.id,
-        roles_id:filterRoles.id,
+      Swal.fire({
+        title: "กรุณายืนยันการแก้ไขข้อมูล",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#218838",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "ยืนยัน",
+        cancelButtonText: "ยกเลิก",
+      }).then(async (result) => {
+        if (result.isConfirmed) {
+          let resp = await Api.put("/system/updateRoleUser", {
+            id: dataEdit.id,
+            roles_id: filterRoles.id,
+          });
+          await Swal.fire("", "แก้ไขข้อมูลเรียบร้อยแล้ว", "success");
+          reload();
+          handleCancel();
+        }
       });
-      alert("เปลี่ยนกลุ่มผู้ใช้งานเรียบร้อยแล้ว");
-      reload();
-      handleCancel()
     } catch (error) {
       console.log(error);
-      alert("มีบางอย่างผิดพลาด");
+      Swal.fire("", "มีบางอย่างผิดพลาด", "success");
     }
   };
   const onSearch = async (value) => {
@@ -230,13 +243,26 @@ const usersSystemPage = () => {
   };
   const handleDelete = async (id) => {
     try {
-      const resp = await Api.post("/system/delUserAD/" + id);
-      console.log(resp);
-      alert("ลบข้อมูลเรีนยร้อยแล้ว");
-      reload()
+      Swal.fire({
+        title: "กรุณายืนยันการลบข้อมูล?",
+        text: "เมื่อยืนยันแล้วจะไม่สามารถเรียกคืนได้",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#218838",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "ยืนยัน",
+        cancelButtonText: "ยกเลิก",
+      }).then(async (result) => {
+        if (result.isConfirmed) {
+          const resp = await Api.post("/system/delUserAD/" + id);
+          console.log(resp);
+          reload();
+          Swal.fire("", "ลบข้อมูลเรียบร้อยแล้ว", "success");
+        }
+      });
     } catch (error) {
       console.log(error);
-      alert("มีบางอย่างผิดพลาด");
+      Swal.fire("", "มีบางอย่างผิดพลาด", "error");
     }
   };
   return (
@@ -325,7 +351,7 @@ const usersSystemPage = () => {
             {...statusValidation}
           >
             <Search
-              placeholder="+Username"
+              placeholder="Username"
               enterButton="ค้นหา"
               onSearch={onSearch}
             />
