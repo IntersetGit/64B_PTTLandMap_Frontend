@@ -319,7 +319,7 @@ const mapPage = () => {
 
             <div className="tools-map-cog">
                 <Col span={6}>
-                    <button className="btn btn-light btn-sm"><i className="fa fa-cog" /></button>
+                    <i className="fa fa-cog"  style={{fontSize:"20px",marginTop:"2.5px"}} id="config-map-cog" />
                 </Col>
             </div>
 
@@ -328,7 +328,7 @@ const mapPage = () => {
                 {/* Administrator And Editor */}
                 {(user && (user.roles_id === "8a97ac7b-01dc-4e06-81c2-8422dffa0ca2" || user.roles_id === "cec6617f-b593-4ebc-9604-3059dfee0ac4")) ? (
                     <Col span={6}>
-                        <button className="btn btn-light btn-sm" onClick={() => setVisibleDashboard(true)}><img width="100%" src="/assets/images/search.png" /></button>
+                        <button className="btn btn-light btn-sm" onClick={() => setVisibleDashboard(true)}><img width="100%"  src="/assets/images/search.png" /></button>
                     </Col>
                 ) : null}
 
