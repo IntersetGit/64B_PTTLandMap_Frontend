@@ -24,6 +24,7 @@ import {
   Space,
   Tooltip,
 } from "antd";
+import ImgCrop from 'antd-img-crop';
 import Api from "../../../../util/Api";
 import axios from "axios";
 const { Search } = Input;
@@ -94,7 +95,7 @@ const GroupLayerSystemPage = () => {
   //     </Menu.Item>
   //   </Menu>
   // );
-  
+
 
   // function handleMenuClick1(e) {
   //   message.warning("เมนู ลบ.");
@@ -115,15 +116,15 @@ const GroupLayerSystemPage = () => {
       },
     },
     {
-      title: "Symbol",
-      dataIndex: "id",
-      render: (id) => {
+      title: "symbol",
+      dataIndex: "symbol",
+      render: (symbol) => {
         // return <MoreOutlined />
         return (
           <img
             width={50}
             height={50}
-            src={`http://localhost:9000/uploads/symbol_group/${id}.jpg`}
+            src={symbol}
           />
         );
       },
@@ -140,41 +141,64 @@ const GroupLayerSystemPage = () => {
       dataIndex: "id",
       width: 150,
       align: "center",
-  //     render: (id) => {
-  //       // return <MoreOutlined />
-  //       return (
-  //         <Dropdown.Button
-  //           overlay={menu}
-  //           icon={<MoreOutlined />}
-  //         ></Dropdown.Button>
-  //       );
-  //     },
-  //   },
-  // ];
+      //     render: (id) => {
+      //       // return <MoreOutlined />
+      //       return (
+      //         <Dropdown.Button
+      //           overlay={menu}
+      //           icon={<MoreOutlined />}
+      //         ></Dropdown.Button>
+      //       );
+      //     },
+      //   },
+      // ];
 
-  // const showDrop = async (items) => {
-  //   Dropdown("show", items);
-  // };
-  render: (id) => {
-    return (
-      <Dropdown
-        overlay={
-          <Menu>
-            <Menu.Item key="1">แก้ไข</Menu.Item>
-            <Menu.Item key="2">ลบ</Menu.Item>
-          </Menu>
-        }
-        placement="bottomLeft"
-        trigger={["click"]}
-        arrow
-      >
-        <MoreOutlined />
-      </Dropdown>
-    );
-  },
-  responsive: ["md"],
-},
-];
+      // const showDrop = async (items) => {
+      //   Dropdown("show", items);
+      // };
+      render: (id) => {
+        return (
+          <Dropdown
+            overlay={
+              <Menu>
+                <Menu.Item
+                  key="1"
+                  onClick={async () => {
+                    await handleEdit(id),
+                      await handleCancel(),
+                      await handleEdit(id);
+                  }}
+                >
+                  แก้ไข
+                </Menu.Item>
+                <Menu.Item key="2" onClick={() => handleDelete(id)}>
+                  ลบ
+                </Menu.Item>
+              </Menu>
+            }
+            placement="bottomLeft"
+            trigger={["click"]}
+            arrow
+          >
+            <MoreOutlined />
+          </Dropdown>
+        );
+      },
+      responsive: ["md"],
+    },
+  ];
+
+  const handleDelete = async (id) => {
+    try {
+      const resp = await Api.delete(`masterdata/masLayers?id=` +id);
+      console.log(resp);
+      alert("ลบข้อมูลเรีนยร้อยแล้ว");
+      reload()
+    } catch (error) {
+      console.log(error);
+      alert("มีบางอย่างผิดพลาด");
+    }
+  };
 
   const search = (value) => {
     Api.post("/masterdata/getmasLayers", { search: value }).then((data) => {
@@ -261,9 +285,11 @@ const GroupLayerSystemPage = () => {
             getValueFromEvent={normFile}
             extra="ขนาดที่ recommend 50*50 pixcel"
           >
-            <Upload name="logo" action="/upload.do" listType="picture">
-              <Button icon={<UploadOutlined />}>Select File</Button>
-            </Upload>
+            <ImgCrop rotate>
+              <Upload name="logo" action="/upload.do" listType="picture">
+                <Button icon={<UploadOutlined />}>Select File</Button>
+              </Upload>
+            </ImgCrop>
           </Form.Item>
         </Form>
       </Modal>

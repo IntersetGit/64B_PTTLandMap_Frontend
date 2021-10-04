@@ -37,17 +37,17 @@ const usersSystemPage = () => {
     {
       key: "2",
       title: "Group Layer",
-      dataIndex: "user_name",
+      dataIndex: "name_layer",
       sorter: (record1, record2) => {
-        return record1.user_name > record2.user_name;
+        return record1.name_layer > record2.name_layer;
       },
     },
     {
       key: "3",
       title: "Color GIS Layer",
-      dataIndex: "firstlast",
+      dataIndex: "color_layer",
       sorter: (record1, record2) => {
-        return record1.firstlast > record2.firstlast;
+        return record1.color_layer > record2.color_layer;
       },
     },
     {
@@ -59,8 +59,19 @@ const usersSystemPage = () => {
           <Dropdown
             overlay={
               <Menu>
-                <Menu.Item key="1">แก้ไข</Menu.Item>
-                <Menu.Item key="2">ลบ</Menu.Item>
+                <Menu.Item
+                  key="1"
+                  onClick={async () => {
+                    await handleEdit(id),
+                      await handleCancel(),
+                      await handleEdit(id);
+                  }}
+                >
+                  แก้ไข
+                </Menu.Item>
+                <Menu.Item key="2" onClick={() => handleDelete(id)}>
+                  ลบ
+                </Menu.Item>
               </Menu>
             }
             placement="bottomLeft"
@@ -75,10 +86,10 @@ const usersSystemPage = () => {
     },
   ];
   const reload = () => {
-    Api.post("/provider/getSearchUser")
-      .then((data) => {
+    Api.get("/masterdata/masLayersShape")
+      .then(({data}) => {
         let tempDataArray = [];
-        data.data.forEach((data, key) => {
+        data.items.forEach((data, key) => {
           tempDataArray = [
             ...tempDataArray,
             {
@@ -86,9 +97,6 @@ const usersSystemPage = () => {
               ...data,
             },
           ];
-        });
-        Api.get("/system/getUser").then((data) => {
-          setRoles(data.data.items);
         });
         setData(tempDataArray);
         setLoading(false);
@@ -118,6 +126,18 @@ const usersSystemPage = () => {
   //     setLoading(true);
   //   });
   // };
+
+  const handleDelete = async (id) => {
+    try {
+      const resp = await Api.delete(`masterdata/masLayersShape?id=` +id);
+      console.log(resp);
+      alert("ลบข้อมูลเรีนยร้อยแล้ว");
+      reload()
+    } catch (error) {
+      console.log(error);
+      alert("มีบางอย่างผิดพลาด");
+    }
+  };
 
   const showModal = () => {
     setIsModalVisible(true);
@@ -178,7 +198,7 @@ const usersSystemPage = () => {
               <RedoOutlined />
             </Button>
           </Col>
-          <Col span={3} offset={11}>
+          {/* <Col span={3} offset={11}>
             <Button
               type="primary"
               onClick={showModal}
@@ -186,7 +206,7 @@ const usersSystemPage = () => {
             >
               + เพิ่มผู้ใช้ใหม่
             </Button>
-          </Col>
+          </Col> */}
           <Col span={24}>
             <div className="table-responsive">
               <Table
@@ -218,7 +238,7 @@ const usersSystemPage = () => {
           wrapperCol={{ span: 14 }}
           onFinish={onFinish}
         >
-          
+
           <Form.Item
             name="roles_id"
             label="Group Layer"
@@ -239,7 +259,7 @@ const usersSystemPage = () => {
             label="สี GIS Layer"
             rules={[{ required: true }]}
           >
-            <Input type="color" style={{width:'15%'}}/>
+            <Input type="color" style={{ width: '15%' }} />
           </Form.Item>
         </Form>
       </Modal>
