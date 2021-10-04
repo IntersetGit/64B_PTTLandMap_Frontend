@@ -28,7 +28,6 @@ const mapPage = () => {
             version: 'weekly',
             libraries: ["drawing", "places"]
         });
-
         loader.load().then(() => {
             const google = window.google;
             var _map = new google.maps.Map(googlemap.current, {
@@ -37,10 +36,15 @@ const mapPage = () => {
                 center: { lat: 13.78, lng: 100.55 },
                 zoom: 8,
             });
+            const centerControlDiv = document.createElement("div");
             setMap(_map)
+            $("#home").click(()=>{
+                _map.setCenter({ lat: 13.78, lng: 100.55 });
+            })
             google.maps.event.addListener(map, "mousemove", (event) => {
                 getLatLon(event)
             });
+            
         });
     }, []);
 
@@ -284,6 +288,16 @@ const mapPage = () => {
     /*  Search */
     const [visibleSearch, setVisibleSearch] = useState(false)
 
+    const openFullscreen = ()=>{
+        var elem = document.documentElement;
+        if (elem.requestFullscreen) {
+            elem.requestFullscreen();
+          } else if (elem.webkitRequestFullscreen) { /* Safari */
+            elem.webkitRequestFullscreen();
+          } else if (elem.msRequestFullscreen) { /* IE11 */
+            elem.msRequestFullscreen();
+          }
+    }
     return (
         <Layout isMap={true}>
             <Head>
@@ -319,7 +333,7 @@ const mapPage = () => {
                 ) : null}
 
                 <Col span={6} className="pt-2">
-                    <button className="btn btn-light btn-sm"><img width="100%" src="/assets/images/home.png" /></button>
+                    <button className="btn btn-light btn-sm" id="home"><img width="100%" src="/assets/images/home.png" /></button>
                 </Col>
                 <Col span={6} className="pt-2">
                     <button className="btn btn-light btn-sm"><img width="100%" src="/assets/images/Line.png" /></button>
@@ -337,7 +351,7 @@ const mapPage = () => {
                     <button className="btn btn-light btn-sm"><img width="100%" src="/assets/images/cross.png" /></button>
                 </Col>
                 <Col span={6} className="pt-2">
-                    <button className="btn btn-light btn-sm"><img width="100%" src="/assets/images/arrows.png" /></button>
+                    <button className="btn btn-light btn-sm" onClick={()=>{openFullscreen()}}><img width="100%" src="/assets/images/arrows.png" /></button>
                 </Col>
             </div>
 
