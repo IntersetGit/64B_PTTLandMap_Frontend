@@ -124,19 +124,6 @@ const usersSystemPage = () => {
     reload();
   }, []);
 
-  const handleDelete = async (id, roles_id) => {
-    try {
-      const resp = await Api.delete(`/masterdata/masLayersShape?id=${id}`);
-      console.log(resp);
-      alert("ลบข้อมูลเรีนยร้อยแล้ว");
-      reload()
-    } catch (error) {
-      console.log(error);
-      alert("มีบางอย่างผิดพลาด");
-    }
-  };
-
-
   const handleDelete = async (id) => {
     try {
       const resp = await Api.delete(`masterdata/masLayersShape?id=` +id);

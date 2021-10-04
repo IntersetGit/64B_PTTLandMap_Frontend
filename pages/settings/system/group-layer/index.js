@@ -187,7 +187,7 @@ const GroupLayerSystemPage = () => {
 
   const handleDelete = async (id) => {
     try {
-      const resp = await Api.delete("/masterdata/masLayers" + id);
+      const resp = await Api.delete(`masterdata/masLayersShape?id=` + id);
       console.log(resp);
       alert("ลบข้อมูลเรีนยร้อยแล้ว");
       reload()
