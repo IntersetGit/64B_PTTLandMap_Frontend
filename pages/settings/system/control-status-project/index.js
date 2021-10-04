@@ -162,71 +162,105 @@ const index = () => {
     formCreate.resetFields();
     formEdit.resetFields();
   };
-  const onFinishCreate = (value) => {
+  // const onFinishCreate = (value) => {
+  //   setLoading(true);
+  //   const data = {
+  //     image_type: value.typename,
+  //     layer_name: value.layerName ?? null,
+  //     type_server: value.typeserver,
+  //     wms_url: value.wms_url,
+  //     date: value["date"].format("YYYY-MM-DD"),
+  //   };
+  //   let fd = new FormData();
+  //   fd.append("file0", value.upload[0].originFileObj);
+  //   Api.post("/masterdata/datLayers", data)
+  //     .then(async (data) => {
+  //       setIsModalVisible({ create: false, edit: false });
+  //       reload();
+  //       setLoading(false);
+  //       formCreate.resetFields();
+  //       const upload = await axios.post(
+  //         `${process.env.NEXT_PUBLIC_SERVICE}/upload?Path=satellite-aerial-photographs&Length=1&Name=${data.data.items.id}&SetType=jpg`,
+  //         fd,
+  //         {
+  //           headers: {
+  //             "Content-Type": "multipart/form-data",
+  //           },
+  //         }
+  //       );
+  //     })
+  //     .catch((error) => {
+  //       console.log(error);
+  //       setLoading(false);
+  //     });
+  // };
+  
+  const onFinishCreate = async (value) => {
     setLoading(true);
     const data = {
-      image_type: value.typename,
-      layer_name: value.layerName ?? null,
-      type_server: value.typeserver,
-      wms_url: value.wms_url,
-      date: value["date"].format("YYYY-MM-DD"),
+      status_code: value.statuscode,
+      name: value.name,
+      isuse: value.isuse,     
     };
-    let fd = new FormData();
-    fd.append("file0", value.upload[0].originFileObj);
-    Api.post("/masterdata/datLayers", data)
-      .then(async (data) => {
+    setLoading(true);
+    Api.post("/system/addUserAD", {
+      status_code: value.statuscode,
+      name: value.name,
+      isuse: value.isuse, 
+    })
+      .then((data) => {
+        Swal.fire("", "บันทึกข้อมูลเรียบร้อย", "success");
+        setStatusValidation([]);
         setIsModalVisible({ create: false, edit: false });
-        reload();
         setLoading(false);
         formCreate.resetFields();
-        const upload = await axios.post(
-          `${process.env.NEXT_PUBLIC_SERVICE}/upload?Path=satellite-aerial-photographs&Length=1&Name=${data.data.items.id}&SetType=jpg`,
-          fd,
-          {
-            headers: {
-              "Content-Type": "multipart/form-data",
-            },
-          }
-        );
+        reload();
+        setButtonCreate(true);
       })
       .catch((error) => {
+        Swal.fire("", "มีบางอย่างผิดพลาด ", "error");
         console.log(error);
+        setStatusValidation([]);
+        setIsModalVisible({ create: false, edit: false });
         setLoading(false);
+        formCreate.resetFields();
+        reload();
+        setButtonCreate(true);
       });
   };
-  const onFinishEdit = (value) => {
-        const data = {
-          id: value.id,
-          image_type: value.image_type,
-          layer_name: value.layerName??null,
-          type_server: value.typeserver,
-          wms_url: value.wms_url,
-          date: value["date"].format("YYYY-MM-DD"),
-        };
-        let fd = new FormData()
-        fd.append("file0", value.upload[0].originFileObj)
-        Api.put("/masterdata/datLayers", data)
-          .then(async (data) => {
-            const upload = await axios.post(`${process.env.NEXT_PUBLIC_SERVICE}/upload?Path=satellite-aerial-photographs&Length=1&Name=${value.id}&SetType=jpg`, fd
-              ,
-              {
-                headers: {
-                  'Content-Type': 'multipart/form-data',
-                },
-              }
-            )
-            setIsModalVisible({create:false,edit:false});
-            setLoading(false);
-            reload();
-            // window.location.reload()
-            formEdit.resetFields();
-          })
-          .catch((error) => console.log(error));
-  };
+  // const onFinishEdit = (value) => {
+  //       const data = {
+  //         id: value.id,
+  //         image_type: value.image_type,
+  //         layer_name: value.layerName??null,
+  //         type_server: value.typeserver,
+  //         wms_url: value.wms_url,
+  //         date: value["date"].format("YYYY-MM-DD"),
+  //       };
+  //       let fd = new FormData()
+  //       fd.append("file0", value.upload[0].originFileObj)
+  //       Api.put("/masterdata/datLayers", data)
+  //         .then(async (data) => {
+  //           const upload = await axios.post(`${process.env.NEXT_PUBLIC_SERVICE}/upload?Path=satellite-aerial-photographs&Length=1&Name=${value.id}&SetType=jpg`, fd
+  //             ,
+  //             {
+  //               headers: {
+  //                 'Content-Type': 'multipart/form-data',
+  //               },
+  //             }
+  //           )
+  //           setIsModalVisible({create:false,edit:false});
+  //           setLoading(false);
+  //           reload();
+  //           // window.location.reload()
+  //           formEdit.resetFields();
+  //         })
+  //         .catch((error) => console.log(error));
+  // };
   const deleteHandle = (id) => {
     if (confirm("คุณแน่ใจหรือไม่ว่าต้องการลบข้อมูล")) {
       setLoading(true);
-      Api.delete("/masterdata/datLayers", { data: { id: id } })
+      Api.delete("/masterdata/masStatusProject?id", { data: { id: id } })
         .then((data) => {
           alert("ลบข้อมูลเรียบร้อย");
           reload();
@@ -260,7 +294,7 @@ const index = () => {
   const reload = async (search = null) => {
     try {
       const respData = await Api.get(
-        `/masterdata/datLayers${search != null ? "?search=" + search : ""}`
+        `/masterdata/masStatusProject${search != null ? "?search=" + search : ""}`
       );
       let tempDataArray = [];
       respData.data.items.forEach((data, key) => {
