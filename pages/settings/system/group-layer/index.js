@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Head from "next/head";
 import System from "../../../../components/_App/System";
 import {
@@ -37,13 +37,11 @@ const GroupLayerSystemPage = () => {
   const [data, setData] = useState([]);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [form] = Form.useForm();
-  const showModal = () => {
-    setIsModalVisible(true);
-  };
+  
 
   const handleOk = () => {
     form.submit();
-    setIsModalVisible(false);
+     
   };
 
   const handleCancel = () => {
@@ -63,6 +61,7 @@ const GroupLayerSystemPage = () => {
           `http://localhost:9000/upload?Path=symbol_group&Length=1&Name=${data.data.items.id}&SetType=jpg`,
           fd
         );
+        setIsModalVisible(!isModalVisible);
       })
       .catch((error) => {
         console.log(error);
@@ -71,8 +70,21 @@ const GroupLayerSystemPage = () => {
   };
   const reload = () => {
     Api.post("/masterdata/getmasLayers")
-      .then((data) => {
-        setData(data.data.items);
+      .then(({ data: { items } }) => {
+        let tempDataArray = [];
+        console.log(`data`, data)
+        items.forEach((data, key) => {
+          tempDataArray = [
+            ...tempDataArray,
+            {
+              number: key + 1,
+              ...data,
+            },
+          ];
+        });
+        console.log(`tempDataArray`, tempDataArray)
+        setData(tempDataArray);
+        setLoading(false);
       })
       .catch((error) => {
         console.log(error);
@@ -109,22 +121,22 @@ const GroupLayerSystemPage = () => {
   const columns = [
     {
       title: "ลำดับ",
-      dataIndex: "order_by",
+      dataIndex: "number",
       width: 100,
       sorter: (record1, record2) => {
-        return record1.order_by > record2.order_by;
+        return record1.number > record2.number;
       },
     },
     {
       title: "symbol",
       dataIndex: "symbol",
-      render: (symbol) => {
+      render: (id) => {
         // return <MoreOutlined />
         return (
           <img
-            width={50}
-            height={50}
-            src={symbol}
+            width={16}
+            height={16}
+            src={id}
           />
         );
       },
@@ -141,21 +153,6 @@ const GroupLayerSystemPage = () => {
       dataIndex: "id",
       width: 150,
       align: "center",
-      //     render: (id) => {
-      //       // return <MoreOutlined />
-      //       return (
-      //         <Dropdown.Button
-      //           overlay={menu}
-      //           icon={<MoreOutlined />}
-      //         ></Dropdown.Button>
-      //       );
-      //     },
-      //   },
-      // ];
-
-      // const showDrop = async (items) => {
-      //   Dropdown("show", items);
-      // };
       render: (id) => {
         return (
           <Dropdown
@@ -190,7 +187,7 @@ const GroupLayerSystemPage = () => {
 
   const handleDelete = async (id) => {
     try {
-      const resp = await Api.delete(`masterdata/masLayers?id=` +id);
+      const resp = await Api.delete("/masterdata/masLayers" + id);
       console.log(resp);
       alert("ลบข้อมูลเรีนยร้อยแล้ว");
       reload()
@@ -215,7 +212,14 @@ const GroupLayerSystemPage = () => {
         <title>จัดการ Group Layer</title>
       </Head>
       <System>
-        <Row gutter={[20, 20]} style={{ background: "white", padding: "50px" }}>
+        <Row 
+        gutter={[10, 10]} 
+        style={{ 
+          background: "white", 
+          padding: "16px",
+          boxShadow:
+            " rgba(0, 0, 0, 0.12) 0px 1px 3px, rgba(0, 0, 0, 0.24) 0px 1px 2px",
+          }}>
           <Col span={24}>
             <h3>จัดการ Group Layer</h3>
           </Col>
@@ -232,7 +236,7 @@ const GroupLayerSystemPage = () => {
             </Button>
           </Col>
           <Col span={3} offset={11}>
-            <Button type="primary" onClick={showModal}>
+            <Button type="primary" onClick={()=>setIsModalVisible(true)}>
               + เพิ่ม group
             </Button>
           </Col>
@@ -258,6 +262,8 @@ const GroupLayerSystemPage = () => {
         visible={isModalVisible}
         onOk={handleOk}
         onCancel={handleCancel}
+        
+        
       >
         <Form
           labelCol={{ span: 8 }}
@@ -279,11 +285,11 @@ const GroupLayerSystemPage = () => {
           </Form.Item>
           <Form.Item
             name="Symbol"
-            label="Sybol"
+            label="Symbol"
             valuePropName="fileList"
             rules={[{ required: true }]}
             getValueFromEvent={normFile}
-            extra="ขนาดที่ recommend 50*50 pixcel"
+            extra="ขนาดรูปภาพไม่เกิน 50*50 pixcel"
           >
             <ImgCrop rotate>
               <Upload name="logo" action="/upload.do" listType="picture">

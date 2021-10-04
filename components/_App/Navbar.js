@@ -87,10 +87,10 @@ const Navbar = ({ isMap, setslideNav, slideNav }) => {
 
                 <li className="nav-item dropdown has-arrow main-drop">
                     <a href="#" className="dropdown-toggle nav-link" data-toggle="dropdown">
-                        <span><i className="la la-user" /> {user ? `${user.user_name} (${user.roles_name}) ` : "-"}</span>
+                        <span><i className="la la-user" /> {user ? `${user.first_name} (${user.roles_name}) ` : "-"}</span>
                     </a>
                     <div className="dropdown-menu">
-                        <a className="dropdown-item" onClick={logout}>ออกการระบบ</a>
+                        <a className="dropdown-item" onClick={logout}>ออกจากระบบ</a>
                     </div>
                 </li>
 
@@ -115,7 +115,7 @@ const Navbar = ({ isMap, setslideNav, slideNav }) => {
                             </>
                         ) : null
                     }
-                    <a className="dropdown-item" onClick={logout}>ออกการระบบ</a>
+                    <a className="dropdown-item" onClick={logout}>ออกจากระบบ</a>
                 </div>
             </div>
 

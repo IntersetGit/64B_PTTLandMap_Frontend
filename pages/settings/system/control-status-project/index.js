@@ -353,11 +353,11 @@ const index = () => {
           
            <Form.Item
             name="Status Code"
-            label="Username"
+            label="Status Code"
             rules={[{ required: true }]}
           >
             {/* <Input placeholder="Username" /> */}
-            {/* <InputNumber min={1} max={10} defaultValue={3} onChange={onChange} /> */}
+            <InputNumber min={1} max={10} defaultValue={3}  />
           </Form.Item>
           <Form.Item
             name="Status"

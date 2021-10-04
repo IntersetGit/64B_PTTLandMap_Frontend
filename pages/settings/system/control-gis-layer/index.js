@@ -24,6 +24,7 @@ const usersSystemPage = () => {
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(5);
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const [listGroup, setListGroup] = useState([]);
   const [form] = Form.useForm();
   const columns = [
     {
@@ -36,7 +37,7 @@ const usersSystemPage = () => {
     },
     {
       key: "2",
-      title: "Group Layer",
+      title: "ชื่อ",
       dataIndex: "name_layer",
       sorter: (record1, record2) => {
         return record1.name_layer > record2.name_layer;
@@ -44,6 +45,14 @@ const usersSystemPage = () => {
     },
     {
       key: "3",
+      title: "Group Layer",
+      dataIndex: " ",
+      sorter: (record1, record2) => {
+        return record1.test > record2.test;
+      },
+    },
+    {
+      key: "4",
       title: "Color GIS Layer",
       dataIndex: "color_layer",
       sorter: (record1, record2) => {
@@ -51,7 +60,7 @@ const usersSystemPage = () => {
       },
     },
     {
-      key: "4",
+      key: "5",
       title: "จัดการ",
       dataIndex: "id",
       render: (id) => {
@@ -85,11 +94,15 @@ const usersSystemPage = () => {
       responsive: ["md"],
     },
   ];
-  const reload = () => {
-    Api.get("/masterdata/masLayersShape")
-      .then(({data}) => {
+
+  const reload = (search = null) => {
+    Api.get("/masterdata/masLayersShape",
+      search != null ? { search: search } : {}
+    )
+      .then(({ data: { items } }) => {
         let tempDataArray = [];
-        data.items.forEach((data, key) => {
+        console.log(`data`, data)
+        items.forEach((data, key) => {
           tempDataArray = [
             ...tempDataArray,
             {
@@ -98,6 +111,7 @@ const usersSystemPage = () => {
             },
           ];
         });
+        console.log(`tempDataArray`, tempDataArray)
         setData(tempDataArray);
         setLoading(false);
       })
@@ -105,27 +119,23 @@ const usersSystemPage = () => {
         console.log(error);
       });
   };
+
   useEffect(() => {
     reload();
   }, []);
 
-  // const search = (value) => {
-  //   setLoading(true);
-  //   Api.post("/provider/getSearchUser", { search: value }).then((data) => {
-  //     let tempDataArray = [];
-  //     data.data.forEach((data, key) => {
-  //       tempDataArray = [
-  //         ...tempDataArray,
-  //         {
-  //           number: key + 1,
-  //           ...data,
-  //         },
-  //       ];
-  //     });
-  //     setData(tempDataArray);
-  //     setLoading(true);
-  //   });
-  // };
+  const handleDelete = async (id, roles_id) => {
+    try {
+      const resp = await Api.delete(`/masterdata/masLayersShape?id=${id}`);
+      console.log(resp);
+      alert("ลบข้อมูลเรีนยร้อยแล้ว");
+      reload()
+    } catch (error) {
+      console.log(error);
+      alert("มีบางอย่างผิดพลาด");
+    }
+  };
+
 
   const handleDelete = async (id) => {
     try {
@@ -210,7 +220,7 @@ const usersSystemPage = () => {
           <Col span={24}>
             <div className="table-responsive">
               <Table
-                // loading={loading}
+                loading={loading}
                 columns={columns}
                 dataSource={data}
                 pagination={{
@@ -238,7 +248,13 @@ const usersSystemPage = () => {
           wrapperCol={{ span: 14 }}
           onFinish={onFinish}
         >
-
+          <Form.Item
+            name="name"
+            label="ชื่อ"
+            rules={[{ required: true }]}
+          >
+            <Input  />
+          </Form.Item>
           <Form.Item
             name="roles_id"
             label="Group Layer"
