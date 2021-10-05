@@ -24,6 +24,7 @@ import {
   Space,
   Tooltip,
 } from "antd";
+import ImgCrop from 'antd-img-crop';
 import Api from "../../../../util/Api";
 import axios from "axios";
 const { Search } = Input;
@@ -127,9 +128,10 @@ const GroupLayerSystemPage = () => {
       },
     },
     {
-      title: "Symbol",
+      title: "symbol",
       dataIndex: "symbol",
       render: (id) => {
+        // return <MoreOutlined />
         return (
           <img
             width={16}
@@ -185,7 +187,7 @@ const GroupLayerSystemPage = () => {
 
   const handleDelete = async (id) => {
     try {
-      const resp = await Api.delete("/masterdata/masLayers" + id);
+      const resp = await Api.delete(`masterdata/masLayersShape?id=` + id);
       console.log(resp);
       alert("ลบข้อมูลเรีนยร้อยแล้ว");
       reload()
@@ -289,9 +291,11 @@ const GroupLayerSystemPage = () => {
             getValueFromEvent={normFile}
             extra="ขนาดรูปภาพไม่เกิน 50*50 pixcel"
           >
-            <Upload name="logo" action="/upload.do" listType="picture">
-              <Button icon={<UploadOutlined />}>Select File</Button>
-            </Upload>
+            <ImgCrop rotate>
+              <Upload name="logo" action="/upload.do" listType="picture">
+                <Button icon={<UploadOutlined />}>Select File</Button>
+              </Upload>
+            </ImgCrop>
           </Form.Item>
         </Form>
       </Modal>
