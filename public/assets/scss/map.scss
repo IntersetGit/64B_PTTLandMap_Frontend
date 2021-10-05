@@ -93,14 +93,14 @@ body {
 
 .tools-map-cog {
   position: absolute !important;
-  right:-14px;
+  right:-17px;
   width: 50px;
   background: linear-gradient( 45deg, #e638e7, #6f33c9da, #2016d4c7);
   // background: -webkit-linear-gradient(left, red , blue);
   cursor: pointer;
   top: 125px;
   color: aliceblue;
-  padding: 10px;
+  padding: 7px;
   border-radius: 16px;
   z-index: 30 !important;
 }
@@ -109,6 +109,27 @@ body {
   position: absolute !important;
   right: 5px;
   top: 190px;
+  color: aliceblue;
+  padding: 10px;
+  border-radius: 15px;
+  z-index: 30 !important;
+  button {
+    color: aliceblue;
+    background-color: #4b5159;
+    width: 30px;
+    text-align: center;
+  }
+
+  button:hover {
+    background-color: #34373d;
+    color: aliceblue;
+  }
+}
+
+.tools-map-area2 {
+  position: absolute !important;
+  right: 5px;
+  top: 455px;
   color: aliceblue;
   padding: 10px;
   border-radius: 15px;
