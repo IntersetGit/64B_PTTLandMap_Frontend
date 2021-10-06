@@ -122,7 +122,7 @@ const GroupLayerSystemPage = () => {
     {
       title: "ลำดับ",
       dataIndex: "number",
-      width: 100,
+      width: '5%',
       sorter: (record1, record2) => {
         return record1.number > record2.number;
       },
@@ -130,6 +130,7 @@ const GroupLayerSystemPage = () => {
     {
       title: "symbol",
       dataIndex: "symbol",
+      width: '15%',
       render: (id) => {
         // return <MoreOutlined />
         return (
@@ -144,6 +145,7 @@ const GroupLayerSystemPage = () => {
     {
       title: "ชื่อ group",
       dataIndex: "group_name",
+      width: '30%',
       sorter: (record1, record2) => {
         return record1.group_name > record2.group_name;
       },
@@ -151,7 +153,7 @@ const GroupLayerSystemPage = () => {
     {
       title: "จัดการ",
       dataIndex: "id",
-      width: 150,
+      width: '10%',
       align: "center",
       render: (id) => {
         return (
@@ -217,6 +219,7 @@ const GroupLayerSystemPage = () => {
         style={{ 
           background: "white", 
           padding: "16px",
+          width: '70%',
           boxShadow:
             " rgba(0, 0, 0, 0.12) 0px 1px 3px, rgba(0, 0, 0, 0.24) 0px 1px 2px",
           }}>
