@@ -124,9 +124,9 @@ const usersSystemPage = () => {
     reload();
   }, []);
 
-  const handleDelete = async (id, roles_id) => {
+  const handleDelete = async (id) => {
     try {
-      const resp = await Api.delete(`/masterdata/masLayersShape?id=${id}`);
+      const resp = await Api.delete(`masterdata/masLayersShape?id=` +id);
       console.log(resp);
       alert("ลบข้อมูลเรีนยร้อยแล้ว");
       reload()
@@ -135,7 +135,6 @@ const usersSystemPage = () => {
       alert("มีบางอย่างผิดพลาด");
     }
   };
-
 
   const showModal = () => {
     setIsModalVisible(true);
@@ -196,7 +195,7 @@ const usersSystemPage = () => {
               <RedoOutlined />
             </Button>
           </Col>
-          <Col span={3} offset={11}>
+          {/* <Col span={3} offset={11}>
             <Button
               type="primary"
               onClick={showModal}
@@ -204,7 +203,7 @@ const usersSystemPage = () => {
             >
               + เพิ่มผู้ใช้ใหม่
             </Button>
-          </Col>
+          </Col> */}
           <Col span={24}>
             <div className="table-responsive">
               <Table
