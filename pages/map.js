@@ -69,7 +69,6 @@ const mapPage = () => {
               // Add a listener for the click event
               new google.maps.event.addListener(_map, "click", (event) => {
                 if (count < 2) {
-                  console.log(event.latLng.lat)
                   const path = poly.getPath();
                   // Because path is an MVCArray, we can simply append a new coordinate
                   // and it will automatically appear.
@@ -590,9 +589,7 @@ const mapPage = () => {
                                                                 </Checkbox>
                                                             </Col>
                                                             <Col xs={3}>
-                                                                <a>
-                                                                    <UnorderedListOutlined />
-                                                                </a>
+                                                                
                                                             </Col>
                                                             <Col xs={3} style={{ paddingTop: 3 }}>
                                                                 <a onClick={() => openColor(i, index)}>
