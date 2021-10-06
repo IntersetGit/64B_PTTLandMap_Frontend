@@ -24,7 +24,9 @@ const usersSystemPage = () => {
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(5);
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const [statusValidation, setStatusValidation] = useState([]);
   const [listGroup, setListGroup] = useState([]);
+  const [dataEdit, setDataEdit] = useState([]);
   const [form] = Form.useForm();
   const columns = [
     {
@@ -46,9 +48,9 @@ const usersSystemPage = () => {
     {
       key: "3",
       title: "Group Layer",
-      dataIndex: " ",
+      dataIndex: "group_layer_id",
       sorter: (record1, record2) => {
-        return record1.test > record2.test;
+        return record1.group_layer_id > record2.group_layer_id;
       },
     },
     {
@@ -95,6 +97,18 @@ const usersSystemPage = () => {
     },
   ];
 
+  const [select, setSelect] = useState()
+
+  const getgroup = () => {
+    Api.post("masterdata/getMasLayers", { group_name :""})
+      .then(async (data) => {
+        setSelect(data.data.items)
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  }
+
   const reload = (search = null) => {
     Api.get("/masterdata/masLayersShape",
       search != null ? { search: search } : {}
@@ -122,6 +136,7 @@ const usersSystemPage = () => {
 
   useEffect(() => {
     reload();
+    getgroup();
   }, []);
 
   const handleDelete = async (id) => {
@@ -133,6 +148,40 @@ const usersSystemPage = () => {
     } catch (error) {
       console.log(error);
       alert("มีบางอย่างผิดพลาด");
+    }
+  };
+
+  const handleEdit = async (id) => {
+    let filterData = await data.find((data) => data.id === id);
+    setDataEdit(filterData);
+    showModal("edit");
+  };
+
+  const onFinishEdit = async (value) => {
+    try {
+      let filterRoles = await roles.find
+      Swal.fire({
+        title: "กรุณายืนยันการแก้ไขข้อมูล",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#218838",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "ยืนยัน",
+        cancelButtonText: "ยกเลิก",
+      }).then(async (result) => {
+        if (result.isConfirmed) {
+          let resp = await Api.post("masterdata/masLayersShape", {
+            id: dataEdit.id,
+            roles_id: filterRoles.id,
+          });
+          await Swal.fire("", "แก้ไขข้อมูลเรียบร้อยแล้ว", "success");
+          reload();
+          handleCancel();
+        }
+      });
+    } catch (error) {
+      console.log(error);
+      Swal.fire("", "มีบางอย่างผิดพลาด", "success");
     }
   };
 
@@ -233,29 +282,32 @@ const usersSystemPage = () => {
           form={form}
           labelCol={{ span: 7 }}
           wrapperCol={{ span: 14 }}
-          onFinish={onFinish}
+          onFinish={onFinishEdit}
         >
           <Form.Item
-            name="name"
+            name="name_layer"
             label="ชื่อ"
             rules={[{ required: true }]}
+            {...statusValidation}
           >
             <Input  />
           </Form.Item>
           <Form.Item
-            name="roles_id"
+            name="group_layer_id"
             label="Group Layer"
             rules={[
               { required: true, message: "กรุณากรอกข้อมูล กลุ่มผู้ใช้งาน" },
             ]}
-          >
-            <Select placeholder="กรุณาเลือก">
-              {roles.map((data, index) => (
-                <Option key={index} value={data.id}>
-                  {data.roles_name}
-                </Option>
-              ))}
-            </Select>
+          ><Select
+          placeholder="กลุ่มผู้ใช้งาน"
+          defaultValue="f942a946-3bcb-4062-9207-d78ab437edf3"
+        >
+          {select && select.map((data, index) => (
+            <Option key={index} value={data.id}>
+              {data.group_name}
+            </Option>
+          ))}
+        </Select>
           </Form.Item>
           <Form.Item
             name="typecolor"
