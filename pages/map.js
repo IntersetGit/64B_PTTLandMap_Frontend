@@ -42,6 +42,8 @@ const mapPage = () => {
                 getLatLon(event)
             });
         });
+
+        loadShapeFile()
     }, []);
 
     const getLatLon = (event) => {
@@ -129,7 +131,8 @@ const mapPage = () => {
                         headers: { Authorization: "Bearer " + token },
                         data: formData,
                     })
-                    await openShapeFile();
+                    clearMapData()
+                    await loadShapeFile();
                     setFileList([])
                     setFileUpload(null)
                     setFileType(null)
@@ -183,7 +186,8 @@ const mapPage = () => {
         message.error("มีบางอย่างผิดพลาด !");
     }
 
-    const openShapeFile = async () => {
+
+    const loadShapeFile = async () => {
         try {
             const { data } = await API.get(`/shp/getDataLayer`)
 
@@ -200,9 +204,8 @@ const mapPage = () => {
             });
             // console.log('data :>> ', data.items);
             setGroupLayerList(data.items)
-            setVisibleShapeFile(true)
         } catch (error) {
-            // message.error("มีบางอย่างผิดพลาด !");
+            message.error("มีบางอย่างผิดพลาด !");
         }
     }
 
@@ -220,33 +223,35 @@ const mapPage = () => {
 
     const checkboxLayer = async (value, index1, index2) => {
         const arr = [...groupLayerList]
-        console.clear();
-        // console.log(' checked  :>> ', value.target.checked);
-        arr[index1].children[index2].checked = value.target.checked
-        setGroupLayerList(arr)
         if (value.target.checked) {
-            // console.log(' data  :>> ', arr[index1].children[index2]);
             const item = arr[index1].children[index2];
             await getDeoJson(item.id, item.color_layer)
-        } else {
-            arr.forEach(e => {
+            arr.forEach((e, i) => {
                 if (e.children) {
-                    e.children.forEach((x, i) => {
-                        x.checked = value.target.checked
+                    e.children.forEach((x, ii) => {
+                        x.checked = (i == index1 && ii == index2) ? true : false
                     });
                 }
             });
-            map.data.forEach((feature) => {
-                map.data.remove(feature);
-            });
-        }
 
+        } else {
+            arr[index1].children[index2].checked = value.target.checked
+            clearMapData()
+        }
+        setGroupLayerList(arr)
     };
+
+
+    const clearMapData = () => {
+        map.data.forEach((feature) => {
+            map.data.remove(feature);
+        });
+    }
 
 
     const getDeoJson = async (id, color) => {
         try {
-            console.log('color :>> ', color);
+            // console.log('color :>> ', color);
             const { data } = await API.get(`/shp/shapeData?id=${id}`)
             const GeoJson = data.items.shape
             map.data.addGeoJson(GeoJson);
@@ -272,8 +277,25 @@ const mapPage = () => {
         setGroupLayerList(arr)
     };
 
-    const saveColor = (index1, index2) => {
-        openColor(index1, index2)
+    const saveColor = async (index1, index2) => {
+        try {
+            const arr = [...groupLayerList]
+            const item = arr[index1].children[index2];
+            const _model = {
+                name_layer: item.name_layer,
+                table_name: item.table_name,
+                color_layer: JSON.stringify(item.rgb),
+                type: item.type,
+                group_layer_id: arr[index1].id,
+                id: item.id
+            }
+            console.log('_model :>> ', _model);
+            await API.post(`/masterdata/masLayersShape`, _model)
+
+            openColor(index1, index2)
+        } catch (error) {
+            message.error("มีบางอย่างผิดพลาด !");
+        }
     };
 
 
@@ -291,7 +313,7 @@ const mapPage = () => {
             </Head>
 
             <div className="tools-group-layer">
-                <button className="btn btn-light btn-sm" onClick={openShapeFile}><i className="fa fa-window-restore" /></button>
+                <button className="btn btn-light btn-sm" onClick={() => setVisibleShapeFile(true)}><i className="fa fa-window-restore" /></button>
             </div>
             <div className="tools-dashboard">
                 <button className="btn btn-light btn-sm" onClick={() => setVisibleDashboard(true)}><i className="fa fa-dashboard" /></button>
@@ -527,6 +549,10 @@ const mapPage = () => {
                     .ant-collapse-ghost > .ant-collapse-item > .ant-collapse-content > .ant-collapse-content-box {
                         padding-top: 0px;
                         padding-bottom: 0px;
+                    }
+
+                    .ant-drawer-mask {
+                        background-color: rgb(0 0 0 / 0%);
                     }
                 `
                 }
