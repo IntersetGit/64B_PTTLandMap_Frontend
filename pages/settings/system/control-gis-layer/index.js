@@ -24,6 +24,7 @@ const usersSystemPage = () => {
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(5);
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const [listGroup, setListGroup] = useState([]);
   const [form] = Form.useForm();
   const columns = [
     {
@@ -36,22 +37,30 @@ const usersSystemPage = () => {
     },
     {
       key: "2",
-      title: "Group Layer",
-      dataIndex: "user_name",
+      title: "ชื่อ",
+      dataIndex: "name_layer",
       sorter: (record1, record2) => {
-        return record1.user_name > record2.user_name;
+        return record1.name_layer > record2.name_layer;
       },
     },
     {
       key: "3",
-      title: "Color GIS Layer",
-      dataIndex: "firstlast",
+      title: "Group Layer",
+      dataIndex: " ",
       sorter: (record1, record2) => {
-        return record1.firstlast > record2.firstlast;
+        return record1.test > record2.test;
       },
     },
     {
       key: "4",
+      title: "Color GIS Layer",
+      dataIndex: "color_layer",
+      sorter: (record1, record2) => {
+        return record1.color_layer > record2.color_layer;
+      },
+    },
+    {
+      key: "5",
       title: "จัดการ",
       dataIndex: "id",
       render: (id) => {
@@ -59,8 +68,19 @@ const usersSystemPage = () => {
           <Dropdown
             overlay={
               <Menu>
-                <Menu.Item key="1">แก้ไข</Menu.Item>
-                <Menu.Item key="2">ลบ</Menu.Item>
+                <Menu.Item
+                  key="1"
+                  onClick={async () => {
+                    await handleEdit(id),
+                      await handleCancel(),
+                      await handleEdit(id);
+                  }}
+                >
+                  แก้ไข
+                </Menu.Item>
+                <Menu.Item key="2" onClick={() => handleDelete(id)}>
+                  ลบ
+                </Menu.Item>
               </Menu>
             }
             placement="bottomLeft"
@@ -74,11 +94,15 @@ const usersSystemPage = () => {
       responsive: ["md"],
     },
   ];
-  const reload = () => {
-    Api.post("/provider/getSearchUser")
-      .then((data) => {
+
+  const reload = (search = null) => {
+    Api.get("/masterdata/masLayersShape",
+      search != null ? { search: search } : {}
+    )
+      .then(({ data: { items } }) => {
         let tempDataArray = [];
-        data.data.forEach((data, key) => {
+        console.log(`data`, data)
+        items.forEach((data, key) => {
           tempDataArray = [
             ...tempDataArray,
             {
@@ -87,9 +111,7 @@ const usersSystemPage = () => {
             },
           ];
         });
-        Api.get("/system/getUser").then((data) => {
-          setRoles(data.data.items);
-        });
+        console.log(`tempDataArray`, tempDataArray)
         setData(tempDataArray);
         setLoading(false);
       })
@@ -97,27 +119,22 @@ const usersSystemPage = () => {
         console.log(error);
       });
   };
+
   useEffect(() => {
     reload();
   }, []);
 
-  // const search = (value) => {
-  //   setLoading(true);
-  //   Api.post("/provider/getSearchUser", { search: value }).then((data) => {
-  //     let tempDataArray = [];
-  //     data.data.forEach((data, key) => {
-  //       tempDataArray = [
-  //         ...tempDataArray,
-  //         {
-  //           number: key + 1,
-  //           ...data,
-  //         },
-  //       ];
-  //     });
-  //     setData(tempDataArray);
-  //     setLoading(true);
-  //   });
-  // };
+  const handleDelete = async (id) => {
+    try {
+      const resp = await Api.delete(`masterdata/masLayersShape?id=` +id);
+      console.log(resp);
+      alert("ลบข้อมูลเรีนยร้อยแล้ว");
+      reload()
+    } catch (error) {
+      console.log(error);
+      alert("มีบางอย่างผิดพลาด");
+    }
+  };
 
   const showModal = () => {
     setIsModalVisible(true);
@@ -178,7 +195,7 @@ const usersSystemPage = () => {
               <RedoOutlined />
             </Button>
           </Col>
-          <Col span={3} offset={11}>
+          {/* <Col span={3} offset={11}>
             <Button
               type="primary"
               onClick={showModal}
@@ -186,11 +203,11 @@ const usersSystemPage = () => {
             >
               + เพิ่มผู้ใช้ใหม่
             </Button>
-          </Col>
+          </Col> */}
           <Col span={24}>
             <div className="table-responsive">
               <Table
-                // loading={loading}
+                loading={loading}
                 columns={columns}
                 dataSource={data}
                 pagination={{
@@ -218,7 +235,13 @@ const usersSystemPage = () => {
           wrapperCol={{ span: 14 }}
           onFinish={onFinish}
         >
-          
+          <Form.Item
+            name="name"
+            label="ชื่อ"
+            rules={[{ required: true }]}
+          >
+            <Input  />
+          </Form.Item>
           <Form.Item
             name="roles_id"
             label="Group Layer"
@@ -239,7 +262,7 @@ const usersSystemPage = () => {
             label="สี GIS Layer"
             rules={[{ required: true }]}
           >
-            <Input type="color" style={{width:'15%'}}/>
+            <Input type="color" style={{ width: '15%' }} />
           </Form.Item>
         </Form>
       </Modal>

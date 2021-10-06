@@ -76,11 +76,39 @@ body {
   }
 }
 
+@media (prefers-reduced-motion: no-preference) {
+  #config-map-cog {
+    animation: App-logo-spin infinite 20s linear;
+  }
+}
+@keyframes App-logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(1000deg);
+  }
+}
+
+
 .tools-map-cog {
   position: absolute !important;
-  right: 5px;
+  right:-17px;
+  width: 50px;
+  background: linear-gradient( 45deg, #e638e7, #6f33c9da, #2016d4c7);
+  // background: -webkit-linear-gradient(left, red , blue);
+  cursor: pointer;
   top: 125px;
-  background-color: #00aeefad;
+  color: aliceblue;
+  padding: 7px;
+  border-radius: 16px;
+  z-index: 30 !important;
+}
+
+.tools-map-area {
+  position: absolute !important;
+  right: 5px;
+  top: 190px;
   color: aliceblue;
   padding: 10px;
   border-radius: 15px;
@@ -98,11 +126,10 @@ body {
   }
 }
 
-.tools-map-area {
+.tools-map-area2 {
   position: absolute !important;
   right: 5px;
-  top: 190px;
-  background-color: #00aeefad;
+  top: 455px;
   color: aliceblue;
   padding: 10px;
   border-radius: 15px;
