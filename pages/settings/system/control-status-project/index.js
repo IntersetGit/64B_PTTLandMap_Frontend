@@ -64,7 +64,7 @@ const { Option } = Select;
 const { Search } = Input;
 
 const index = () => {
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [data, setData] = useState([]);
   const [dataEdit,setDataEdit]=useState([])
   const [page, setPage] = useState(1);
@@ -81,14 +81,16 @@ const index = () => {
       key: "1",
       title: "ลำดับ",
       dataIndex: "number",
+      width: '5%',
       sorter: (record1, record2) => {
         return record1.number > record2.number;
       },
     },
     {
       key: "2",
-      title: "Status_code",
-      dataIndex: "Status_code",
+      title: "Status code",
+      dataIndex: "Status code",
+      width: '15%',
       sorter: (record1, record2) => {
         return record1.Status_code > record2.Status_code;
       },
@@ -97,6 +99,7 @@ const index = () => {
       key: "3",
       title: "Status",
       dataIndex: "Status",
+      width: '25%',
       sorter: (record1, record2) => {
         return record1.Status > record2.Status;
       },
@@ -105,6 +108,7 @@ const index = () => {
       key: "4",
       title: "จัดการ",
       dataIndex: "id",
+      width: '10%',
       render: (id) => {
         return (
           <Dropdown
@@ -325,6 +329,7 @@ const index = () => {
         style={{
           background: "white",
           padding: "16px",
+          width: '70%',
           boxShadow:
             " rgba(0, 0, 0, 0.12) 0px 1px 3px, rgba(0, 0, 0, 0.24) 0px 1px 2px",
         }}
@@ -391,7 +396,7 @@ const index = () => {
             rules={[{ required: true }]}
           >
             {/* <Input placeholder="Username" /> */}
-            <InputNumber min={1} max={10} defaultValue={3}  />
+            <InputNumber min={1} max={10} defaultValue={1}  />
           </Form.Item>
           <Form.Item
             name="Status"
