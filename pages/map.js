@@ -262,28 +262,52 @@ const mapPage = () => {
 
     const clearMapData = () => {
         map.data.forEach((feature) => {
-            // console.log('feature :>> ', feature);
-            map.data.remove(feature);
+            console.log('feature :>> ', feature);
+            // map.data.remove(feature);
         });
     }
 
     const getDeoJson = async (id, color) => {
         try {
-            console.log("color :>> ", color);
+            // console.log("color :>> ", color);
             const { data } = await API.get(`/shp/shapeData?id=${id}`);
             const GeoJson = data.items.shape;
-            map.data.addGeoJson(GeoJson);
+            // console.log('GeoJson :>> ', GeoJson);
+
+            /* old */
+            // map.data.addGeoJson(GeoJson);
+            // const bounds = new google.maps.LatLngBounds();
+            // map.data.forEach((feature) => {
+            //     feature.getGeometry().forEachLatLng((latlng) => {
+            //         bounds.extend(latlng);
+            //     });
+            // });
+            // map.fitBounds(bounds);
+
+            // map.data.setStyle({
+            //     fillColor: color,
+            // });
+
+            /* new */
             const bounds = new google.maps.LatLngBounds();
-            map.data.forEach((feature) => {
+            const layer = new google.maps.Data();
+            layer.addGeoJson(GeoJson)
+            layer.setStyle({
+                fillColor: color,
+                opacity: 0.5,
+                strokeWeight: 1,
+                clickable: false
+            });
+            layer.setMap(map);
+
+            layer.forEach((feature) => {
+                // console.log('feature :>> ', feature);
                 feature.getGeometry().forEachLatLng((latlng) => {
                     bounds.extend(latlng);
                 });
             });
             map.fitBounds(bounds);
 
-            map.data.setStyle({
-                fillColor: color,
-            });
         } catch (error) { }
     };
 
