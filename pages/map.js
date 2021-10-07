@@ -49,14 +49,49 @@ const mapPage = () => {
                 center: { lat: 13.78, lng: 100.55 },
                 zoom: 8,
             });
-            const centerControlDiv = document.createElement("div");
             setMap(_map);
+            google.maps.event.addListener(_map, "mousemove", (event) => {
+                getLatLon(event);
+            });
+            
+            //-----------------------chi---------------------------------------------------------
             $("#home").click(() => {
                 _map.setCenter({ lat: 13.78, lng: 100.55 });
             });
-            google.maps.event.addListener(map, "mousemove", (event) => {
-                getLatLon(event);
-            });
+            let count = 0
+            let line
+            $("#line").click(() => {
+              let poly = new google.maps.Polyline({
+                strokeColor: "#000000",
+                strokeOpacity: 1.0,
+                strokeWeight: 5,
+              });
+              // Add a listener for the click event
+              new google.maps.event.addListener(_map, "click", (event) => {
+                if (count < 2) {
+                  const path = poly.getPath();
+                  // Because path is an MVCArray, we can simply append a new coordinate
+                  // and it will automatically appear.
+                  path.push(event.latLng);
+                  // Add a new marker at the new plotted point on the polyline.
+                  line = new google.maps.Marker({
+                    position: event.latLng,
+                    title: "#" + path.getLength(),
+                    map: _map,
+                  });
+                  poly.setMap(_map);
+                  count++
+                } else {
+                  _map = new google.maps.Map(googlemap.current, {
+                    mapTypeControl: false,
+                    fullscreenControl: false,
+                    center: { lat: 13.78, lng: 100.55 },
+                    zoom: 8,
+                  })
+                  count=0
+                }
+              });
+            })
         });
 
         loadShapeFile()
@@ -262,28 +297,52 @@ const mapPage = () => {
 
     const clearMapData = () => {
         map.data.forEach((feature) => {
-            // console.log('feature :>> ', feature);
-            map.data.remove(feature);
+            console.log('feature :>> ', feature);
+            // map.data.remove(feature);
         });
     }
 
     const getDeoJson = async (id, color) => {
         try {
-            console.log("color :>> ", color);
+            // console.log("color :>> ", color);
             const { data } = await API.get(`/shp/shapeData?id=${id}`);
             const GeoJson = data.items.shape;
-            map.data.addGeoJson(GeoJson);
+            // console.log('GeoJson :>> ', GeoJson);
+
+            /* old */
+            // map.data.addGeoJson(GeoJson);
+            // const bounds = new google.maps.LatLngBounds();
+            // map.data.forEach((feature) => {
+            //     feature.getGeometry().forEachLatLng((latlng) => {
+            //         bounds.extend(latlng);
+            //     });
+            // });
+            // map.fitBounds(bounds);
+
+            // map.data.setStyle({
+            //     fillColor: color,
+            // });
+
+            /* new */
             const bounds = new google.maps.LatLngBounds();
-            map.data.forEach((feature) => {
+            const layer = new google.maps.Data();
+            layer.addGeoJson(GeoJson)
+            layer.setStyle({
+                fillColor: color,
+                opacity: 0.5,
+                strokeWeight: 1,
+                clickable: false
+            });
+            layer.setMap(map);
+
+            layer.forEach((feature) => {
+                // console.log('feature :>> ', feature);
                 feature.getGeometry().forEachLatLng((latlng) => {
                     bounds.extend(latlng);
                 });
             });
             map.fitBounds(bounds);
 
-            map.data.setStyle({
-                fillColor: color,
-            });
         } catch (error) { }
     };
 
@@ -417,7 +476,7 @@ const mapPage = () => {
                     </button>
                 </Col>
                 <Col span={6} className="pt-2">
-                    <button className="btn btn-light btn-sm">
+                    <button className="btn btn-light btn-sm" id="line">
                         <img
                             width="120%"
                             style={{ marginTop: "-2px" }}
@@ -530,9 +589,7 @@ const mapPage = () => {
                                                                 </Checkbox>
                                                             </Col>
                                                             <Col xs={3}>
-                                                                <a>
-                                                                    <UnorderedListOutlined />
-                                                                </a>
+                                                                
                                                             </Col>
                                                             <Col xs={3} style={{ paddingTop: 3 }}>
                                                                 <a onClick={() => openColor(i, index)}>
