@@ -1,45 +1,8 @@
-// import Head from "next/head";
-// import System from "../../../../components/_App/System";
-// import { Row, Col } from "antd";
-
-
-
-// const index = () => {
-  
-  
-  
-  
-  
-//   return (
-//     <>
-//       <Head>
-//         <title>จัดการ Status โครงการ</title>
-//       </Head>
-//       <System>
-//         <Row
-//           gutter={[10, 10]}
-//           style={{
-//             background: "white",
-//             padding: "16px",
-//             boxShadow:
-//               " rgba(0, 0, 0, 0.12) 0px 1px 3px, rgba(0, 0, 0, 0.24) 0px 1px 2px",
-//           }}
-//         >
-//           <Col span={24}>
-//             <h3 className="mb-4">จัดการ Status โครงการ</h3>
-//           </Col>
-//         </Row>
-//       </System>
-//     </>
-//   );
-// };
-
-// export default index;
 import { useState, useEffect } from "react";
+import Swal from "sweetalert2";
 import axios from "axios";
 import Head from "next/head";
 import System from "../../../../components/_App/System";
-import moment from "moment";
 import { MoreOutlined } from "@ant-design/icons";
 import {
   Col,
@@ -55,12 +18,13 @@ import {
   Modal,
   Dropdown,
   Menu,
+  Image,
 
 } from "antd";
 import Api from "../../../../util/Api";
-import { UploadOutlined, RedoOutlined } from "@ant-design/icons";
+import { RedoOutlined } from "@ant-design/icons";
 import { InputNumber } from 'antd';
-const { Option } = Select;
+//const { Option } = Select;
 const { Search } = Input;
 
 const index = () => {
@@ -73,7 +37,7 @@ const index = () => {
     create: false,
     edit: false,
   });
-  const [menuItem, setMenuItem] = useState([]);
+  const [setMenuItem] = useState([]);
   const [formCreate] = Form.useForm();
   const [formEdit] = Form.useForm();
   const columns = [
@@ -89,7 +53,7 @@ const index = () => {
     {
       key: "2",
       title: "Status code",
-      dataIndex: "Status code",
+      dataIndex: "status_code",
       width: '15%',
       sorter: (record1, record2) => {
         return record1.Status_code > record2.Status_code;
@@ -98,7 +62,7 @@ const index = () => {
     {
       key: "3",
       title: "Status",
-      dataIndex: "Status",
+      dataIndex: "name",
       width: '25%',
       sorter: (record1, record2) => {
         return record1.Status > record2.Status;
@@ -117,7 +81,8 @@ const index = () => {
                 <Menu.Item
                   key="1"
                   onClick={() => {
-                    showModal("edit"),handleEdit(id);
+                    console.log(`id`, id)
+                    handleEdit(id);
                   }}
                 >
                   แก้ไข
@@ -142,12 +107,7 @@ const index = () => {
       },
     },
   ];
-  const normFile = (e) => {
-    if (Array.isArray(e)) {
-      return e;
-    }
-    return e && e.fileList;
-  };
+
   const showModal = (value) => {
     setIsModalVisible((data) => {
       return { ...data, [value]: true };
@@ -161,140 +121,73 @@ const index = () => {
       formEdit.submit();
     }
   };
+  
   const handleCancel = () => {
     setIsModalVisible({ create: false, edit: false });
     formCreate.resetFields();
     formEdit.resetFields();
   };
-  // const onFinishCreate = (value) => {
-  //   setLoading(true);
-  //   const data = {
-  //     image_type: value.typename,
-  //     layer_name: value.layerName ?? null,
-  //     type_server: value.typeserver,
-  //     wms_url: value.wms_url,
-  //     date: value["date"].format("YYYY-MM-DD"),
-  //   };
-  //   let fd = new FormData();
-  //   fd.append("file0", value.upload[0].originFileObj);
-  //   Api.post("/masterdata/datLayers", data)
-  //     .then(async (data) => {
-  //       setIsModalVisible({ create: false, edit: false });
-  //       reload();
-  //       setLoading(false);
-  //       formCreate.resetFields();
-  //       const upload = await axios.post(
-  //         `${process.env.NEXT_PUBLIC_SERVICE}/upload?Path=satellite-aerial-photographs&Length=1&Name=${data.data.items.id}&SetType=jpg`,
-  //         fd,
-  //         {
-  //           headers: {
-  //             "Content-Type": "multipart/form-data",
-  //           },
-  //         }
-  //       );
-  //     })
-  //     .catch((error) => {
-  //       console.log(error);
-  //       setLoading(false);
-  //     });
-  // };
   
+  const [id, setId] = useState(null)
   const onFinishCreate = async (value) => {
     setLoading(true);
-    const data = {
-      status_code: value.statuscode,
-      name: value.name,
-      isuse: value.isuse,     
-    };
+    console.log(`value`, value)
+  
     setLoading(true);
-    Api.post("/system/addUserAD", {
-      status_code: value.statuscode,
-      name: value.name,
-      isuse: value.isuse, 
-    })
-      .then((data) => {
-        Swal.fire("", "บันทึกข้อมูลเรียบร้อย", "success");
-        setStatusValidation([]);
+    Api.post("/masterdata/masStatusProject", {...value , id })
+      .then(async (data) => {
         setIsModalVisible({ create: false, edit: false });
+        reload();
         setLoading(false);
         formCreate.resetFields();
-        reload();
-        setButtonCreate(true);
+        await Swal.fire("", "บันทึกข้อมูลเรียบร้อย", "success");
+        window.location.reload();
+        setId(null)
       })
       .catch((error) => {
-        Swal.fire("", "มีบางอย่างผิดพลาด ", "error");
         console.log(error);
-        setStatusValidation([]);
-        setIsModalVisible({ create: false, edit: false });
         setLoading(false);
-        formCreate.resetFields();
-        reload();
-        setButtonCreate(true);
+        setId(null)
       });
+  
   };
-  // const onFinishEdit = (value) => {
-  //       const data = {
-  //         id: value.id,
-  //         image_type: value.image_type,
-  //         layer_name: value.layerName??null,
-  //         type_server: value.typeserver,
-  //         wms_url: value.wms_url,
-  //         date: value["date"].format("YYYY-MM-DD"),
-  //       };
-  //       let fd = new FormData()
-  //       fd.append("file0", value.upload[0].originFileObj)
-  //       Api.put("/masterdata/datLayers", data)
-  //         .then(async (data) => {
-  //           const upload = await axios.post(`${process.env.NEXT_PUBLIC_SERVICE}/upload?Path=satellite-aerial-photographs&Length=1&Name=${value.id}&SetType=jpg`, fd
-  //             ,
-  //             {
-  //               headers: {
-  //                 'Content-Type': 'multipart/form-data',
-  //               },
-  //             }
-  //           )
-  //           setIsModalVisible({create:false,edit:false});
-  //           setLoading(false);
-  //           reload();
-  //           // window.location.reload()
-  //           formEdit.resetFields();
-  //         })
-  //         .catch((error) => console.log(error));
-  // };
+ 
   const deleteHandle = (id) => {
-    if (confirm("คุณแน่ใจหรือไม่ว่าต้องการลบข้อมูล")) {
-      setLoading(true);
-      Api.delete("/masterdata/masStatusProject?id", { data: { id: id } })
-        .then((data) => {
-          alert("ลบข้อมูลเรียบร้อย");
+    try {
+      Swal.fire({
+        title: "กรุณายืนยันการลบข้อมูล?",
+        text: "เมื่อยืนยันแล้วจะไม่สามารถเรียกคืนได้",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#218838",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "ยืนยัน",
+        cancelButtonText: "ยกเลิก",
+      }).then(async (result) => {
+        if (result.isConfirmed) {
+          setLoading(true);
+          const resp = await Api.delete("/masterdata/masStatusProject", {
+            data: { id: id },
+          });
+          Swal.fire("", "ลบข้อมูลเรียบร้อยแล้ว", "success");
           reload();
-        })
-        .catch((error) => alert("มีบางอย่างผิดพลาด ไม่สามารถลบข้อมูลได้"));
+        }
+      });
+    } catch (error) {
+      console.log(error);
+      Swal.fire("", "มีบางอย่างผิดพลาด ไม่สามารถลบข้อมูลได้", "error");
       setLoading(false);
     }
   };
-  const handleEdit = (id)=>{
-    let filterData =  data.find((data) => data.id === id);
-    setDataEdit(filterData);
-    console.log(filterData)
-  }
-  const changeTypeServer = (e) => {
-    const type = e.target.value;
-    setMenuItem([]);
-    if (type !== "arcgisserver") {
-      setMenuItem(
-        <>
-          <Form.Item
-            name="layerName"
-            label="Layer Name"
-            rules={[{ required: true }]}
-          >
-            <Input placeholder="Layer Name" />
-          </Form.Item>
-        </>
-      );
-    }
+  const handleEdit = async (id) => {
+    console.log(`id`, id);
+    setIsModalVisible({...isModalVisible , create : true});
+    const {data } = await Api.post("/masterdata/masStatusProject")
+     
   };
+
+
+
   const reload = async (search = null) => {
     try {
       const respData = await Api.get(
@@ -314,11 +207,16 @@ const index = () => {
       setLoading(false);
     } catch (error) {
       console.log(error);
+      setLoading(false);
     }
   };
+
+
   useEffect(() => {
     reload();
   }, loading);
+
+  
   return (
     <System>
       <Head>
@@ -391,26 +289,23 @@ const index = () => {
         >
           
            <Form.Item
-            name="Status Code"
+            name="status_code"
             label="Status Code"
             rules={[{ required: true }]}
           >
-            {/* <Input placeholder="Username" /> */}
             <InputNumber min={1} max={10} defaultValue={1}  />
           </Form.Item>
           <Form.Item
-            name="Status"
+            name="name"
             label="Status"
             rules={[{ required: true }]}
           >
             <Input placeholder="Status" />
           </Form.Item>
       
-      
-            
-          
         </Form>
       </Modal>
+      
     </System>
   );
 };
