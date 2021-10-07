@@ -1,6 +1,7 @@
 import axios from 'axios';
 import { Cookies } from 'react-cookie'
 import jwt_decode from "jwt-decode";
+import RefreshToken from "./RefreshToken";
 
 const cookies = new Cookies();
 
@@ -10,7 +11,6 @@ export default axios.create({
         'Content-Type': 'application/json',
     },
     transformRequest: [(data, headers) => {
-
         // Do whatever you want to transform the data
         const token = cookies.get('token');
         const refresh_token = cookies.get('refresh_token');
@@ -22,32 +22,39 @@ export default axios.create({
                 RefreshToken(refresh_token);
             }
         }
+
         if (token) headers.Authorization = "Bearer " + token
         return JSON.stringify(data);
     }],
+    transformResponse: [function (data) {
+        // Do whatever you want to transform the data
+        console.log('JSON.parse(data) :>> ', JSON.parse(data));
+        return JSON.parse(data); 
+    }],
 });
 
-const logout = () => {
-    cookies.remove("token");
-    cookies.remove("refresh_token");
-    window.location.href = "/login";
-}
+// const logout = () => {
+//     cookies.remove("token");
+//     cookies.remove("refresh_token");
+//     window.location.href = "/login";
+// }
 
-const RefreshToken = async (refreshtokenval) => {
-    try {
-        if (refreshtokenval) {
-            const { data } = await axios({
-                method: "get",
-                url: `${process.env.NEXT_PUBLIC_SERVICE}/provider/refreshToken`,
-                headers: { Authorization: "Bearer " + refreshtokenval },
-            })
-            const token = data.items
-            cookies.set('token', token, { path: '/' });
-            // window.location.reload();
-        } else {
-            logout()
-        }
-    } catch (error) {
-        logout()
-    }
-}
+// const RefreshToken = async (refreshtokenval) => {
+//     try {
+//         if (refreshtokenval) {
+
+//             const { data } = await axios({
+//                 method: "get",
+//                 url: `${process.env.NEXT_PUBLIC_SERVICE}/provider/refreshToken`,
+//                 headers: { Authorization: "Bearer " + refreshtokenval },
+//             })
+//             const token = data.items
+//             cookies.set('token', token, { path: '/' });
+//             // window.location.reload();
+//         } else {
+//             logout()
+//         }
+//     } catch (error) {
+//         logout()
+//     }
+// }

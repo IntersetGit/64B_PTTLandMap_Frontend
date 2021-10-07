@@ -21,6 +21,7 @@ import { useSelector } from "react-redux";
 import { SketchPicker } from "react-color";
 import { UnorderedListOutlined, UploadOutlined } from "@ant-design/icons";
 import API from "../util/Api";
+import RefreshToken from "../util/RefreshToken";
 import axios from "axios";
 import { Cookies } from "react-cookie";
 import jwt_decode from "jwt-decode";
@@ -35,6 +36,7 @@ const mapPage = () => {
     const [map, setMap] = useState(null);
     const googlemap = useRef(null);
     const { user } = useSelector(({ user }) => user);
+    const centerMap = { lat: 13.78, lng: 100.55 }
     useEffect(() => {
         const loader = new Loader({
             apiKey: process.env.NEXT_PUBLIC_GOOGLE_API_KEY,
@@ -46,56 +48,24 @@ const mapPage = () => {
             var _map = new google.maps.Map(googlemap.current, {
                 mapTypeControl: false,
                 fullscreenControl: false,
-                center: { lat: 13.78, lng: 100.55 },
+                center: centerMap,
                 zoom: 8,
             });
             setMap(_map);
-            google.maps.event.addListener(_map, "mousemove", (event) => {
+            // $("#home").click(() => {
+            //     _map.setCenter(centerMap);
+            // });
+            google.maps.event.addListener(map, "mousemove", (event) => {
                 getLatLon(event);
             });
-            
-            //-----------------------chi---------------------------------------------------------
-            $("#home").click(() => {
-                _map.setCenter({ lat: 13.78, lng: 100.55 });
-            });
-            let count = 0
-            let line
-            $("#line").click(() => {
-              let poly = new google.maps.Polyline({
-                strokeColor: "#000000",
-                strokeOpacity: 1.0,
-                strokeWeight: 5,
-              });
-              // Add a listener for the click event
-              new google.maps.event.addListener(_map, "click", (event) => {
-                if (count < 2) {
-                  const path = poly.getPath();
-                  // Because path is an MVCArray, we can simply append a new coordinate
-                  // and it will automatically appear.
-                  path.push(event.latLng);
-                  // Add a new marker at the new plotted point on the polyline.
-                  line = new google.maps.Marker({
-                    position: event.latLng,
-                    title: "#" + path.getLength(),
-                    map: _map,
-                  });
-                  poly.setMap(_map);
-                  count++
-                } else {
-                  _map = new google.maps.Map(googlemap.current, {
-                    mapTypeControl: false,
-                    fullscreenControl: false,
-                    center: { lat: 13.78, lng: 100.55 },
-                    zoom: 8,
-                  })
-                  count=0
-                }
-              });
-            })
         });
 
         loadShapeFile()
     }, []);
+
+    const clickHome = () => {
+        map.setCenter(centerMap);
+    }
 
     const getLatLon = (event) => {
         let _lat = event.latLng.lat();
@@ -176,6 +146,7 @@ const mapPage = () => {
                     const token_decode = jwt_decode(token);
                     if (token_decode.exp < Date.now() / 1000) {
                         console.log("หมดเวลาtoken");
+                        const refresh_token = cookies.get('refresh_token');
                         await RefreshToken(refresh_token);
                     }
 
@@ -210,30 +181,30 @@ const mapPage = () => {
         }
     };
 
-    const RefreshToken = async (refreshtokenval) => {
-        try {
-            if (refreshtokenval) {
-                const { data } = await axios({
-                    method: "get",
-                    url: `${process.env.NEXT_PUBLIC_SERVICE}/provider/refreshToken`,
-                    headers: { Authorization: "Bearer " + refreshtokenval },
-                });
-                const token = data.items;
-                cookies.set("token", token, { path: "/" });
-                // window.location.reload();
-            } else {
-                logout();
-            }
-        } catch (error) {
-            logout();
-        }
-    };
+    // const RefreshToken = async (refreshtokenval) => {
+    //     try {
+    //         if (refreshtokenval) {
+    //             const { data } = await axios({
+    //                 method: "get",
+    //                 url: `${process.env.NEXT_PUBLIC_SERVICE}/provider/refreshToken`,
+    //                 headers: { Authorization: "Bearer " + refreshtokenval },
+    //             });
+    //             const token = data.items;
+    //             cookies.set("token", token, { path: "/" });
+    //             // window.location.reload();
+    //         } else {
+    //             logout();
+    //         }
+    //     } catch (error) {
+    //         logout();
+    //     }
+    // };
 
-    const logout = () => {
-        cookies.remove("token");
-        cookies.remove("refresh_token");
-        window.location.href = "/login";
-    };
+    // const logout = () => {
+    //     cookies.remove("token");
+    //     cookies.remove("refresh_token");
+    //     window.location.href = "/login";
+    // };
 
     const onFinishFailedUpload = (error) => {
         message.error("มีบางอย่างผิดพลาด !");
@@ -241,6 +212,8 @@ const mapPage = () => {
 
     const loadShapeFile = async () => {
         try {
+            const refresh_token = cookies.get('refresh_token');
+            await RefreshToken(refresh_token);
             const { data } = await API.get(`/shp/getDataLayer`)
 
             data.items.forEach(e => {
@@ -277,25 +250,35 @@ const mapPage = () => {
 
     const checkboxLayer = async (value, index1, index2) => {
         const arr = [...groupLayerList]
-        if (value.target.checked) {
-            const item = arr[index1].children[index2];
-            await getDeoJson(item.id, item.color_layer)
-            arr.forEach((e, i) => {
-                if (e.children) {
-                    e.children.forEach((x, ii) => {
-                        x.checked = (i == index1 && ii == index2) ? true : false
-                    });
-                }
-            });
+        // if (value.target.checked) {
+        //     const item = arr[index1].children[index2];
+        //     await getDeoJson(item.id, item.color_layer)
+        //     arr.forEach((e, i) => {
+        //         if (e.children) {
+        //             e.children.forEach((x, ii) => {
+        //                 x.checked = (i == index1 && ii == index2) ? true : false
+        //             });
+        //         }
+        //     });
 
-        } else {
+        // } else {
+        //     arr[index1].children[index2].checked = value.target.checked
+        //     clearMapData()
+        // }
+
+        arr[index1].children[index2].checked = value.target.checked
+        if (!value.target.checked) {
             arr[index1].children[index2].checked = value.target.checked
             clearMapData()
+        } else {
+            const item = arr[index1].children[index2];
+            await getDeoJson(item.id, item.color_layer)
         }
         setGroupLayerList(arr)
     };
 
     const clearMapData = () => {
+        console.log("adasd" , map);
         map.data.forEach((feature) => {
             console.log('feature :>> ', feature);
             // map.data.remove(feature);
@@ -467,7 +450,7 @@ const mapPage = () => {
                 ) : null}
 
                 <Col span={6} className="pt-2">
-                    <button className="btn btn-light btn-sm" id="home">
+                    <button className="btn btn-light btn-sm" onClick={clickHome}>
                         <img
                             width="120%"
                             style={{ marginTop: "-2px", marginLeft: "-1px" }}
@@ -476,7 +459,7 @@ const mapPage = () => {
                     </button>
                 </Col>
                 <Col span={6} className="pt-2">
-                    <button className="btn btn-light btn-sm" id="line">
+                    <button className="btn btn-light btn-sm">
                         <img
                             width="120%"
                             style={{ marginTop: "-2px" }}
@@ -589,7 +572,9 @@ const mapPage = () => {
                                                                 </Checkbox>
                                                             </Col>
                                                             <Col xs={3}>
-                                                                
+                                                                <a>
+                                                                    <UnorderedListOutlined />
+                                                                </a>
                                                             </Col>
                                                             <Col xs={3} style={{ paddingTop: 3 }}>
                                                                 <a onClick={() => openColor(i, index)}>
