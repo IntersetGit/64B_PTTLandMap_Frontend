@@ -28,8 +28,8 @@ export default axios.create({
     }],
     transformResponse: [function (data) {
         // Do whatever you want to transform the data
-        console.log('JSON.parse(data) :>> ', JSON.parse(data));
-        return JSON.parse(data); 
+        // console.log('JSON.parse(data) :>> ', JSON.parse(data));
+        return JSON.parse(data);
     }],
 });
 

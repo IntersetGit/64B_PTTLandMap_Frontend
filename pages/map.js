@@ -241,29 +241,12 @@ const mapPage = () => {
         // console.log('rgb :>> ', rgb);
         setGroupLayerList(arr);
 
-        map.data.setStyle({
-            fillColor: arr[index1].children[index2].color_layer,
-        });
+        changeColor(arr[index1].children[index2].id, arr[index1].children[index2].color_layer,)
+
     };
 
     const checkboxLayer = async (value, index1, index2) => {
         const arr = [...groupLayerList]
-        // if (value.target.checked) {
-        //     const item = arr[index1].children[index2];
-        //     await getDeoJson(item.id, item.color_layer)
-        //     arr.forEach((e, i) => {
-        //         if (e.children) {
-        //             e.children.forEach((x, ii) => {
-        //                 x.checked = (i == index1 && ii == index2) ? true : false
-        //             });
-        //         }
-        //     });
-
-        // } else {
-        //     arr[index1].children[index2].checked = value.target.checked
-        //     clearMapData()
-        // }
-
         arr[index1].children[index2].checked = value.target.checked
         if (!value.target.checked) {
             arr[index1].children[index2].checked = value.target.checked
@@ -275,53 +258,39 @@ const mapPage = () => {
         setGroupLayerList(arr)
     };
 
-    const clearMapData = (id) => {
-        console.log("layerData", layerData);
-        // map.data.forEach((feature) => {
-        //     console.log('feature :>> ', feature);
-        //     // map.data.remove(feature);
-        // });
+
+    const changeColor = (id, color) => {
         const arr = [...layerData]
         const index = arr.findIndex(e => e.id == id)
         if (index != -1) {
-            console.log('arr[index].layer :>> ', arr[index].layer);
-            // for (let key in arr[index].layer) {
-            //     let layer = arr[index].layer[key];
-            //     layer.forEach(function (feature) {
-            //         // let gaGeom = feature.getGeometry();
-            //         // console.log('gaGeom :>> ', gaGeom);
-            //         console.log('feature :>> ', feature);
-            //         layer.remove(feature);
-            //     });
-            // }
-            // arr.splice(index, 1);
-            // setLayerData(arr)
+            const layer = arr[index].layer
+            layer.setStyle({
+                fillColor: color,
+                opacity: 0.5,
+                strokeWeight: 1,
+                clickable: false
+            });
         }
+    }
 
+    const clearMapData = (id) => {
+        const arr = [...layerData]
+        const index = arr.findIndex(e => e.id == id)
+        if (index != -1) {
+            console.clear();
+            const layer = arr[index].layer
+            layer.forEach((feature) => {
+                layer.remove(feature);
+            });
+            arr.splice(index, 1);
+            setLayerData(arr)
+        }
     }
 
     const getDeoJson = async (id, color) => {
         try {
-            // console.log("color :>> ", color);
             const { data } = await API.get(`/shp/shapeData?id=${id}`);
             const GeoJson = data.items.shape;
-            // console.log('GeoJson :>> ', GeoJson);
-
-            /* old */
-            // map.data.addGeoJson(GeoJson);
-            // const bounds = new google.maps.LatLngBounds();
-            // map.data.forEach((feature) => {
-            //     feature.getGeometry().forEachLatLng((latlng) => {
-            //         bounds.extend(latlng);
-            //     });
-            // });
-            // map.fitBounds(bounds);
-
-            // map.data.setStyle({
-            //     fillColor: color,
-            // });
-
-            /* new */
             const bounds = new google.maps.LatLngBounds();
             const layer = new google.maps.Data();
             layer.addGeoJson(GeoJson)
@@ -364,7 +333,7 @@ const mapPage = () => {
                 group_layer_id: arr[index1].id,
                 id: item.id
             }
-            console.log('_model :>> ', _model);
+            // console.log('_model :>> ', _model);
             await API.post(`/masterdata/masLayersShape`, _model)
 
             openColor(index1, index2)
@@ -630,7 +599,7 @@ const mapPage = () => {
                                         {e.children
                                             ? e.children.map((x, index) =>
                                                 Object.assign(
-                                                    <div className="pt-2" key={e.id}>
+                                                    <div className="pt-2" key={index}>
                                                         <Row>
                                                             <Col xs={18}>
                                                                 <Checkbox
