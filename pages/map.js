@@ -601,7 +601,7 @@ const mapPage = () => {
                                                 Object.assign(
                                                     <div className="pt-2" key={index}>
                                                         <Row>
-                                                            <Col xs={18}>
+                                                            <Col xs={20}>
                                                                 <Checkbox
                                                                     checked={x.checked}
                                                                     onClick={(value) =>
@@ -611,12 +611,8 @@ const mapPage = () => {
                                                                     {x.name_layer}
                                                                 </Checkbox>
                                                             </Col>
-                                                            <Col xs={3}>
-                                                                <a>
-                                                                    <UnorderedListOutlined />
-                                                                </a>
-                                                            </Col>
-                                                            <Col xs={3} style={{ paddingTop: 3 }}>
+
+                                                            <Col xs={4} style={{ paddingTop: 3 }}>
                                                                 <a onClick={() => openColor(i, index)}>
                                                                     <div
                                                                         style={{
