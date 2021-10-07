@@ -54,14 +54,10 @@ const mapPage = () => {
                 zoom: 8,
             });
             setMap(_map);
-            // $("#home").click(() => {
-            //     _map.setCenter(centerMap);
-            // });
             google.maps.event.addListener(map, "mousemove", (event) => {
                 getLatLon(event);
             });
         });
-
         loadShapeFile()
     }, []);
 
@@ -414,7 +410,61 @@ const mapPage = () => {
         $("#openFullscreen").fadeToggle();
         $("#closeFullscreen").fadeToggle("slow");
     };
-
+    const clickLine = () => {
+        let count = 0 //นับจำนวนครั้งที่กด วัดระยะ ถ้ากด3ครั้งให้ยกเลิกเมพใหม่
+        let origin //จุดมาร์คที่ 1
+        let destination //จุดมาร์คที่ 2
+        let path
+        let markers = []
+        let poly = new google.maps.Polyline({
+            strokeColor: "#000000",
+            strokeOpacity: 1.0,
+            strokeWeight: 3,
+        });
+        poly.setMap(map);
+        map.addListener("click", async (event) => {
+            if (count < 2) {
+                count++
+                const marker = new google.maps.Marker({
+                    position: event.latLng,
+                    map: map
+                })
+                markers.push(marker)
+                path = poly.getPath();
+                path.push(event.latLng);
+                if (count === 1) {
+                    origin = event.latLng
+                }
+                if (count === 2) {
+                    destination = event.latLng
+                    const service = new google.maps.DistanceMatrixService();
+                    const request = {
+                        origins: [origin],
+                        destinations: [destination],
+                        travelMode: google.maps.TravelMode.DRIVING,
+                        unitSystem: google.maps.UnitSystem.METRIC,
+                        avoidHighways: false,
+                        avoidTolls: false,
+                    };
+                    const test = await service.getDistanceMatrix(request)
+                    if (test.rows[0].elements[0].distance !== undefined) {
+                        let infoWindow = await new google.maps.InfoWindow({
+                            content: `ระยะทาง${test.rows[0].elements[0].distance.text}`,
+                            position: destination,
+                        })
+                        infoWindow.open(map)
+                    }
+                }
+            } else {
+                for (let i = 0; i < markers.length; i++) {
+                    markers[i].setMap(null);
+                    path.pop()
+                }
+                markers = []
+                count = 0
+            }
+        })
+    }
     return (
         <Layout isMap={true}>
             <Head>
@@ -480,7 +530,7 @@ const mapPage = () => {
                     </button>
                 </Col>
                 <Col span={6} className="pt-2">
-                    <button className="btn btn-light btn-sm">
+                    <button className="btn btn-light btn-sm" onClick={clickLine}>
                         <img
                             width="120%"
                             style={{ marginTop: "-2px" }}

@@ -1,3 +1,26 @@
 {
-    "WillLuke.nextjs.hasPrompted": true
-}
+    "editor.formatOnSave": true,
+    "emmet.syntaxProfiles": {
+      "javascript": "jsx"
+    },
+    "[javascript]": {
+      "editor.defaultFormatter": "vscode.typescript-language-features"
+    },
+    "emmet.includeLanguages": {
+      "javascript": "javascriptreact",
+      "vue-html": "html",
+      "vue": "html"
+    },
+    "editor.defaultFormatter": "vscode.typescript-language-features",
+    "emmet.showAbbreviationSuggestions": true,
+    "emmet.showExpandedAbbreviation": "always",
+   "emeraldwalk.runonsave": {
+      "commands": [
+        {
+          "match": ".*",
+          "isAsync": true,
+          "cmd": "npm run less"
+        }
+      ]
+    }
+  }
