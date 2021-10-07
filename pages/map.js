@@ -37,6 +37,8 @@ const mapPage = () => {
     const googlemap = useRef(null);
     const { user } = useSelector(({ user }) => user);
     const centerMap = { lat: 13.78, lng: 100.55 }
+    const [layerData, setLayerData] = useState([])
+
     useEffect(() => {
         const loader = new Loader({
             apiKey: process.env.NEXT_PUBLIC_GOOGLE_API_KEY,
@@ -269,7 +271,7 @@ const mapPage = () => {
         arr[index1].children[index2].checked = value.target.checked
         if (!value.target.checked) {
             arr[index1].children[index2].checked = value.target.checked
-            clearMapData()
+            clearMapData(arr[index1].children[index2].id)
         } else {
             const item = arr[index1].children[index2];
             await getDeoJson(item.id, item.color_layer)
@@ -277,12 +279,29 @@ const mapPage = () => {
         setGroupLayerList(arr)
     };
 
-    const clearMapData = () => {
-        console.log("adasd" , map);
-        map.data.forEach((feature) => {
-            console.log('feature :>> ', feature);
-            // map.data.remove(feature);
-        });
+    const clearMapData = (id) => {
+        console.log("layerData", layerData);
+        // map.data.forEach((feature) => {
+        //     console.log('feature :>> ', feature);
+        //     // map.data.remove(feature);
+        // });
+        const arr = [...layerData]
+        const index = arr.findIndex(e => e.id == id)
+        if (index != -1) {
+            console.log('arr[index].layer :>> ', arr[index].layer);
+            // for (let key in arr[index].layer) {
+            //     let layer = arr[index].layer[key];
+            //     layer.forEach(function (feature) {
+            //         // let gaGeom = feature.getGeometry();
+            //         // console.log('gaGeom :>> ', gaGeom);
+            //         console.log('feature :>> ', feature);
+            //         layer.remove(feature);
+            //     });
+            // }
+            // arr.splice(index, 1);
+            // setLayerData(arr)
+        }
+
     }
 
     const getDeoJson = async (id, color) => {
@@ -324,6 +343,8 @@ const mapPage = () => {
                     bounds.extend(latlng);
                 });
             });
+
+            setLayerData([...layerData, { id, layer }])
             map.fitBounds(bounds);
 
         } catch (error) { }
