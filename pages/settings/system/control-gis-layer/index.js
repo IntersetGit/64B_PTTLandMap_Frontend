@@ -48,9 +48,9 @@ const usersSystemPage = () => {
     {
       key: "3",
       title: "Group Layer",
-      dataIndex: "group_layer_id",
+      dataIndex: "group_name",
       sorter: (record1, record2) => {
-        return record1.group_layer_id > record2.group_layer_id;
+        return record1.group_name > record2.group_name;
       },
     },
     {
@@ -110,7 +110,7 @@ const usersSystemPage = () => {
   }
 
   const reload = (search = null) => {
-    Api.get("/masterdata/masLayersShape",
+    Api.get("masterdata/masLayersShape",
       search != null ? { search: search } : {}
     )
       .then(({ data: { items } }) => {
@@ -300,7 +300,7 @@ const usersSystemPage = () => {
             ]}
           ><Select
           placeholder="กลุ่มผู้ใช้งาน"
-          defaultValue="f942a946-3bcb-4062-9207-d78ab437edf3"
+          defaultValue=""
         >
           {select && select.map((data, index) => (
             <Option key={index} value={data.id}>

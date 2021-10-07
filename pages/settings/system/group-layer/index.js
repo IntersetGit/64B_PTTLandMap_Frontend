@@ -54,7 +54,7 @@ const GroupLayerSystemPage = () => {
     let fd = new FormData();
     //console.log(value.Symbol[0].originFileObj)
     fd.append("file0", value.Symbol[0].originFileObj);
-    Api.post("/masterdata/masLayers", { group_name: value.groupLayer })
+    Api.post("/masterdata/masLayers", { group_name: value.group_name })
       .then(async (data) => {
         reload();
         const upload = await axios.post(
@@ -153,18 +153,14 @@ const GroupLayerSystemPage = () => {
       dataIndex: "id",
       width: 150,
       align: "center",
-      render: (id) => {
+      render: (id,show) => {
         return (
           <Dropdown
             overlay={
               <Menu>
                 <Menu.Item
                   key="1"
-                  onClick={async () => {
-                    await handleEdit(id),
-                      await handleCancel(),
-                      await handleEdit(id);
-                  }}
+                  onClick={() => handleEdit(show)}
                 >
                   แก้ไข
                 </Menu.Item>
@@ -184,6 +180,14 @@ const GroupLayerSystemPage = () => {
       responsive: ["md"],
     },
   ];
+
+  const handleEdit = async (show) => {
+    setIsModalVisible(true);
+    console.log(`show`, show)
+    form.setFieldsValue(show);
+  }
+
+
 
   const handleDelete = async (id) => {
     try {
@@ -275,11 +279,12 @@ const GroupLayerSystemPage = () => {
           onFinish={onFinish}
         >
           <Form.Item
-            name="groupLayer"
+            name="group_name"
             label="Group Layer Name"
             rules={[
               { required: true, message: "Please input your grouplayer!" },
             ]}
+            
           >
             <Input />
           </Form.Item>
@@ -291,11 +296,11 @@ const GroupLayerSystemPage = () => {
             getValueFromEvent={normFile}
             extra="ขนาดรูปภาพไม่เกิน 50*50 pixcel"
           >
-            <ImgCrop rotate>
+            {/* <ImgCrop rotate> */}
               <Upload name="logo" action="/upload.do" listType="picture">
                 <Button icon={<UploadOutlined />}>Select File</Button>
               </Upload>
-            </ImgCrop>
+            {/* </ImgCrop> */}
           </Form.Item>
         </Form>
       </Modal>
