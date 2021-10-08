@@ -9,16 +9,11 @@ import {
   Row,
   Form,
   Input,
-  Radio,
   Button,
-  DatePicker,
-  Select,
-  Upload,
   Table,
   Modal,
   Dropdown,
   Menu,
-  Image,
 
 } from "antd";
 import Api from "../../../../util/Api";
@@ -30,7 +25,7 @@ const { Search } = Input;
 const index = () => {
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState([]);
-  const [dataEdit,setDataEdit]=useState([])
+  const [dataEdit, setDataEdit] = useState([])
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(5);
   const [isModalVisible, setIsModalVisible] = useState({
@@ -121,20 +116,20 @@ const index = () => {
       formEdit.submit();
     }
   };
-  
+
   const handleCancel = () => {
     setIsModalVisible({ create: false, edit: false });
     formCreate.resetFields();
     formEdit.resetFields();
   };
-  
+
   const [id, setId] = useState(null)
   const onFinishCreate = async (value) => {
     setLoading(true);
     console.log(`value`, value)
-  
+
     setLoading(true);
-    Api.post("/masterdata/masStatusProject", {...value , id })
+    Api.post("/masterdata/masStatusProject", { ...value, id })
       .then(async (data) => {
         setIsModalVisible({ create: false, edit: false });
         reload();
@@ -149,9 +144,36 @@ const index = () => {
         setLoading(false);
         setId(null)
       });
-  
+
   };
- 
+
+  // const deleteHandle = (id) => {
+  //   try {
+  //     Swal.fire({
+  //       title: "กรุณายืนยันการลบข้อมูล?",
+  //       text: "เมื่อยืนยันแล้วจะไม่สามารถเรียกคืนได้",
+  //       icon: "warning",
+  //       showCancelButton: true,
+  //       confirmButtonColor: "#218838",
+  //       cancelButtonColor: "#d33",
+  //       confirmButtonText: "ยืนยัน",
+  //       cancelButtonText: "ยกเลิก",
+  //     }).then(async (result) => {
+  //       if (result.isConfirmed) {
+  //         setLoading(true);
+  //         const resp = await Api.delete("/masterdata/masStatusProject?id", {
+  //           data: { id: id },
+  //         });
+  //         Swal.fire("", "ลบข้อมูลเรียบร้อยแล้ว", "success");
+  //         reload();
+  //       }
+  //     });
+  //   } catch (error) {
+  //     console.log(error);
+  //     Swal.fire("", "มีบางอย่างผิดพลาด ไม่สามารถลบข้อมูลได้", "error");
+  //     setLoading(false);
+  //   }
+  // };
   const deleteHandle = (id) => {
     try {
       Swal.fire({
@@ -181,12 +203,10 @@ const index = () => {
   };
   const handleEdit = async (id) => {
     console.log(`id`, id);
-    setIsModalVisible({...isModalVisible , create : true});
-    const {data } = await Api.post("/masterdata/masStatusProject")
-     
+    setIsModalVisible({ ...isModalVisible, create: true });
+    const { data } = await Api.post("/masterdata/masStatusProject")
+
   };
-
-
 
   const reload = async (search = null) => {
     try {
@@ -212,11 +232,13 @@ const index = () => {
   };
 
 
+
+
   useEffect(() => {
     reload();
   }, loading);
 
-  
+
   return (
     <System>
       <Head>
@@ -277,7 +299,7 @@ const index = () => {
       <Modal
         title="จัดการ Status"
         visible={isModalVisible.create}
-        onOk={()=>handleOk("formCreate")}
+        onOk={() => handleOk("formCreate")}
         onCancel={handleCancel}
         centered
       >
@@ -287,13 +309,13 @@ const index = () => {
           wrapperCol={{ span: 14 }}
           onFinish={onFinishCreate}
         >
-          
-           <Form.Item
+
+          <Form.Item
             name="status_code"
             label="Status Code"
             rules={[{ required: true }]}
           >
-            <InputNumber min={1} max={10} defaultValue={1}  />
+            <InputNumber min={1} max={10} defaultValue={1} />
           </Form.Item>
           <Form.Item
             name="name"
@@ -302,10 +324,10 @@ const index = () => {
           >
             <Input placeholder="Status" />
           </Form.Item>
-      
+
         </Form>
       </Modal>
-      
+
     </System>
   );
 };
