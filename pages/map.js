@@ -435,14 +435,14 @@ const mapPage = () => {
         })
     }
     const clickClearMap = () => {
-        var t = new google.maps.Map(googlemap.current, {
+        var clearMap = new google.maps.Map(googlemap.current, {
             mapTypeControl: false,
             fullscreenControl: false,
             center: centerMap,
             zoom: 8,
         });
 
-        setMap(t)
+        setMap(clearMap)
     }
     return (
         <Layout isMap={true}>
