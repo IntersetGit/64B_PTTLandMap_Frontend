@@ -444,6 +444,83 @@ const mapPage = () => {
 
         setMap(clearMap)
     }
+    const [changmap, setChangeMap] = useState(false)
+    const clickSplit = async () => {
+        let mapLeft, mapRight;
+        setChangeMap(true)
+        const mapOptions = await {
+            zoom: 8,
+            scaleControl: false,
+            streetViewControl: false,
+            mapTypeControl: false,
+            fullscreenControl: false,
+            center: centerMap,
+        };
+
+        // instantiate the map on the left with control positioning
+        mapLeft = await new google.maps.Map(document.getElementById("map-left"), {
+            ...mapOptions,
+            mapTypeId: "satellite",
+            tilt: 0,
+        });
+        // instantiate the map on the right with control positioning
+        mapRight = await new google.maps.Map(document.getElementById("map-right"), {
+            ...mapOptions,
+            fullscreenControlOptions: {
+                position: google.maps.ControlPosition.RIGHT_BOTTOM,
+            },
+            zoomControlOptions: {
+                position: google.maps.ControlPosition.RIGHT_BOTTOM,
+            },
+        });
+        // helper function to keep maps in sync
+        function sync(...maps) {
+            let center, zoom;
+
+            function update(changedMap) {
+                maps.forEach((m) => {
+                    if (m === changedMap) {
+                        return;
+                    }
+
+                    m.setCenter(center);
+                    m.setZoom(zoom);
+                });
+            }
+
+            maps.forEach((m) => {
+                m.addListener("bounds_changed", () => {
+                    const changedCenter = m.getCenter();
+                    const changedZoom = m.getZoom();
+
+                    if (changedCenter !== center || changedZoom !== zoom) {
+                        center = changedCenter;
+                        zoom = changedZoom;
+                        update(m);
+                    }
+                });
+            });
+        }
+
+        sync(mapLeft, mapRight);
+
+        function handleContainerResize() {
+            const width = document.getElementById("container").offsetWidth;
+
+            document.getElementById("map-left").style.width = `${width}px`;
+            document.getElementById("map-right").style.width = `${width}px`;
+        }
+
+        // trigger to set map container size since using absolute
+        handleContainerResize();
+        // add event listener
+        window.addEventListener("resize", handleContainerResize);
+        //@ts-ignore
+        Split(["#left", "#right"], {
+            sizes: [50, 50],
+        });
+
+    }
     return (
         <Layout isMap={true}>
             <Head>
@@ -527,7 +604,7 @@ const mapPage = () => {
                     </button>
                 </Col>
                 <Col span={6} className="pt-2">
-                    <button className="btn btn-light btn-sm">
+                    <button className="btn btn-light btn-sm" onClick={clickSplit}>
                         <img
                             width="120%"
                             style={{ marginTop: "-2px", marginLeft: "-1px" }}
@@ -591,8 +668,16 @@ const mapPage = () => {
                 </Col>
             </div>
 
-            <div id="map" ref={googlemap} />
+            <div id="map" ref={googlemap} hidden={changmap} />
 
+            <div id="container" hidden={!changmap}>
+                <div id="left">
+                    <div id="map-left" class="map"></div>
+                </div>
+                <div id="right">
+                    <div id="map-right" class="map"></div>
+                </div>
+            </div>
             {/* Shape File */}
             <Drawer
                 width={350}
