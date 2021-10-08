@@ -434,6 +434,16 @@ const mapPage = () => {
             }
         })
     }
+    const clickClearMap = () => {
+        var t = new google.maps.Map(googlemap.current, {
+            mapTypeControl: false,
+            fullscreenControl: false,
+            center: centerMap,
+            zoom: 8,
+        });
+
+        setMap(t)
+    }
     return (
         <Layout isMap={true}>
             <Head>
@@ -535,7 +545,7 @@ const mapPage = () => {
                     </button>
                 </Col>
                 <Col span={6} className="pt-2">
-                    <button className="btn btn-light btn-sm">
+                    <button className="btn btn-light btn-sm" onClick={clickClearMap}>
                         <img
                             width="120%"
                             style={{ marginTop: "-2px", marginLeft: "-1.5px" }}
