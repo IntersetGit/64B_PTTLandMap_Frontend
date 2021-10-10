@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import Head from "next/head";
 import System from "../../../../components/_App/System";
+import Swal from "sweetalert2";
 import {
   MoreOutlined,
   RedoOutlined,
@@ -24,7 +25,6 @@ import {
   Space,
   Tooltip,
 } from "antd";
-import ImgCrop from 'antd-img-crop';
 import Api from "../../../../util/Api";
 import axios from "axios";
 const { Search } = Input;
@@ -37,11 +37,11 @@ const GroupLayerSystemPage = () => {
   const [data, setData] = useState([]);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [form] = Form.useForm();
-  
+
 
   const handleOk = () => {
     form.submit();
-     
+
   };
 
   const handleCancel = () => {
@@ -62,6 +62,7 @@ const GroupLayerSystemPage = () => {
           fd
         );
         setIsModalVisible(!isModalVisible);
+        Swal.fire("", "บันทึกเรียบร้อย", "success")
       })
       .catch((error) => {
         console.log(error);
@@ -153,7 +154,7 @@ const GroupLayerSystemPage = () => {
       dataIndex: "id",
       width: 150,
       align: "center",
-      render: (id,show) => {
+      render: (id, show) => {
         return (
           <Dropdown
             overlay={
@@ -182,22 +183,36 @@ const GroupLayerSystemPage = () => {
   ];
 
   const handleEdit = async (show) => {
-    setIsModalVisible(true);
-    console.log(`show`, show)
-    form.setFieldsValue(show);
+      setIsModalVisible(true)
+      console.log(`show`, show)
+      form.setFieldsValue(show);  
+      
   }
 
 
 
   const handleDelete = async (id) => {
     try {
-      const resp = await Api.delete(`masterdata/masLayersShape?id=` + id);
-      console.log(resp);
-      alert("ลบข้อมูลเรีนยร้อยแล้ว");
-      reload()
+      Swal.fire({
+        title: "กรุณายืนยันการลบข้อมูล?",
+        text: "เมื่อยืนยันแล้วจะไม่สามารถเรียกคืนได้",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#218838",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "ยืนยัน",
+        cancelButtonText: "ยกเลิก",
+      }).then(async (result) => {
+        if (result.isConfirmed) {
+          const resp = await Api.delete(`masterdata/masLayers?id=` + id);
+          console.log(resp);
+          Swal.fire("", "ลบข้อมูลเรียบร้อยแล้ว", "success");
+          reload()
+        }
+      });
     } catch (error) {
       console.log(error);
-      alert("มีบางอย่างผิดพลาด");
+      Swal.fire("", "มีบางอย่างผิดพลาด", "error");
     }
   };
 
@@ -216,13 +231,13 @@ const GroupLayerSystemPage = () => {
         <title>จัดการ Group Layer</title>
       </Head>
       <System>
-        <Row 
-        gutter={[10, 10]} 
-        style={{ 
-          background: "white", 
-          padding: "16px",
-          boxShadow:
-            " rgba(0, 0, 0, 0.12) 0px 1px 3px, rgba(0, 0, 0, 0.24) 0px 1px 2px",
+        <Row
+          gutter={[10, 10]}
+          style={{
+            background: "white",
+            padding: "16px",
+            boxShadow:
+              " rgba(0, 0, 0, 0.12) 0px 1px 3px, rgba(0, 0, 0, 0.24) 0px 1px 2px",
           }}>
           <Col span={24}>
             <h3>จัดการ Group Layer</h3>
@@ -240,7 +255,7 @@ const GroupLayerSystemPage = () => {
             </Button>
           </Col>
           <Col span={3} offset={11}>
-            <Button type="primary" onClick={()=>setIsModalVisible(true)}>
+            <Button type="primary" onClick={() => setIsModalVisible(true)}>
               + เพิ่ม group
             </Button>
           </Col>
@@ -266,8 +281,8 @@ const GroupLayerSystemPage = () => {
         visible={isModalVisible}
         onOk={handleOk}
         onCancel={handleCancel}
-        
-        
+
+
       >
         <Form
           labelCol={{ span: 8 }}
@@ -284,7 +299,7 @@ const GroupLayerSystemPage = () => {
             rules={[
               { required: true, message: "Please input your grouplayer!" },
             ]}
-            
+
           >
             <Input />
           </Form.Item>
@@ -297,9 +312,9 @@ const GroupLayerSystemPage = () => {
             extra="ขนาดรูปภาพไม่เกิน 50*50 pixcel"
           >
             {/* <ImgCrop rotate> */}
-              <Upload name="logo" action="/upload.do" listType="picture">
-                <Button icon={<UploadOutlined />}>Select File</Button>
-              </Upload>
+            <Upload name="logo" action="/upload.do" listType="picture">
+              <Button icon={<UploadOutlined />}>Select File</Button>
+            </Upload>
             {/* </ImgCrop> */}
           </Form.Item>
         </Form>
