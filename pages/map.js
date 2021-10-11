@@ -594,8 +594,7 @@ const mapPage = () => {
                 <Col span={6} className="pt-2">
                     <button className="btn btn-light btn-sm" onClick={clickHome} >
                         <img
-                            width="120%"
-                            style={{ marginTop: "-2px", marginLeft: "-1px" }}
+                            width="100%"
                             src="/assets/images/home.png"
                         />
                     </button>
@@ -603,8 +602,7 @@ const mapPage = () => {
                 <Col span={6} className="pt-2">
                     <button className="btn btn-light btn-sm" onClick={clickLine} >
                         <img
-                            width="120%"
-                            style={{ marginTop: "-2px" }}
+                            width="100%"
                             src="/assets/images/Line.png"
                         />
                     </button>
@@ -612,8 +610,7 @@ const mapPage = () => {
                 <Col span={6} className="pt-2">
                     <button className="btn btn-light btn-sm" >
                         <img
-                            width="120%"
-                            style={{ marginTop: "-2px", marginLeft: "-1px" }}
+                            width="100%"
                             src="/assets/images/-line_icon.png"
                         />
                     </button>
@@ -621,8 +618,7 @@ const mapPage = () => {
                 <Col span={6} className="pt-2">
                     <button className="btn btn-light btn-sm" onClick={clickSplit} >
                         <img
-                            width="120%"
-                            style={{ marginTop: "-2px", marginLeft: "-1px" }}
+                            width="100%"
                             src="/assets/images/polegon.png"
                         />
                     </button>
@@ -630,7 +626,7 @@ const mapPage = () => {
                 <Col span={6} className="pt-2">
                     <button className="btn btn-light btn-sm" >
                         <img
-                            width="120%"
+                            width="100%"
                             style={{ marginTop: "-2px", marginLeft: "-1px" }}
                             src="/assets/images/arrow_back_time.png"
                         />
@@ -639,7 +635,7 @@ const mapPage = () => {
                 <Col span={6} className="pt-2">
                     <button className="btn btn-light btn-sm" onClick={clickClearMap} >
                         <img
-                            width="120%"
+                            width="100%"
                             style={{ marginTop: "-2px", marginLeft: "-1.5px" }}
                             src="/assets/images/cross.png"
                         />
@@ -655,7 +651,7 @@ const mapPage = () => {
                         onClick={() => closeFullscreen()}
                     >
                         <img
-                            width="110%"
+                            width="100%"
                             style={{ marginTop: "-1px" }}
                             src="/assets/images/close_full_screen.png"
                         />
@@ -666,7 +662,7 @@ const mapPage = () => {
                         style={{ display: "none" }}
                         onClick={() => openFullscreen()}
                     >
-                        <img width="120%" src="/assets/images/open_full_screen.png" />
+                        <img width="100%" src="/assets/images/open_full_screen.png" />
                     </button>
                     <button
                         className="btn btn-light btn-sm"
@@ -675,8 +671,7 @@ const mapPage = () => {
                         }}
                     >
                         <img
-                            width="120%"
-                            style={{ marginTop: "-1px" }}
+                            width="100%"
                             src="/assets/images/menu_full_screen.png"
                         />
                     </button>
