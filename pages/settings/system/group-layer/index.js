@@ -36,16 +36,24 @@ const GroupLayerSystemPage = () => {
   const [pageSize, setPageSize] = useState(5);
   const [data, setData] = useState([]);
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const [isModalVisible2, setIsModalVisible2] = useState(false);
   const [form] = Form.useForm();
 
 
   const handleOk = () => {
     form.submit();
-
   };
 
   const handleCancel = () => {
     setIsModalVisible(false);
+    form.resetFields();
+  };
+  const handleOk2 = () => {
+    form.submit();
+  };
+
+  const handleCancel2 = () => {
+    setIsModalVisible2(false);
     form.resetFields();
   };
 
@@ -183,12 +191,39 @@ const GroupLayerSystemPage = () => {
   ];
 
   const handleEdit = async (show) => {
-      setIsModalVisible(true)
-      console.log(`show`, show)
-      form.setFieldsValue(show);  
-      
-  }
+    setIsModalVisible2(true)
+    console.log(`show`, show)
+    form.setFieldsValue(show);
+}
 
+  const onFinishEdit = async (data) => {
+    console.log(`data`, data)
+    try {
+      Swal.fire({
+        title: "กรุณายืนยันการแก้ไขข้อมูล",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#218838",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "ยืนยัน",
+        cancelButtonText: "ยกเลิก",
+      }).then(async (result) => {
+        if (result.isConfirmed) {
+          let resp = await Api.put("masterdata/masLayers", {
+            ...data,
+            id: form.getFieldValue().id,
+          });
+          await Swal.fire("", "แก้ไขข้อมูลเรียบร้อยแล้ว", "success");
+          reload();
+          handleCancel2();
+        }
+        console.log("sdasd" , form.getFieldValue())
+      });
+    } catch (error) {
+      console.log(error);
+      Swal.fire("", "มีบางอย่างผิดพลาด", "success");
+    }
+  };
 
 
   const handleDelete = async (id) => {
@@ -205,7 +240,6 @@ const GroupLayerSystemPage = () => {
       }).then(async (result) => {
         if (result.isConfirmed) {
           const resp = await Api.delete(`masterdata/masLayers?id=` + id);
-          console.log(resp);
           reload();
           Swal.fire("", "ลบข้อมูลเรียบร้อยแล้ว", "success");
         }
@@ -292,6 +326,52 @@ const GroupLayerSystemPage = () => {
           labelCol={{ span: 7 }}
           wrapperCol={{ span: 14 }}
           onFinish={onFinish}
+          
+        >
+          <Form.Item
+            name="group_name"
+            label="Group Layer Name"
+            rules={[
+              { required: true, message: "Please input your grouplayer!" },
+            ]}
+
+          >
+            <Input />
+          </Form.Item>
+          <Form.Item
+            name="Symbol"
+            label="Symbol"
+            valuePropName="fileList"
+            rules={[{ required: true }]}
+            getValueFromEvent={normFile}
+            extra="ขนาดรูปภาพไม่เกิน 50*50 pixcel"
+          >
+            {/* <ImgCrop rotate> */}
+            <Upload name="logo" action="/upload.do" listType="picture">
+              <Button icon={<UploadOutlined />}>Select File</Button>
+            </Upload>
+            {/* </ImgCrop> */}
+          </Form.Item>
+        </Form>
+      </Modal>
+
+      <Modal
+        title="แก้ไข Group Layer"
+        visible={isModalVisible2}
+        onOk={handleOk2}
+        onCancel={handleCancel2}
+
+
+      >
+        <Form
+          labelCol={{ span: 8 }}
+          wrapperCol={{ span: 16 }}
+          colon={false}
+          form={form}
+          labelCol={{ span: 7 }}
+          wrapperCol={{ span: 14 }}
+          onFinish={onFinishEdit}
+          
         >
           <Form.Item
             name="group_name"

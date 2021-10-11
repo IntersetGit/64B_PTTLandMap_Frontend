@@ -58,14 +58,14 @@ const usersSystemPage = () => {
       key: "5",
       title: "จัดการ",
       dataIndex: "id",
-      render: (id) => {
+      render: (id,show) => {
         return (
           <Dropdown
             overlay={
               <Menu>
                 <Menu.Item
                   key="1"
-                  onClick={() => handleEdit(id)}
+                  onClick={() => handleEdit(show)}
                 >
                   แก้ไข
                 </Menu.Item>
@@ -154,13 +154,12 @@ const usersSystemPage = () => {
   const handleEdit = async (show) => {
     setIsModalVisible(true)
     console.log(`show`, show)
-    form.setFieldsValue(show);      
+    form.setFieldsValue(show);
 }
 
-
-  const onFinishEdit = async (value) => {
+  const onFinishEdit = async (data) => {
+    console.log(`data`, data)
     try {
-      let filterRoles = await roles.find
       Swal.fire({
         title: "กรุณายืนยันการแก้ไขข้อมูล",
         icon: "warning",
@@ -172,13 +171,14 @@ const usersSystemPage = () => {
       }).then(async (result) => {
         if (result.isConfirmed) {
           let resp = await Api.post("masterdata/masLayersShape", {
-            id: dataEdit.id,
-            roles_id: filterRoles.id,
+            ...data,
+            id: form.getFieldValue().id,
           });
           await Swal.fire("", "แก้ไขข้อมูลเรียบร้อยแล้ว", "success");
           reload();
           handleCancel();
         }
+        console.log("sdasd" , form.getFieldValue())
       });
     } catch (error) {
       console.log(error);
@@ -301,7 +301,7 @@ const usersSystemPage = () => {
             ]}
           ><Select
           placeholder="กลุ่มผู้ใช้งาน"
-          defaultValue=""
+          // defaultValue=""
         >
           {select && select.map((data, index) => (
             <Option key={index} value={data.id}>
@@ -311,7 +311,7 @@ const usersSystemPage = () => {
         </Select>
           </Form.Item>
           <Form.Item
-            name="typecolor"
+            name="type"
             label="สี GIS Layer"
             rules={[{ required: true }]}
           >
