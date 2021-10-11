@@ -387,7 +387,7 @@ const mapPage = () => {
         let destination //จุดมาร์คที่ 2
         let path
         let markers = []
-        let clickOpenLine
+
         let poly = new google.maps.Polyline({
             strokeColor: "#000000",
             strokeOpacity: 1.0,
@@ -396,7 +396,7 @@ const mapPage = () => {
         poly.setMap(map);
         setOpenLine(!openLine) // สลับปุ่มเปิดปิด
         if (openLine) {
-            clickOpenLine = map.addListener("click", async (event) => {
+            map.addListener("click", async (event) => {
                 if (count < 2) {
                     count++
                     const marker = new google.maps.Marker({
@@ -439,8 +439,6 @@ const mapPage = () => {
                 }
             })
         } else {
-            // google.maps.event.clearListeners(map, clickOpenLine);
-            // new google.maps.event.removeListener(map, clickOpenLine);
             google.maps.event.clearListeners(map, 'click');
         }
     }
@@ -451,7 +449,6 @@ const mapPage = () => {
             center: centerMap,
             zoom: 8,
         });
-
         setMap(clearMap)
     }
     const [changmap, setChangeMap] = useState(false) // ปุ่มเปิดปิด split map
