@@ -2,8 +2,8 @@ import { useState, useEffect } from "react";
 import Head from "next/head";
 import System from "../../../../components/_App/System";
 import Api from "../../../../util/Api";
-import { MoreOutlined, RedoOutlined } from "@ant-design/icons";
 import Swal from "sweetalert2";
+import { MoreOutlined, RedoOutlined } from "@ant-design/icons";
 import {
   Table,
   Input,
@@ -72,7 +72,8 @@ const usersSystemPage = () => {
             overlay={
               <Menu>
                 <Menu.Item
-                 key="1" onClick={() => handleEdit(id)}
+                  key="1"
+                  onClick={() => handleEdit(id)}
                 >
                   แก้ไข
                 </Menu.Item>
@@ -96,7 +97,7 @@ const usersSystemPage = () => {
   const [select, setSelect] = useState()
 
   const getgroup = () => {
-    Api.post("masterdata/getMasLayers", { group_name: "" })
+    Api.post("masterdata/getMasLayers", { group_name :""})
       .then(async (data) => {
         setSelect(data.data.items)
       })
@@ -105,10 +106,8 @@ const usersSystemPage = () => {
       });
   }
 
-  const reload = (search = null) => {
-    Api.get("masterdata/masLayersShape",
-      search != null ? { search: search } : {}
-    )
+  const reload = () => {
+    Api.get("masterdata/masLayersShape")
       .then(({ data: { items } }) => {
         let tempDataArray = [];
         console.log(`data`, data)
@@ -137,25 +136,39 @@ const usersSystemPage = () => {
 
   const handleDelete = async (id) => {
     try {
-      const resp = await Api.delete(`masterdata/masLayers?id=` + id);
-      console.log(resp);
-      alert("ลบข้อมูลเรีนยร้อยแล้ว");
-      reload()
+      Swal.fire({
+        title: "กรุณายืนยันการลบข้อมูล?",
+        text: "เมื่อยืนยันแล้วจะไม่สามารถเรียกคืนได้",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#218838",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "ยืนยัน",
+        cancelButtonText: "ยกเลิก",
+      }).then(async (result) => {
+        if (result.isConfirmed) {
+          const resp = await Api.delete(`masterdata/masLayersShape?id=` + id);
+          console.log(resp);
+          reload();
+          Swal.fire("", "ลบข้อมูลเรียบร้อยแล้ว", "success");
+        }
+      });
     } catch (error) {
       console.log(error);
-      alert("มีบางอย่างผิดพลาด");
+      Swal.fire("", "มีบางอย่างผิดพลาด", "error");
     }
   };
 
-  // const handleEdit = async (id) => {
-  //   let filterData = await data.find((data) => data.id === id);
-  //   setDataEdit(filterData);
-  //   showModal("edit");
-  // };
+  const handleEdit = async (show) => {
+    setIsModalVisible(true)
+    console.log(`show`, show)
+    form.setFieldsValue(show);      
+}
 
-  const handleEdit = async (id) => {
+
+  const onFinishEdit = async (value) => {
     try {
-
+      let filterRoles = await roles.find
       Swal.fire({
         title: "กรุณายืนยันการแก้ไขข้อมูล",
         icon: "warning",
@@ -166,80 +179,81 @@ const usersSystemPage = () => {
         cancelButtonText: "ยกเลิก",
       }).then(async (result) => {
         if (result.isConfirmed) {
-          let filterData = await data.find((data) => data.id === id);
-          setDataEdit(filterData);
-          showModal("edit");
+          let resp = await Api.post("masterdata/masLayersShape", {
+            id: dataEdit.id,
+            roles_id: filterRoles.id,
+          });
+          await Swal.fire("", "แก้ไขข้อมูลเรียบร้อยแล้ว", "success");
+          reload();
+          handleCancel();
         }
       });
-      await Swal.fire("", "แก้ไขข้อมูลเรียบร้อยแล้ว", "success");
-      reload();
-      handleCancel();
-} catch (error) {
-  console.log(error);
-  Swal.fire("", "มีบางอย่างผิดพลาด", "success");
-}
+    } catch (error) {
+      console.log(error);
+      Swal.fire("", "มีบางอย่างผิดพลาด", "success");
+    }
   };
 
-const showModal = () => {
-  setIsModalVisible(true);
-};
-const handleOk = () => {
-  form.submit();
-};
-const handleCancel = () => {
-  setIsModalVisible(false);
-  form.resetFields();
-};
-const onFinish = async (value) => {
-  setLoading(true);
-  Api.post("/system/addUserAD", {
-    username: value.username,
-    roles_id: value.roles_id,
-  })
-    .then((data) => {
-      setIsModalVisible(false);
-      setLoading(false);
-      reload();
-      form.resetFields();
+  const showModal = () => {
+    setIsModalVisible(true);
+  };
+  const handleOk = () => {
+    form.submit();
+  };
+  const handleCancel = () => {
+    setIsModalVisible(false);
+    form.resetFields();
+  };
+  const onFinish = async (value) => {
+    setLoading(true);
+    Api.post("/system/addUserAD", {
+      username: value.username,
+      roles_id: value.roles_id,
     })
-    .catch((error) => {
-      alert("มีบางอย่างผิดพลาด หรือมีผู้ใช้ในระบบแล้ว");
-      setIsModalVisible(false);
-      setLoading(false);
-    });
-  form.resetFields();
-};
-return (
-  <>
-    <Head>
-      <title>จัดการผู้ใช้ระบบ</title>
-    </Head>
-    <System>
-      <Row
-        gutter={[10, 10]}
-        style={{
-          background: "white",
-          padding: "16px",
-          boxShadow:
-            " rgba(0, 0, 0, 0.12) 0px 1px 3px, rgba(0, 0, 0, 0.24) 0px 1px 2px",
-        }}
-      >
-        <Col span={24}>
-          <h3 className="mb-4">จัดการข้อมูล GIS Layer</h3>
-        </Col>
-        <Col span={5}>
-          <Search placeholder="input search text" />
-        </Col>
-        <Col span={5}>
-          <Button
-            onClick={() => {
-              reload();
-            }}
-          >
-            <RedoOutlined />
-          </Button>
-        </Col>
-        {/* <Col span={3} offset={11}>
+      .then((data) => {
+        setIsModalVisible(false);
+        setLoading(false);
+        reload();
+        form.resetFields();
+      })
+      .catch((error) => {
+        alert("มีบางอย่างผิดพลาด หรือมีผู้ใช้ในระบบแล้ว");
+        setIsModalVisible(false);
+        setLoading(false);
+      });
+    form.resetFields();
+  };
+  return (
+    <>
+      <Head>
+        <title>จัดการผู้ใช้ระบบ</title>
+      </Head>
+      <System>
+        <Row
+          gutter={[10, 10]}
+          style={{
+            background: "white",
+            padding: "16px",
+            boxShadow:
+              " rgba(0, 0, 0, 0.12) 0px 1px 3px, rgba(0, 0, 0, 0.24) 0px 1px 2px",
+          }}
+        >
+          <Col span={24}>
+            <h3 className="mb-4">จัดการข้อมูล GIS Layer</h3>
+          </Col>
+          <Col span={5}>
+            <Search placeholder="input search text" />
+          </Col>
+          <Col span={5}>
+            <Button
+              onClick={() => {
+                reload();
+              }}
+            >
+              <RedoOutlined />
+            </Button>
+          </Col>
+          {/* <Col span={3} offset={11}>
             <Button
               type="primary"
               onClick={showModal}
@@ -248,73 +262,73 @@ return (
               + เพิ่มผู้ใช้ใหม่
             </Button>
           </Col> */}
-        <Col span={24}>
-          <div className="table-responsive">
-            <Table
-              loading={loading}
-              columns={columns}
-              dataSource={data}
-              pagination={{
-                current: page,
-                pageSize: pageSize,
-                onChange: (page, pageSize) => {
-                  setPage(page);
-                  setPageSize(pageSize);
-                },
-              }}
-            />
-          </div>
-        </Col>
-      </Row>
-    </System>
-    <Modal
-      title="เพิ่มผู้ใช้ระบบ"
-      visible={isModalVisible}
-      onOk={handleOk}
-      onCancel={handleCancel}
-    >
-      <Form
-        form={form}
-        labelCol={{ span: 7 }}
-        wrapperCol={{ span: 14 }}
-        onFinish={onFinishEdit}
+          <Col span={24}>
+            <div className="table-responsive">
+              <Table
+                loading={loading}
+                columns={columns}
+                dataSource={data}
+                pagination={{
+                  current: page,
+                  pageSize: pageSize,
+                  onChange: (page, pageSize) => {
+                    setPage(page);
+                    setPageSize(pageSize);
+                  },
+                }}
+              />
+            </div>
+          </Col>
+        </Row>
+      </System>
+      <Modal
+        title="เพิ่มผู้ใช้ระบบ"
+        visible={isModalVisible}
+        onOk={handleOk}
+        onCancel={handleCancel}
       >
-        <Form.Item
-          name="name_layer"
-          label="ชื่อ"
-          rules={[{ required: true }]}
-          {...statusValidation}
+        <Form
+          form={form}
+          labelCol={{ span: 7 }}
+          wrapperCol={{ span: 14 }}
+          onFinish={onFinishEdit}
         >
-          <Input />
-        </Form.Item>
-        <Form.Item
-          name="group_layer_id"
-          label="Group Layer"
-          rules={[
-            { required: true, message: "กรุณากรอกข้อมูล กลุ่มผู้ใช้งาน" },
-          ]}
-        ><Select
+          <Form.Item
+            name="name_layer"
+            label="ชื่อ"
+            rules={[{ required: true }]}
+            {...statusValidation}
+          >
+            <Input  />
+          </Form.Item>
+          <Form.Item
+            name="group_layer_id"
+            label="Group Layer"
+            rules={[
+              { required: true, message: "กรุณากรอกข้อมูล กลุ่มผู้ใช้งาน" },
+            ]}
+          ><Select
           placeholder="กลุ่มผู้ใช้งาน"
           defaultValue=""
         >
-            {select && select.map((data, index) => (
-              <Option key={index} value={data.id}>
-                {data.group_name}
-              </Option>
-            ))}
-          </Select>
-        </Form.Item>
-        <Form.Item
-          name="typecolor"
-          label="สี GIS Layer"
-          rules={[{ required: true }]}
-        >
-          <Input type="color" style={{ width: '15%' }} />
-        </Form.Item>
-      </Form>
-    </Modal>
-  </>
-);
+          {select && select.map((data, index) => (
+            <Option key={index} value={data.id}>
+              {data.group_name}
+            </Option>
+          ))}
+        </Select>
+          </Form.Item>
+          <Form.Item
+            name="typecolor"
+            label="สี GIS Layer"
+            rules={[{ required: true }]}
+          >
+            <Input type="color" style={{ width: '15%' }} />
+          </Form.Item>
+        </Form>
+      </Modal>
+    </>
+  );
 };
 
 export default usersSystemPage;

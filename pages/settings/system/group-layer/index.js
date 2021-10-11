@@ -206,8 +206,8 @@ const GroupLayerSystemPage = () => {
         if (result.isConfirmed) {
           const resp = await Api.delete(`masterdata/masLayers?id=` + id);
           console.log(resp);
+          reload();
           Swal.fire("", "ลบข้อมูลเรียบร้อยแล้ว", "success");
-          reload()
         }
       });
     } catch (error) {
