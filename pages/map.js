@@ -624,7 +624,6 @@ const mapPage = () => {
                     <button className="btn btn-light btn-sm" >
                         <img
                             width="100%"
-                            style={{ marginTop: "-2px", marginLeft: "-1px" }}
                             src="/assets/images/arrow_back_time.png"
                         />
                     </button>
@@ -633,7 +632,6 @@ const mapPage = () => {
                     <button className="btn btn-light btn-sm" onClick={clickClearMap} >
                         <img
                             width="100%"
-                            style={{ marginTop: "-2px", marginLeft: "-1.5px" }}
                             src="/assets/images/cross.png"
                         />
                     </button>
@@ -649,7 +647,6 @@ const mapPage = () => {
                     >
                         <img
                             width="100%"
-                            style={{ marginTop: "-1px" }}
                             src="/assets/images/close_full_screen.png"
                         />
                     </button>
