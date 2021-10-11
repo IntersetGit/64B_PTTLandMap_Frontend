@@ -63,6 +63,7 @@ const mapPage = () => {
 
     const clickHome = () => {
         map.setCenter(centerMap);
+        map.setZoom(8)
     }
 
     const getLatLon = (event) => {
@@ -438,7 +439,9 @@ const mapPage = () => {
                 }
             })
         } else {
-            google.maps.event.clearListeners(map, clickOpenLine);
+            // google.maps.event.clearListeners(map, clickOpenLine);
+            // new google.maps.event.removeListener(map, clickOpenLine);
+            google.maps.event.clearListeners(map, 'click');
         }
     }
     const clickClearMap = () => {
@@ -589,7 +592,7 @@ const mapPage = () => {
                 ) : null}
 
                 <Col span={6} className="pt-2">
-                    <button className="btn btn-light btn-sm" onClick={clickHome}>
+                    <button className="btn btn-light btn-sm" onClick={clickHome} >
                         <img
                             width="120%"
                             style={{ marginTop: "-2px", marginLeft: "-1px" }}
@@ -598,7 +601,7 @@ const mapPage = () => {
                     </button>
                 </Col>
                 <Col span={6} className="pt-2">
-                    <button className="btn btn-light btn-sm" onClick={clickLine}>
+                    <button className="btn btn-light btn-sm" onClick={clickLine} >
                         <img
                             width="120%"
                             style={{ marginTop: "-2px" }}
@@ -607,7 +610,7 @@ const mapPage = () => {
                     </button>
                 </Col>
                 <Col span={6} className="pt-2">
-                    <button className="btn btn-light btn-sm">
+                    <button className="btn btn-light btn-sm" >
                         <img
                             width="120%"
                             style={{ marginTop: "-2px", marginLeft: "-1px" }}
@@ -616,7 +619,7 @@ const mapPage = () => {
                     </button>
                 </Col>
                 <Col span={6} className="pt-2">
-                    <button className="btn btn-light btn-sm" onClick={clickSplit}>
+                    <button className="btn btn-light btn-sm" onClick={clickSplit} >
                         <img
                             width="120%"
                             style={{ marginTop: "-2px", marginLeft: "-1px" }}
@@ -625,7 +628,7 @@ const mapPage = () => {
                     </button>
                 </Col>
                 <Col span={6} className="pt-2">
-                    <button className="btn btn-light btn-sm">
+                    <button className="btn btn-light btn-sm" >
                         <img
                             width="120%"
                             style={{ marginTop: "-2px", marginLeft: "-1px" }}
@@ -634,7 +637,7 @@ const mapPage = () => {
                     </button>
                 </Col>
                 <Col span={6} className="pt-2">
-                    <button className="btn btn-light btn-sm" onClick={clickClearMap}>
+                    <button className="btn btn-light btn-sm" onClick={clickClearMap} >
                         <img
                             width="120%"
                             style={{ marginTop: "-2px", marginLeft: "-1.5px" }}
