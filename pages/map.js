@@ -451,82 +451,87 @@ const mapPage = () => {
 
         setMap(clearMap)
     }
-    const [changmap, setChangeMap] = useState(false)
+    const [changmap, setChangeMap] = useState(false) // ปุ่มเปิดปิด split map
+    const googlemapLeft = useRef(null)
+    const googlemapRight = useRef(null)
+    const [count, setCount] = useState(false)
     const clickSplit = async () => {
-        let mapLeft, mapRight;
-        setChangeMap(true)
-        const mapOptions = await {
-            zoom: 8,
-            scaleControl: false,
-            streetViewControl: false,
-            mapTypeControl: false,
-            fullscreenControl: false,
-            center: centerMap,
-        };
+        setChangeMap(!changmap)
+        setCount(true)
+        if (!count) {
+            let mapLeft, mapRight;
+            const mapOptions = await {
+                zoom: 8,
+                scaleControl: false,
+                streetViewControl: false,
+                mapTypeControl: false,
+                fullscreenControl: false,
+                center: centerMap,
+            };
 
-        // instantiate the map on the left with control positioning
-        mapLeft = await new google.maps.Map(document.getElementById("map-left"), {
-            ...mapOptions,
-            mapTypeId: "satellite",
-            tilt: 0,
-        });
-        // instantiate the map on the right with control positioning
-        mapRight = await new google.maps.Map(document.getElementById("map-right"), {
-            ...mapOptions,
-            fullscreenControlOptions: {
-                position: google.maps.ControlPosition.RIGHT_BOTTOM,
-            },
-            zoomControlOptions: {
-                position: google.maps.ControlPosition.RIGHT_BOTTOM,
-            },
-        });
-        // helper function to keep maps in sync
-        function sync(...maps) {
-            let center, zoom;
+            // instantiate the map on the left with control positioning
+            mapLeft = await new google.maps.Map(googlemapLeft.current, {
+                ...mapOptions,
+                mapTypeId: "satellite",
+                tilt: 0,
+            });
+            // instantiate the map on the right with control positioning
+            mapRight = await new google.maps.Map(googlemapRight.current, {
+                ...mapOptions,
+                fullscreenControlOptions: {
+                    position: google.maps.ControlPosition.RIGHT_BOTTOM,
+                },
+                zoomControlOptions: {
+                    position: google.maps.ControlPosition.RIGHT_BOTTOM,
+                },
+            });
+            // helper function to keep maps in sync
+            function sync(...maps) {
+                let center, zoom;
 
-            function update(changedMap) {
+                function update(changedMap) {
+                    maps.forEach((m) => {
+                        if (m === changedMap) {
+                            return;
+                        }
+
+                        m.setCenter(center);
+                        m.setZoom(zoom);
+                    });
+                }
+
                 maps.forEach((m) => {
-                    if (m === changedMap) {
-                        return;
-                    }
+                    m.addListener("bounds_changed", () => {
+                        const changedCenter = m.getCenter();
+                        const changedZoom = m.getZoom();
 
-                    m.setCenter(center);
-                    m.setZoom(zoom);
+                        if (changedCenter !== center || changedZoom !== zoom) {
+                            center = changedCenter;
+                            zoom = changedZoom;
+                            update(m);
+                        }
+                    });
                 });
             }
 
-            maps.forEach((m) => {
-                m.addListener("bounds_changed", () => {
-                    const changedCenter = m.getCenter();
-                    const changedZoom = m.getZoom();
+            sync(mapLeft, mapRight);
 
-                    if (changedCenter !== center || changedZoom !== zoom) {
-                        center = changedCenter;
-                        zoom = changedZoom;
-                        update(m);
-                    }
-                });
+            function handleContainerResize() {
+                const width = document.getElementById("container").offsetWidth;
+
+                document.getElementById("map-left").style.width = `${width}px`;
+                document.getElementById("map-right").style.width = `${width}px`;
+            }
+
+            // trigger to set map container size since using absolute
+            handleContainerResize();
+            // add event listener
+            window.addEventListener("resize", handleContainerResize);
+            //@ts-ignore
+            Split(["#left", "#right"], {
+                sizes: [50, 50],
             });
         }
-
-        sync(mapLeft, mapRight);
-
-        function handleContainerResize() {
-            const width = document.getElementById("container").offsetWidth;
-
-            document.getElementById("map-left").style.width = `${width}px`;
-            document.getElementById("map-right").style.width = `${width}px`;
-        }
-
-        // trigger to set map container size since using absolute
-        handleContainerResize();
-        // add event listener
-        window.addEventListener("resize", handleContainerResize);
-        //@ts-ignore
-        Split(["#left", "#right"], {
-            sizes: [50, 50],
-        });
-
     }
     return (
         <Layout isMap={true}>
@@ -679,10 +684,10 @@ const mapPage = () => {
 
             <div id="container" hidden={!changmap}>
                 <div id="left">
-                    <div id="map-left" class="map"></div>
+                    <div id="map-left" class="map" ref={googlemapLeft}></div>
                 </div>
                 <div id="right">
-                    <div id="map-right" class="map"></div>
+                    <div id="map-right" class="map" ref={googlemapRight}></div>
                 </div>
             </div>
             {/* Shape File */}
