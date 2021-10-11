@@ -55,14 +55,6 @@ const usersSystemPage = () => {
       },
     },
     {
-      key: "4",
-      title: "Color GIS Layer",
-      dataIndex: "color_layer",
-      sorter: (record1, record2) => {
-        return record1.color_layer > record2.color_layer;
-      },
-    },
-    {
       key: "5",
       title: "จัดการ",
       dataIndex: "id",
