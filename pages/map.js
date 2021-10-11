@@ -379,14 +379,14 @@ const mapPage = () => {
         $("#openFullscreen").fadeToggle();
         $("#closeFullscreen").fadeToggle("slow");
     };
-    const [openLine, setOpenLine] = useState(false) //ปุ่มเปิดปิด Line
+    const [openLine, setOpenLine] = useState(true) //ปุ่มเปิดปิด Line
     const clickLine = () => {
         let count = 0 //นับจำนวนครั้งที่กด วัดระยะ ถ้ากด3ครั้งให้ยกเลิกเมพใหม่
         let origin //จุดมาร์คที่ 1
         let destination //จุดมาร์คที่ 2
         let path
         let markers = []
-        let test
+        let clickOpenLine
         let poly = new google.maps.Polyline({
             strokeColor: "#000000",
             strokeOpacity: 1.0,
@@ -395,7 +395,7 @@ const mapPage = () => {
         poly.setMap(map);
         setOpenLine(!openLine) // สลับปุ่มเปิดปิด
         if (openLine) {
-            const test = map.addListener("click", async (event) => {
+            clickOpenLine = map.addListener("click", async (event) => {
                 if (count < 2) {
                     count++
                     const marker = new google.maps.Marker({
@@ -438,7 +438,7 @@ const mapPage = () => {
                 }
             })
         } else {
-            google.maps.event.clearListeners(map, test);
+            google.maps.event.clearListeners(map, clickOpenLine);
         }
     }
     const clickClearMap = () => {
