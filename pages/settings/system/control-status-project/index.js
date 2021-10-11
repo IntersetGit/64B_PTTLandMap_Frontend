@@ -40,6 +40,7 @@ import axios from "axios";
 import Head from "next/head";
 import System from "../../../../components/_App/System";
 import moment from "moment";
+import Swal from "sweetalert2";
 import { MoreOutlined } from "@ant-design/icons";
 import {
   Col,
@@ -224,15 +225,27 @@ const index = () => {
           .catch((error) => console.log(error));
   };
   const deleteHandle = (id) => {
-    if (confirm("คุณแน่ใจหรือไม่ว่าต้องการลบข้อมูล")) {
-      setLoading(true);
-      Api.delete("/masterdata/datLayers", { data: { id: id } })
-        .then((data) => {
-          alert("ลบข้อมูลเรียบร้อย");
+    try {
+      Swal.fire({
+        title: "กรุณายืนยันการลบข้อมูล?",
+        text: "เมื่อยืนยันแล้วจะไม่สามารถเรียกคืนได้",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#218838",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "ยืนยัน",
+        cancelButtonText: "ยกเลิก",
+      }).then(async (result) => {
+        if (result.isConfirmed) {
+          const resp = await Api.delete(`masterdata/masStatusProject?id=` + id);
+          console.log(resp);
           reload();
-        })
-        .catch((error) => alert("มีบางอย่างผิดพลาด ไม่สามารถลบข้อมูลได้"));
-      setLoading(false);
+          Swal.fire("", "ลบข้อมูลเรียบร้อยแล้ว", "success");
+        }
+      });
+    } catch (error) {
+      console.log(error);
+      Swal.fire("", "มีบางอย่างผิดพลาด", "error");
     }
   };
   const handleEdit = (id)=>{
