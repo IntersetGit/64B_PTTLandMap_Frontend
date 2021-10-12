@@ -32,15 +32,17 @@ const index = () => {
     create: false,
     edit: false,
   });
+  const [isModalVisible2, setIsModalVisible2] = useState(false);
   const [setMenuItem] = useState([]);
   const [formCreate] = Form.useForm();
   const [formEdit] = Form.useForm();
+  const [form] = Form.useForm();
   const columns = [
     {
       key: "1",
       title: "ลำดับ",
       dataIndex: "number",
-      width: '5%',
+      width: '3%',
       sorter: (record1, record2) => {
         return record1.number > record2.number;
       },
@@ -58,7 +60,7 @@ const index = () => {
       key: "3",
       title: "Status",
       dataIndex: "name",
-      width: '25%',
+      width: '30%',
       sorter: (record1, record2) => {
         return record1.Status > record2.Status;
       },
@@ -67,8 +69,9 @@ const index = () => {
       key: "4",
       title: "จัดการ",
       dataIndex: "id",
-      width: '10%',
-      render: (id) => {
+      width: '2%',
+      align: 'center',
+      render: (id, show) => {
         return (
           <Dropdown
             overlay={
@@ -76,8 +79,7 @@ const index = () => {
                 <Menu.Item
                   key="1"
                   onClick={() => {
-                    console.log(`id`, id)
-                    handleEdit(id);
+                    handleEdit(show);
                   }}
                 >
                   แก้ไข
@@ -147,33 +149,50 @@ const index = () => {
 
   };
 
-  // const deleteHandle = (id) => {
-  //   try {
-  //     Swal.fire({
-  //       title: "กรุณายืนยันการลบข้อมูล?",
-  //       text: "เมื่อยืนยันแล้วจะไม่สามารถเรียกคืนได้",
-  //       icon: "warning",
-  //       showCancelButton: true,
-  //       confirmButtonColor: "#218838",
-  //       cancelButtonColor: "#d33",
-  //       confirmButtonText: "ยืนยัน",
-  //       cancelButtonText: "ยกเลิก",
-  //     }).then(async (result) => {
-  //       if (result.isConfirmed) {
-  //         setLoading(true);
-  //         const resp = await Api.delete("/masterdata/masStatusProject?id", {
-  //           data: { id: id },
-  //         });
-  //         Swal.fire("", "ลบข้อมูลเรียบร้อยแล้ว", "success");
-  //         reload();
-  //       }
-  //     });
-  //   } catch (error) {
-  //     console.log(error);
-  //     Swal.fire("", "มีบางอย่างผิดพลาด ไม่สามารถลบข้อมูลได้", "error");
-  //     setLoading(false);
-  //   }
-  // };
+  const handleOk2 = () => {
+    form.submit();
+  };
+
+  const handleCancel2 = () => {
+    setIsModalVisible2(false);
+    form.resetFields();
+  };
+
+  const handleEdit = async (show) => {
+    setIsModalVisible2(true)
+    console.log(`show`, show)
+    form.setFieldsValue(show);
+  }
+
+  const onFinishEdit = async (data) => {
+    console.log(`data`, data)
+    try {
+      Swal.fire({
+        title: "กรุณายืนยันการแก้ไขข้อมูล",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#218838",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "ยืนยัน",
+        cancelButtonText: "ยกเลิก",
+      }).then(async (result) => {
+        if (result.isConfirmed) {
+          let resp = await Api.post("masterdata/masStatusProject", {
+            ...data,
+            id: form.getFieldValue().id,
+          });
+          await Swal.fire("", "แก้ไขข้อมูลเรียบร้อยแล้ว", "success");
+          reload();
+          handleCancel2();
+        }
+        console.log("sdasd", form.getFieldValue())
+      });
+    } catch (error) {
+      console.log(error);
+      Swal.fire("", "มีบางอย่างผิดพลาด", "success");
+    }
+  };
+
   const handleDelete = async (id) => {
     try {
       Swal.fire({
@@ -199,18 +218,20 @@ const index = () => {
     }
   };
 
-  const handleEdit = async (id) => {
-    console.log(`id`, id);
-    setIsModalVisible({ ...isModalVisible, create: true });
-    const { data } = await Api.post("/masterdata/masStatusProject")
+  // const handleEdit = async (id) => {
+  //   console.log(`id`, id);
+  //   setIsModalVisible({ ...isModalVisible, create: true });
+  //   const { data } = await Api.post("/masterdata/masStatusProject")
 
-  };
+  // };
 
   const reload = async (search = null) => {
+    setLoading(true);
     try {
       const respData = await Api.get(
         `/masterdata/masStatusProject${search != null ? "?search=" + search : ""}`
       );
+
       let tempDataArray = [];
       respData.data.items.forEach((data, key) => {
         tempDataArray = [
@@ -247,7 +268,7 @@ const index = () => {
         style={{
           background: "white",
           padding: "16px",
-          width: '70%',
+          // width: '100%',
           boxShadow:
             " rgba(0, 0, 0, 0.12) 0px 1px 3px, rgba(0, 0, 0, 0.24) 0px 1px 2px",
         }}
@@ -255,7 +276,7 @@ const index = () => {
         <Col span={24}>
           <h3>จัดการ Status โครงการ</h3>{dataEdit.layer_name}
         </Col>
-        <Col span={5}>
+        <Col xs={8} sm={8} md={8} lg={8} xl={8} xxl={5}>
           <Search
             placeholder="input search text"
             onSearch={(e) => {
@@ -263,12 +284,12 @@ const index = () => {
             }}
           />
         </Col>
-        <Col span={5}>
+        <Col xs={8} sm={8} md={8} lg={8} xl={8} xxl={11}>
           <Button onClick={() => reload()}>
             <RedoOutlined />
           </Button>
         </Col>
-        <Col span={3} offset={11}>
+        <Col xs={8} sm={8} md={8} lg={8} xl={8} xxl={8} >
           <Button
             type="primary"
             style={{ float: "right" }}
@@ -277,7 +298,7 @@ const index = () => {
             + เพิ่ม Status
           </Button>
         </Col>
-        <Col span={24}>
+        <Col xs={24} sm={24} md={24} lg={24} xl={24} xxl={24}>
           <Table
             loading={loading}
             columns={columns}
@@ -302,10 +323,43 @@ const index = () => {
         centered
       >
         <Form
-          form={formCreate}
+          colon={false}
+          form={form}
           labelCol={{ span: 7 }}
           wrapperCol={{ span: 14 }}
-          onFinish={onFinishCreate}
+          onFinish={onFinishEdit}
+        >
+
+          <Form.Item
+            name="status_code"
+            label="Status Code"
+            rules={[{ required: true }]}
+          >
+            <InputNumber min={1} max={10} defaultValue={1} />
+          </Form.Item>
+          <Form.Item
+            name="name"
+            label="Status"
+            rules={[{ required: true }]}
+          >
+            <Input placeholder="Status" />
+          </Form.Item>
+
+        </Form>
+      </Modal>
+
+      <Modal
+        title="แก้ไข Status"
+        visible={isModalVisible2}
+        onOk={handleOk2}
+        onCancel={handleCancel2}
+      >
+        <Form
+          colon={false}
+          form={form}
+          labelCol={{ span: 7 }}
+          wrapperCol={{ span: 14 }}
+          onFinish={onFinishEdit}
         >
 
           <Form.Item

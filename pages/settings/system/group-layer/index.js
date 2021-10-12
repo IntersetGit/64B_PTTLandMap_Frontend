@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import Head from "next/head";
 import System from "../../../../components/_App/System";
 import Swal from "sweetalert2";
+import { useSelector } from 'react-redux'
 import {
   MoreOutlined,
   RedoOutlined,
@@ -37,8 +38,10 @@ const GroupLayerSystemPage = () => {
   const [data, setData] = useState([]);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [isModalVisible2, setIsModalVisible2] = useState(false);
+  const [loding, setLoding] = useState(false)
   const [form] = Form.useForm();
-
+  const user = useSelector(({ user }) => user.user);
+  console.log(`user`, user)
 
   const handleOk = () => {
     form.submit();
@@ -71,6 +74,7 @@ const GroupLayerSystemPage = () => {
         );
         setIsModalVisible(!isModalVisible);
         Swal.fire("", "บันทึกเรียบร้อย", "success")
+
       })
       .catch((error) => {
         console.log(error);
@@ -78,8 +82,10 @@ const GroupLayerSystemPage = () => {
     form.resetFields();
   };
   const reload = () => {
+    setLoding(true)
     Api.post("/masterdata/getmasLayers")
       .then(({ data: { items } }) => {
+        setLoding(false)
         let tempDataArray = [];
         console.log(`data`, data)
         items.forEach((data, key) => {
@@ -96,6 +102,7 @@ const GroupLayerSystemPage = () => {
         setLoading(false);
       })
       .catch((error) => {
+        setLoding(false)
         console.log(error);
       });
   };
@@ -194,7 +201,7 @@ const GroupLayerSystemPage = () => {
     setIsModalVisible2(true)
     console.log(`show`, show)
     form.setFieldsValue(show);
-}
+  }
 
   const onFinishEdit = async (data) => {
     console.log(`data`, data)
@@ -209,15 +216,29 @@ const GroupLayerSystemPage = () => {
         cancelButtonText: "ยกเลิก",
       }).then(async (result) => {
         if (result.isConfirmed) {
+
+          setIsModalVisible2(!isModalVisible2);
+          Swal.fire("", "บันทึกเรียบร้อย", "success")
           let resp = await Api.put("masterdata/masLayers", {
             ...data,
             id: form.getFieldValue().id,
+            order_by: "7",
+            isuse: 1,
+            roles_id: user.roles_id,
+            user_id: user.sysm_id,
           });
+          let fd = new FormData();
+          //console.log(value.Symbol[0].originFileObj)
+          fd.append("file0", data.Symbol[0].originFileObj);
+          const upload = await axios.post(
+            `http://localhost:9000/upload?Path=symbol_group&Length=1&Name=${form.getFieldValue().id}&SetType=jpg`,
+            fd
+          );
           await Swal.fire("", "แก้ไขข้อมูลเรียบร้อยแล้ว", "success");
           reload();
           handleCancel2();
         }
-        console.log("sdasd" , form.getFieldValue())
+        console.log("sdasd", form.getFieldValue())
       });
     } catch (error) {
       console.log(error);
@@ -240,6 +261,7 @@ const GroupLayerSystemPage = () => {
       }).then(async (result) => {
         if (result.isConfirmed) {
           const resp = await Api.delete(`masterdata/masLayers?id=` + id);
+          console.log(resp);
           reload();
           Swal.fire("", "ลบข้อมูลเรียบร้อยแล้ว", "success");
         }
@@ -276,10 +298,11 @@ const GroupLayerSystemPage = () => {
           <Col span={24}>
             <h3>จัดการ Group Layer</h3>
           </Col>
-          <Col span={5}>
+
+          <Col xs={8} sm={8} md={8} lg={8} xl={8} xxl={5}>
             <Search placeholder="input search text" onSearch={search} />
           </Col>
-          <Col span={5}>
+          <Col xs={8} sm={8} md={8} lg={8} xl={8} xxl={11}>
             <Button
               onClick={() => {
                 reload();
@@ -288,13 +311,15 @@ const GroupLayerSystemPage = () => {
               <RedoOutlined />
             </Button>
           </Col>
-          <Col span={3} offset={11}>
-            <Button type="primary" onClick={() => setIsModalVisible(true)}>
+          <Col xs={8} sm={8} md={8} lg={8} xl={8} xxl={8} >
+            <Button type="primary" onClick={() => setIsModalVisible(true)} style={{ display: "block", float: "right" }}>
               + เพิ่ม group
             </Button>
           </Col>
+
           <Col span={24}>
             <Table
+              loading={loding}
               columns={columns}
               dataSource={data}
               pagination={{
@@ -323,10 +348,10 @@ const GroupLayerSystemPage = () => {
           wrapperCol={{ span: 16 }}
           colon={false}
           form={form}
-          labelCol={{ span: 7 }}
-          wrapperCol={{ span: 14 }}
+          // labelCol={{ span: 7 }}
+          // wrapperCol={{ span: 14 }}
           onFinish={onFinish}
-          
+
         >
           <Form.Item
             name="group_name"
@@ -371,7 +396,7 @@ const GroupLayerSystemPage = () => {
           labelCol={{ span: 7 }}
           wrapperCol={{ span: 14 }}
           onFinish={onFinishEdit}
-          
+
         >
           <Form.Item
             name="group_name"

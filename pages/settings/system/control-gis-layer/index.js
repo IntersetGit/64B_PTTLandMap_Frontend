@@ -58,7 +58,7 @@ const usersSystemPage = () => {
       key: "5",
       title: "จัดการ",
       dataIndex: "id",
-      render: (id,show) => {
+      render: (id, show) => {
         return (
           <Dropdown
             overlay={
@@ -89,7 +89,7 @@ const usersSystemPage = () => {
   const [select, setSelect] = useState()
 
   const getgroup = () => {
-    Api.post("masterdata/getMasLayers", { group_name :""})
+    Api.post("masterdata/getMasLayers", { group_name: "" })
       .then(async (data) => {
         setSelect(data.data.items)
       })
@@ -99,6 +99,7 @@ const usersSystemPage = () => {
   }
 
   const reload = () => {
+    setLoading(true);
     Api.get("masterdata/masLayersShape")
       .then(({ data: { items } }) => {
         let tempDataArray = [];
@@ -155,7 +156,7 @@ const usersSystemPage = () => {
     setIsModalVisible(true)
     console.log(`show`, show)
     form.setFieldsValue(show);
-}
+  }
 
   const onFinishEdit = async (data) => {
     console.log(`data`, data)
@@ -178,7 +179,7 @@ const usersSystemPage = () => {
           reload();
           handleCancel();
         }
-        console.log("sdasd" , form.getFieldValue())
+        console.log("sdasd", form.getFieldValue())
       });
     } catch (error) {
       console.log(error);
@@ -233,10 +234,10 @@ const usersSystemPage = () => {
           <Col span={24}>
             <h3 className="mb-4">จัดการข้อมูล GIS Layer</h3>
           </Col>
-          <Col span={5}>
+          <Col xs={10} sm={8} md={8} lg={8} xl={8} xxl={5}>
             <Search placeholder="input search text" />
           </Col>
-          <Col span={5}>
+          <Col xs={8} sm={8} md={8} lg={8} xl={8} xxl={11}>
             <Button
               onClick={() => {
                 reload();
@@ -291,7 +292,7 @@ const usersSystemPage = () => {
             rules={[{ required: true }]}
             {...statusValidation}
           >
-            <Input  />
+            <Input />
           </Form.Item>
           <Form.Item
             name="group_layer_id"
@@ -300,15 +301,15 @@ const usersSystemPage = () => {
               { required: true, message: "กรุณากรอกข้อมูล กลุ่มผู้ใช้งาน" },
             ]}
           ><Select
-          placeholder="กลุ่มผู้ใช้งาน"
+            placeholder="กลุ่มผู้ใช้งาน"
           // defaultValue=""
-        >
-          {select && select.map((data, index) => (
-            <Option key={index} value={data.id}>
-              {data.group_name}
-            </Option>
-          ))}
-        </Select>
+          >
+              {select && select.map((data, index) => (
+                <Option key={index} value={data.id}>
+                  {data.group_name}
+                </Option>
+              ))}
+            </Select>
           </Form.Item>
           <Form.Item
             name="type"
