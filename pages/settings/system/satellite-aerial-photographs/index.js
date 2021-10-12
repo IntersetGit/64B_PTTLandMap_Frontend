@@ -408,7 +408,7 @@ const index = () => {
           >
             <Input placeholder="wms_url" />
           </Form.Item>
-          <Form.Item name="url" label="url" rules={[{ required: true }]}>
+          <Form.Item name="url" label="url" rules={[{ required: true }, { type: "url" }]}>
             <Input placeholder="url" />
           </Form.Item>
           {menuItem}
@@ -492,7 +492,7 @@ const index = () => {
           >
             <Input placeholder="wms_url" />
           </Form.Item>
-          <Form.Item name="url" label="url" rules={[{ required: true }]}>
+          <Form.Item name="url" label="url" rules={[{ required: true }, { type: "url" }]}>
             <Input placeholder="wms_url" />
           </Form.Item>
           {menuItem}
