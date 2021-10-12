@@ -146,6 +146,42 @@ body {
     color: aliceblue;
   }
 }
+.tools-map-area3{
+  position: absolute !important;
+  left: 5px;
+  bottom: 10px;
+  color: aliceblue;
+  padding: 10px;
+  border-radius: 15px;
+  z-index: 30 !important;
+  button {
+    color: aliceblue;
+    background-color: #4b5159;
+    width: 100px;
+    text-align: center;
+    padding: 2.5px;
+  }
+  div{
+    float:right;
+    margin-left: 10px;
+    padding: 10px;
+    color:red;
+    width: 250px;
+    height: 100px;
+    border-radius: 5%;
+    background-color: white;
+
+    button{
+      width: 60px;
+      height: 60px;
+      margin: 3.5%;
+    }
+  }
+  button:hover {
+    background-color: #34373d;
+    color: aliceblue;
+  }
+}
 
 /* Always set the map height explicitly to define the size of the div
        * element that contains the map. */

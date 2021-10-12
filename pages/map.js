@@ -15,6 +15,7 @@ import {
     Upload,
     Button,
     message,
+    Image
 } from "antd";
 import Head from "next/head";
 import { useSelector } from "react-redux";
@@ -38,7 +39,6 @@ const mapPage = () => {
     const { user } = useSelector(({ user }) => user);
     const centerMap = { lat: 13.78, lng: 100.55 }
     const [layerData, setLayerData] = useState([])
-
     useEffect(() => {
         const loader = new Loader({
             apiKey: process.env.NEXT_PUBLIC_GOOGLE_API_KEY,
@@ -349,6 +349,17 @@ const mapPage = () => {
     /*  Search */
     const [visibleSearch, setVisibleSearch] = useState(false);
 
+    /* Raster */
+    const [visibleRaster, setVisibleRaster] = useState(false)
+    const [rasterData, setRasterData] = useState([]) // ข้อมูล raster
+    const openCloseRaster = async () => {
+        setVisibleRaster(!visibleRaster)
+        if (!visibleRaster) {
+            const respRaster = await API.get("/masterdata/datLayers")
+            setRasterData(respRaster.data.items)
+            console.log(rasterData)
+        }
+    }
     const [fullscreen, setFullScreen] = useState(false);
     const openFullscreen = () => {
         var elem = document.documentElement;
@@ -563,7 +574,7 @@ const mapPage = () => {
                 </div>
             </div>
 
-            <div className="tools-map-cog">
+            <div className="tools-map-cog" onClick={() => openCloseRaster()}>
                 <Col span={6}>
                     <i
                         className="fa fa-cog"
@@ -605,7 +616,7 @@ const mapPage = () => {
                     </button>
                 </Col>
                 <Col span={6} className="pt-2">
-                    <button className="btn btn-light btn-sm" >
+                    <button className="btn btn-light btn-sm" onClick={clickSplit}>
                         <img
                             width="100%"
                             src="/assets/images/-line_icon.png"
@@ -613,7 +624,7 @@ const mapPage = () => {
                     </button>
                 </Col>
                 <Col span={6} className="pt-2">
-                    <button className="btn btn-light btn-sm" onClick={clickSplit} >
+                    <button className="btn btn-light btn-sm"  >
                         <img
                             width="100%"
                             src="/assets/images/polegon.png"
@@ -670,6 +681,23 @@ const mapPage = () => {
                         />
                     </button>
                 </Col>
+            </div>
+            <div className="tools-map-area3" >
+                <button className="btn btn-light btn-sm" onClick={() => $("#changeMap").fadeToggle()}>
+                    <img width="100%" src="https://images.adsttc.com/media/images/6141/d09d/f91c/8104/f800/009b/large_jpg/Feature_Image.jpg?1631703175" alt="" />
+                </button>
+                <div id="changeMap" style={{ display: "none" }}>
+                    <button className="btn btn-light btn-sm">
+                        <img width="100%" src="https://images.adsttc.com/media/images/6141/d09d/f91c/8104/f800/009b/large_jpg/Feature_Image.jpg?1631703175" alt="" />
+                    </button>
+                    <button className="btn btn-light btn-sm">
+                        <img width="100%" src="https://www.nsm.or.th/images/IT-Category/IT-Tips/GoogleMaps/20200204-2PNG.PNG" alt="" />
+                    </button>
+                    <button className="btn btn-light btn-sm">
+                        <img width="100%" src="https://images.adsttc.com/media/images/6141/d09d/f91c/8104/f800/009b/large_jpg/Feature_Image.jpg?1631703175" alt="" />
+                    </button>
+                </div>
+
             </div>
 
             <div id="map" ref={googlemap} hidden={changmap} />
@@ -891,6 +919,28 @@ const mapPage = () => {
                 <p>Some contents...</p>
             </Drawer>
 
+            <Drawer placement="right" onClose={() => openCloseRaster()} visible={visibleRaster} width={350}>
+                <Tabs defaultActiveKey="1">
+                    <TabPane tab="Raster" key="1">
+                        <b className="text-info" >ภาพถ่ายทางอากาศ</b>
+                        <div className="pt-3 pb-4">
+                            {rasterData.map(data => {
+                                <b>eiei{data.id}</b>
+                            })}
+                            test
+                        </div>
+
+                        <b className="text-info pt-5">ภาพถ่ายดาวเทียม</b>
+                        <div className="pt-3">
+                            test
+                        </div>
+
+                    </TabPane>
+                    <TabPane tab="Left Layer for Swipe Map" key="2">
+                        22222
+                    </TabPane>
+                </Tabs>
+            </Drawer>
             <style global jsx>
                 {`
           .ant-collapse > .ant-collapse-item > .ant-collapse-header {
