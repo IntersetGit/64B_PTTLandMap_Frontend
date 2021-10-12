@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import Head from "next/head";
 import System from "../../../../components/_App/System";
+import Swal from "sweetalert2";
 import {
   MoreOutlined,
   RedoOutlined,
@@ -24,7 +25,6 @@ import {
   Space,
   Tooltip,
 } from "antd";
-import ImgCrop from 'antd-img-crop';
 import Api from "../../../../util/Api";
 import axios from "axios";
 const { Search } = Input;
@@ -36,16 +36,24 @@ const GroupLayerSystemPage = () => {
   const [pageSize, setPageSize] = useState(5);
   const [data, setData] = useState([]);
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const [isModalVisible2, setIsModalVisible2] = useState(false);
   const [form] = Form.useForm();
-  
+
 
   const handleOk = () => {
     form.submit();
-     
   };
 
   const handleCancel = () => {
     setIsModalVisible(false);
+    form.resetFields();
+  };
+  const handleOk2 = () => {
+    form.submit();
+  };
+
+  const handleCancel2 = () => {
+    setIsModalVisible2(false);
     form.resetFields();
   };
 
@@ -54,7 +62,7 @@ const GroupLayerSystemPage = () => {
     let fd = new FormData();
     //console.log(value.Symbol[0].originFileObj)
     fd.append("file0", value.Symbol[0].originFileObj);
-    Api.post("/masterdata/masLayers", { group_name: value.groupLayer })
+    Api.post("/masterdata/masLayers", { group_name: value.group_name })
       .then(async (data) => {
         reload();
         const upload = await axios.post(
@@ -62,6 +70,7 @@ const GroupLayerSystemPage = () => {
           fd
         );
         setIsModalVisible(!isModalVisible);
+        Swal.fire("", "บันทึกเรียบร้อย", "success")
       })
       .catch((error) => {
         console.log(error);
@@ -122,7 +131,7 @@ const GroupLayerSystemPage = () => {
     {
       title: "ลำดับ",
       dataIndex: "number",
-      width: '5%',
+      width: 100,
       sorter: (record1, record2) => {
         return record1.number > record2.number;
       },
@@ -130,7 +139,6 @@ const GroupLayerSystemPage = () => {
     {
       title: "symbol",
       dataIndex: "symbol",
-      width: '15%',
       render: (id) => {
         // return <MoreOutlined />
         return (
@@ -145,7 +153,6 @@ const GroupLayerSystemPage = () => {
     {
       title: "ชื่อ group",
       dataIndex: "group_name",
-      width: '30%',
       sorter: (record1, record2) => {
         return record1.group_name > record2.group_name;
       },
@@ -153,20 +160,16 @@ const GroupLayerSystemPage = () => {
     {
       title: "จัดการ",
       dataIndex: "id",
-      width: '10%',
+      width: 150,
       align: "center",
-      render: (id) => {
+      render: (id, show) => {
         return (
           <Dropdown
             overlay={
               <Menu>
                 <Menu.Item
                   key="1"
-                  onClick={async () => {
-                    await handleEdit(id),
-                      await handleCancel(),
-                      await handleEdit(id);
-                  }}
+                  onClick={() => handleEdit(show)}
                 >
                   แก้ไข
                 </Menu.Item>
@@ -187,15 +190,63 @@ const GroupLayerSystemPage = () => {
     },
   ];
 
-  const handleDelete = async (id) => {
+  const handleEdit = async (show) => {
+    setIsModalVisible2(true)
+    console.log(`show`, show)
+    form.setFieldsValue(show);
+}
+
+  const onFinishEdit = async (data) => {
+    console.log(`data`, data)
     try {
-      const resp = await Api.delete(`masterdata/masLayersShape?id=` + id);
-      console.log(resp);
-      alert("ลบข้อมูลเรีนยร้อยแล้ว");
-      reload()
+      Swal.fire({
+        title: "กรุณายืนยันการแก้ไขข้อมูล",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#218838",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "ยืนยัน",
+        cancelButtonText: "ยกเลิก",
+      }).then(async (result) => {
+        if (result.isConfirmed) {
+          let resp = await Api.put("masterdata/masLayers", {
+            ...data,
+            id: form.getFieldValue().id,
+          });
+          await Swal.fire("", "แก้ไขข้อมูลเรียบร้อยแล้ว", "success");
+          reload();
+          handleCancel2();
+        }
+        console.log("sdasd" , form.getFieldValue())
+      });
     } catch (error) {
       console.log(error);
-      alert("มีบางอย่างผิดพลาด");
+      Swal.fire("", "มีบางอย่างผิดพลาด", "success");
+    }
+  };
+
+
+  const handleDelete = async (id) => {
+    try {
+      Swal.fire({
+        title: "กรุณายืนยันการลบข้อมูล?",
+        text: "เมื่อยืนยันแล้วจะไม่สามารถเรียกคืนได้",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#218838",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "ยืนยัน",
+        cancelButtonText: "ยกเลิก",
+      }).then(async (result) => {
+        if (result.isConfirmed) {
+          const resp = await Api.delete(`masterdata/masLayers?id=` + id);
+          reload();
+          Swal.fire("", "ลบข้อมูลเรียบร้อยแล้ว", "success");
+        }
+      });
+    } catch (error) {
+      console.log(error);
+      Swal.fire("", "มีบางอย่างผิดพลาด", "error");
     }
   };
 
@@ -214,14 +265,13 @@ const GroupLayerSystemPage = () => {
         <title>จัดการ Group Layer</title>
       </Head>
       <System>
-        <Row 
-        gutter={[10, 10]} 
-        style={{ 
-          background: "white", 
-          padding: "16px",
-          width: '70%',
-          boxShadow:
-            " rgba(0, 0, 0, 0.12) 0px 1px 3px, rgba(0, 0, 0, 0.24) 0px 1px 2px",
+        <Row
+          gutter={[10, 10]}
+          style={{
+            background: "white",
+            padding: "16px",
+            boxShadow:
+              " rgba(0, 0, 0, 0.12) 0px 1px 3px, rgba(0, 0, 0, 0.24) 0px 1px 2px",
           }}>
           <Col span={24}>
             <h3>จัดการ Group Layer</h3>
@@ -239,7 +289,7 @@ const GroupLayerSystemPage = () => {
             </Button>
           </Col>
           <Col span={3} offset={11}>
-            <Button type="primary" onClick={()=>setIsModalVisible(true)}>
+            <Button type="primary" onClick={() => setIsModalVisible(true)}>
               + เพิ่ม group
             </Button>
           </Col>
@@ -265,8 +315,8 @@ const GroupLayerSystemPage = () => {
         visible={isModalVisible}
         onOk={handleOk}
         onCancel={handleCancel}
-        
-        
+
+
       >
         <Form
           labelCol={{ span: 8 }}
@@ -276,13 +326,15 @@ const GroupLayerSystemPage = () => {
           labelCol={{ span: 7 }}
           wrapperCol={{ span: 14 }}
           onFinish={onFinish}
+          
         >
           <Form.Item
-            name="groupLayer"
+            name="group_name"
             label="Group Layer Name"
             rules={[
               { required: true, message: "Please input your grouplayer!" },
             ]}
+
           >
             <Input />
           </Form.Item>
@@ -294,11 +346,56 @@ const GroupLayerSystemPage = () => {
             getValueFromEvent={normFile}
             extra="ขนาดรูปภาพไม่เกิน 50*50 pixcel"
           >
-            <ImgCrop rotate>
-              <Upload name="logo" action="/upload.do" listType="picture">
-                <Button icon={<UploadOutlined />}>Select File</Button>
-              </Upload>
-            </ImgCrop>
+            {/* <ImgCrop rotate> */}
+            <Upload name="logo" action="/upload.do" listType="picture">
+              <Button icon={<UploadOutlined />}>Select File</Button>
+            </Upload>
+            {/* </ImgCrop> */}
+          </Form.Item>
+        </Form>
+      </Modal>
+
+      <Modal
+        title="แก้ไข Group Layer"
+        visible={isModalVisible2}
+        onOk={handleOk2}
+        onCancel={handleCancel2}
+
+
+      >
+        <Form
+          labelCol={{ span: 8 }}
+          wrapperCol={{ span: 16 }}
+          colon={false}
+          form={form}
+          labelCol={{ span: 7 }}
+          wrapperCol={{ span: 14 }}
+          onFinish={onFinishEdit}
+          
+        >
+          <Form.Item
+            name="group_name"
+            label="Group Layer Name"
+            rules={[
+              { required: true, message: "Please input your grouplayer!" },
+            ]}
+
+          >
+            <Input />
+          </Form.Item>
+          <Form.Item
+            name="Symbol"
+            label="Symbol"
+            valuePropName="fileList"
+            rules={[{ required: true }]}
+            getValueFromEvent={normFile}
+            extra="ขนาดรูปภาพไม่เกิน 50*50 pixcel"
+          >
+            {/* <ImgCrop rotate> */}
+            <Upload name="logo" action="/upload.do" listType="picture">
+              <Button icon={<UploadOutlined />}>Select File</Button>
+            </Upload>
+            {/* </ImgCrop> */}
           </Form.Item>
         </Form>
       </Modal>

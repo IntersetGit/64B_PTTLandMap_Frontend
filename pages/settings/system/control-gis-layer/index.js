@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import Head from "next/head";
 import System from "../../../../components/_App/System";
 import Api from "../../../../util/Api";
+import Swal from "sweetalert2";
 import { MoreOutlined, RedoOutlined } from "@ant-design/icons";
 import {
   Table,
@@ -24,7 +25,9 @@ const usersSystemPage = () => {
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(5);
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const [statusValidation, setStatusValidation] = useState([]);
   const [listGroup, setListGroup] = useState([]);
+  const [dataEdit, setDataEdit] = useState([]);
   const [form] = Form.useForm();
   const columns = [
     {
@@ -46,35 +49,23 @@ const usersSystemPage = () => {
     {
       key: "3",
       title: "Group Layer",
-      dataIndex: " ",
+      dataIndex: "group_name",
       sorter: (record1, record2) => {
-        return record1.test > record2.test;
-      },
-    },
-    {
-      key: "4",
-      title: "Color GIS Layer",
-      dataIndex: "color_layer",
-      sorter: (record1, record2) => {
-        return record1.color_layer > record2.color_layer;
+        return record1.group_name > record2.group_name;
       },
     },
     {
       key: "5",
       title: "จัดการ",
       dataIndex: "id",
-      render: (id) => {
+      render: (id,show) => {
         return (
           <Dropdown
             overlay={
               <Menu>
                 <Menu.Item
                   key="1"
-                  onClick={async () => {
-                    await handleEdit(id),
-                      await handleCancel(),
-                      await handleEdit(id);
-                  }}
+                  onClick={() => handleEdit(show)}
                 >
                   แก้ไข
                 </Menu.Item>
@@ -95,10 +86,20 @@ const usersSystemPage = () => {
     },
   ];
 
-  const reload = (search = null) => {
-    Api.get("/masterdata/masLayersShape",
-      search != null ? { search: search } : {}
-    )
+  const [select, setSelect] = useState()
+
+  const getgroup = () => {
+    Api.post("masterdata/getMasLayers", { group_name :""})
+      .then(async (data) => {
+        setSelect(data.data.items)
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  }
+
+  const reload = () => {
+    Api.get("masterdata/masLayersShape")
       .then(({ data: { items } }) => {
         let tempDataArray = [];
         console.log(`data`, data)
@@ -122,17 +123,66 @@ const usersSystemPage = () => {
 
   useEffect(() => {
     reload();
+    getgroup();
   }, []);
 
   const handleDelete = async (id) => {
     try {
-      const resp = await Api.delete(`masterdata/masLayersShape?id=` +id);
-      console.log(resp);
-      alert("ลบข้อมูลเรีนยร้อยแล้ว");
-      reload()
+      Swal.fire({
+        title: "กรุณายืนยันการลบข้อมูล?",
+        text: "เมื่อยืนยันแล้วจะไม่สามารถเรียกคืนได้",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#218838",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "ยืนยัน",
+        cancelButtonText: "ยกเลิก",
+      }).then(async (result) => {
+        if (result.isConfirmed) {
+          const resp = await Api.delete(`masterdata/masLayersShape?id=` + id);
+          console.log(resp);
+          reload();
+          Swal.fire("", "ลบข้อมูลเรียบร้อยแล้ว", "success");
+        }
+      });
     } catch (error) {
       console.log(error);
-      alert("มีบางอย่างผิดพลาด");
+      Swal.fire("", "มีบางอย่างผิดพลาด", "error");
+    }
+  };
+
+  const handleEdit = async (show) => {
+    setIsModalVisible(true)
+    console.log(`show`, show)
+    form.setFieldsValue(show);
+}
+
+  const onFinishEdit = async (data) => {
+    console.log(`data`, data)
+    try {
+      Swal.fire({
+        title: "กรุณายืนยันการแก้ไขข้อมูล",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#218838",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "ยืนยัน",
+        cancelButtonText: "ยกเลิก",
+      }).then(async (result) => {
+        if (result.isConfirmed) {
+          let resp = await Api.post("masterdata/masLayersShape", {
+            ...data,
+            id: form.getFieldValue().id,
+          });
+          await Swal.fire("", "แก้ไขข้อมูลเรียบร้อยแล้ว", "success");
+          reload();
+          handleCancel();
+        }
+        console.log("sdasd" , form.getFieldValue())
+      });
+    } catch (error) {
+      console.log(error);
+      Swal.fire("", "มีบางอย่างผิดพลาด", "success");
     }
   };
 
@@ -233,32 +283,35 @@ const usersSystemPage = () => {
           form={form}
           labelCol={{ span: 7 }}
           wrapperCol={{ span: 14 }}
-          onFinish={onFinish}
+          onFinish={onFinishEdit}
         >
           <Form.Item
-            name="name"
+            name="name_layer"
             label="ชื่อ"
             rules={[{ required: true }]}
+            {...statusValidation}
           >
             <Input  />
           </Form.Item>
           <Form.Item
-            name="roles_id"
+            name="group_layer_id"
             label="Group Layer"
             rules={[
               { required: true, message: "กรุณากรอกข้อมูล กลุ่มผู้ใช้งาน" },
             ]}
-          >
-            <Select placeholder="กรุณาเลือก">
-              {roles.map((data, index) => (
-                <Option key={index} value={data.id}>
-                  {data.roles_name}
-                </Option>
-              ))}
-            </Select>
+          ><Select
+          placeholder="กลุ่มผู้ใช้งาน"
+          // defaultValue=""
+        >
+          {select && select.map((data, index) => (
+            <Option key={index} value={data.id}>
+              {data.group_name}
+            </Option>
+          ))}
+        </Select>
           </Form.Item>
           <Form.Item
-            name="typecolor"
+            name="type"
             label="สี GIS Layer"
             rules={[{ required: true }]}
           >

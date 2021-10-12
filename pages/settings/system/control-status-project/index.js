@@ -85,7 +85,7 @@ const index = () => {
                 <Menu.Item
                   key="2"
                   onClick={() => {
-                    deleteHandle(id);
+                    handleDelete(id);
                   }}
                 >
                   ลบ
@@ -174,7 +174,7 @@ const index = () => {
   //     setLoading(false);
   //   }
   // };
-  const deleteHandle = (id) => {
+  const handleDelete = async (id) => {
     try {
       Swal.fire({
         title: "กรุณายืนยันการลบข้อมูล?",
@@ -187,20 +187,18 @@ const index = () => {
         cancelButtonText: "ยกเลิก",
       }).then(async (result) => {
         if (result.isConfirmed) {
-          setLoading(true);
-          const resp = await Api.delete("/masterdata/masStatusProject", {
-            data: { id: id },
-          });
-          Swal.fire("", "ลบข้อมูลเรียบร้อยแล้ว", "success");
+          const resp = await Api.delete(`masterdata/masStatusProject?id=` + id);
+          console.log(resp);
           reload();
+          Swal.fire("", "ลบข้อมูลเรียบร้อยแล้ว", "success");
         }
       });
     } catch (error) {
       console.log(error);
-      Swal.fire("", "มีบางอย่างผิดพลาด ไม่สามารถลบข้อมูลได้", "error");
-      setLoading(false);
+      Swal.fire("", "มีบางอย่างผิดพลาด", "error");
     }
   };
+
   const handleEdit = async (id) => {
     console.log(`id`, id);
     setIsModalVisible({ ...isModalVisible, create: true });
