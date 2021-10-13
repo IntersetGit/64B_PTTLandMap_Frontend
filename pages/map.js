@@ -20,7 +20,7 @@ import {
 import Head from "next/head";
 import { useSelector } from "react-redux";
 import { SketchPicker } from "react-color";
-import { CaretRightOutlined, UploadOutlined } from "@ant-design/icons";
+import { CaretRightOutlined, UploadOutlined, EditFilled } from "@ant-design/icons";
 import API from "../util/Api";
 import RefreshToken from "../util/RefreshToken";
 import axios from "axios";
@@ -54,7 +54,7 @@ const mapPage = () => {
                 zoom: 8,
             });
             setMap(_map);
-            google.maps.event.addListener(map, "mousemove", (event) => {
+            google.maps.event.addListener(_map, "mousemove", (event) => {
                 getLatLon(event);
             });
         });
@@ -179,31 +179,6 @@ const mapPage = () => {
             message.error("มีบางอย่างผิดพลาด !");
         }
     };
-
-    // const RefreshToken = async (refreshtokenval) => {
-    //     try {
-    //         if (refreshtokenval) {
-    //             const { data } = await axios({
-    //                 method: "get",
-    //                 url: `${process.env.NEXT_PUBLIC_SERVICE}/provider/refreshToken`,
-    //                 headers: { Authorization: "Bearer " + refreshtokenval },
-    //             });
-    //             const token = data.items;
-    //             cookies.set("token", token, { path: "/" });
-    //             // window.location.reload();
-    //         } else {
-    //             logout();
-    //         }
-    //     } catch (error) {
-    //         logout();
-    //     }
-    // };
-
-    // const logout = () => {
-    //     cookies.remove("token");
-    //     cookies.remove("refresh_token");
-    //     window.location.href = "/login";
-    // };
 
     const onFinishFailedUpload = (error) => {
         message.error("มีบางอย่างผิดพลาด !");
@@ -525,6 +500,7 @@ const mapPage = () => {
                         }
                     });
                 });
+
             }
 
             sync(mapLeft, mapRight);
@@ -546,6 +522,19 @@ const mapPage = () => {
             });
         }
     }
+
+    /* Search */
+    const [formSearch] = Form.useForm();
+    const [searchList, setSearchList] = useState(["red", "green", "#F05A28", "#F9F200", "#0079F9"])
+
+    const onFinishSearch = (value) => {
+        console.log('value :>> ', value);
+    }
+
+    const onFinishFailedSearch = (error) => {
+        console.log('error :>> ', error);
+    }
+
     return (
         <Layout isMap={true}>
             <Head>
@@ -594,7 +583,7 @@ const mapPage = () => {
                     <Col span={6}>
                         <button
                             className="btn btn-light btn-sm"
-                            onClick={() => setVisibleDashboard(true)}
+                            onClick={() => setVisibleSearch(true)}
                         >
                             <img width="100%" src="/assets/images/search.png" />
                         </button>
@@ -914,15 +903,201 @@ const mapPage = () => {
 
             {/* Search */}
             <Drawer
-                title="Create a new account"
-                width={350}
+                id="drawer-search"
+                width={650}
+                title="ต้นหา"
                 placement={"left"}
                 visible={visibleSearch}
                 onClose={() => setVisibleSearch(false)}
             >
-                <p>Some contents...</p>
-                <p>Some contents...</p>
-                <p>Some contents...</p>
+                <div>
+                    <Form
+                        form={formSearch}
+                        onFinish={onFinishSearch}
+                        onFinishFailed={onFinishFailedSearch}
+                        layout="vertical"
+                        autoComplete="off"
+                    >
+                        <div className="row">
+                            <div className="col-4">
+                                <Form.Item
+                                    label=""
+                                    name="name_layer"
+                                >
+                                    <Input placeholder="Search" />
+                                </Form.Item>
+                            </div>
+                            <div className="col-3">
+                                <Form.Item
+                                    label=""
+                                    name="name_layer"
+                                >
+                                    <Select
+                                        placeholder="ชื่อโครงการ"
+                                        allowClear
+                                    >
+                                        <Option value="male">male</Option>
+                                        <Option value="female">female</Option>
+                                        <Option value="other">other</Option>
+                                    </Select>
+                                </Form.Item>
+                            </div>
+                            <div className="col-3">
+                                <Form.Item
+                                    label=""
+                                    name="name_layer"
+                                >
+                                    <Select
+                                        placeholder="ชั้นข้อมูล"
+                                        allowClear
+                                    >
+                                        <Option value="male">male</Option>
+                                        <Option value="female">female</Option>
+                                        <Option value="other">other</Option>
+                                    </Select>
+                                </Form.Item>
+                            </div>
+                            <div className="col-2">
+                                <Form.Item>
+                                    <Button type="primary" htmlType="submit">
+                                        ค้นหา
+                                    </Button>
+                                </Form.Item>
+                            </div>
+                        </div>
+
+                        <div className="row">
+                            <div className="col-4">
+                                <Form.Item
+                                    label=""
+                                    name="name_layer"
+                                >
+                                    <Select
+                                        placeholder="จังหวัด"
+                                        allowClear
+                                    >
+                                        <Option value="male">male</Option>
+                                        <Option value="female">female</Option>
+                                        <Option value="other">other</Option>
+                                    </Select>
+                                </Form.Item>
+                            </div>
+                            <div className="col-4">
+                                <Form.Item
+                                    label=""
+                                    name="name_layer"
+                                >
+                                    <Select
+                                        placeholder="อำเภอ"
+                                        allowClear
+                                    >
+                                        <Option value="male">male</Option>
+                                        <Option value="female">female</Option>
+                                        <Option value="other">other</Option>
+                                    </Select>
+                                </Form.Item>
+                            </div>
+                            <div className="col-4">
+                                <Form.Item
+                                    label=""
+                                    name="name_layer"
+                                >
+                                    <Select
+                                        placeholder="ตำบล"
+                                        allowClear
+                                    >
+                                        <Option value="male">male</Option>
+                                        <Option value="female">female</Option>
+                                        <Option value="other">other</Option>
+                                    </Select>
+                                </Form.Item>
+                            </div>
+                        </div>
+
+
+                    </Form>
+                </div>
+                <hr />
+
+                <div>
+                    <h4 className="pb-3">พบข้อมูลจำนวน <span className="text-red">{searchList.length}</span> Recorde</h4>
+                    {
+                        searchList.map((e, i) => (
+                            <div key={`SearchList-${i}`}>
+                                <div className="row pt-2">
+                                    <div className="col-1">
+                                        <div
+                                            style={{
+                                                width: "25px",
+                                                height: "25px",
+                                                borderRadius: "2px",
+                                                background: e,
+                                                border: "1px solid black",
+                                            }}
+                                        />
+                                    </div>
+                                    <div className="col-11">
+
+                                        <div className="row">
+                                            <label>PROJECT_NAME :</label>
+                                            <p className="pl-3">โครงการท่อส่งก๊าซธรรมชาติจากบางปรกงไปโรงไฟฟ้าพระนคร</p>
+                                        </div>
+
+                                        <div className="row">
+                                            <label>PARTYPE :</label>
+                                            <p className="pl-3">โฉนดที่ดิน</p>
+                                        </div>
+
+                                        <div className="pl-2">
+                                            <div className="row">
+                                                <div className="col-4">
+                                                    <div className="row">
+                                                        <label>PARLABEL1 :</label>
+                                                        <p className="pl-3">1000</p>
+                                                    </div>
+                                                </div>
+                                                <div className="col-4">
+                                                    <div className="row">
+                                                        <label>PARLABEL2 :</label>
+                                                        <p className="pl-3">23</p>
+                                                    </div>
+                                                </div>
+                                                <div className="col-4">
+                                                    <div className="row">
+                                                        <label>PARLABEL3 :</label>
+                                                        <p className="pl-3">455</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div className="row">
+                                                <div className="col-4">
+                                                    <div className="row">
+                                                        <label>PARLABEL4 :</label>
+                                                        <p className="pl-3">5037 || 7520-3</p>
+                                                    </div>
+                                                </div>
+                                                <div className="col-4">
+                                                    <div className="row">
+                                                        <label>PARLABEL5 :</label>
+                                                        <p className="pl-3">-</p>
+                                                    </div>
+                                                </div>
+                                                <div className="col-4">
+                                                    <button className="btn"><EditFilled /></button>
+                                                </div>
+                                            </div>
+                                        </div>
+
+
+                                    </div>
+
+                                </div>
+                                <hr />
+                            </div>
+                        ))
+                    }
+                </div>
             </Drawer>
 
             <Drawer placement="right" onClose={() => openCloseRaster()} visible={visibleRaster} width={350}>
@@ -956,6 +1131,11 @@ const mapPage = () => {
 
           .ant-drawer-mask{
             background-color: rgb(0 0 0 / 0%);
+          }
+
+          .col-4 , .col-3 {
+            padding-right: 5px;
+            padding-left: 5px;
           }
         `}
             </style>
