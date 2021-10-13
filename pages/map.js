@@ -15,12 +15,12 @@ import {
     Upload,
     Button,
     message,
-    Image
+    Switch
 } from "antd";
 import Head from "next/head";
 import { useSelector } from "react-redux";
 import { SketchPicker } from "react-color";
-import { UnorderedListOutlined, UploadOutlined } from "@ant-design/icons";
+import { CaretRightOutlined, UploadOutlined } from "@ant-design/icons";
 import API from "../util/Api";
 import RefreshToken from "../util/RefreshToken";
 import axios from "axios";
@@ -214,8 +214,10 @@ const mapPage = () => {
             const refresh_token = cookies.get('refresh_token');
             await RefreshToken(refresh_token);
             const { data } = await API.get(`/shp/getDataLayer`)
-
-            data.items.forEach(e => {
+            // console.log('data :>> ', data);
+            data.items.forEach((e, i) => {
+                // if (i === 0)
+                //     e.symbol = e.symbol ?? "http://10.224.163.53:9000/uploads/symbol_group/d8f2f089-7476-4337-b579-ca3cb30971a9.jpg"
                 if (e.children) {
                     e.children.forEach(x => {
                         if (x.color_layer) {
@@ -226,7 +228,7 @@ const mapPage = () => {
                     });
                 }
             });
-            // console.log('data :>> ', data.items);
+            console.log('data :>> ', data.items);
             setGroupLayerList(data.items)
         } catch (error) {
             message.error("มีบางอย่างผิดพลาด !");
@@ -248,9 +250,9 @@ const mapPage = () => {
 
     const checkboxLayer = async (value, index1, index2) => {
         const arr = [...groupLayerList]
-        arr[index1].children[index2].checked = value.target.checked
-        if (!value.target.checked) {
-            arr[index1].children[index2].checked = value.target.checked
+        arr[index1].children[index2].checked = value
+        if (!value) {
+            arr[index1].children[index2].checked = value
             clearMapData(arr[index1].children[index2].id)
         } else {
             const item = arr[index1].children[index2];
@@ -719,73 +721,77 @@ const mapPage = () => {
             >
                 <Tabs>
                     <TabPane tab="ชั้นข้อมูล" key="1">
-                        <Collapse ghost>
-                            {groupLayerList.map((e, i) =>
-                                Object.assign(
-                                    <Panel header={e.group_name} key={i}>
-                                        {e.children
-                                            ? e.children.map((x, index) =>
-                                                Object.assign(
-                                                    <div className="pt-2" key={index}>
-                                                        <Row>
-                                                            <Col xs={20}>
-                                                                <Checkbox
-                                                                    checked={x.checked}
-                                                                    onClick={(value) =>
-                                                                        checkboxLayer(value, i, index)
-                                                                    }
-                                                                >
-                                                                    {x.name_layer}
-                                                                </Checkbox>
-                                                            </Col>
-
-                                                            <Col xs={4} style={{ paddingTop: 3 }}>
-                                                                <a onClick={() => openColor(i, index)}>
-                                                                    <div
-                                                                        style={{
-                                                                            width: "36px",
-                                                                            height: "20px",
-                                                                            borderRadius: "2px",
-                                                                            background: x.color_layer,
-                                                                            border: "1px solid black",
-                                                                        }}
-                                                                    />
-                                                                </a>
-                                                                {x.open ? (
-                                                                    <div
-                                                                        div
-                                                                        style={{
-                                                                            position: "fixed",
-                                                                            zIndex: "2",
-                                                                            textAlign: "end",
-                                                                        }}
+                        {groupLayerList.map((e, i) =>
+                            Object.assign(
+                                <div className="pt-2">
+                                    <Collapse
+                                        expandIcon={({ isActive }) => e.symbol ? <img src={e.symbol} width={20} /> : <CaretRightOutlined rotate={isActive ? 90 : 0} />}
+                                    >
+                                        <Panel header={e.group_name} key={i}>
+                                            {e.children
+                                                ? e.children.map((x, index) =>
+                                                    Object.assign(
+                                                        <div className="pt-2" key={index}>
+                                                            <Row>
+                                                                <Col xs={20}>
+                                                                    {/* <Checkbox
+                                                                        checked={x.checked}
+                                                                        onClick={(value) =>
+                                                                            checkboxLayer(value.target.checked, i, index)
+                                                                        }
                                                                     >
-                                                                        <SketchPicker
-                                                                            color={!x.rgb ? x.color_layer : x.rgb}
-                                                                            onChange={(value) =>
-                                                                                handleChangeShapeFile(value, i, index)
-                                                                            }
+                                                                        {x.name_layer}
+                                                                    </Checkbox> */}
+                                                                    <Switch size="small" checked={x.checked} onChange={(value) => checkboxLayer(value, i, index)} /> {x.name_layer}
+                                                                </Col>
+
+                                                                <Col xs={4} style={{ paddingTop: 3 }}>
+                                                                    <a onClick={() => openColor(i, index)}>
+                                                                        <div
+                                                                            style={{
+                                                                                width: "36px",
+                                                                                height: "20px",
+                                                                                borderRadius: "2px",
+                                                                                background: x.color_layer,
+                                                                                border: "1px solid black",
+                                                                            }}
                                                                         />
-                                                                        <footer className="footer-color">
-                                                                            <button
-                                                                                className="btn btn-primary btn-sm"
-                                                                                onClick={() => saveColor(i, index)}
-                                                                            >
-                                                                                save
-                                                                            </button>
-                                                                        </footer>
-                                                                    </div>
-                                                                ) : null}
-                                                            </Col>
-                                                        </Row>
-                                                    </div>
+                                                                    </a>
+                                                                    {x.open ? (
+                                                                        <div
+                                                                            div
+                                                                            style={{
+                                                                                position: "fixed",
+                                                                                zIndex: "2",
+                                                                                textAlign: "end",
+                                                                            }}
+                                                                        >
+                                                                            <SketchPicker
+                                                                                color={!x.rgb ? x.color_layer : x.rgb}
+                                                                                onChange={(value) =>
+                                                                                    handleChangeShapeFile(value, i, index)
+                                                                                }
+                                                                            />
+                                                                            <footer className="footer-color">
+                                                                                <button
+                                                                                    className="btn btn-primary btn-sm"
+                                                                                    onClick={() => saveColor(i, index)}
+                                                                                >
+                                                                                    save
+                                                                                </button>
+                                                                            </footer>
+                                                                        </div>
+                                                                    ) : null}
+                                                                </Col>
+                                                            </Row>
+                                                        </div>
+                                                    )
                                                 )
-                                            )
-                                            : null}
-                                    </Panel>
-                                )
-                            )}
-                        </Collapse>
+                                                : null}
+                                        </Panel>
+                                    </Collapse>
+                                </div>
+                            ))}
                     </TabPane>
 
                     {/* Administrator And Editor */}
@@ -946,14 +952,6 @@ const mapPage = () => {
           .ant-collapse > .ant-collapse-item > .ant-collapse-header {
             position: relative;
             padding: 10px 0px;
-          }
-
-          .ant-collapse-ghost
-            > .ant-collapse-item
-            > .ant-collapse-content
-            > .ant-collapse-content-box {
-            padding-top: 0px;
-            padding-bottom: 0px;
           }
 
           .ant-drawer-mask{
