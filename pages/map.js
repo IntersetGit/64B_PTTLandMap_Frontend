@@ -1,6 +1,7 @@
 import Layout from "../components/_App/Layout";
 import { useEffect, useRef, useState } from "react";
 import { Loader } from "@googlemaps/js-api-loader";
+import { Doughnut } from "react-chartjs-2";
 import {
     Drawer,
     Tabs,
@@ -560,6 +561,29 @@ const mapPage = () => {
         console.log('error :>> ', error);
     }
 
+    /* Dashboard */
+    const [formDashboard] = Form.useForm();
+
+    const onFinishDashboard = (value) => {
+        console.log('value :>> ', value);
+    }
+
+    const onFinishFailedDashboard = (error) => {
+        console.log('error :>> ', error);
+    }
+
+
+    const option = {
+        responsive: true,
+        legend: {
+            display: false
+        },
+        plugins: {
+            legend: {
+                position: 'start',
+            },
+        }
+    }
 
     return (
         <Layout isMap={true}>
@@ -931,14 +955,191 @@ const mapPage = () => {
 
             {/* Dashboard */}
             <Drawer
-                title="Create a new account"
-                width={350}
+                id="drawer-dashboard"
+                width={650}
+                title="Process ส่งมอบโครงการ"
                 placement={"left"}
                 visible={visibleDashboard}
                 onClose={() => setVisibleDashboard(false)}
             >
-                <p>Some contents...</p>
-                <p>Some contents...</p>
+                <>
+                    <div>
+                        <Form
+                            form={formDashboard}
+                            onFinish={onFinishDashboard}
+                            onFinishFailed={onFinishFailedDashboard}
+                            layout="vertical"
+                            autoComplete="off"
+                        >
+                            <div className="row">
+                                <div className="col-4">
+                                    <Form.Item
+                                        label=""
+                                        name="name_layer"
+                                    >
+                                        <Input placeholder="Search" />
+                                    </Form.Item>
+                                </div>
+                                <div className="col-3">
+                                    <Form.Item
+                                        label=""
+                                        name="name_layer"
+                                    >
+                                        <Select
+                                            placeholder="ชื่อโครงการ"
+                                            allowClear
+                                        >
+                                            <Option value="male">male</Option>
+                                            <Option value="female">female</Option>
+                                            <Option value="other">other</Option>
+                                        </Select>
+                                    </Form.Item>
+                                </div>
+                                <div className="col-3">
+                                    <Form.Item
+                                        label=""
+                                        name="name_layer"
+                                    >
+                                        <Select
+                                            placeholder="ชั้นข้อมูล"
+                                            allowClear
+                                        >
+                                            <Option value="male">male</Option>
+                                            <Option value="female">female</Option>
+                                            <Option value="other">other</Option>
+                                        </Select>
+                                    </Form.Item>
+                                </div>
+                                <div className="col-2">
+                                    <Form.Item>
+                                        <Button type="primary" htmlType="submit">
+                                            ค้นหา
+                                        </Button>
+                                    </Form.Item>
+                                </div>
+                            </div>
+
+                            <div className="row">
+                                <div className="col-4">
+                                    <Form.Item
+                                        label=""
+                                        name="name_layer"
+                                    >
+                                        <Select
+                                            placeholder="จังหวัด"
+                                            allowClear
+                                        >
+                                            <Option value="male">male</Option>
+                                            <Option value="female">female</Option>
+                                            <Option value="other">other</Option>
+                                        </Select>
+                                    </Form.Item>
+                                </div>
+                                <div className="col-4">
+                                    <Form.Item
+                                        label=""
+                                        name="name_layer"
+                                    >
+                                        <Select
+                                            placeholder="อำเภอ"
+                                            allowClear
+                                        >
+                                            <Option value="male">male</Option>
+                                            <Option value="female">female</Option>
+                                            <Option value="other">other</Option>
+                                        </Select>
+                                    </Form.Item>
+                                </div>
+                                <div className="col-4">
+                                    <Form.Item
+                                        label=""
+                                        name="name_layer"
+                                    >
+                                        <Select
+                                            placeholder="ตำบล"
+                                            allowClear
+                                        >
+                                            <Option value="male">male</Option>
+                                            <Option value="female">female</Option>
+                                            <Option value="other">other</Option>
+                                        </Select>
+                                    </Form.Item>
+                                </div>
+                            </div>
+
+
+                        </Form>
+                    </div>
+                    <hr />
+
+                    <h3>แปลง</h3>
+                    <div className="row">
+                        <div className="col-9">
+                            <Doughnut
+                                data={{
+                                    labels: ['Status1', 'Status2', 'Status3', 'Status4', 'Status5'],
+                                    datasets: [
+                                        {
+                                            label: 'Dataset 1',
+                                            data: [5, 20, 300, 45, 2],
+                                            backgroundColor: [
+                                                'Red',
+                                                'Orange',
+                                                'Yellow',
+                                                'Green',
+                                                'Blue',
+                                            ],
+                                        }
+                                    ]
+                                }}
+                                options={option}
+                            />
+                        </div>
+                        <div className="col-3">
+                            <p>Status1 : 5 แปลง</p>
+                            <p>Status2 : 20 แปลง</p>
+                            <p>Status3 : 300 แปลง</p>
+                            <p>Status4 : 45 แปลง</p>
+                            <p>Status5 : 2 แปลง</p>
+                        </div>
+                    </div>
+
+                    <hr />
+
+                    <h3>ระยะทาง</h3>
+                    <div className="row">
+                        <div className="col-9">
+                            <Doughnut
+                                data={{
+                                    labels: ['Status1', 'Status2', 'Status3', 'Status4', 'Status5'],
+                                    datasets: [
+                                        {
+                                            label: 'Dataset 1',
+                                            data: [3, 86, 109, 65, 0.5],
+                                            backgroundColor: [
+                                                'Red',
+                                                'Orange',
+                                                'Yellow',
+                                                'Green',
+                                                'Blue',
+                                            ],
+                                        }
+                                    ]
+                                }}
+                                options={option}
+                            />
+                        </div>
+                        <div className="col-3">
+                            <p>Status1 : 3 ก.ม.</p>
+                            <p>Status2 : 86 ก.ม.</p>
+                            <p>Status3 : 109 ก.ม.</p>
+                            <p>Status4 : 65 ก.ม.</p>
+                            <p>Status5 : 0.5 ก.ม.</p>
+                        </div>
+                    </div>
+
+                </>
+
             </Drawer>
 
             {/* Search */}
