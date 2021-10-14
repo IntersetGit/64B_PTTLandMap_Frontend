@@ -299,7 +299,7 @@ const GroupLayerSystemPage = () => {
             <h3>จัดการ Group Layer</h3>
           </Col>
 
-          <Col xs={8} sm={8} md={8} lg={8} xl={8} xxl={5}>
+          <Col xs={8} sm={8} md={8} lg={8} xl={5} xxl={5}>
             <Search placeholder="input search text" onSearch={search} />
           </Col>
           <Col xs={8} sm={8} md={8} lg={8} xl={8} xxl={11}>
