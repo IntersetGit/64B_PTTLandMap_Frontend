@@ -222,7 +222,6 @@ const GroupLayerSystemPage = () => {
           let resp = await Api.put("masterdata/masLayers", {
             ...data,
             id: form.getFieldValue().id,
-            order_by: "7",
             isuse: 1,
             roles_id: user.roles_id,
             user_id: user.sysm_id,
