@@ -234,7 +234,7 @@ const usersSystemPage = () => {
           <Col span={24}>
             <h3 className="mb-4">จัดการข้อมูล GIS Layer</h3>
           </Col>
-          <Col xs={10} sm={8} md={8} lg={8} xl={8} xxl={5}>
+          <Col xs={10} sm={8} md={8} lg={8} xl={5} xxl={5}>
             <Search placeholder="input search text" />
           </Col>
           <Col xs={8} sm={8} md={8} lg={8} xl={8} xxl={11}>
