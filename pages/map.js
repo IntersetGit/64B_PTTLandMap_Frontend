@@ -525,9 +525,6 @@ const mapPage = () => {
 
     const [imgChangeMap, setImgChangeMap] = useState("https://www.worldatlas.com/r/w1200/upload/f4/9a/b2/shutterstock-214460839.jpg")
     const changeMap = (info) => {
-        // map.setMapTypeId(info)
-
-
         switch (info) {
             case "Terrain":
                 map.setMapTypeId("terrain");
