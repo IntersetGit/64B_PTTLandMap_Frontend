@@ -149,7 +149,7 @@ body {
 .tools-map-area3{
   position: absolute !important;
   left: 5px;
-  bottom: 10px;
+  bottom: 15px;
   color: alicredeblue;
   padding: 10px;
   border-radius: 15px;
@@ -157,10 +157,9 @@ body {
   button {
     color: aliceblue;
     background-color: white;
-    width: 100px;
     text-align: center;
-    padding: 1px;
-    height: 100px;
+    padding: 2px;
+    border-radius: 10px;
   }
   div{
     float:right;

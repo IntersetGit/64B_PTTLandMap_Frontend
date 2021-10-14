@@ -193,7 +193,7 @@ const GroupLayerSystemPage = () => {
           </Dropdown>
         );
       },
-      responsive: ["md"],
+      // responsive: ["md"],
     },
   ];
 
@@ -231,7 +231,7 @@ const GroupLayerSystemPage = () => {
           //console.log(value.Symbol[0].originFileObj)
           fd.append("file0", data.Symbol[0].originFileObj);
           const upload = await axios.post(
-            `                            }}/upload?Path=symbol_group&Length=1&Name=${form.getFieldValue().id}&SetType=jpg`,
+            `${process.env.NEXT_PUBLIC_SERVICE}/upload?Path=symbol_group&Length=1&Name=${form.getFieldValue().id}&SetType=jpg`,
             fd
           );
           await Swal.fire("", "แก้ไขข้อมูลเรียบร้อยแล้ว", "success");
@@ -319,6 +319,7 @@ const GroupLayerSystemPage = () => {
 
           <Col span={24}>
             <Table
+              scroll={{ x: true }}
               loading={loding}
               columns={columns}
               dataSource={data}

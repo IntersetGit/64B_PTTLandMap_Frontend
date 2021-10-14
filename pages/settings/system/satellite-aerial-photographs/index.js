@@ -335,7 +335,7 @@ const index = () => {
         <Col span={24}>
           <h3>จัดการ ภาพถ่ายดาวเทียม และภาพถ่ายทางอากาศ</h3>
         </Col>
-        <Col span={5}>
+        <Col xs={8} sm={8} md={8} lg={8} xl={8} xxl={5}>
           <Search
             placeholder="input search text"
             onSearch={(e) => {
@@ -343,12 +343,12 @@ const index = () => {
             }}
           />
         </Col>
-        <Col span={5}>
+        <Col xs={8} sm={8} md={8} lg={8} xl={8} xxl={11}>
           <Button onClick={() => reload()}>
             <RedoOutlined />
           </Button>
         </Col>
-        <Col span={3} offset={11}>
+        <Col xs={8} sm={8} md={8} lg={8} xl={8} xxl={8}>
           <Button
             type="primary"
             style={{ float: "right" }}
@@ -358,8 +358,9 @@ const index = () => {
           </Button>
         </Col>
         <Col span={24}>
-          <div className="table-responsive">
+          <div>
             <Table
+              scroll={{ x: true }}
               loading={loading}
               columns={columns}
               dataSource={data}

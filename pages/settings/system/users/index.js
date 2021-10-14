@@ -283,7 +283,7 @@ const usersSystemPage = () => {
           <Col span={24}>
             <h3 className="mb-4">จัดการผู้ใช้งานระบบ</h3>
           </Col>
-          <Col span={5}>
+          <Col xs={8} sm={8} md={8} lg={8} xl={8} xxl={5}>
             <Search
               placeholder="input search text"
               onSearch={(search) => {
@@ -291,7 +291,7 @@ const usersSystemPage = () => {
               }}
             />
           </Col>
-          <Col span={5}>
+          <Col xs={8} sm={8} md={8} lg={8} xl={8} xxl={11}>
             <Button
               onClick={() => {
                 reload();
@@ -300,7 +300,7 @@ const usersSystemPage = () => {
               <RedoOutlined />
             </Button>
           </Col>
-          <Col span={3} offset={11}>
+          <Col xs={8} sm={8} md={8} lg={8} xl={8} xxl={11}>
             <Button
               type="primary"
               onClick={() => showModal("create")}
@@ -310,8 +310,9 @@ const usersSystemPage = () => {
             </Button>
           </Col>
           <Col span={24}>
-            <div className="table-responsive">
+            <div >
               <Table
+                scroll={{ x: true }}
                 loading={loading}
                 columns={columns}
                 dataSource={data}

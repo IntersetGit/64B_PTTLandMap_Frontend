@@ -300,6 +300,7 @@ const index = () => {
         </Col>
         <Col xs={24} sm={24} md={24} lg={24} xl={24} xxl={24}>
           <Table
+            scroll={{ x: true }}
             loading={loading}
             columns={columns}
             dataSource={data}

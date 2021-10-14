@@ -28,6 +28,7 @@ const usersSystemPage = () => {
   const [statusValidation, setStatusValidation] = useState([]);
   const [listGroup, setListGroup] = useState([]);
   const [dataEdit, setDataEdit] = useState([]);
+  // const [buttonCreate, setButtonCreate] = useState(true); //สถานะเปิดปิดsubmit ตอนmodal create
   const [form] = Form.useForm();
   const columns = [
     {
@@ -57,6 +58,7 @@ const usersSystemPage = () => {
     {
       key: "5",
       title: "จัดการ",
+      // width: 200,
       dataIndex: "id",
       render: (id, show) => {
         return (
@@ -82,7 +84,7 @@ const usersSystemPage = () => {
           </Dropdown>
         );
       },
-      responsive: ["md"],
+      // responsive: ["md"],
     },
   ];
 
@@ -98,9 +100,25 @@ const usersSystemPage = () => {
       });
   }
 
-  const reload = () => {
+  const onSearch = async (value) => {
+    Api.get(`masterdata/masLayersShape?search=${value}`).then((data) => {
+      console.log(`data`, data)
+      setStatusValidation({
+        help: "ข้อมูล GIS Layer",
+      });
+    })
+      .catch((error) => {
+        console.log(error);
+        setStatusValidation({
+          validateStatus: "error",
+          help: "ไม่พบข้อมูล GIS Layer ",
+        });
+      });
+  };
+
+  const reload = (search = null) => {
     setLoading(true);
-    Api.get("masterdata/masLayersShape")
+    Api.get("masterdata/masLayersShape", search != null ? { search: search } : {})
       .then(({ data: { items } }) => {
         let tempDataArray = [];
         console.log(`data`, data)
@@ -256,8 +274,9 @@ const usersSystemPage = () => {
             </Button>
           </Col> */}
           <Col span={24}>
-            <div className="table-responsive">
+            <div >
               <Table
+                scroll={{ x: true }}
                 loading={loading}
                 columns={columns}
                 dataSource={data}

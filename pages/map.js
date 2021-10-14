@@ -334,7 +334,6 @@ const mapPage = () => {
         if (!visibleRaster) {
             const respRaster = await API.get("/masterdata/datLayers")
             setRasterData(respRaster.data.items)
-            console.log(rasterData)
         }
     }
     const [fullscreen, setFullScreen] = useState(false);
@@ -523,22 +522,26 @@ const mapPage = () => {
         }
     }
 
-    const [imgChangeMap, setImgChangeMap] = useState("https://www.worldatlas.com/r/w1200/upload/f4/9a/b2/shutterstock-214460839.jpg")
+    const [imgChangeMap, setImgChangeMap] = useState("https://images.adsttc.com/media/images/6141/d09d/f91c/8104/f800/009b/large_jpg/Feature_Image.jpg?1631703175")
+    const [txtChangeMap, setTextChangeMap] = useState("Satellite")
     const changeMap = (info) => {
         switch (info) {
             case "Terrain":
                 map.setMapTypeId("terrain");
                 setImgChangeMap("https://images.adsttc.com/media/images/6141/d09d/f91c/8104/f800/009b/large_jpg/Feature_Image.jpg?1631703175")
+                setTextChangeMap("Terrain")
                 break;
             case "Traffic":
                 const trafficLayer = new google.maps.TrafficLayer();
                 trafficLayer.setMap(map);
                 setImgChangeMap("https://www.nsm.or.th/images/IT-Category/IT-Tips/GoogleMaps/20200204-2PNG.PNG")
+                setTextChangeMap("Traffic")
                 break
             case "Transit":
                 const transitLayer = new google.maps.TransitLayer();
                 transitLayer.setMap(map)
                 setImgChangeMap("https://www.howtogeek.com/wp-content/uploads/2010/03/minigooglemaps04.png")
+                setTextChangeMap("Transit")
                 break
             default:
                 break;
@@ -698,7 +701,10 @@ const mapPage = () => {
             </div>
             <div className="tools-map-area3" >
                 <button className="btn btn-light" onClick={() => $("#changeMap").fadeToggle()}>
-                    <img width="90" height="90" src={imgChangeMap} alt="" />
+                    <img width="90" height="90" style={{ borderRadius: "10px" }} src={imgChangeMap} alt="" />
+                    <span style={{ position: "absolute", bottom: "15px", left: "25px", textAlign: "center" }}>
+                        {txtChangeMap}
+                    </span>
                 </button>
                 <div id="changeMap" style={{ display: "none" }}>
                     <span style={{ display: "flex", justifyContent: "space-around" }} >
@@ -1138,18 +1144,28 @@ const mapPage = () => {
                 <Tabs defaultActiveKey="1">
                     <TabPane tab="Raster" key="1">
                         <b className="text-info" >ภาพถ่ายทางอากาศ</b>
-                        <div className="pt-3 pb-4">
+                        <Row className="pt-3" gutter={[16]}>
                             {rasterData.map(data => {
-                                <b>eiei{data.id}</b>
+                                if (data.image_type === 'ภาพถ่ายทางอากาศจากโดรน') {
+                                    return <Col span={8}>
+                                        <img width="90" height="55" src={`${process.env.NEXT_PUBLIC_SERVICE}/uploads/satellite-aerial-photographs/${data.id}.jpg`} alt="" />
+                                        <p>{data.wms}</p>
+                                    </Col>
+                                }
                             })}
-                            test
-                        </div>
+                        </Row>
 
                         <b className="text-info pt-5">ภาพถ่ายดาวเทียม</b>
-                        <div className="pt-3">
-                            test
-                        </div>
-
+                        <Row className="pt-3" gutter={[16]}>
+                            {rasterData.map(data => {
+                                if (data.image_type === 'ภาพถ่ายจากดาวเทียม') {
+                                    return <Col span={8} >
+                                        <img width="90" height="55" src={`${process.env.NEXT_PUBLIC_SERVICE}/uploads/satellite-aerial-photographs/${data.id}.jpg`} alt="" />
+                                        <p>{data.wms}</p>
+                                    </Col>
+                                }
+                            })}
+                        </Row>
                     </TabPane>
                     <TabPane tab="Left Layer for Swipe Map" key="2">
                         22222
