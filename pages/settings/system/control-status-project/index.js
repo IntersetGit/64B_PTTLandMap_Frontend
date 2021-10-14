@@ -276,7 +276,7 @@ const index = () => {
         <Col span={24}>
           <h3>จัดการ Status โครงการ</h3>{dataEdit.layer_name}
         </Col>
-        <Col xs={8} sm={8} md={8} lg={8} xl={8} xxl={5}>
+        <Col xs={8} sm={8} md={8} lg={8} xl={5} xxl={5}>
           <Search
             placeholder="input search text"
             onSearch={(e) => {
