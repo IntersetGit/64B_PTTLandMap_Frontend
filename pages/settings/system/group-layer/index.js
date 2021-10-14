@@ -69,7 +69,7 @@ const GroupLayerSystemPage = () => {
       .then(async (data) => {
         reload();
         const upload = await axios.post(
-          `http://localhost:9000/upload?Path=symbol_group&Length=1&Name=${data.data.items.id}&SetType=jpg`,
+          `${process.env.NEXT_PUBLIC_SERVICE}/upload?Path=symbol_group&Length=1&Name=${data.data.items.id}&SetType=jpg`,
           fd
         );
         setIsModalVisible(!isModalVisible);
@@ -231,7 +231,7 @@ const GroupLayerSystemPage = () => {
           //console.log(value.Symbol[0].originFileObj)
           fd.append("file0", data.Symbol[0].originFileObj);
           const upload = await axios.post(
-            `http://localhost:9000/upload?Path=symbol_group&Length=1&Name=${form.getFieldValue().id}&SetType=jpg`,
+            `                            }}/upload?Path=symbol_group&Length=1&Name=${form.getFieldValue().id}&SetType=jpg`,
             fd
           );
           await Swal.fire("", "แก้ไขข้อมูลเรียบร้อยแล้ว", "success");
