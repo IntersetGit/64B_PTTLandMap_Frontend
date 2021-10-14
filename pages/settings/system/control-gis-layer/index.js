@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import Head from "next/head";
 import System from "../../../../components/_App/System";
 import Api from "../../../../util/Api";
+import moment from "moment";
 import Swal from "sweetalert2";
 import { MoreOutlined, RedoOutlined } from "@ant-design/icons";
 import {
@@ -15,6 +16,9 @@ import {
   Select,
   Menu,
   Dropdown,
+  // Upload,
+  Radio,
+  DatePicker
 } from "antd";
 const { Search } = Input;
 const { Option } = Select;
@@ -25,19 +29,23 @@ const usersSystemPage = () => {
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(5);
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const [isModalVisible2, setIsModalVisible2] = useState(false);
   const [statusValidation, setStatusValidation] = useState([]);
+  const [menuItem, setMenuItem] = useState([]);
   const [listGroup, setListGroup] = useState([]);
   const [dataEdit, setDataEdit] = useState([]);
   // const [buttonCreate, setButtonCreate] = useState(true); //สถานะเปิดปิดsubmit ตอนmodal create
   const [form] = Form.useForm();
+  const [formCreate] = Form.useForm();
   const columns = [
     {
       key: "1",
       title: "ลำดับ",
-      dataIndex: "number",
+      // dataIndex: "number",
       sorter: (record1, record2) => {
         return record1.number > record2.number;
       },
+      render: (a, b, i) => i + 1
     },
     {
       key: "2",
@@ -102,17 +110,10 @@ const usersSystemPage = () => {
 
   const onSearch = async (value) => {
     Api.get(`masterdata/masLayersShape?search=${value}`).then((data) => {
-      console.log(`data`, data)
-      setStatusValidation({
-        help: "ข้อมูล GIS Layer",
-      });
+      setData(data.data.items);
     })
       .catch((error) => {
         console.log(error);
-        setStatusValidation({
-          validateStatus: "error",
-          help: "ไม่พบข้อมูล GIS Layer ",
-        });
       });
   };
 
@@ -122,11 +123,10 @@ const usersSystemPage = () => {
       .then(({ data: { items } }) => {
         let tempDataArray = [];
         console.log(`data`, data)
-        items.forEach((data, key) => {
+        items.forEach((data) => {
           tempDataArray = [
             ...tempDataArray,
             {
-              number: key + 1,
               ...data,
             },
           ];
@@ -138,6 +138,30 @@ const usersSystemPage = () => {
       .catch((error) => {
         console.log(error);
       });
+  };
+
+  const changeTypeServer = (e) => {
+    const type = e.target.value;
+    setMenuItem([]);
+    if (type !== "arcgisserver") {
+      setMenuItem(
+        <>
+          <Form.Item
+            name="layerName"
+            label="Layer Name"
+            rules={[{ required: true }]}
+          >
+            <Input placeholder="Layer Name" />
+          </Form.Item>
+        </>
+      );
+    }
+  };
+  const normFile = (e) => {
+    if (Array.isArray(e)) {
+      return e;
+    }
+    return e && e.fileList;
   };
 
   useEffect(() => {
@@ -208,32 +232,76 @@ const usersSystemPage = () => {
   const showModal = () => {
     setIsModalVisible(true);
   };
+  const showModal2 = () => {
+    setIsModalVisible2(true);
+  };
   const handleOk = () => {
     form.submit();
+  };
+
+  const handleOk2 = (form) => {
+    form.submit();
+  };
+  const handleCancel2 = () => {
+    setIsModalVisible2(false);
+    form.resetFields();
   };
   const handleCancel = () => {
     setIsModalVisible(false);
     form.resetFields();
   };
-  const onFinish = async (value) => {
+
+  const onFinishCreate = async (value) => {
+    let filterRoles = await roles.find(
+      (data) => data.roles_name === value.roles_id
+    );
     setLoading(true);
     Api.post("/system/addUserAD", {
       username: value.username,
-      roles_id: value.roles_id,
+      roles_id: filterRoles.id,
     })
       .then((data) => {
-        setIsModalVisible(false);
+        Swal.fire("", "บันทึกข้อมูลเรียบร้อย", "success");
+        setStatusValidation([]);
+        setIsModalVisible({ create: false, edit: false });
         setLoading(false);
+        formCreate.resetFields();
         reload();
-        form.resetFields();
+        setButtonCreate(true);
       })
       .catch((error) => {
-        alert("มีบางอย่างผิดพลาด หรือมีผู้ใช้ในระบบแล้ว");
-        setIsModalVisible(false);
+        Swal.fire("", "มีบางอย่างผิดพลาด หรือมีผู้ใช้ในระบบแล้ว", "error");
+        console.log(error);
+        setStatusValidation([]);
+        setIsModalVisible({ create: false, edit: false });
         setLoading(false);
+        formCreate.resetFields();
+        reload();
+        setButtonCreate(true);
       });
-    form.resetFields();
   };
+
+
+  // const onFinish = async (value) => {
+  //   setLoading(true);
+  //   Api.post("/system/addUserAD", {
+  //     username: value.username,
+  //     roles_id: value.roles_id,
+  //   })
+  //     .then((data) => {
+  //       setIsModalVisible(false);
+  //       setLoading(false);
+  //       reload();
+  //       form.resetFields();
+  //     })
+  //     .catch((error) => {
+  //       alert("มีบางอย่างผิดพลาด หรือมีผู้ใช้ในระบบแล้ว");
+  //       setIsModalVisible(false);
+  //       setLoading(false);
+  //     });
+  //   form.resetFields();
+  // };
+
   return (
     <>
       <Head>
@@ -253,7 +321,9 @@ const usersSystemPage = () => {
             <h3 className="mb-4">จัดการข้อมูล GIS Layer</h3>
           </Col>
           <Col xs={10} sm={8} md={8} lg={8} xl={5} xxl={5}>
-            <Search placeholder="input search text" />
+            <Search placeholder="input search text"
+              onSearch={onSearch}
+            />
           </Col>
           <Col xs={8} sm={8} md={8} lg={8} xl={8} xxl={11}>
             <Button
@@ -264,15 +334,15 @@ const usersSystemPage = () => {
               <RedoOutlined />
             </Button>
           </Col>
-          {/* <Col span={3} offset={11}>
+          <Col xs={8} sm={8} md={8} lg={8} xl={8} xxl={8}>
             <Button
               type="primary"
-              onClick={showModal}
+              onClick={showModal2}
               style={{ float: "right" }}
             >
-              + เพิ่มผู้ใช้ใหม่
+              + เพิ่ม WMS ของ GIS Layer
             </Button>
-          </Col> */}
+          </Col>
           <Col span={24}>
             <div >
               <Table
@@ -294,7 +364,72 @@ const usersSystemPage = () => {
         </Row>
       </System>
       <Modal
-        title="เพิ่มผู้ใช้ระบบ"
+        title="เพิ่ม WMS ของ GIS Layer"
+        visible={isModalVisible2}
+        onOk={() => handleOk2}
+        onCancel={handleCancel2}
+      // okButtonProps={{ disabled: buttonCreate }}
+      >
+        <Form
+          form={formCreate}
+          labelCol={{ span: 7 }}
+          wrapperCol={{ span: 14 }}
+          onFinish={onFinishCreate}
+        >
+          <Form.Item
+            name="typename"
+            label="ประเภทของภาพ"
+            rules={[{ required: true }]}
+          >
+            <Input />
+          </Form.Item>
+          <Form.Item
+            name="typename"
+            label="ประเภทของภาพ"
+            rules={[{ required: true }]}
+          >
+            <Select placeholder="ประเภทของภาพ">
+              <Option value="ภาพถ่ายจากดาวเทียม">ภาพถ่ายจากดาวเทียม</Option>
+              <Option value="ภาพถ่ายทางอากาศจากโดรน">
+                ภาพถ่ายทางอากาศจากโดรน
+              </Option>
+            </Select>
+          </Form.Item>
+          <Form.Item
+            name="wms"
+            label="ชื่อข้อมูล (WMS)"
+            rules={[{ required: true }]}
+          >
+            <Input placeholder="wms_url" />
+          </Form.Item>
+          <Form.Item name="url" label="url" rules={[{ required: true }, { type: "url" }]}>
+            <Input placeholder="url" />
+          </Form.Item>
+          {menuItem}
+          <Form.Item
+            name="typeserver"
+            label=" "
+            wrapperCol={{ span: 12 }}
+            rules={[{ required: true }]}
+          >
+            <Radio.Group
+              onChange={(e) => {
+                changeTypeServer(e);
+              }}
+            >
+              <Radio value="arcgisserver">ArcGIS Server</Radio>
+              <Radio value="imageserver">Image Server</Radio>
+              <Radio value="geoserver">Geoserver</Radio>
+            </Radio.Group>
+          </Form.Item>
+          <Form.Item name="date" label="Date" rules={[{ required: true }]}>
+            <DatePicker />
+          </Form.Item>
+        </Form>
+      </Modal>
+
+      <Modal
+        title="แก้ไขข้อมูล GIS"
         visible={isModalVisible}
         onOk={handleOk}
         onCancel={handleCancel}

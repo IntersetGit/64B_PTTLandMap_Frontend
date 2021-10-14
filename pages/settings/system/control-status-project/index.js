@@ -46,6 +46,7 @@ const index = () => {
       sorter: (record1, record2) => {
         return record1.number > record2.number;
       },
+      render: (a, b, i) => i + 1
     },
     {
       key: "2",
@@ -237,7 +238,6 @@ const index = () => {
         tempDataArray = [
           ...tempDataArray,
           {
-            number: key + 1,
             ...data,
           },
         ];
@@ -250,6 +250,15 @@ const index = () => {
     }
   };
 
+  // const onSearch = async (value) => {
+  //   Api.get(`masterdata/masLayersShape?search=${value}`)
+  //     .then((data) => {
+  //       console.log(`data`, data)
+  //       setData(data.data.items)
+  //     }).catch((err) => {
+  //       console.log(`err`, err)
+  //     })
+  // };
 
 
 
@@ -279,9 +288,7 @@ const index = () => {
         <Col xs={8} sm={8} md={8} lg={8} xl={5} xxl={5}>
           <Search
             placeholder="input search text"
-            onSearch={(e) => {
-              reload(e);
-            }}
+          // onSearch={onSearch}
           />
         </Col>
         <Col xs={8} sm={8} md={8} lg={8} xl={8} xxl={11}>
