@@ -327,6 +327,7 @@ const mapPage = () => {
     /*  Search */
     const [visibleSearch, setVisibleSearch] = useState(false);
 
+    /*------------------------------------------------------------------------------ */
     /* Raster */
     const [visibleRaster, setVisibleRaster] = useState(false)
     const [rasterData, setRasterData] = useState([]) // ข้อมูล raster
@@ -337,6 +338,7 @@ const mapPage = () => {
             setRasterData(respRaster.data.items)
         }
     }
+    /* open close fullscreen */
     const [fullscreen, setFullScreen] = useState(false);
     const openFullscreen = () => {
         var elem = document.documentElement;
@@ -368,6 +370,8 @@ const mapPage = () => {
         $("#openFullscreen").fadeToggle();
         $("#closeFullscreen").fadeToggle("slow");
     };
+
+    /* เปิดปิดเส้นวัดระยะ */
     const [openLine, setOpenLine] = useState(true) //ปุ่มเปิดปิด Line
     const clickLine = () => {
         let count = 0 //นับจำนวนครั้งที่กด วัดระยะ ถ้ากด3ครั้งให้ยกเลิกเมพใหม่
@@ -430,6 +434,7 @@ const mapPage = () => {
             google.maps.event.clearListeners(map, 'click');
         }
     }
+    /* เคลียเมพ */
     const clickClearMap = () => {
         var clearMap = new google.maps.Map(googlemap.current, {
             mapTypeControl: false,
@@ -439,6 +444,7 @@ const mapPage = () => {
         });
         setMap(clearMap)
     }
+    /* เปิดปิดสวิทเมพ */
     const [changmap, setChangeMap] = useState(false) // ปุ่มเปิดปิด split map
     const googlemapLeft = useRef(null)
     const googlemapRight = useRef(null)
@@ -522,6 +528,9 @@ const mapPage = () => {
             });
         }
     }
+    /* แสดง Loadmore ข้อมูลเพิ่มเตืม */
+    const [showInfoAir, setShowInfoAir] = useState(true) //โชว ภาพถ่ายจากดาวเทียม
+    const [showInfoDron, setShowInfoDron] = useState(true) //โชว ภาพถ่ายทางอากาศจากโดรน
 
     const [imgChangeMap, setImgChangeMap] = useState("https://images.adsttc.com/media/images/6141/d09d/f91c/8104/f800/009b/large_jpg/Feature_Image.jpg?1631703175")
     const [txtChangeMap, setTextChangeMap] = useState("Satellite")
@@ -548,6 +557,7 @@ const mapPage = () => {
                 break;
         }
     }
+    /* -------------------------------------------------------------------------------------- */
 
     /* Search */
     const [formSearch] = Form.useForm();
@@ -584,6 +594,7 @@ const mapPage = () => {
             },
         }
     }
+
 
     return (
         <Layout isMap={true}>
@@ -1346,30 +1357,116 @@ const mapPage = () => {
                     <TabPane tab="Raster" key="1">
                         <b className="text-info" >ภาพถ่ายทางอากาศ</b>
                         <Row className="pt-3" gutter={[16]}>
-                            {rasterData.map(data => {
+                            {rasterData.map((data, index) => {
+                                let loadText
                                 if (data.image_type === 'ภาพถ่ายทางอากาศจากโดรน') {
-                                    return <Col span={8}>
-                                        <img width="90" height="55" src={`${process.env.NEXT_PUBLIC_SERVICE}/uploads/satellite-aerial-photographs/${data.id}.jpg`} alt="" />
-                                        <p>{data.wms}</p>
-                                    </Col>
+                                    if (index <= 3) {
+                                        return <Col span={8} key={index} >
+                                            <img width="90" height="55" src={`${process.env.NEXT_PUBLIC_SERVICE}/uploads/satellite-aerial-photographs/${data.id}.jpg`} alt="" />
+                                            <p>{data.wms}</p>
+                                        </Col>
+                                    }
+                                    if (index > 3) {
+                                        loadText = "... Load more"
+                                    }
+                                }
+                                if (showInfoDron) {
+                                    return <h5 style={{ cursor: "pointer", float: "left" }} className="text-info" onClick={() => { setShowInfoDron(false) }}>{loadText}</h5>
+                                } else {
+                                    if (data.image_type === 'ภาพถ่ายทางอากาศจากโดรน') {
+                                        return <Col span={8} key={index}>
+                                            <img width="90" height="55" src={`${process.env.NEXT_PUBLIC_SERVICE}/uploads/satellite-aerial-photographs/${data.id}.jpg`} alt="" />
+                                            <p>{data.wms}</p>
+                                        </Col>
+                                    }
                                 }
                             })}
                         </Row>
 
                         <b className="text-info pt-5">ภาพถ่ายดาวเทียม</b>
                         <Row className="pt-3" gutter={[16]}>
-                            {rasterData.map(data => {
+                            {rasterData.map((data, index) => {
+                                let loadText
                                 if (data.image_type === 'ภาพถ่ายจากดาวเทียม') {
-                                    return <Col span={8} >
-                                        <img width="90" height="55" src={`${process.env.NEXT_PUBLIC_SERVICE}/uploads/satellite-aerial-photographs/${data.id}.jpg`} alt="" />
-                                        <p>{data.wms}</p>
-                                    </Col>
+                                    if (index <= 3) {
+                                        return <Col span={8} key={index} >
+                                            <img width="90" height="55" src={`${process.env.NEXT_PUBLIC_SERVICE}/uploads/satellite-aerial-photographs/${data.id}.jpg`} alt="" />
+                                            <p>{data.wms}</p>
+                                        </Col>
+                                    }
+                                    if (index > 3) {
+                                        loadText = "... Load more"
+                                    }
+                                }
+                                if (showInfoAir) {
+                                    return <h5 style={{ cursor: "pointer", float: "left" }} className="text-info" onClick={() => { setShowInfoAir(false) }}>{loadText}</h5>
+                                } else {
+                                    if (data.image_type === 'ภาพถ่ายจากดาวเทียม') {
+                                        return <Col span={8} key={index}>
+                                            <img width="90" height="55" src={`${process.env.NEXT_PUBLIC_SERVICE}/uploads/satellite-aerial-photographs/${data.id}.jpg`} alt="" />
+                                            <p>{data.wms}</p>
+                                        </Col>
+                                    }
                                 }
                             })}
                         </Row>
                     </TabPane>
                     <TabPane tab="Left Layer for Swipe Map" key="2">
-                        22222
+                        <b className="text-info" >ภาพถ่ายทางอากาศ</b>
+                        <Row className="pt-3" gutter={[16]}>
+                            {rasterData.map((data, index) => {
+                                let loadText
+                                if (data.image_type === 'ภาพถ่ายทางอากาศจากโดรน') {
+                                    if (index <= 3) {
+                                        return <Col span={8} key={index} >
+                                            <img width="90" height="55" src={`${process.env.NEXT_PUBLIC_SERVICE}/uploads/satellite-aerial-photographs/${data.id}.jpg`} alt="" />
+                                            <p>{data.wms}</p>
+                                        </Col>
+                                    }
+                                    if (index > 3) {
+                                        loadText = "... Load more"
+                                    }
+                                }
+                                if (showInfoDron) {
+                                    return <h5 style={{ cursor: "pointer", float: "left" }} className="text-info" onClick={() => { setShowInfoDron(false) }}>{loadText}</h5>
+                                } else {
+                                    if (data.image_type === 'ภาพถ่ายทางอากาศจากโดรน') {
+                                        return <Col span={8} key={index}>
+                                            <img width="90" height="55" src={`${process.env.NEXT_PUBLIC_SERVICE}/uploads/satellite-aerial-photographs/${data.id}.jpg`} alt="" />
+                                            <p>{data.wms}</p>
+                                        </Col>
+                                    }
+                                }
+                            })}
+                        </Row>
+
+                        <b className="text-info pt-5">ภาพถ่ายดาวเทียม</b>
+                        <Row className="pt-3" gutter={[16]}>
+                            {rasterData.map((data, index) => {
+                                let loadText
+                                if (data.image_type === 'ภาพถ่ายจากดาวเทียม') {
+                                    if (index <= 3) {
+                                        return <Col span={8} key={index} >
+                                            <img width="90" height="55" src={`${process.env.NEXT_PUBLIC_SERVICE}/uploads/satellite-aerial-photographs/${data.id}.jpg`} alt="" />
+                                            <p>{data.wms}</p>
+                                        </Col>
+                                    }
+                                    if (index > 3) {
+                                        loadText = "... Load more"
+                                    }
+                                }
+                                if (showInfoAir) {
+                                    return <h5 style={{ cursor: "pointer", float: "left" }} className="text-info" onClick={() => { setShowInfoAir(false) }}>{loadText}</h5>
+                                } else {
+                                    if (data.image_type === 'ภาพถ่ายจากดาวเทียม') {
+                                        return <Col span={8} key={index}>
+                                            <img width="90" height="55" src={`${process.env.NEXT_PUBLIC_SERVICE}/uploads/satellite-aerial-photographs/${data.id}.jpg`} alt="" />
+                                            <p>{data.wms}</p>
+                                        </Col>
+                                    }
+                                }
+                            })}
+                        </Row>
                     </TabPane>
                 </Tabs>
             </Drawer>
