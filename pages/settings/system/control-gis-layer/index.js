@@ -320,7 +320,7 @@ const usersSystemPage = () => {
           <Col span={24}>
             <h3 className="mb-4">จัดการข้อมูล GIS Layer</h3>
           </Col>
-          <Col xs={10} sm={8} md={8} lg={8} xl={5} xxl={5}>
+          <Col xs={10} sm={8} md={8} lg={8} xl={8} xxl={5}>
             <Search placeholder="input search text"
               onSearch={onSearch}
             />
@@ -375,41 +375,43 @@ const usersSystemPage = () => {
           labelCol={{ span: 7 }}
           wrapperCol={{ span: 14 }}
           onFinish={onFinishCreate}
+          labelAlign="left"
+          colon={false}
+          style={{ padding: "0%  0%  0% 10%" }}
         >
           <Form.Item
             name="typename"
-            label="ประเภทของภาพ"
+            label="ชื่อ GIS Layer"
             rules={[{ required: true }]}
           >
             <Input />
           </Form.Item>
           <Form.Item
             name="typename"
-            label="ประเภทของภาพ"
+            label="เลือก Group Layer"
             rules={[{ required: true }]}
           >
-            <Select placeholder="ประเภทของภาพ">
-              <Option value="ภาพถ่ายจากดาวเทียม">ภาพถ่ายจากดาวเทียม</Option>
-              <Option value="ภาพถ่ายทางอากาศจากโดรน">
-                ภาพถ่ายทางอากาศจากโดรน
-              </Option>
+            <Select placeholder="เลือก Group Layer">
+              <Option value="แปลงที่ดิน">แปลงที่ดิน</Option>
             </Select>
           </Form.Item>
+          <Form.Item name="url" label="URL" rules={[{ required: true }, { type: "url" }]}>
+            <Input placeholder="URL" />
+          </Form.Item>
           <Form.Item
-            name="wms"
-            label="ชื่อข้อมูล (WMS)"
+            name=""
+            label="Layer Name"
             rules={[{ required: true }]}
           >
-            <Input placeholder="wms_url" />
+            <Input placeholder="Layer Name" />
           </Form.Item>
-          <Form.Item name="url" label="url" rules={[{ required: true }, { type: "url" }]}>
-            <Input placeholder="url" />
-          </Form.Item>
+
           {menuItem}
           <Form.Item
-            name="typeserver"
-            label=" "
-            wrapperCol={{ span: 12 }}
+            name=""
+            label="GIS Server Type"
+            wrapperCol={{ span: 10 }}
+
             rules={[{ required: true }]}
           >
             <Radio.Group
@@ -418,8 +420,8 @@ const usersSystemPage = () => {
               }}
             >
               <Radio value="arcgisserver">ArcGIS Server</Radio>
-              <Radio value="imageserver">Image Server</Radio>
-              <Radio value="geoserver">Geoserver</Radio>
+              <Radio value="imageserver">ArcGIS Image Server</Radio>
+              <Radio value="geoserver">GEO Server</Radio>
             </Radio.Group>
           </Form.Item>
           <Form.Item name="date" label="Date" rules={[{ required: true }]}>
