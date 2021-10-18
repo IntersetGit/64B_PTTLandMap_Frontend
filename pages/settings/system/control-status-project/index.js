@@ -226,6 +226,16 @@ const index = () => {
 
   // };
 
+  const onSearch = async (value) => {
+    Api.get(`masterdata/masStatusProject?search=${value}`).then((data) => {
+      setData(data.data.items);
+    })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
+
+
   const reload = async (search = null) => {
     setLoading(true);
     try {
@@ -288,7 +298,7 @@ const index = () => {
         <Col xs={8} sm={8} md={8} lg={8} xl={5} xxl={5}>
           <Search
             placeholder="input search text"
-          // onSearch={onSearch}
+            onSearch={onSearch}
           />
         </Col>
         <Col xs={8} sm={8} md={8} lg={8} xl={8} xxl={11}>

@@ -65,7 +65,11 @@ const GroupLayerSystemPage = () => {
     let fd = new FormData();
     //console.log(value.Symbol[0].originFileObj)
     fd.append("file0", value.Symbol[0].originFileObj);
-    Api.post("/masterdata/masLayers", { group_name: value.group_name })
+    Api.post("/masterdata/masLayers", {
+      group_name: value.group_name,
+      isuse: 1
+
+    })
       .then(async (data) => {
         reload();
         const upload = await axios.post(
@@ -222,7 +226,6 @@ const GroupLayerSystemPage = () => {
           let resp = await Api.put("masterdata/masLayers", {
             ...data,
             id: form.getFieldValue().id,
-            order_by: "7",
             isuse: 1,
             roles_id: user.roles_id,
             user_id: user.sysm_id,
