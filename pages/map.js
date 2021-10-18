@@ -330,12 +330,30 @@ const mapPage = () => {
     /*------------------------------------------------------------------------------ */
     /* Raster */
     const [visibleRaster, setVisibleRaster] = useState(false)
-    const [rasterData, setRasterData] = useState([]) // ข้อมูล raster
+    const [rasterDataDron1, setRasterDataDron1] = useState([]) // ข้อมูล raster ภาพถ่ายจากดาวเทียม
+    const [rasterDataDow1, setRasterDataDow1] = useState([]) // ข้อมูล raster ภาพถ่ายทางอากาศจากโดรน
+    const [loadmore1, setLoadmore1] = useState({ dronMore: 3, dowMore: 3 })
+    const [loadmore2, setLoadmore2] = useState({ dronMore: 3, dowMore: 3 })
+    /* แสดง Loadmore ข้อมูลเพิ่มเตืม */
+    const [showMoreDow, setShowMoreDow] = useState({ dow1: false, dow2: false }) //โชวLoadmore  ภาพถ่ายจากดาวเทียม
+    const [showMoreDron, setShowMoreDron] = useState({ dron1: false, dron2: false }) //โชวLoadmore  ภาพถ่ายทางอากาศจากโดรน
     const openCloseRaster = async () => {
+        let dron = []; //ภาพถ่ายทางอากาศจากโดรน
+        let dow = []; //ภาพถ่ายจากดาวเทียม
         setVisibleRaster(!visibleRaster)
         if (!visibleRaster) {
             const respRaster = await API.get("/masterdata/datLayers")
-            setRasterData(respRaster.data.items)
+            console.log(respRaster)
+            respRaster.data.items.map(data => {
+                if (data.image_type === "ภาพถ่ายจากดาวเทียม") {
+                    dow.push(data)
+                }
+                if (data.image_type === "ภาพถ่ายทางอากาศจากโดรน") {
+                    dron.push(data)
+                }
+            })
+            setRasterDataDron1(dron)
+            setRasterDataDow1(dow)
         }
     }
     /* open close fullscreen */
@@ -528,10 +546,8 @@ const mapPage = () => {
             });
         }
     }
-    /* แสดง Loadmore ข้อมูลเพิ่มเตืม */
-    const [showInfoAir, setShowInfoAir] = useState(true) //โชว ภาพถ่ายจากดาวเทียม
-    const [showInfoDron, setShowInfoDron] = useState(true) //โชว ภาพถ่ายทางอากาศจากโดรน
 
+    /* change map */
     const [imgChangeMap, setImgChangeMap] = useState("https://images.adsttc.com/media/images/6141/d09d/f91c/8104/f800/009b/large_jpg/Feature_Image.jpg?1631703175")
     const [txtChangeMap, setTextChangeMap] = useState("Satellite")
     const changeMap = (info) => {
@@ -1355,117 +1371,79 @@ const mapPage = () => {
             <Drawer placement="right" onClose={() => openCloseRaster()} visible={visibleRaster} width={350}>
                 <Tabs defaultActiveKey="1">
                     <TabPane tab="Raster" key="1">
-                        <b className="text-info" >ภาพถ่ายทางอากาศ</b>
+                        <b className="text-info" >ภาพถ่ายทางอากาศ </b>
                         <Row className="pt-3" gutter={[16]}>
-                            {rasterData.map((data, index) => {
-                                let loadText
-                                if (data.image_type === 'ภาพถ่ายทางอากาศจากโดรน') {
-                                    if (index <= 3) {
-                                        return <Col span={8} key={index} >
-                                            <img width="90" height="55" src={`${process.env.NEXT_PUBLIC_SERVICE}/uploads/satellite-aerial-photographs/${data.id}.jpg`} alt="" />
-                                            <p>{data.wms}</p>
-                                        </Col>
-                                    }
-                                    if (index > 3) {
-                                        loadText = "... Load more"
-                                    }
-                                }
-                                if (showInfoDron) {
-                                    return <h5 style={{ cursor: "pointer", float: "left" }} className="text-info" onClick={() => { setShowInfoDron(false) }}>{loadText}</h5>
-                                } else {
-                                    if (data.image_type === 'ภาพถ่ายทางอากาศจากโดรน') {
-                                        return <Col span={8} key={index}>
-                                            <img width="90" height="55" src={`${process.env.NEXT_PUBLIC_SERVICE}/uploads/satellite-aerial-photographs/${data.id}.jpg`} alt="" />
-                                            <p>{data.wms}</p>
-                                        </Col>
-                                    }
-                                }
-                            })}
+                            {
+                                rasterDataDron1.slice(0, loadmore1.dronMore).map((data, index) => {
+                                    return <Col span={8} key={index} >
+                                        <img width="90" height="55" src={`${process.env.NEXT_PUBLIC_SERVICE}/uploads/satellite-aerial-photographs/${data.id}.jpg`} alt="" />
+                                        <p>{data.wms}</p>
+                                    </Col>
+                                })
+                            }
+                            {
+                                rasterDataDron1.length > 3 ? (
+                                    <h3 style={{ cursor: "pointer", float: "left" }} className="text-info" hidden={showMoreDron.dron1} onClick={() => { setLoadmore1({ ...loadmore1, dowMore: rasterDataDow1.length }), setShowMoreDron({ ...showMoreDron, dron1: true }) }}>
+                                        ...Load More
+                                    </h3>
+                                ) : null
+                            }
                         </Row>
-
                         <b className="text-info pt-5">ภาพถ่ายดาวเทียม</b>
                         <Row className="pt-3" gutter={[16]}>
-                            {rasterData.map((data, index) => {
-                                let loadText
-                                if (data.image_type === 'ภาพถ่ายจากดาวเทียม') {
-                                    if (index <= 3) {
-                                        return <Col span={8} key={index} >
-                                            <img width="90" height="55" src={`${process.env.NEXT_PUBLIC_SERVICE}/uploads/satellite-aerial-photographs/${data.id}.jpg`} alt="" />
-                                            <p>{data.wms}</p>
-                                        </Col>
-                                    }
-                                    if (index > 3) {
-                                        loadText = "... Load more"
-                                    }
-                                }
-                                if (showInfoAir) {
-                                    return <h5 style={{ cursor: "pointer", float: "left" }} className="text-info" onClick={() => { setShowInfoAir(false) }}>{loadText}</h5>
-                                } else {
-                                    if (data.image_type === 'ภาพถ่ายจากดาวเทียม') {
-                                        return <Col span={8} key={index}>
-                                            <img width="90" height="55" src={`${process.env.NEXT_PUBLIC_SERVICE}/uploads/satellite-aerial-photographs/${data.id}.jpg`} alt="" />
-                                            <p>{data.wms}</p>
-                                        </Col>
-                                    }
-                                }
-                            })}
+                            {
+                                rasterDataDow1.slice(0, loadmore1.dowMore).map((data, index) => {
+                                    return <Col span={8} key={index} >
+                                        <img width="90" height="55" src={`${process.env.NEXT_PUBLIC_SERVICE}/uploads/satellite-aerial-photographs/${data.id}.jpg`} alt="" />
+                                        <p>{data.wms} </p>
+                                    </Col>
+                                })
+                            }
+                            {
+                                rasterDataDow1.length > 3 ? (
+                                    <h3 style={{ cursor: "pointer", float: "left" }} className="text-info" hidden={showMoreDow.dow1} onClick={() => { setLoadmore1({ ...loadmore1, dowMore: rasterDataDow1.length }), setShowMoreDow({ ...showMoreDow, dow1: true }) }}>
+                                        ...Load More
+                                    </h3>
+                                ) : null
+                            }
                         </Row>
                     </TabPane>
                     <TabPane tab="Left Layer for Swipe Map" key="2">
-                        <b className="text-info" >ภาพถ่ายทางอากาศ</b>
+                        <b className="text-info" >ภาพถ่ายทางอากาศ </b>
                         <Row className="pt-3" gutter={[16]}>
-                            {rasterData.map((data, index) => {
-                                let loadText
-                                if (data.image_type === 'ภาพถ่ายทางอากาศจากโดรน') {
-                                    if (index <= 3) {
-                                        return <Col span={8} key={index} >
-                                            <img width="90" height="55" src={`${process.env.NEXT_PUBLIC_SERVICE}/uploads/satellite-aerial-photographs/${data.id}.jpg`} alt="" />
-                                            <p>{data.wms}</p>
-                                        </Col>
-                                    }
-                                    if (index > 3) {
-                                        loadText = "... Load more"
-                                    }
-                                }
-                                if (showInfoDron) {
-                                    return <h5 style={{ cursor: "pointer", float: "left" }} className="text-info" onClick={() => { setShowInfoDron(false) }}>{loadText}</h5>
-                                } else {
-                                    if (data.image_type === 'ภาพถ่ายทางอากาศจากโดรน') {
-                                        return <Col span={8} key={index}>
-                                            <img width="90" height="55" src={`${process.env.NEXT_PUBLIC_SERVICE}/uploads/satellite-aerial-photographs/${data.id}.jpg`} alt="" />
-                                            <p>{data.wms}</p>
-                                        </Col>
-                                    }
-                                }
-                            })}
+                            {
+                                rasterDataDron1.slice(0, loadmore2.dronMore).map((data, index) => {
+                                    return <Col span={8} key={index} >
+                                        <img width="90" height="55" src={`${process.env.NEXT_PUBLIC_SERVICE}/uploads/satellite-aerial-photographs/${data.id}.jpg`} alt="" />
+                                        <p>{data.wms}</p>
+                                    </Col>
+                                })
+                            }
+                            {
+                                rasterDataDron1.length > 3 ? (
+                                    <h3 style={{ cursor: "pointer", float: "left" }} className="text-info" hidden={showMoreDron.dron2} onClick={() => { setLoadmore2({ ...loadmore2, dowMore: rasterDataDow1.length }), setShowMoreDron({ ...showMoreDron, dron2: true }) }}>
+                                        ...Load More
+                                    </h3>
+                                ) : null
+                            }
                         </Row>
-
                         <b className="text-info pt-5">ภาพถ่ายดาวเทียม</b>
                         <Row className="pt-3" gutter={[16]}>
-                            {rasterData.map((data, index) => {
-                                let loadText
-                                if (data.image_type === 'ภาพถ่ายจากดาวเทียม') {
-                                    if (index <= 3) {
-                                        return <Col span={8} key={index} >
-                                            <img width="90" height="55" src={`${process.env.NEXT_PUBLIC_SERVICE}/uploads/satellite-aerial-photographs/${data.id}.jpg`} alt="" />
-                                            <p>{data.wms}</p>
-                                        </Col>
-                                    }
-                                    if (index > 3) {
-                                        loadText = "... Load more"
-                                    }
-                                }
-                                if (showInfoAir) {
-                                    return <h5 style={{ cursor: "pointer", float: "left" }} className="text-info" onClick={() => { setShowInfoAir(false) }}>{loadText}</h5>
-                                } else {
-                                    if (data.image_type === 'ภาพถ่ายจากดาวเทียม') {
-                                        return <Col span={8} key={index}>
-                                            <img width="90" height="55" src={`${process.env.NEXT_PUBLIC_SERVICE}/uploads/satellite-aerial-photographs/${data.id}.jpg`} alt="" />
-                                            <p>{data.wms}</p>
-                                        </Col>
-                                    }
-                                }
-                            })}
+                            {
+                                rasterDataDow1.slice(0, loadmore2.dowMore).map((data, index) => {
+                                    return <Col span={8} key={index} >
+                                        <img width="90" height="55" src={`${process.env.NEXT_PUBLIC_SERVICE}/uploads/satellite-aerial-photographs/${data.id}.jpg`} alt="" />
+                                        <p>{data.wms} </p>
+                                    </Col>
+                                })
+                            }
+                            {
+                                rasterDataDow1.length > 3 ? (
+                                    <h3 style={{ cursor: "pointer", float: "left" }} className="text-info" hidden={showMoreDow.dow2} onClick={() => { setLoadmore2({ ...loadmore2, dowMore: rasterDataDow1.length }), setShowMoreDow({ ...showMoreDow, dow2: true }) }}>
+                                        ...Load More
+                                    </h3>
+                                ) : null
+                            }
                         </Row>
                     </TabPane>
                 </Tabs>
