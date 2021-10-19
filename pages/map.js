@@ -1383,9 +1383,9 @@ const mapPage = () => {
                             }
                             {
                                 rasterDataDron1.length > 3 ? (
-                                    <h3 style={{ cursor: "pointer", float: "left" }} className="text-info" hidden={showMoreDron.dron1} onClick={() => { setLoadmore1({ ...loadmore1, dowMore: rasterDataDow1.length }), setShowMoreDron({ ...showMoreDron, dron1: true }) }}>
+                                    <h5 style={{ cursor: "pointer", marginLeft: "220px" }} className="text-info" hidden={showMoreDron.dron1} onClick={() => { setLoadmore1({ ...loadmore1, dowMore: rasterDataDow1.length }), setShowMoreDron({ ...showMoreDron, dron1: true }) }}>
                                         ...Load More
-                                    </h3>
+                                    </h5>
                                 ) : null
                             }
                         </Row>
@@ -1401,9 +1401,9 @@ const mapPage = () => {
                             }
                             {
                                 rasterDataDow1.length > 3 ? (
-                                    <h3 style={{ cursor: "pointer", float: "left" }} className="text-info" hidden={showMoreDow.dow1} onClick={() => { setLoadmore1({ ...loadmore1, dowMore: rasterDataDow1.length }), setShowMoreDow({ ...showMoreDow, dow1: true }) }}>
+                                    <h5 style={{ cursor: "pointer", marginLeft: "220px" }} className="text-info" hidden={showMoreDow.dow1} onClick={() => { setLoadmore1({ ...loadmore1, dowMore: rasterDataDow1.length }), setShowMoreDow({ ...showMoreDow, dow1: true }) }}>
                                         ...Load More
-                                    </h3>
+                                    </h5>
                                 ) : null
                             }
                         </Row>
@@ -1421,9 +1421,9 @@ const mapPage = () => {
                             }
                             {
                                 rasterDataDron1.length > 3 ? (
-                                    <h3 style={{ cursor: "pointer", float: "left" }} className="text-info" hidden={showMoreDron.dron2} onClick={() => { setLoadmore2({ ...loadmore2, dowMore: rasterDataDow1.length }), setShowMoreDron({ ...showMoreDron, dron2: true }) }}>
+                                    <h5 style={{ cursor: "pointer", marginLeft: "220px" }} className="text-info" hidden={showMoreDron.dron2} onClick={() => { setLoadmore2({ ...loadmore2, dowMore: rasterDataDow1.length }), setShowMoreDron({ ...showMoreDron, dron2: true }) }}>
                                         ...Load More
-                                    </h3>
+                                    </h5>
                                 ) : null
                             }
                         </Row>
@@ -1439,9 +1439,9 @@ const mapPage = () => {
                             }
                             {
                                 rasterDataDow1.length > 3 ? (
-                                    <h3 style={{ cursor: "pointer", float: "left" }} className="text-info" hidden={showMoreDow.dow2} onClick={() => { setLoadmore2({ ...loadmore2, dowMore: rasterDataDow1.length }), setShowMoreDow({ ...showMoreDow, dow2: true }) }}>
+                                    <h5 style={{ cursor: "pointer", marginLeft: "220px" }} className="text-info" hidden={showMoreDow.dow2} onClick={() => { setLoadmore2({ ...loadmore2, dowMore: rasterDataDow1.length }), setShowMoreDow({ ...showMoreDow, dow2: true }) }}>
                                         ...Load More
-                                    </h3>
+                                    </h5>
                                 ) : null
                             }
                         </Row>
