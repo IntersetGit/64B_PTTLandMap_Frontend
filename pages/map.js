@@ -326,6 +326,7 @@ const mapPage = () => {
         try {
             const { data } = await API.get(`/shp/shapeData?id=${id}`);
             const GeoJson = data.items.shape;
+            console.log('GeoJson :>> ', GeoJson);
             const bounds = new google.maps.LatLngBounds();
             const layer = new google.maps.Data();
             layer.addGeoJson(GeoJson)
@@ -688,6 +689,10 @@ const mapPage = () => {
     /* Search */
     const [formSearch] = Form.useForm();
     const [searchList, setSearchList] = useState([])
+    const [layerSearchData, setLayerSearchData] = useState([])
+    const [sumData, setSumData] = useState(10)
+    const [amount, setAmount] = useState(0)
+    const [searchAllList, setSearchAllList] = useState([])
 
     const onFinishSearch = (value) => {
         apiSearchData({})
@@ -700,21 +705,79 @@ const mapPage = () => {
     const apiSearchData = async ({ }) => {
         try {
             const { data } = await API.get(`/shp/getSearchData?`)
-            // console.log('data :>> ', data);
+            const _arr = []
+            setAmount(data.items.amount_data)
+            setSumData(10)
             data.items.data.forEach((e, i) => {
-                e.index = i;
+                e.index = i + 1;
                 if (e.color) {
                     const rgb = JSON.parse(e.color)
                     e.color = `rgb(${rgb.r},${rgb.g},${rgb.b},${rgb.a})`;
                 }
+                if (i < 10) _arr.push(e)
             })
-            console.log('data.items.data :>> ', data.items.data);
-            setSearchList(data.items.data)
+            setSearchList(_arr)
+            setSearchAllList(data.items.data)
 
         } catch (error) {
             console.log('error :>> ', error);
         }
     }
+
+    const switchGeom = async (value, item) => {
+        // console.log('value :>> ', value);
+        if (!value) {
+            const arr = [...layerSearchData]
+            const index = arr.findIndex(e => e.id == item.index)
+            if (index != -1) {
+                const layer = arr[index].layer
+                layer.forEach((feature) => {
+                    layer.remove(feature);
+                });
+                arr.splice(index, 1);
+                setLayerSearchData(arr)
+            }
+        } else {
+            const { data } = await API.get(`/shp/getByIdShape?id=${item.gid}&table_name=${item.table_name}`);
+            const GeoJson = data.items.shape;
+            // console.log('GeoJson :>> ', GeoJson);
+            const bounds = new google.maps.LatLngBounds();
+            const layer = new google.maps.Data();
+            layer.addGeoJson(GeoJson)
+
+
+            layer.addGeoJson(GeoJson)
+            layer.setStyle({
+                fillColor: item.color,
+                opacity: 0.5,
+                strokeWeight: 1,
+                clickable: false
+            });
+            layer.setMap(map);
+
+            layer.forEach((feature) => {
+                // console.log('feature :>> ', feature);
+                feature.getGeometry().forEachLatLng((latlng) => {
+                    bounds.extend(latlng);
+                });
+            });
+
+            setLayerSearchData([...layerSearchData, { id: item.index, layer }])
+            map.fitBounds(bounds);
+        }
+    };
+
+    const pushSearchData = () => {
+        const _arr = [...searchList]
+        searchAllList.forEach((e, i) => {
+            const index = i + 1
+            if (index > sumData && index <= sumData + 10) _arr.push(e)
+        })
+        setSearchList(_arr)
+        setSumData(sumData + 10)
+
+    }
+
 
     /* Dashboard */
     const [formDashboard] = Form.useForm();
@@ -790,7 +853,7 @@ const mapPage = () => {
                         <button
                             className="btn btn-light btn-sm"
                             onClick={() => {
-                                apiSearchData({})
+                                // apiSearchData({})
                                 setVisibleSearch(true)
                             }}
                         >
@@ -1408,10 +1471,11 @@ const mapPage = () => {
                 <hr />
 
                 <div>
-                    <h4 className="pb-3">พบข้อมูลจำนวน <span className="text-red">{searchList.length}</span> Recorde</h4>
+                    <h4 className="pb-3">พบข้อมูลจำนวน <span className="text-red">{amount}</span> Recorde</h4>
                     {
                         searchList.map((e, i) => (
                             <div key={`SearchList-${i}`}>
+                                {e.index})
                                 <div className="row pt-2">
                                     <div className="col-1">
                                         <div
@@ -1473,6 +1537,7 @@ const mapPage = () => {
                                                 </div>
                                                 <div className="col-4">
                                                     <button className="btn"><EditFilled /></button>
+                                                    <Switch size="small" checked={e.checked} onChange={(value) => switchGeom(value, e)} />
                                                 </div>
                                             </div>
                                         </div>
@@ -1485,6 +1550,10 @@ const mapPage = () => {
                             </div>
                         ))
                     }
+                    <div style={{ textAlign: "center" }}>
+                        {amount >= sumData ? <button className="btn btn-primary" onClick={pushSearchData}>โหลดเพิ่มเติม</button> : null}
+                    </div>
+
                 </div>
             </Drawer>
 
