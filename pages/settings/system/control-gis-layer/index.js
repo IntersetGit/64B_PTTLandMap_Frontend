@@ -468,7 +468,7 @@ const usersSystemPage = () => {
             </Select>
           </Form.Item>
           <Form.Item
-            name="color_layer"
+            name="type"
             label="สี GIS Layer"
             rules={[{ required: true }]}
           >
