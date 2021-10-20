@@ -40,6 +40,18 @@ const mapPage = () => {
     const { user } = useSelector(({ user }) => user);
     const centerMap = { lat: 13.78, lng: 100.55 }
     const [layerData, setLayerData] = useState([])
+
+    /* จ อ ต */
+
+    const [provAmpTamAll, setProvAmpTamAll] = useState({
+        prov: [],
+        amp: [],
+        tam: [],
+    })
+    const [provinceList, setProvinceList] = useState([])
+    const [districtList, setDistrictList] = useState([])
+    const [subDistrictList, setSubDistrictList] = useState([])
+
     useEffect(() => {
         const loader = new Loader({
             apiKey: process.env.NEXT_PUBLIC_GOOGLE_API_KEY,
@@ -61,7 +73,44 @@ const mapPage = () => {
             clickMapShowLatLag(_map)
         });
         loadShapeFile()
+        loadGetShapeProvince()
     }, []);
+
+    const loadGetShapeProvince = async (layer_group = "f942a946-3bcb-4062-9207-d78ab437edf3") => {
+        try {
+            const { data } = await API.get(`/shp/getShapeProvince?layer_group=${layer_group}`)
+            const { prov, amp, tam } = data.items
+            console.log('data.items :>> ', data.items);
+            setProvAmpTamAll({
+                ...provAmpTamAll, prov, amp, tam
+            })
+            setProvinceList(prov)
+        } catch (error) {
+
+        }
+    }
+
+    const onChangeProv = (value, _form) => {
+        const find_prov = provAmpTamAll.prov.find(e => e.name == value)
+        if (find_prov) {
+            const ampList = provAmpTamAll.amp.filter(e => e.prov_id == find_prov.id)
+            setDistrictList(ampList)
+        }
+
+        /* subDistrict */
+        setSubDistrictList([])
+        if (_form) _form.setFieldsValue({ ..._form, amp: null, tam: null })
+
+    }
+
+    const onChangeAmp = (value, _form) => {
+        const find_amp = provAmpTamAll.amp.find(e => e.name == value)
+        if (find_amp) {
+            const tamList = provAmpTamAll.tam.filter(e => e.amp_id == find_amp.id)
+            setSubDistrictList(tamList)
+        }
+        if (_form) _form.setFieldsValue({ ..._form, tam: null })
+    }
 
     const clickHome = () => {
         map.setCenter(centerMap);
@@ -82,6 +131,7 @@ const mapPage = () => {
     /*  Shape File */
     const [visibleShapeFile, setVisibleShapeFile] = useState(false);
     const [groupLayerList, setGroupLayerList] = useState([]);
+    const [layerList, setLayerList] = useState([]);
     const [FileList, setFileList] = useState([]);
     const [FileUpload, setFileUpload] = useState(null);
     const [FileType, setFileType] = useState(null);
@@ -207,6 +257,11 @@ const mapPage = () => {
             });
             console.log('data :>> ', data.items);
             setGroupLayerList(data.items)
+
+            /* layerList */
+            const find = data.items.find(e => e.id === "f942a946-3bcb-4062-9207-d78ab437edf3")
+            if (find) setLayerList(find.children)
+
         } catch (error) {
             message.error("มีบางอย่างผิดพลาด !");
         }
@@ -632,14 +687,33 @@ const mapPage = () => {
 
     /* Search */
     const [formSearch] = Form.useForm();
-    const [searchList, setSearchList] = useState(["red", "green", "#F05A28", "#F9F200", "#0079F9"])
+    const [searchList, setSearchList] = useState([])
 
     const onFinishSearch = (value) => {
-        console.log('value :>> ', value);
+        apiSearchData({})
     }
 
     const onFinishFailedSearch = (error) => {
         console.log('error :>> ', error);
+    }
+
+    const apiSearchData = async ({ }) => {
+        try {
+            const { data } = await API.get(`/shp/getSearchData?`)
+            // console.log('data :>> ', data);
+            data.items.data.forEach((e, i) => {
+                e.index = i;
+                if (e.color) {
+                    const rgb = JSON.parse(e.color)
+                    e.color = `rgb(${rgb.r},${rgb.g},${rgb.b},${rgb.a})`;
+                }
+            })
+            console.log('data.items.data :>> ', data.items.data);
+            setSearchList(data.items.data)
+
+        } catch (error) {
+            console.log('error :>> ', error);
+        }
     }
 
     /* Dashboard */
@@ -715,7 +789,10 @@ const mapPage = () => {
                     <Col span={6}>
                         <button
                             className="btn btn-light btn-sm"
-                            onClick={() => setVisibleSearch(true)}
+                            onClick={() => {
+                                apiSearchData({})
+                                setVisibleSearch(true)
+                            }}
                         >
                             <img width="100%" src="/assets/images/search.png" />
                         </button>
@@ -841,10 +918,10 @@ const mapPage = () => {
 
             <div id="container" hidden={!changmap}>
                 <div id="left">
-                    <div id="map-left" class="map" ref={googlemapLeft}></div>
+                    <div id="map-left" className="map" ref={googlemapLeft}></div>
                 </div>
                 <div id="right">
-                    <div id="map-right" class="map" ref={googlemapRight}></div>
+                    <div id="map-right" className="map" ref={googlemapRight}></div>
                 </div>
             </div>
             {/* Shape File */}
@@ -1065,30 +1142,28 @@ const mapPage = () => {
                                 <div className="col-3">
                                     <Form.Item
                                         label=""
-                                        name="name_layer"
+                                        name="project_name"
                                     >
                                         <Select
                                             placeholder="ชื่อโครงการ"
                                             allowClear
                                         >
-                                            <Option value="male">male</Option>
-                                            <Option value="female">female</Option>
-                                            <Option value="other">other</Option>
+                                            <Option value="project_na">ชื่อโครงการ</Option>
+                                            <Option value="partype">เลขที่โฉนด</Option>
+                                            <Option value="">ลำดับแปลงที่ดิน</Option>
                                         </Select>
                                     </Form.Item>
                                 </div>
                                 <div className="col-3">
                                     <Form.Item
                                         label=""
-                                        name="name_layer"
+                                        name="layer"
                                     >
                                         <Select
                                             placeholder="ชั้นข้อมูล"
                                             allowClear
                                         >
-                                            <Option value="male">male</Option>
-                                            <Option value="female">female</Option>
-                                            <Option value="other">other</Option>
+                                            {layerList.map(e => <Option value={e.id}>{e.name_layer}</Option>)}
                                         </Select>
                                     </Form.Item>
                                 </div>
@@ -1105,45 +1180,41 @@ const mapPage = () => {
                                 <div className="col-4">
                                     <Form.Item
                                         label=""
-                                        name="name_layer"
+                                        name="prov"
                                     >
                                         <Select
                                             placeholder="จังหวัด"
                                             allowClear
+                                            onChange={(e) => onChangeProv(e, formDashboard)}
                                         >
-                                            <Option value="male">male</Option>
-                                            <Option value="female">female</Option>
-                                            <Option value="other">other</Option>
+                                            {provinceList.map(e => <Option value={e.name}>{e.name}</Option>)}
                                         </Select>
                                     </Form.Item>
                                 </div>
                                 <div className="col-4">
                                     <Form.Item
                                         label=""
-                                        name="name_layer"
+                                        name="amp"
                                     >
                                         <Select
                                             placeholder="อำเภอ"
                                             allowClear
+                                            onChange={(e) => onChangeAmp(e, formDashboard)}
                                         >
-                                            <Option value="male">male</Option>
-                                            <Option value="female">female</Option>
-                                            <Option value="other">other</Option>
+                                            {districtList.map(e => <Option value={e.name}>{e.name}</Option>)}
                                         </Select>
                                     </Form.Item>
                                 </div>
                                 <div className="col-4">
                                     <Form.Item
                                         label=""
-                                        name="name_layer"
+                                        name="tam"
                                     >
                                         <Select
                                             placeholder="ตำบล"
                                             allowClear
                                         >
-                                            <Option value="male">male</Option>
-                                            <Option value="female">female</Option>
-                                            <Option value="other">other</Option>
+                                            {subDistrictList.map(e => <Option value={e.name}>{e.name}</Option>)}
                                         </Select>
                                     </Form.Item>
                                 </div>
@@ -1253,30 +1324,28 @@ const mapPage = () => {
                             <div className="col-3">
                                 <Form.Item
                                     label=""
-                                    name="name_layer"
+                                    name="project_name"
                                 >
                                     <Select
                                         placeholder="ชื่อโครงการ"
                                         allowClear
                                     >
-                                        <Option value="male">male</Option>
-                                        <Option value="female">female</Option>
-                                        <Option value="other">other</Option>
+                                        <Option value="project_na">ชื่อโครงการ</Option>
+                                        <Option value="partype">เลขที่โฉนด</Option>
+                                        <Option value="">ลำดับแปลงที่ดิน</Option>
                                     </Select>
                                 </Form.Item>
                             </div>
                             <div className="col-3">
                                 <Form.Item
                                     label=""
-                                    name="name_layer"
+                                    name="layer"
                                 >
                                     <Select
                                         placeholder="ชั้นข้อมูล"
                                         allowClear
                                     >
-                                        <Option value="male">male</Option>
-                                        <Option value="female">female</Option>
-                                        <Option value="other">other</Option>
+                                        {layerList.map(e => <Option value={e.id}>{e.name_layer}</Option>)}
                                     </Select>
                                 </Form.Item>
                             </div>
@@ -1293,45 +1362,41 @@ const mapPage = () => {
                             <div className="col-4">
                                 <Form.Item
                                     label=""
-                                    name="name_layer"
+                                    name="prov"
                                 >
                                     <Select
                                         placeholder="จังหวัด"
                                         allowClear
+                                        onChange={(e) => onChangeProv(e, formSearch)}
                                     >
-                                        <Option value="male">male</Option>
-                                        <Option value="female">female</Option>
-                                        <Option value="other">other</Option>
+                                        {provinceList.map(e => <Option value={e.name}>{e.name}</Option>)}
                                     </Select>
                                 </Form.Item>
                             </div>
                             <div className="col-4">
                                 <Form.Item
                                     label=""
-                                    name="name_layer"
+                                    name="amp"
                                 >
                                     <Select
                                         placeholder="อำเภอ"
                                         allowClear
+                                        onChange={(e) => onChangeAmp(e, formSearch)}
                                     >
-                                        <Option value="male">male</Option>
-                                        <Option value="female">female</Option>
-                                        <Option value="other">other</Option>
+                                        {districtList.map(e => <Option value={e.name}>{e.name}</Option>)}
                                     </Select>
                                 </Form.Item>
                             </div>
                             <div className="col-4">
                                 <Form.Item
                                     label=""
-                                    name="name_layer"
+                                    name="tam"
                                 >
                                     <Select
                                         placeholder="ตำบล"
                                         allowClear
                                     >
-                                        <Option value="male">male</Option>
-                                        <Option value="female">female</Option>
-                                        <Option value="other">other</Option>
+                                        {subDistrictList.map(e => <Option value={e.name}>{e.name}</Option>)}
                                     </Select>
                                 </Form.Item>
                             </div>
@@ -1354,7 +1419,7 @@ const mapPage = () => {
                                                 width: "25px",
                                                 height: "25px",
                                                 borderRadius: "2px",
-                                                background: e,
+                                                background: e.color,
                                                 border: "1px solid black",
                                             }}
                                         />
@@ -1363,12 +1428,12 @@ const mapPage = () => {
 
                                         <div className="row">
                                             <label>PROJECT_NAME :</label>
-                                            <p className="pl-3">โครงการท่อส่งก๊าซธรรมชาติจากบางปรกงไปโรงไฟฟ้าพระนคร</p>
+                                            <p className="pl-3">{e.project_na}</p>
                                         </div>
 
                                         <div className="row">
                                             <label>PARTYPE :</label>
-                                            <p className="pl-3">โฉนดที่ดิน</p>
+                                            <p className="pl-3">{e.partype}</p>
                                         </div>
 
                                         <div className="pl-2">
@@ -1376,19 +1441,19 @@ const mapPage = () => {
                                                 <div className="col-4">
                                                     <div className="row">
                                                         <label>PARLABEL1 :</label>
-                                                        <p className="pl-3">1000</p>
+                                                        <p className="pl-3">{e.parlabel1}</p>
                                                     </div>
                                                 </div>
                                                 <div className="col-4">
                                                     <div className="row">
                                                         <label>PARLABEL2 :</label>
-                                                        <p className="pl-3">23</p>
+                                                        <p className="pl-3">{e.parlabel2}</p>
                                                     </div>
                                                 </div>
                                                 <div className="col-4">
                                                     <div className="row">
                                                         <label>PARLABEL3 :</label>
-                                                        <p className="pl-3">455</p>
+                                                        <p className="pl-3">{e.parlabel3}</p>
                                                     </div>
                                                 </div>
                                             </div>
@@ -1397,13 +1462,13 @@ const mapPage = () => {
                                                 <div className="col-4">
                                                     <div className="row">
                                                         <label>PARLABEL4 :</label>
-                                                        <p className="pl-3">5037 || 7520-3</p>
+                                                        <p className="pl-3">{e.parlabel4}</p>
                                                     </div>
                                                 </div>
                                                 <div className="col-4">
                                                     <div className="row">
                                                         <label>PARLABEL5 :</label>
-                                                        <p className="pl-3">-</p>
+                                                        <p className="pl-3">{e.parlabel5}</p>
                                                     </div>
                                                 </div>
                                                 <div className="col-4">
