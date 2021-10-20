@@ -58,6 +58,7 @@ const mapPage = () => {
             google.maps.event.addListener(_map, "mousemove", (event) => {
                 getLatLon(event);
             });
+            clickMapShowLatLag(_map)
         });
         loadShapeFile()
     }, []);
@@ -388,10 +389,21 @@ const mapPage = () => {
         $("#openFullscreen").fadeToggle();
         $("#closeFullscreen").fadeToggle("slow");
     };
+    /* click map show lat lag */
+    const clickMapShowLatLag = (map) => {
+        google.maps.event.addListener(map, "click", (event) => {
 
+            let infoWindow = new google.maps.InfoWindow({
+                content: `${event.latLng}`,
+                position: event.latLng,
+            })
+            infoWindow.open(map)
+        })
+    }
     /* เปิดปิดเส้นวัดระยะ */
     const [openLine, setOpenLine] = useState(true) //ปุ่มเปิดปิด Line
     const clickLine = () => {
+        google.maps.event.clearListeners(map, 'click');
         let count = 0 //นับจำนวนครั้งที่กด วัดระยะ ถ้ากด3ครั้งให้ยกเลิกเมพใหม่
         let origin //จุดมาร์คที่ 1
         let destination //จุดมาร์คที่ 2
@@ -450,6 +462,7 @@ const mapPage = () => {
             })
         } else {
             google.maps.event.clearListeners(map, 'click');
+            clickMapShowLatLag(map)
         }
     }
     /* เคลียเมพ */
@@ -546,7 +559,6 @@ const mapPage = () => {
             });
         }
     }
-
     /* change map */
     const [imgChangeMap, setImgChangeMap] = useState("https://images.adsttc.com/media/images/6141/d09d/f91c/8104/f800/009b/large_jpg/Feature_Image.jpg?1631703175")
     const [txtChangeMap, setTextChangeMap] = useState("Satellite")
