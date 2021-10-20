@@ -585,6 +585,49 @@ const mapPage = () => {
                 break;
         }
     }
+
+    /* วัดขนาดพื่นที่ */
+    const areaDistance = () => {
+        const drawingManager = new google.maps.drawing.DrawingManager({
+            drawingMode: google.maps.drawing.OverlayType.CIRCLE,
+            drawingControl: true,
+            drawingControlOptions: {
+                position: google.maps.ControlPosition.TOP_CENTER,
+                drawingModes: [
+                    google.maps.drawing.OverlayType.CIRCLE,
+                    google.maps.drawing.OverlayType.POLYGON,
+                    google.maps.drawing.OverlayType.POLYLINE,
+                    google.maps.drawing.OverlayType.RECTANGLE,
+                ],
+            }
+        });
+        // google.maps.event.addListener(drawingManager, 'circlecomplete', function (circle) {
+        //     var radius = circle.getRadius();
+        //     alert(radius)
+        //     console.log(circle)
+        // });
+        google.maps.event.addListener(drawingManager, 'overlaycomplete', function (event) {
+            if (event.type == 'circle') {
+                var radius = event.overlay.getRadius();
+                // alert(radius)
+                // console.log(radius)
+                console.log(event.type)
+            }
+            if (event.type == 'polygon') {
+                console.log(event.overlay.latLngs)
+            }
+
+            if (event.type == 'polyline') {
+                alert("polyline")
+            }
+            if (event.type == 'rectangle') {
+                alert("rectangle")
+            }
+            console.log(event.type)
+        });
+
+        drawingManager.setMap(map);
+    }
     /* -------------------------------------------------------------------------------------- */
 
     /* Search */
@@ -704,7 +747,7 @@ const mapPage = () => {
                     </button>
                 </Col>
                 <Col span={6} className="pt-2">
-                    <button className="btn btn-light btn-sm"  >
+                    <button className="btn btn-light btn-sm" onClick={areaDistance}>
                         <img
                             width="100%"
                             src="/assets/images/polegon.png"
