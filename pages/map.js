@@ -1394,8 +1394,8 @@ const mapPage = () => {
                                         allowClear
                                     >
                                         <Option value="project_na">ชื่อโครงการ</Option>
-                                        <Option value="partype">เลขที่โฉนด</Option>
-                                        <Option value="">ลำดับแปลงที่ดิน</Option>
+                                        <Option value="objectid">เลขที่โฉนด</Option>
+                                        <Option value="parlabel1">ลำดับแปลงที่ดิน</Option>
                                     </Select>
                                 </Form.Item>
                             </div>
@@ -1572,7 +1572,7 @@ const mapPage = () => {
                             }
                             {
                                 rasterDataDron1.length > 3 ? (
-                                    <h5 style={{ cursor: "pointer", marginLeft: "220px" }} className="text-info" hidden={showMoreDron.dron1} onClick={() => { setLoadmore1({ ...loadmore1, dowMore: rasterDataDow1.length }), setShowMoreDron({ ...showMoreDron, dron1: true }) }}>
+                                    <h5 style={{ cursor: "pointer", marginLeft: "220px" }} className="text-info" hidden={showMoreDron.dron1} onClick={() => { setLoadmore1({ ...loadmore1, dronMore: rasterDataDow1.length }), setShowMoreDron({ ...showMoreDron, dron1: true }) }}>
                                         ...Load More
                                     </h5>
                                 ) : null
@@ -1610,7 +1610,7 @@ const mapPage = () => {
                             }
                             {
                                 rasterDataDron1.length > 3 ? (
-                                    <h5 style={{ cursor: "pointer", marginLeft: "220px" }} className="text-info" hidden={showMoreDron.dron2} onClick={() => { setLoadmore2({ ...loadmore2, dowMore: rasterDataDow1.length }), setShowMoreDron({ ...showMoreDron, dron2: true }) }}>
+                                    <h5 style={{ cursor: "pointer", marginLeft: "220px" }} className="text-info" hidden={showMoreDron.dron2} onClick={() => { setLoadmore2({ ...loadmore2, dronMore: rasterDataDow1.length }), setShowMoreDron({ ...showMoreDron, dron2: true }) }}>
                                         ...Load More
                                     </h5>
                                 ) : null
