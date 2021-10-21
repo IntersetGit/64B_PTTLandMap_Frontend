@@ -6,6 +6,8 @@
     flex-direction: row;
     border-radius: 10px;
     overflow: hidden;
+    min-width: 450px;
+    cursor: all-scroll;
 }
 
 .date {
@@ -37,7 +39,7 @@
 
 .datepicker {
     position: absolute;
-    left: 30%;
+    left: 32.5%;
     bottom: 150px;
     transform: translate(-50%, -50%);
     margin: 0 auto;
@@ -47,4 +49,6 @@
     flex-direction: column;
     border-radius: 10px;
     height: 130px;
+    cursor: all-scroll;
+    z-index: 9;
 }

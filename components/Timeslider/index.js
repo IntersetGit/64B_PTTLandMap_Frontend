@@ -189,7 +189,7 @@ function Timeslide({ data = testdata, onChange = (e) => { }, onDateChange = (e) 
                     onChange={val => setDatevalue(val)}
                     onOpenChange={onOpenChange}
                 />
-                <Button type="primary" style={{ width: "100px", alignSelf: "flex-end", marginTop: "5px", fontWeight: "bold" }}>Start</Button>
+                <Button type="primary" size="middle" style={{ width: "100px", alignSelf: "flex-end", marginTop: "8px", fontWeight: "bold" }}>Start</Button>
             </div>
             <div id="mydiv">
                 {/* -----------------------------PLAYER--------------------------------------------- */}
@@ -206,15 +206,15 @@ function Timeslide({ data = testdata, onChange = (e) => { }, onDateChange = (e) 
                                 <PlayCircleOutlined onClick={() => setIsRunning(!isRunning)} style={{ fontSize: "35px ", color: "#FFF" }} />
                             }
                         </div>
-                        <div className="btnleft" style={{ width: "5%" }}>
-                            <LeftCircleOutlined onClick={Previewstep} style={{ fontSize: "25px ", color: "#FFF" }} />
+                        <div className="btnleft" style={{ width: "5%", textAlign: "center" }}>
+                            <LeftCircleOutlined onClick={Previewstep} style={{ fontSize: "25px ", color: "#FFF", }} />
                         </div>
                         <div className={styles.slide} style={{ width: "80%", flexDirection: "column", }}>
                             <span style={{ color: "white", fontWeight: "bold", padding: "0 5px" }}>Time Slider</span>
                             <span style={{ color: "white", fontWeight: "bold", padding: "0 5px" }}>{marks && marks[value]?.label ? marks[value]?.label : ""}</span>
                             <SliderCustom onChange={e => setValue(e)} value={value} tipFormatter={(e) => marks[e]?.label || e} step={10} max={max} marks={marks} defaultValue={0} trackStyle={{ backgroundColor: "#BC9945", }} />
                         </div>
-                        <div className="btnright" style={{ width: "5%" }}>
+                        <div className="btnright" style={{ width: "5%", textAlign: "center" }}>
                             <RightCircleOutlined onClick={Nextstep} style={{ fontSize: "25px ", color: "#FFF" }} />
                         </div>
                     </div>

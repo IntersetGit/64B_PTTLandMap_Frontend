@@ -27,6 +27,7 @@ import RefreshToken from "../util/RefreshToken";
 import axios from "axios";
 import { Cookies } from "react-cookie";
 import jwt_decode from "jwt-decode";
+import Timeslide from "../components/Timeslider";
 
 const cookies = new Cookies();
 
@@ -40,6 +41,8 @@ const mapPage = () => {
     const { user } = useSelector(({ user }) => user);
     const centerMap = { lat: 13.78, lng: 100.55 }
     const [layerData, setLayerData] = useState([])
+
+    const [slidemapshow, setSlidemapshow] = useState(false);
 
     /* จ อ ต */
 
@@ -802,14 +805,16 @@ const mapPage = () => {
             },
         }
     }
-
+    const ontimeslider = () => {
+        setSlidemapshow(!slidemapshow)
+    }
 
     return (
         <Layout isMap={true}>
             <Head>
                 <title>PTT Land Map</title>
             </Head>
-
+            <Timeslide visible={slidemapshow} />
             <div className="tools-group-layer">
                 <button className="btn btn-light btn-sm" onClick={() => setVisibleShapeFile(true)}>
                     {/* <i className="fa fa-window-restore" /> */}
@@ -867,6 +872,7 @@ const mapPage = () => {
                         <img
                             width="100%"
                             src="/assets/images/home.png"
+                            title="้home"
                         />
                     </button>
                 </Col>
@@ -895,10 +901,11 @@ const mapPage = () => {
                     </button>
                 </Col>
                 <Col span={6} className="pt-2">
-                    <button className="btn btn-light btn-sm" >
+                    <button className="btn btn-light btn-sm" onClick={ontimeslider} >
                         <img
                             width="100%"
                             src="/assets/images/arrow_back_time.png"
+                            title="timeslide"
                         />
                     </button>
                 </Col>
