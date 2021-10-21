@@ -5,7 +5,6 @@ const cookies = new Cookies();
 export default async (refreshtokenval) => {
     try {
         if (refreshtokenval) {
-
             const { data } = await axios({
                 method: "get",
                 url: `${process.env.NEXT_PUBLIC_SERVICE}/provider/refreshToken`,
