@@ -21,7 +21,7 @@ import {
 import Head from "next/head";
 import { useSelector } from "react-redux";
 import { SketchPicker } from "react-color";
-import { CaretRightOutlined, UploadOutlined, EditFilled } from "@ant-design/icons";
+import { CaretRightOutlined, UploadOutlined, EditFilled, ExpandOutlined } from "@ant-design/icons";
 import API from "../util/Api";
 import RefreshToken from "../util/RefreshToken";
 import axios from "axios";
@@ -311,6 +311,24 @@ const mapPage = () => {
         }
     }
 
+    const goTolayer = (id, type) => {
+        console.log('id :>> ', id);
+        console.log('type :>> ', type);
+        const arr = (type == "search") ? [...layerSearchData] : [...layerData]
+        console.log('arr :>> ', arr);
+        const index = arr.findIndex(e => e.id == id)
+        if (index != -1) {
+            const layer = arr[index].layer
+            const bounds = new google.maps.LatLngBounds();
+            layer.forEach((feature) => {
+                feature.getGeometry().forEachLatLng((latlng) => {
+                    bounds.extend(latlng);
+                });
+            });
+            map.fitBounds(bounds);
+        }
+    };
+
     const clearMapData = (id) => {
         const arr = [...layerData]
         const index = arr.findIndex(e => e.id == id)
@@ -329,7 +347,7 @@ const mapPage = () => {
         try {
             const { data } = await API.get(`/shp/shapeData?id=${id}`);
             const GeoJson = data.items.shape;
-            console.log('GeoJson :>> ', GeoJson);
+            // console.log('GeoJson :>> ', GeoJson);
             const bounds = new google.maps.LatLngBounds();
             const layer = new google.maps.Data();
             layer.addGeoJson(GeoJson)
@@ -705,27 +723,28 @@ const mapPage = () => {
     const [sumData, setSumData] = useState(10)
     const [amount, setAmount] = useState(0)
     const [searchAllList, setSearchAllList] = useState([])
+    const [firstSearc, setFirstSearc] = useState(true)
 
     const onFinishSearch = (value) => {
-        apiSearchData({})
+        apiSearchData({ ...value })
     }
 
     const onFinishFailedSearch = (error) => {
         console.log('error :>> ', error);
     }
 
-    const apiSearchData = async ({ }) => {
+    const apiSearchData = async ({ layer_group = "", project_name = "", prov = "", search = "", tam = "", amp = "" }) => {
         try {
-            const { data } = await API.get(`/shp/getSearchData?`)
+            const { data } = await API.get(`/shp/getSearchData?layer_group=${layer_group}&project_name=${project_name}&prov=${prov}&search=${search}&tam=${tam}&amp=${amp}&`)
             const _arr = []
             setAmount(data.items.amount_data)
             setSumData(10)
             data.items.data.forEach((e, i) => {
                 e.index = i + 1;
-                if (e.color) {
-                    const rgb = JSON.parse(e.color)
-                    e.color = `rgb(${rgb.r},${rgb.g},${rgb.b},${rgb.a})`;
-                }
+                // if (e.color) {
+                //     const rgb = JSON.parse(e.color)
+                //     e.color = `rgb(${rgb.r},${rgb.g},${rgb.b},${rgb.a})`;
+                // }
                 if (i < 10) _arr.push(e)
             })
             setSearchList(_arr)
@@ -736,8 +755,14 @@ const mapPage = () => {
         }
     }
 
-    const switchGeom = async (value, item) => {
+    const switchGeom = async (value, item, i) => {
         // console.log('value :>> ', value);
+        item.checked = value
+        item.parlabel1 = 500
+        const _searchList = [...searchList]
+        _searchList[i] = item
+        setSearchList([..._searchList])
+
         if (!value) {
             const arr = [...layerSearchData]
             const index = arr.findIndex(e => e.id == item.index)
@@ -867,7 +892,10 @@ const mapPage = () => {
                         <button
                             className="btn btn-light btn-sm"
                             onClick={() => {
-                                // apiSearchData({})
+                                if (firstSearc) {
+                                    apiSearchData({})
+                                    setFirstSearc(false)
+                                }
                                 setVisibleSearch(true)
                             }}
                         >
@@ -1009,6 +1037,8 @@ const mapPage = () => {
                 placement={"left"}
                 visible={visibleShapeFile}
                 onClose={() => setVisibleShapeFile(false)}
+                maskClosable={false}
+                style={{ width: visibleShapeFile ? 350 : 0 }}
             >
                 <Tabs>
                     <TabPane tab="ชั้นข้อมูล" key="1">
@@ -1024,7 +1054,7 @@ const mapPage = () => {
                                                     Object.assign(
                                                         <div className="pt-2" key={index}>
                                                             <Row>
-                                                                <Col xs={20}>
+                                                                <Col xs={19}>
                                                                     {/* <Checkbox
                                                                         checked={x.checked}
                                                                         onClick={(value) =>
@@ -1036,7 +1066,16 @@ const mapPage = () => {
                                                                     <Switch size="small" checked={x.checked} onChange={(value) => checkboxLayer(value, i, index)} /> {x.name_layer}
                                                                 </Col>
 
-                                                                <Col xs={4} style={{ paddingTop: 3 }}>
+                                                                <Col xs={2} >
+                                                                    {
+                                                                        x.checked ?
+                                                                            <a onClick={() => goTolayer(x.id)}>
+                                                                                <ExpandOutlined />
+                                                                            </a> : null
+                                                                    }
+                                                                </Col>
+
+                                                                <Col xs={3} style={{ paddingTop: 3 }}>
                                                                     <a onClick={() => openColor(i, index)}>
                                                                         <div
                                                                             style={{
@@ -1199,6 +1238,8 @@ const mapPage = () => {
                 placement={"left"}
                 visible={visibleDashboard}
                 onClose={() => setVisibleDashboard(false)}
+                maskClosable={false}
+                style={{ width: visibleDashboard ? 650 : 0 }}
             >
                 <>
                     <div>
@@ -1213,7 +1254,7 @@ const mapPage = () => {
                                 <div className="col-4">
                                     <Form.Item
                                         label=""
-                                        name="name_layer"
+                                        name="search"
                                     >
                                         <Input placeholder="Search" />
                                     </Form.Item>
@@ -1228,15 +1269,15 @@ const mapPage = () => {
                                             allowClear
                                         >
                                             <Option value="project_na">ชื่อโครงการ</Option>
-                                            <Option value="partype">เลขที่โฉนด</Option>
-                                            <Option value="">ลำดับแปลงที่ดิน</Option>
+                                            <Option value="objectid">เลขที่โฉนด</Option>
+                                            <Option value="parlabel1">ลำดับแปลงที่ดิน</Option>
                                         </Select>
                                     </Form.Item>
                                 </div>
                                 <div className="col-3">
                                     <Form.Item
                                         label=""
-                                        name="layer"
+                                        name="layer_group"
                                     >
                                         <Select
                                             placeholder="ชั้นข้อมูล"
@@ -1382,10 +1423,15 @@ const mapPage = () => {
                 placement={"left"}
                 visible={visibleSearch}
                 onClose={() => setVisibleSearch(false)}
+                maskClosable={false}
+                style={{ width: visibleSearch ? 650 : 0 }}
             >
                 <div>
                     <Form
                         form={formSearch}
+                        initialValues={{
+                            project_name: "project_na"
+                        }}
                         onFinish={onFinishSearch}
                         onFinishFailed={onFinishFailedSearch}
                         layout="vertical"
@@ -1395,7 +1441,7 @@ const mapPage = () => {
                             <div className="col-4">
                                 <Form.Item
                                     label=""
-                                    name="name_layer"
+                                    name="search"
                                 >
                                     <Input placeholder="Search" />
                                 </Form.Item>
@@ -1418,7 +1464,7 @@ const mapPage = () => {
                             <div className="col-3">
                                 <Form.Item
                                     label=""
-                                    name="layer"
+                                    name="layer_group"
                                 >
                                     <Select
                                         placeholder="ชั้นข้อมูล"
@@ -1553,7 +1599,11 @@ const mapPage = () => {
                                                 </div>
                                                 <div className="col-4">
                                                     <button className="btn"><EditFilled /></button>
-                                                    <Switch size="small" checked={e.checked} onChange={(value) => switchGeom(value, e)} />
+                                                    <Switch size="small" checked={e.checked} onChange={(value) => switchGeom(value, e, i)} />
+                                                    {e.checked ?
+                                                        <button className="btn" onClick={() => goTolayer(e.index, "search")}>
+                                                            <ExpandOutlined />
+                                                        </button> : null}
                                                 </div>
                                             </div>
                                         </div>
