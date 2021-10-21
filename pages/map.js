@@ -618,24 +618,33 @@ const mapPage = () => {
     /* change map */
     const [imgChangeMap, setImgChangeMap] = useState("https://images.adsttc.com/media/images/6141/d09d/f91c/8104/f800/009b/large_jpg/Feature_Image.jpg?1631703175")
     const [txtChangeMap, setTextChangeMap] = useState("Satellite")
+    const [changeMapButtom, setChangeMapButtom] = useState(false)
+
+    const clickChangeMap = () => {
+        $("#changeMap").fadeToggle()
+        setChangeMapButtom(!changeMapButtom)
+        if (!changeMapButtom) {
+            map.setMapTypeId(google.maps.MapTypeId.HYBRID)
+            setTextChangeMap("Layers")
+            setImgChangeMap("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTwyYk7BSUClNOfiGhMybXiO4KbV0xOI8nOg_Qy9T9quhUOT4fNB8ZcUrcTPinYtaEsLFU&usqp=CAU")
+        } else {
+            map.setMapTypeId(google.maps.MapTypeId.ROADMAP)
+            setTextChangeMap("satellite")
+            setImgChangeMap("https://images.adsttc.com/media/images/6141/d09d/f91c/8104/f800/009b/large_jpg/Feature_Image.jpg?1631703175")
+        }
+    }
     const changeMap = (info) => {
         switch (info) {
             case "Terrain":
                 map.setMapTypeId("terrain");
-                setImgChangeMap("https://images.adsttc.com/media/images/6141/d09d/f91c/8104/f800/009b/large_jpg/Feature_Image.jpg?1631703175")
-                setTextChangeMap("Terrain")
                 break;
             case "Traffic":
                 const trafficLayer = new google.maps.TrafficLayer();
                 trafficLayer.setMap(map);
-                setImgChangeMap("https://www.nsm.or.th/images/IT-Category/IT-Tips/GoogleMaps/20200204-2PNG.PNG")
-                setTextChangeMap("Traffic")
                 break
             case "Transit":
                 const transitLayer = new google.maps.TransitLayer();
                 transitLayer.setMap(map)
-                setImgChangeMap("https://www.howtogeek.com/wp-content/uploads/2010/03/minigooglemaps04.png")
-                setTextChangeMap("Transit")
                 break
             default:
                 break;
@@ -946,7 +955,7 @@ const mapPage = () => {
                 </Col>
             </div>
             <div className="tools-map-area3" >
-                <button className="btn btn-light" onClick={() => $("#changeMap").fadeToggle()}>
+                <button className="btn btn-light" onClick={() => clickChangeMap()}>
                     <img width="90" height="90" style={{ borderRadius: "10px" }} src={imgChangeMap} alt="" />
                     <span style={{ position: "absolute", bottom: "15px", left: "25px", textAlign: "center" }}>
                         {txtChangeMap}
@@ -956,19 +965,19 @@ const mapPage = () => {
                     <span style={{ display: "flex", justifyContent: "space-around" }} >
                         <span style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
                             <button className="btn btn-light btn-sm" onClick={() => changeMap("Terrain")}>
-                                <img width="55" height="55" style={{ borderRadius: "10px" }} src="https://images.adsttc.com/media/images/6141/d09d/f91c/8104/f800/009b/large_jpg/Feature_Image.jpg?1631703175" alt="" />
+                                <img width="55" height="55" style={{ borderRadius: "10px" }} src="assets/images/icon-chang-map/Terrain.png" alt="" />
                             </button>
                             <h5 className="text-info" >Terrain</h5>
                         </span>
                         <span style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
                             <button className="btn btn-light btn-sm" onClick={() => changeMap("Traffic")}>
-                                <img width="55" height="55" style={{ borderRadius: "10px" }} src="https://www.nsm.or.th/images/IT-Category/IT-Tips/GoogleMaps/20200204-2PNG.PNG" alt="" />
+                                <img width="55" height="55" style={{ borderRadius: "10px" }} src="assets/images/icon-chang-map/Traffic.png" alt="" />
                             </button>
                             <h5 className="text-info" >Traffic</h5>
                         </span>
                         <span style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
                             <button className="btn btn-light btn-sm" onClick={() => changeMap("Transit")}>
-                                <img width="55" height="55" style={{ borderRadius: "10px" }} src="https://www.howtogeek.com/wp-content/uploads/2010/03/minigooglemaps04.png" alt="" />
+                                <img width="55" height="55" style={{ borderRadius: "10px" }} src="assets/images/icon-chang-map/Transit.png" alt="" />
                             </button>
                             <h5 className="text-info" >Transit</h5>
                         </span>
