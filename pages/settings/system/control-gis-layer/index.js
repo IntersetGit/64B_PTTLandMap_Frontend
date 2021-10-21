@@ -20,6 +20,7 @@ import {
   Radio,
   DatePicker
 } from "antd";
+import { SketchPicker } from "react-color";
 const { Search } = Input;
 const { Option } = Select;
 const usersSystemPage = () => {
@@ -34,9 +35,15 @@ const usersSystemPage = () => {
   const [menuItem, setMenuItem] = useState([]);
   const [listGroup, setListGroup] = useState([]);
   const [dataEdit, setDataEdit] = useState([]);
+  const [openColorUpload, setOpenColorUpload] = useState(false);
+  const [colorUpload, setColorUpload] = useState({
+    hex: "red",
+    rgb: { r: 255, g: 0, b: 0, a: 1 },
+  });
   // const [buttonCreate, setButtonCreate] = useState(true); //สถานะเปิดปิดsubmit ตอนmodal create
   const [form] = Form.useForm();
   const [formCreate] = Form.useForm();
+  const [formEdit] = Form.useForm();
   const columns = [
     {
       key: "1",
@@ -117,6 +124,28 @@ const usersSystemPage = () => {
       });
   };
 
+  const [id, setId] = useState(null)
+  const onFinishCreate = async (value) => {
+    console.log(`value`, value)
+    setLoading(true);
+    Api.post("masterdata/masLayersShape", { ...value, id })
+      .then(async (data) => {
+        setIsModalVisible2({ create: false, edit: false });
+        reload();
+        setLoading(false);
+        formCreate.resetFields();
+        await Swal.fire("", "บันทึกข้อมูลเรียบร้อย", "success");
+        window.location.reload();
+        setId(null)
+      })
+      .catch((error) => {
+        console.log(error);
+        setLoading(false);
+        setId(null)
+      });
+
+  };
+
   const reload = (search = null) => {
     setLoading(true);
     Api.get("masterdata/masLayersShape", search != null ? { search: search } : {})
@@ -195,6 +224,7 @@ const usersSystemPage = () => {
   };
 
   const handleEdit = async (show) => {
+    setColorUpload(JSON.parse(show.color_layer))
     setIsModalVisible(true)
     console.log(`show`, show)
     form.setFieldsValue(show);
@@ -202,6 +232,7 @@ const usersSystemPage = () => {
 
   const onFinishEdit = async (data) => {
     console.log(`data`, data)
+    console.log('colorUpload', colorUpload);
     try {
       Swal.fire({
         title: "กรุณายืนยันการแก้ไขข้อมูล",
@@ -215,6 +246,7 @@ const usersSystemPage = () => {
         if (result.isConfirmed) {
           let resp = await Api.post("masterdata/masLayersShape", {
             ...data,
+            color_layer: JSON.stringify(colorUpload),
             id: form.getFieldValue().id,
           });
           await Swal.fire("", "แก้ไขข้อมูลเรียบร้อยแล้ว", "success");
@@ -240,8 +272,14 @@ const usersSystemPage = () => {
   };
 
   const handleOk2 = (form) => {
-    form.submit();
+    if (form === "formCreate") {
+      formCreate.submit();
+    }
+    if (form === "formEdit") {
+      formEdit.submit();
+    }
   };
+
   const handleCancel2 = () => {
     setIsModalVisible2(false);
     form.resetFields();
@@ -249,36 +287,6 @@ const usersSystemPage = () => {
   const handleCancel = () => {
     setIsModalVisible(false);
     form.resetFields();
-  };
-
-  const onFinishCreate = async (value) => {
-    let filterRoles = await roles.find(
-      (data) => data.roles_name === value.roles_id
-    );
-    setLoading(true);
-    Api.post("/system/addUserAD", {
-      username: value.username,
-      roles_id: filterRoles.id,
-    })
-      .then((data) => {
-        Swal.fire("", "บันทึกข้อมูลเรียบร้อย", "success");
-        setStatusValidation([]);
-        setIsModalVisible({ create: false, edit: false });
-        setLoading(false);
-        formCreate.resetFields();
-        reload();
-        setButtonCreate(true);
-      })
-      .catch((error) => {
-        Swal.fire("", "มีบางอย่างผิดพลาด หรือมีผู้ใช้ในระบบแล้ว", "error");
-        console.log(error);
-        setStatusValidation([]);
-        setIsModalVisible({ create: false, edit: false });
-        setLoading(false);
-        formCreate.resetFields();
-        reload();
-        setButtonCreate(true);
-      });
   };
 
 
@@ -366,9 +374,8 @@ const usersSystemPage = () => {
       <Modal
         title="เพิ่ม WMS ของ GIS Layer"
         visible={isModalVisible2}
-        onOk={() => handleOk2}
+        onOk={() => handleOk2("formCreate")}
         onCancel={handleCancel2}
-      // okButtonProps={{ disabled: buttonCreate }}
       >
         <Form
           form={formCreate}
@@ -380,26 +387,33 @@ const usersSystemPage = () => {
           style={{ padding: "0%  0%  0% 10%" }}
         >
           <Form.Item
-            name="typename"
+            name="name_layer"
             label="ชื่อ GIS Layer"
             rules={[{ required: true }]}
           >
             <Input />
           </Form.Item>
           <Form.Item
-            name="typename"
+            name="group_layer_id"
             label="เลือก Group Layer"
             rules={[{ required: true }]}
           >
-            <Select placeholder="เลือก Group Layer">
-              <Option value="แปลงที่ดิน">แปลงที่ดิน</Option>
+            <Select
+              placeholder="กลุ่มผู้ใช้งาน"
+            // defaultValue=""
+            >
+              {select && select.map((data, index) => (
+                <Option key={index} value={data.id}>
+                  {data.group_name}
+                </Option>
+              ))}
             </Select>
           </Form.Item>
           <Form.Item name="url" label="URL" rules={[{ required: true }, { type: "url" }]}>
             <Input placeholder="URL" />
           </Form.Item>
           <Form.Item
-            name=""
+            name="wms_name"
             label="Layer Name"
             rules={[{ required: true }]}
           >
@@ -408,7 +422,7 @@ const usersSystemPage = () => {
 
           {menuItem}
           <Form.Item
-            name=""
+            name="type_server"
             label="GIS Server Type"
             wrapperCol={{ span: 10 }}
 
@@ -457,9 +471,7 @@ const usersSystemPage = () => {
               { required: true, message: "กรุณากรอกข้อมูล กลุ่มผู้ใช้งาน" },
             ]}
           ><Select
-            placeholder="กลุ่มผู้ใช้งาน"
-          // defaultValue=""
-          >
+            placeholder="กลุ่มผู้ใช้งาน">
               {select && select.map((data, index) => (
                 <Option key={index} value={data.id}>
                   {data.group_name}
@@ -467,12 +479,45 @@ const usersSystemPage = () => {
               ))}
             </Select>
           </Form.Item>
-          <Form.Item
-            name="type"
-            label="สี GIS Layer"
-            rules={[{ required: true }]}
-          >
-            <Input type="color" style={{ width: '15%' }} />
+          <Form.Item name="color_layer" label="สีชั้นข้อมูล" rules={[{ required: true }]}>
+            <a onClick={() => setOpenColorUpload(!openColorUpload)}>
+              <div
+                style={{
+                  width: "36px",
+                  height: "24px",
+                  borderRadius: "2px",
+                  background: colorUpload.hex,
+                  border: "1px solid black",
+                }}
+              />
+            </a>
+            {openColorUpload ? (
+              <div
+                div
+                style={{
+                  position: "fixed",
+                  zIndex: "2",
+                  textAlign: "end",
+                }}
+              >
+                <SketchPicker
+                  color={colorUpload.rgb}
+                  onChange={({ rgb, hex }) =>
+                    setColorUpload({ ...colorUpload, rgb, hex })
+                  }
+                />
+                <footer className="footer-color">
+                  <button
+                    type="button"
+                    className="btn btn-primary btn-sm"
+                    onClick={() => setOpenColorUpload(!openColorUpload)}
+                  >
+                    save
+                  </button>
+                </footer>
+              </div>
+            ) : null}
+            {/* <Input type="color" style={{ width: '15%' }} /> */}
           </Form.Item>
         </Form>
       </Modal>

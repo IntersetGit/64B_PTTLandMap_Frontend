@@ -128,11 +128,9 @@ const index = () => {
 
   const [id, setId] = useState(null)
   const onFinishCreate = async (value) => {
-    setLoading(true);
     console.log(`value`, value)
-
     setLoading(true);
-    Api.post("/masterdata/masStatusProject", { ...value, id })
+    Api.post("masterdata/masStatusProject", { ...value, id })
       .then(async (data) => {
         setIsModalVisible({ create: false, edit: false });
         reload();
@@ -342,10 +340,10 @@ const index = () => {
       >
         <Form
           colon={false}
-          form={form}
+          form={formCreate}
           labelCol={{ span: 7 }}
           wrapperCol={{ span: 14 }}
-          onFinish={onFinishEdit}
+          onFinish={onFinishCreate}
         >
 
           <Form.Item
