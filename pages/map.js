@@ -16,12 +16,13 @@ import {
     Upload,
     Button,
     message,
-    Switch
+    Switch,
+    Slider
 } from "antd";
 import Head from "next/head";
 import { useSelector } from "react-redux";
 import { SketchPicker } from "react-color";
-import { CaretRightOutlined, UploadOutlined, EditFilled, ExpandOutlined } from "@ant-design/icons";
+import { CaretRightOutlined, UploadOutlined, EditFilled, ExpandOutlined, EyeFilled } from "@ant-design/icons";
 import API from "../util/Api";
 import RefreshToken from "../util/RefreshToken";
 import axios from "axios";
@@ -33,6 +34,7 @@ const cookies = new Cookies();
 
 const { TabPane } = Tabs;
 const { Panel } = Collapse;
+const { Meta } = Card;
 
 const { Option } = Select;
 const mapPage = () => {
@@ -466,7 +468,7 @@ const mapPage = () => {
 
     /* open close Navbar */
     const [hideNavbar, setHideNavbar] = useState(false)
-    const clickButtomHideNavbar = () => { // 
+    const clickButtomHideNavbar = () => { //
         setHideNavbar(!hideNavbar)
     };
     const menuOpenFullscreen = () => {
@@ -893,12 +895,47 @@ const mapPage = () => {
     const ontimeslider = () => {
         setSlidemapshow(!slidemapshow)
     }
+    // -------------------------------------------WMS----------------------------
+    const [selectwms, setSelectwms] = useState([])
+    const [wmsopacity, setWmsopacity] = useState(100);
+
+    const Clickwms = (items) => {
+        // console.log('itemswms :>> ', items);
+        let maptype = new WmsMapType(
+            items.id,
+            items.url, {
+            layers: items.layer_name,
+            wmsProjectKey: items.id,
+        }, {
+            opacity: wmsopacity / 100
+        }, items.type_server
+        );
+        console.log('maptype :>> ', maptype);
+        if (selectwms.some((item) => item.name == maptype.name)) {
+            let cut = selectwms.filter((item) => item.name !== maptype.name)
+            setSelectwms(cut);
+            maptype.removeFromMap(map);
+        } else {
+            setSelectwms([...selectwms, maptype]);
+            maptype.addToMap(map);
+            // maptype.zoomToWms(map);
+        }
+    }
+    const ChangeOpacity = (e) => {
+        setWmsopacity(e);
+    }
+    useEffect(() => {
+        selectwms.forEach((wms) => {
+            wms.setOpacity(wmsopacity / 100);
+        })
+    }, [wmsopacity]);
+
     return (
         <Layout isMap={true} navbarHide={hideNavbar}>
             <Head>
                 <title>PTT Land Map</title>
             </Head>
-            <Timeslide visible={slidemapshow} />
+            <Timeslide onClose={() => setSlidemapshow(false)} visible={slidemapshow} />
             <div className="tools-group-layer">
                 <button className="btn btn-light btn-sm" onClick={() => setVisibleShapeFile(true)}>
                     {/* <i className="fa fa-window-restore" /> */}
@@ -1680,15 +1717,29 @@ const mapPage = () => {
             </Drawer>
 
             <Drawer placement="right" onClose={() => openCloseRaster()} visible={visibleRaster} width={350}>
-                <Tabs defaultActiveKey="1">
-                    <TabPane tab="Raster" key="1">
+                <Tabs defaultActiveKey="1" style={{ marginBottom: "100px" }}>
+                    <TabPane tab="Left Layer WMS" key="1">
                         <b className="text-info" >ภาพถ่ายทางอากาศ </b>
-                        <Row className="pt-3" gutter={[16]}>
+                        <Row className="pt-3" gutter={[16, 5]} style={{ margin: 0 }}>
                             {
                                 rasterDataDron1.slice(0, loadmore1.dronMore).map((data, index) => {
                                     return <Col span={8} key={index} >
-                                        <img width="90" height="55" src={`${process.env.NEXT_PUBLIC_SERVICE}/uploads/satellite-aerial-photographs/${data.id}.jpg`} alt="" />
-                                        <p>{data.wms}</p>
+                                        <Card
+                                            className={`${selectwms.some((item) => item.name == data.id) ? "cardwa" : ""}`}
+                                            bodyStyle={{ padding: "5px", }}
+                                            bordered={false}
+                                            onClick={() => Clickwms(data)}
+                                            hoverable
+                                            style={{ width: "100%", height: "100%", cursor: "pointer", }}
+                                            cover={<img style={{ objectFit: "cover", height: "70px" }} alt="example" src={`${process.env.NEXT_PUBLIC_SERVICE}/uploads/satellite-aerial-photographs/${data.id}.jpg`} />}
+                                        >
+                                            <p style={{ flexWrap: "wrap" }}>{data.wms}</p>
+                                            {
+                                                selectwms.some((item) => item.name == data.id) ?
+                                                    <EyeFilled style={{ position: "absolute", bottom: "5px", right: "5px", color: "#0f7fff" }} />
+                                                    : null
+                                            }
+                                        </Card>
                                     </Col>
                                 })
                             }
@@ -1701,12 +1752,26 @@ const mapPage = () => {
                             }
                         </Row>
                         <b className="text-info pt-5">ภาพถ่ายดาวเทียม</b>
-                        <Row className="pt-3" gutter={[16]}>
+                        <Row className="pt-3 pb-3" gutter={[16, 5]} style={{ margin: 0 }}>
                             {
                                 rasterDataDow1.slice(0, loadmore1.dowMore).map((data, index) => {
                                     return <Col span={8} key={index} >
-                                        <img width="90" height="55" src={`${process.env.NEXT_PUBLIC_SERVICE}/uploads/satellite-aerial-photographs/${data.id}.jpg`} alt="" />
-                                        <p>{data.wms} </p>
+                                        <Card
+                                            className={`${selectwms.some((item) => item.name == data.id) ? "cardwa" : ""}`}
+                                            bodyStyle={{ padding: "5px", }}
+                                            bordered={false}
+                                            onClick={() => Clickwms(data)}
+                                            hoverable
+                                            style={{ width: "100%", height: "100%", cursor: "pointer" }}
+                                            cover={<img style={{ objectFit: "cover", height: "70px" }} alt="example" src={`${process.env.NEXT_PUBLIC_SERVICE}/uploads/satellite-aerial-photographs/${data.id}.jpg`} />}
+                                        >
+                                            <p style={{ flexWrap: "wrap" }}>{data.wms}</p>
+                                            {
+                                                selectwms.some((item) => item.name == data.id) ?
+                                                    <EyeFilled style={{ position: "absolute", bottom: "5px", right: "5px", color: "#0f7fff" }} />
+                                                    : null
+                                            }
+                                        </Card>
                                     </Col>
                                 })
                             }
@@ -1718,15 +1783,38 @@ const mapPage = () => {
                                 ) : null
                             }
                         </Row>
+                        <div style={{ position: "absolute", bottom: "10px", height: "70px", width: "300px", backgroundColor: "#f1eded", padding: "5px" }}>
+                            <span><b>Brightness</b></span>
+                            <div style={{ display: "flex", flexDirection: "row", justifyContent: "center", alignItems: "baseline" }}>
+                                <span>🌘</span>
+                                <Slider onChange={ChangeOpacity} defaultValue={100} disabled={false} style={{ width: "80%" }} />
+                                <span>🌕</span>
+                            </div>
+                        </div>
                     </TabPane>
-                    <TabPane tab="Left Layer for Swipe Map" key="2">
+                    <TabPane tab="Right Layer WMS" key="2">
                         <b className="text-info" >ภาพถ่ายทางอากาศ </b>
-                        <Row className="pt-3" gutter={[16]}>
+                        <Row className="pt-3" gutter={[16, 5]} style={{ margin: 0 }}>
                             {
                                 rasterDataDron1.slice(0, loadmore2.dronMore).map((data, index) => {
                                     return <Col span={8} key={index} >
-                                        <img width="90" height="55" src={`${process.env.NEXT_PUBLIC_SERVICE}/uploads/satellite-aerial-photographs/${data.id}.jpg`} alt="" />
-                                        <p>{data.wms}</p>
+                                        <Card
+                                            className={`${selectwms.some((item) => item.name == data.id) ? "cardwa" : ""}`}
+                                            bodyStyle={{ padding: "5px", }}
+                                            bordered={false}
+                                            onClick={() => Clickwms(data)}
+                                            hoverable
+                                            style={{ width: "100%", height: "100%", cursor: "pointer" }}
+                                            cover={<img style={{ objectFit: "cover", height: "70px" }} alt="example" src={`${process.env.NEXT_PUBLIC_SERVICE}/uploads/satellite-aerial-photographs/${data.id}.jpg`} />}
+                                        >
+                                            <p style={{ flexWrap: "wrap" }}>{data.wms}</p>
+                                            {
+                                                selectwms.some((item) => item.name == data.id) ?
+                                                    <EyeFilled style={{ position: "absolute", bottom: "5px", right: "5px", color: "#0f7fff" }} />
+                                                    : null
+                                            }
+                                        </Card>
+
                                     </Col>
                                 })
                             }
@@ -1739,12 +1827,26 @@ const mapPage = () => {
                             }
                         </Row>
                         <b className="text-info pt-5">ภาพถ่ายดาวเทียม</b>
-                        <Row className="pt-3" gutter={[16]}>
+                        <Row className="pt-3" gutter={[16, 5]} style={{ margin: 0 }}>
                             {
                                 rasterDataDow1.slice(0, loadmore2.dowMore).map((data, index) => {
                                     return <Col span={8} key={index} >
-                                        <img width="90" height="55" src={`${process.env.NEXT_PUBLIC_SERVICE}/uploads/satellite-aerial-photographs/${data.id}.jpg`} alt="" />
-                                        <p>{data.wms} </p>
+                                        <Card
+                                            className={`${selectwms.some((item) => item.name == data.id) ? "cardwa" : ""}`}
+                                            bodyStyle={{ padding: "5px", }}
+                                            bordered={false}
+                                            onClick={() => Clickwms(data)}
+                                            hoverable
+                                            style={{ width: "100%", height: "100%", cursor: "pointer" }}
+                                            cover={<img style={{ objectFit: "cover", height: "70px" }} alt="example" src={`${process.env.NEXT_PUBLIC_SERVICE}/uploads/satellite-aerial-photographs/${data.id}.jpg`} />}
+                                        >
+                                            <p style={{ flexWrap: "wrap" }}>{data.wms}</p>
+                                            {
+                                                selectwms.some((item) => item.name == data.id) ?
+                                                    <EyeFilled style={{ position: "absolute", bottom: "5px", right: "5px", color: "#0f7fff" }} />
+                                                    : null
+                                            }
+                                        </Card>
                                     </Col>
                                 })
                             }
@@ -1756,7 +1858,16 @@ const mapPage = () => {
                                 ) : null
                             }
                         </Row>
+                        <div style={{ position: "absolute", bottom: "10px", height: "70px", width: "300px", backgroundColor: "#f1eded", padding: "5px" }}>
+                            <span><b>Brightness</b></span>
+                            <div style={{ display: "flex", flexDirection: "row", justifyContent: "center", alignItems: "baseline" }}>
+                                <span>🌘</span>
+                                <Slider defaultValue={100} disabled={false} style={{ width: "80%" }} />
+                                <span>🌕</span>
+                            </div>
+                        </div>
                     </TabPane>
+
                 </Tabs>
             </Drawer>
             <style global jsx>
