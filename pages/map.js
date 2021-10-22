@@ -7,7 +7,7 @@ import {
     Tabs,
     Col,
     Collapse,
-    Checkbox,
+    Modal,
     Row,
     Card,
     Form,
@@ -85,7 +85,7 @@ const mapPage = () => {
         try {
             const { data } = await API.get(`/shp/getShapeProvince?layer_group=${layer_group}`)
             const { prov, amp, tam } = data.items
-            console.log('data.items :>> ', data.items);
+            // console.log('data.items :>> ', data.items);
             setProvAmpTamAll({
                 ...provAmpTamAll, prov, amp, tam
             })
@@ -260,7 +260,7 @@ const mapPage = () => {
                     });
                 }
             });
-            console.log('data :>> ', data.items);
+            // console.log('data :>> ', data.items);
             setGroupLayerList(data.items)
 
             /* layerList */
@@ -314,10 +314,7 @@ const mapPage = () => {
     }
 
     const goTolayer = (id, type) => {
-        console.log('id :>> ', id);
-        console.log('type :>> ', type);
         const arr = (type == "search") ? [...layerSearchData] : [...layerData]
-        console.log('arr :>> ', arr);
         const index = arr.findIndex(e => e.id == id)
         if (index != -1) {
             const layer = arr[index].layer
@@ -400,12 +397,6 @@ const mapPage = () => {
             message.error("มีบางอย่างผิดพลาด !");
         }
     };
-
-    /*  Dashboard */
-    const [visibleDashboard, setVisibleDashboard] = useState(false);
-
-    /*  Search */
-    const [visibleSearch, setVisibleSearch] = useState(false);
 
     /*------------------------------------------------------------------------------ */
     /* Raster */
@@ -650,31 +641,70 @@ const mapPage = () => {
     const [imgChangeMap, setImgChangeMap] = useState("https://images.adsttc.com/media/images/6141/d09d/f91c/8104/f800/009b/large_jpg/Feature_Image.jpg?1631703175")
     const [txtChangeMap, setTextChangeMap] = useState("Satellite")
     const [changeMapButtom, setChangeMapButtom] = useState(false)
+    const [buttomChangeMap, setButtomChangeMap] = useState({ terrain: false, traffic: false, transit: false }) //เมื่อคลิกที่ปุ่มไหนอยู่ จะเป็น true (ปุ่มterrain traffic transit)
+    const [clickButtomChangeMap, setClickButtomChangeMap] = useState({ statellite: false, map: true })
     const clickChangeMap = () => {
-
         setChangeMapButtom(!changeMapButtom)
         if (!changeMapButtom) {
             map.setMapTypeId(google.maps.MapTypeId.HYBRID)
             setTextChangeMap("satellite")
+            setClickButtomChangeMap({ statellite: true, map: false })
             setImgChangeMap("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTwyYk7BSUClNOfiGhMybXiO4KbV0xOI8nOg_Qy9T9quhUOT4fNB8ZcUrcTPinYtaEsLFU&usqp=CAU")
+            if (buttomChangeMap.terrain) {
+                map.setMapTypeId("terrain");
+            }
         } else {
             map.setMapTypeId(google.maps.MapTypeId.ROADMAP)
             setTextChangeMap("Map")
+            setClickButtomChangeMap({ statellite: false, map: true })
             setImgChangeMap("https://images.adsttc.com/media/images/6141/d09d/f91c/8104/f800/009b/large_jpg/Feature_Image.jpg?1631703175")
+            if (buttomChangeMap.terrain) {
+                map.setMapTypeId("terrain");
+            }
         }
     }
-    const changeMap = (info) => {
+    const changeMap = async (info) => {
         switch (info) {
             case "Terrain":
-                map.setMapTypeId("terrain");
+                if (buttomChangeMap.terrain) {
+                    setButtomChangeMap({ ...buttomChangeMap, terrain: false })
+                    $(".terrain").css("background-color", "white")
+                    if (clickButtomChangeMap.statellite) {
+                        map.setMapTypeId(google.maps.MapTypeId.HYBRID)
+                    } else {
+                        map.setMapTypeId(google.maps.MapTypeId.ROADMAP)
+                    }
+                } else {
+                    map.setMapTypeId("terrain");
+                    setButtomChangeMap({ ...buttomChangeMap, terrain: true })
+                    $(".terrain").css("background-color", "rgb(0, 102, 255)")
+                    // background-color: rgb(0, 102, 255);
+                }
                 break;
             case "Traffic":
                 const trafficLayer = new google.maps.TrafficLayer();
                 trafficLayer.setMap(map);
-                break
+                $(".traffic").css("background-color", "rgb(0, 102, 255)")
+
+                // if (buttomChangeMap.traffic) {
+                //     // kuyyyy.setMap(map);
+                //     kuyyyy = await new google.maps.TrafficLayer();
+
+                //     await kuyyyy.setMap(null);
+                //     alert("close")
+                //     await setButtomChangeMap({ ...buttomChangeMap, traffic: false })
+                // } else {
+                //     kuyyyy = await new google.maps.TrafficLayer();
+
+                //     alert("open")
+                //     await kuyyyy.setMap(map);
+                //     await setButtomChangeMap({ ...buttomChangeMap, traffic: true })
+                // }
+                break;
             case "Transit":
                 const transitLayer = new google.maps.TransitLayer();
                 transitLayer.setMap(map)
+                $(".transit").css("background-color", "rgb(0, 102, 255)")
                 break
             default:
                 break;
@@ -723,9 +753,16 @@ const mapPage = () => {
 
         drawingManager.setMap(map);
     }
+    const test = () => {
+        $("#changeMap").fadeIn()
+        setTimeout(() => {
+            $("#changeMap").fadeOut()
+        }, 15000)
+    }
     /* -------------------------------------------------------------------------------------- */
 
     /* Search */
+    const [visibleSearch, setVisibleSearch] = useState(false);
     const [formSearch] = Form.useForm();
     const [searchList, setSearchList] = useState([])
     const [layerSearchData, setLayerSearchData] = useState([])
@@ -767,7 +804,6 @@ const mapPage = () => {
     const switchGeom = async (value, item, i) => {
         // console.log('value :>> ', value);
         item.checked = value
-        item.parlabel1 = 500
         const _searchList = [...searchList]
         _searchList[i] = item
         setSearchList([..._searchList])
@@ -824,8 +860,74 @@ const mapPage = () => {
 
     }
 
+    const editShapefileSearch = (item, index) => {
+        // console.log('item :>> ', item);
+        const formData = []
+        const setFieldsValue = {}
+
+        const disabled = ["gid", "table_name"],
+            required = ["project_na", "status"],
+            hide = ["index", "color", "checked"],
+            sort = []
+
+        for (const [key, value] of Object.entries(item)) {
+            // console.log(`${key}:key`);
+            // console.log(`${value}:value`);
+            if (typeof value != "object" && !(hide.find(x => x == key))) {
+                formData.push({
+                    label: key.toUpperCase(),
+                    name: key,
+                    required: required.find(x => x == key) ? true : false,
+                    disabled: disabled.find(x => x == key) ? true : false,
+                    message: `Please input your ${key}!`,
+                })
+                setFieldsValue[key] = value
+            }
+        }
+        // console.log('formData :>> ', formData);
+        // console.log('setFieldsValue :>> ', setFieldsValue);
+        setFormDataShapefile([...formData])
+        formModalSearch.setFieldsValue(setFieldsValue)
+        setVisibleModalSearch(true)
+    }
+
+    /* Modal Search */
+    const [visibleModalSearch, setVisibleModalSearch] = useState(false)
+    const [formDataShapefile, setFormDataShapefile] = useState([])
+    const [formModalSearch] = Form.useForm();
+
+    const handleOkModalSearch = () => {
+        formModalSearch.submit()
+    }
+
+    const handleCancelModalSearch = () => {
+        setVisibleModalSearch(false)
+    }
+
+    const onFinishModalSearch = async (value) => {
+        try {
+            value.id = value.gid
+            console.log('value :>> ', value);
+            await await API.post(`/shp/editShapeData`, value);
+            const _searchList = [...searchList];
+            const index = _searchList.findIndex(e => e.gid == value.gid)
+            if (index != -1) {
+                _searchList[index] = { ..._searchList[index], ...value }
+                setSearchList([..._searchList])
+            }
+            setVisibleModalSearch(false)
+        } catch (error) {
+            console.log('error :>> ', error);
+        }
+    }
+
+    const onFinishFailedModalSearch = (error) => {
+        console.log('error :>> ', error);
+    }
+
 
     /* Dashboard */
+    const [visibleDashboard, setVisibleDashboard] = useState(false);
     const [formDashboard] = Form.useForm();
 
     const onFinishDashboard = (value) => {
@@ -939,7 +1041,7 @@ const mapPage = () => {
                                     apiSearchData({})
                                     setFirstSearc(false)
                                 }
-                                setVisibleSearch(true)
+                                setVisibleSearch(!visibleSearch)
                             }}
                         >
                             <img width="100%" src="/assets/images/search.png" />
@@ -961,6 +1063,7 @@ const mapPage = () => {
                         <img
                             width="100%"
                             src="/assets/images/Line.png"
+                            title="line"
                         />
                     </button>
                 </Col>
@@ -969,6 +1072,7 @@ const mapPage = () => {
                         <img
                             width="100%"
                             src="/assets/images/-line_icon.png"
+                            title="split"
                         />
                     </button>
                 </Col>
@@ -977,6 +1081,7 @@ const mapPage = () => {
                         <img
                             width="100%"
                             src="/assets/images/polegon.png"
+                            title="area distance"
                         />
                     </button>
                 </Col>
@@ -994,6 +1099,7 @@ const mapPage = () => {
                         <img
                             width="100%"
                             src="/assets/images/cross.png"
+                            title="clear map"
                         />
                     </button>
                 </Col>
@@ -1033,28 +1139,30 @@ const mapPage = () => {
                 </Col>
             </div>
             <div className="tools-map-area3" >
-                <button className="btn btn-light" onClick={() => clickChangeMap()} >
-                    <img width="90" height="90" style={{ borderRadius: "10px" }} src={imgChangeMap} alt="" onMouseOver={() => $("#changeMap").fadeIn()} />
+                <button className="btn btn-light" onClick={() => clickChangeMap()} onMouseOver={() => test()} >
+                    <img width="90" height="90" style={{ borderRadius: "10px" }} src={imgChangeMap} alt="" />
+                    {/* onMouseOver={() => $("#changeMap").fadeIn()} */}
                     <span style={{ position: "absolute", bottom: "15px", left: "25px", textAlign: "center" }}>
                         {txtChangeMap}
                     </span>
                 </button>
                 <div id="changeMap" style={{ display: "none" }} >
+                    {/* onMouseLeave={() => { $("#changeMap").fadeOut() }} */}
                     <span style={{ display: "flex", justifyContent: "space-around" }} >
                         <span style={{ display: "flex", flexDirection: "column", alignItems: "center" }} >
-                            <button className="btn btn-light btn-sm" onClick={() => changeMap("Terrain")}>
+                            <button className="btn btn-light btn-sm terrain" onClick={() => changeMap("Terrain")} >
                                 <img width="55" height="55" style={{ borderRadius: "10px" }} src="assets/images/icon-chang-map/Terrain.png" alt="" />
                             </button>
                             <h5 className="text-info" >Terrain</h5>
                         </span>
                         <span style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
-                            <button className="btn btn-light btn-sm" onClick={() => changeMap("Traffic")}>
+                            <button className="btn btn-light btn-sm traffic" onClick={() => changeMap("Traffic")} >
                                 <img width="55" height="55" style={{ borderRadius: "10px" }} src="assets/images/icon-chang-map/Traffic.png" alt="" />
                             </button>
                             <h5 className="text-info" >Traffic</h5>
                         </span>
                         <span style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
-                            <button className="btn btn-light btn-sm" onClick={() => changeMap("Transit")}>
+                            <button className="btn btn-light btn-sm transit" onClick={() => changeMap("Transit")}>
                                 <img width="55" height="55" style={{ borderRadius: "10px" }} src="assets/images/icon-chang-map/Transit.png" alt="" />
                             </button>
                             <h5 className="text-info" >Transit</h5>
@@ -1087,7 +1195,7 @@ const mapPage = () => {
                     <TabPane tab="ชั้นข้อมูล" key="1">
                         {groupLayerList.map((e, i) =>
                             Object.assign(
-                                <div className="pt-2">
+                                <div className="pt-2" key={`maps-${e.id}`}>
                                     <Collapse
                                         expandIcon={({ isActive }) => e.symbol ? <img src={e.symbol} width={20} /> : <CaretRightOutlined rotate={isActive ? 90 : 0} />}
                                     >
@@ -1095,17 +1203,9 @@ const mapPage = () => {
                                             {e.children
                                                 ? e.children.map((x, index) =>
                                                     Object.assign(
-                                                        <div className="pt-2" key={index}>
+                                                        <div className="pt-2" key={`children-${x.id}`}>
                                                             <Row>
                                                                 <Col xs={19}>
-                                                                    {/* <Checkbox
-                                                                        checked={x.checked}
-                                                                        onClick={(value) =>
-                                                                            checkboxLayer(value.target.checked, i, index)
-                                                                        }
-                                                                    >
-                                                                        {x.name_layer}
-                                                                    </Checkbox> */}
                                                                     <Switch size="small" checked={x.checked} onChange={(value) => checkboxLayer(value, i, index)} /> {x.name_layer}
                                                                 </Col>
 
@@ -1191,7 +1291,7 @@ const mapPage = () => {
                                     >
                                         <Select>
                                             {groupLayerList.map((e, i) => (
-                                                <Option key={e.id} value={e.id}>
+                                                <Option key={`groupLayerList-${e.id}`} value={e.id}>
                                                     {e.group_name}
                                                 </Option>
                                             ))}
@@ -1212,6 +1312,7 @@ const mapPage = () => {
                                     >
                                         <Upload
                                             onChange={handleChange}
+                                            action={`${process.env.NEXT_PUBLIC_SERVICE}/demo/resTrue`}
                                             fileList={FileList}
                                             multiple={false}
                                         >
@@ -1280,7 +1381,7 @@ const mapPage = () => {
                 title="Process ส่งมอบโครงการ"
                 placement={"left"}
                 visible={visibleDashboard}
-                onClose={() => setVisibleDashboard(false)}
+                onClose={() => setVisibleDashboard(!visibleDashboard)}
                 maskClosable={false}
                 style={{ width: visibleDashboard ? 650 : 0 }}
             >
@@ -1326,7 +1427,7 @@ const mapPage = () => {
                                             placeholder="ชั้นข้อมูล"
                                             allowClear
                                         >
-                                            {layerList.map(e => <Option value={e.id}>{e.name_layer}</Option>)}
+                                            {layerList.map(e => <Option key={`layer_group-${e.id}`} value={e.id}>{e.name_layer}</Option>)}
                                         </Select>
                                     </Form.Item>
                                 </div>
@@ -1350,7 +1451,7 @@ const mapPage = () => {
                                             allowClear
                                             onChange={(e) => onChangeProv(e, formDashboard)}
                                         >
-                                            {provinceList.map(e => <Option value={e.name}>{e.name}</Option>)}
+                                            {provinceList.map(e => <Option key={`prov1-${e.id}`} value={e.name}>{e.name}</Option>)}
                                         </Select>
                                     </Form.Item>
                                 </div>
@@ -1364,7 +1465,7 @@ const mapPage = () => {
                                             allowClear
                                             onChange={(e) => onChangeAmp(e, formDashboard)}
                                         >
-                                            {districtList.map(e => <Option value={e.name}>{e.name}</Option>)}
+                                            {districtList.map(e => <Option key={`amp1-${e.id}`} value={e.name}>{e.name}</Option>)}
                                         </Select>
                                     </Form.Item>
                                 </div>
@@ -1377,7 +1478,7 @@ const mapPage = () => {
                                             placeholder="ตำบล"
                                             allowClear
                                         >
-                                            {subDistrictList.map(e => <Option value={e.name}>{e.name}</Option>)}
+                                            {subDistrictList.map(e => <Option key={`tam1-${e.id}`} value={e.name}>{e.name}</Option>)}
                                         </Select>
                                     </Form.Item>
                                 </div>
@@ -1465,7 +1566,7 @@ const mapPage = () => {
                 title="ต้นหา"
                 placement={"left"}
                 visible={visibleSearch}
-                onClose={() => setVisibleSearch(false)}
+                onClose={() => setVisibleSearch(!visibleSearch)}
                 maskClosable={false}
                 style={{ width: visibleSearch ? 650 : 0 }}
             >
@@ -1513,7 +1614,7 @@ const mapPage = () => {
                                         placeholder="ชั้นข้อมูล"
                                         allowClear
                                     >
-                                        {layerList.map(e => <Option value={e.id}>{e.name_layer}</Option>)}
+                                        {layerList.map(e => <Option key={`name-layer-${e.id}`} value={e.id}>{e.name_layer}</Option>)}
                                     </Select>
                                 </Form.Item>
                             </div>
@@ -1537,7 +1638,7 @@ const mapPage = () => {
                                         allowClear
                                         onChange={(e) => onChangeProv(e, formSearch)}
                                     >
-                                        {provinceList.map(e => <Option value={e.name}>{e.name}</Option>)}
+                                        {provinceList.map(e => <Option key={`prov-${e.id}`} value={e.name}>{e.name}</Option>)}
                                     </Select>
                                 </Form.Item>
                             </div>
@@ -1551,7 +1652,7 @@ const mapPage = () => {
                                         allowClear
                                         onChange={(e) => onChangeAmp(e, formSearch)}
                                     >
-                                        {districtList.map(e => <Option value={e.name}>{e.name}</Option>)}
+                                        {districtList.map(e => <Option key={`amp-${e.id}`} value={e.name}>{e.name}</Option>)}
                                     </Select>
                                 </Form.Item>
                             </div>
@@ -1564,7 +1665,7 @@ const mapPage = () => {
                                         placeholder="ตำบล"
                                         allowClear
                                     >
-                                        {subDistrictList.map(e => <Option value={e.name}>{e.name}</Option>)}
+                                        {subDistrictList.map(e => <Option key={`tam-${e.id}`} value={e.name}>{e.name}</Option>)}
                                     </Select>
                                 </Form.Item>
                             </div>
@@ -1641,7 +1742,7 @@ const mapPage = () => {
                                                     </div>
                                                 </div>
                                                 <div className="col-4">
-                                                    <button className="btn"><EditFilled /></button>
+                                                    <button className="btn" onClick={() => editShapefileSearch(e, i)}><EditFilled /></button>
                                                     <Switch size="small" checked={e.checked} onChange={(value) => switchGeom(value, e, i)} />
                                                     {e.checked ?
                                                         <button className="btn" onClick={() => goTolayer(e.index, "search")}>
@@ -1666,31 +1767,75 @@ const mapPage = () => {
                 </div>
             </Drawer>
 
-            <Drawer placement="right" onClose={() => openCloseRaster()} visible={visibleRaster} width={350}>
+            {/* Modal Search */}
+            <Modal
+                maskClosable={false}
+                bodyStyle={{
+                    maxHeight: 600,
+                    overflowX: "auto"
+                }}
+                title="แก้ไข"
+                visible={visibleModalSearch}
+                onOk={handleOkModalSearch}
+                onCancel={handleCancelModalSearch}
+            >
+                <Form
+                    form={formModalSearch}
+                    name="formModalSearch"
+                    labelCol={{ span: 8 }}
+                    wrapperCol={{ span: 16 }}
+                    onFinish={onFinishModalSearch}
+                    onFinishFailed={onFinishFailedModalSearch}
+                    autoComplete="off"
+                >
+                    {formDataShapefile.map((e, i) => (
+                        <Form.Item
+                            key={`form-modal-search-${i}`}
+                            label={e.label}
+                            name={e.name}
+                            rules={[{ required: e.required, message: e.message }]}
+                        >
+                            <Input disabled={e.disabled} />
+                        </Form.Item>
+                    ))}
+                </Form>
+            </Modal>
+
+            {/* ภาพถ่ายทางอากาศ */}
+            <Drawer
+                placement="right"
+                onClose={() => openCloseRaster()}
+                visible={visibleRaster}
+                width={350}
+                maskClosable={false}
+                style={{ width: visibleRaster ? 350 : 0 }}
+            >
                 <Tabs defaultActiveKey="1" style={{ marginBottom: "100px" }}>
                     <TabPane tab="Left Layer WMS" key="1">
                         <b className="text-info" >ภาพถ่ายทางอากาศ </b>
                         <Row className="pt-3" gutter={[16, 5]} style={{ margin: 0 }}>
                             {
                                 rasterDataDron1.slice(0, loadmore1.dronMore).map((data, index) => {
-                                    return <Col span={8} key={index} >
-                                        <Card
-                                            className={`${selectwms.some((item) => item.name == data.id) ? "cardwa" : ""}`}
-                                            bodyStyle={{ padding: "5px", }}
-                                            bordered={false}
-                                            onClick={() => Clickwms(data)}
-                                            hoverable
-                                            style={{ width: "100%", height: "100%", cursor: "pointer", }}
-                                            cover={<img style={{ objectFit: "cover", height: "70px" }} alt="example" src={`${process.env.NEXT_PUBLIC_SERVICE}/uploads/satellite-aerial-photographs/${data.id}.jpg`} />}
-                                        >
-                                            <p style={{ flexWrap: "wrap" }}>{data.wms}</p>
-                                            {
-                                                selectwms.some((item) => item.name == data.id) ?
-                                                    <EyeFilled style={{ position: "absolute", bottom: "5px", right: "5px", color: "#0f7fff" }} />
-                                                    : null
-                                            }
-                                        </Card>
-                                    </Col>
+                                    return (
+                                        <Col key={`dronMore-${index}`} span={8} key={index} >
+                                            <Card
+                                                className={`${selectwms.some((item) => item.name == data.id) ? "cardwa" : ""}`}
+                                                bodyStyle={{ padding: "5px", }}
+                                                bordered={false}
+                                                onClick={() => Clickwms(data)}
+                                                hoverable
+                                                style={{ width: "100%", height: "100%", cursor: "pointer", }}
+                                                cover={<img style={{ objectFit: "cover", height: "70px" }} alt="example" src={`${process.env.NEXT_PUBLIC_SERVICE}/uploads/satellite-aerial-photographs/${data.id}.jpg`} />}
+                                            >
+                                                <p style={{ flexWrap: "wrap" }}>{data.wms}</p>
+                                                {
+                                                    selectwms.some((item) => item.name == data.id) ?
+                                                        <EyeFilled style={{ position: "absolute", bottom: "5px", right: "5px", color: "#0f7fff" }} />
+                                                        : null
+                                                }
+                                            </Card>
+                                        </Col>
+                                    )
                                 })
                             }
                             {
@@ -1837,7 +1982,7 @@ const mapPage = () => {
           }
         `}
             </style>
-        </Layout>
+        </Layout >
     );
 };
 
