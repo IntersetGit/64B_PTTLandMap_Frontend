@@ -867,7 +867,7 @@ const mapPage = () => {
 
         const disabled = ["gid", "table_name"],
             required = ["project_na"],
-            hide = ["index", "color", "status"],
+            hide = ["index", "color", "status", "checked"],
             sort = []
 
         for (const [key, value] of Object.entries(item)) {
