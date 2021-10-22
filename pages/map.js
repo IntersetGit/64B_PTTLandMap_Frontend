@@ -7,7 +7,7 @@ import {
     Tabs,
     Col,
     Collapse,
-    Checkbox,
+    Modal,
     Row,
     Card,
     Form,
@@ -85,7 +85,7 @@ const mapPage = () => {
         try {
             const { data } = await API.get(`/shp/getShapeProvince?layer_group=${layer_group}`)
             const { prov, amp, tam } = data.items
-            console.log('data.items :>> ', data.items);
+            // console.log('data.items :>> ', data.items);
             setProvAmpTamAll({
                 ...provAmpTamAll, prov, amp, tam
             })
@@ -260,7 +260,7 @@ const mapPage = () => {
                     });
                 }
             });
-            console.log('data :>> ', data.items);
+            // console.log('data :>> ', data.items);
             setGroupLayerList(data.items)
 
             /* layerList */
@@ -397,12 +397,6 @@ const mapPage = () => {
             message.error("มีบางอย่างผิดพลาด !");
         }
     };
-
-    /*  Dashboard */
-    const [visibleDashboard, setVisibleDashboard] = useState(false);
-
-    /*  Search */
-    const [visibleSearch, setVisibleSearch] = useState(false);
 
     /*------------------------------------------------------------------------------ */
     /* Raster */
@@ -767,6 +761,7 @@ const mapPage = () => {
     /* -------------------------------------------------------------------------------------- */
 
     /* Search */
+    const [visibleSearch, setVisibleSearch] = useState(false);
     const [formSearch] = Form.useForm();
     const [searchList, setSearchList] = useState([])
     const [layerSearchData, setLayerSearchData] = useState([])
@@ -865,8 +860,72 @@ const mapPage = () => {
 
     }
 
+    const editShapefileSearch = (item, index) => {
+        // console.log('item :>> ', item);
+        const formData = []
+        const setFieldsValue = {}
+
+        const disabled = ["gid", "table_name"],
+            required = ["project_na"],
+            hide = ["index", "color", "status"],
+            sort = []
+
+        for (const [key, value] of Object.entries(item)) {
+            // console.log(`${key}: ${value}`);
+            if (typeof value != "object" && !(hide.find(x => x == key))) {
+                formData.push({
+                    label: key.toUpperCase(),
+                    name: key,
+                    required: required.find(x => x == key) ? true : false,
+                    disabled: disabled.find(x => x == key) ? true : false,
+                    message: `Please input your ${key}!`,
+                })
+                setFieldsValue[key] = value
+            }
+        }
+        // console.log('formData :>> ', formData);
+        // console.log('setFieldsValue :>> ', setFieldsValue);
+        setFormDataShapefile([...formData])
+        formModalSearch.setFieldsValue(setFieldsValue)
+        setVisibleModalSearch(true)
+    }
+
+    /* Modal Search */
+    const [visibleModalSearch, setVisibleModalSearch] = useState(false)
+    const [formDataShapefile, setFormDataShapefile] = useState([])
+    const [formModalSearch] = Form.useForm();
+
+    const handleOkModalSearch = () => {
+        formModalSearch.submit()
+    }
+
+    const handleCancelModalSearch = () => {
+        setVisibleModalSearch(false)
+    }
+
+    const onFinishModalSearch = async (value) => {
+        try {
+            console.log('value :>> ', value);
+
+            const _searchList = [...searchList];
+            const index = _searchList.findIndex(e => e.gid == value.gid)
+            if (index != -1) {
+                _searchList[index] = { ..._searchList[index], ...value }
+                setSearchList([..._searchList])
+            }
+            setVisibleModalSearch(false)
+        } catch (error) {
+            console.log('error :>> ', error);
+        }
+    }
+
+    const onFinishFailedModalSearch = (error) => {
+        console.log('error :>> ', error);
+    }
+
 
     /* Dashboard */
+    const [visibleDashboard, setVisibleDashboard] = useState(false);
     const [formDashboard] = Form.useForm();
 
     const onFinishDashboard = (value) => {
@@ -1145,14 +1204,6 @@ const mapPage = () => {
                                                         <div className="pt-2" key={`children-${x.id}`}>
                                                             <Row>
                                                                 <Col xs={19}>
-                                                                    {/* <Checkbox
-                                                                        checked={x.checked}
-                                                                        onClick={(value) =>
-                                                                            checkboxLayer(value.target.checked, i, index)
-                                                                        }
-                                                                    >
-                                                                        {x.name_layer}
-                                                                    </Checkbox> */}
                                                                     <Switch size="small" checked={x.checked} onChange={(value) => checkboxLayer(value, i, index)} /> {x.name_layer}
                                                                 </Col>
 
@@ -1688,7 +1739,7 @@ const mapPage = () => {
                                                     </div>
                                                 </div>
                                                 <div className="col-4">
-                                                    <button className="btn"><EditFilled /></button>
+                                                    <button className="btn" onClick={() => editShapefileSearch(e, i)}><EditFilled /></button>
                                                     <Switch size="small" checked={e.checked} onChange={(value) => switchGeom(value, e, i)} />
                                                     {e.checked ?
                                                         <button className="btn" onClick={() => goTolayer(e.index, "search")}>
@@ -1713,7 +1764,49 @@ const mapPage = () => {
                 </div>
             </Drawer>
 
-            <Drawer placement="right" onClose={() => openCloseRaster()} visible={visibleRaster} width={350}>
+            {/* Modal Search */}
+            <Modal
+                maskClosable={false}
+                bodyStyle={{
+                    maxHeight: 600,
+                    overflowX: "auto"
+                }}
+                title="แก้ไข"
+                visible={visibleModalSearch}
+                onOk={handleOkModalSearch}
+                onCancel={handleCancelModalSearch}
+            >
+                <Form
+                    form={formModalSearch}
+                    name="formModalSearch"
+                    labelCol={{ span: 8 }}
+                    wrapperCol={{ span: 16 }}
+                    onFinish={onFinishModalSearch}
+                    onFinishFailed={onFinishFailedModalSearch}
+                    autoComplete="off"
+                >
+                    {formDataShapefile.map((e, i) => (
+                        <Form.Item
+                            key={`form-modal-search-${i}`}
+                            label={e.label}
+                            name={e.name}
+                            rules={[{ required: e.required, message: e.message }]}
+                        >
+                            <Input disabled={e.disabled} />
+                        </Form.Item>
+                    ))}
+                </Form>
+            </Modal>
+
+            {/* ภาพถ่ายทางอากาศ */}
+            <Drawer
+                placement="right"
+                onClose={() => openCloseRaster()}
+                visible={visibleRaster}
+                width={350}
+                maskClosable={false}
+                style={{ width: visibleRaster ? 350 : 0 }}
+            >
                 <Tabs defaultActiveKey="1" style={{ marginBottom: "100px" }}>
                     <TabPane tab="Left Layer WMS" key="1">
                         <b className="text-info" >ภาพถ่ายทางอากาศ </b>
@@ -1886,7 +1979,7 @@ const mapPage = () => {
           }
         `}
             </style>
-        </Layout>
+        </Layout >
     );
 };
 
