@@ -437,19 +437,6 @@ const mapPage = () => {
     /* open close fullscreen */
     const [fullscreen, setFullScreen] = useState(false);
     const openFullscreen = () => {
-        var elem = document.documentElement;
-        if (elem.requestFullscreen) {
-            elem.requestFullscreen();
-        } else if (elem.webkitRequestFullscreen) {
-            /* Safari */
-            elem.webkitRequestFullscreen();
-        } else if (elem.msRequestFullscreen) {
-            /* IE11 */
-            elem.msRequestFullscreen();
-        }
-        setFullScreen(true);
-    };
-    const closeFullscreen = () => {
         if (fullscreen) {
             if (document.exitFullscreen) {
                 document.exitFullscreen();
@@ -460,7 +447,27 @@ const mapPage = () => {
                 /* IE11 */
                 document.msExitFullscreen();
             }
+            setFullScreen(false);
+        } else {
+            var elem = document.documentElement;
+            if (elem.requestFullscreen) {
+                elem.requestFullscreen();
+            } else if (elem.webkitRequestFullscreen) {
+                /* Safari */
+                elem.webkitRequestFullscreen();
+            } else if (elem.msRequestFullscreen) {
+                /* IE11 */
+                elem.msRequestFullscreen();
+            }
+            setFullScreen(true);
         }
+
+    };
+
+    /* open close Navbar */
+    const [hideNavbar, setHideNavbar] = useState(false)
+    const clickButtomHideNavbar = () => { // 
+        setHideNavbar(!hideNavbar)
     };
     const menuOpenFullscreen = () => {
         $("#openFullscreen").fadeToggle();
@@ -640,17 +647,16 @@ const mapPage = () => {
     const [imgChangeMap, setImgChangeMap] = useState("https://images.adsttc.com/media/images/6141/d09d/f91c/8104/f800/009b/large_jpg/Feature_Image.jpg?1631703175")
     const [txtChangeMap, setTextChangeMap] = useState("Satellite")
     const [changeMapButtom, setChangeMapButtom] = useState(false)
-
     const clickChangeMap = () => {
-        $("#changeMap").fadeToggle()
+
         setChangeMapButtom(!changeMapButtom)
         if (!changeMapButtom) {
             map.setMapTypeId(google.maps.MapTypeId.HYBRID)
-            setTextChangeMap("Layers")
+            setTextChangeMap("satellite")
             setImgChangeMap("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTwyYk7BSUClNOfiGhMybXiO4KbV0xOI8nOg_Qy9T9quhUOT4fNB8ZcUrcTPinYtaEsLFU&usqp=CAU")
         } else {
             map.setMapTypeId(google.maps.MapTypeId.ROADMAP)
-            setTextChangeMap("satellite")
+            setTextChangeMap("Map")
             setImgChangeMap("https://images.adsttc.com/media/images/6141/d09d/f91c/8104/f800/009b/large_jpg/Feature_Image.jpg?1631703175")
         }
     }
@@ -844,7 +850,7 @@ const mapPage = () => {
     }
 
     return (
-        <Layout isMap={true}>
+        <Layout isMap={true} navbarHide={hideNavbar}>
             <Head>
                 <title>PTT Land Map</title>
             </Head>
@@ -961,7 +967,7 @@ const mapPage = () => {
                         className="btn btn-light btn-sm "
                         id="closeFullscreen"
                         style={{ display: "none" }}
-                        onClick={() => closeFullscreen()}
+                        onClick={() => clickButtomHideNavbar()}
                     >
                         <img
                             width="100%"
@@ -990,15 +996,15 @@ const mapPage = () => {
                 </Col>
             </div>
             <div className="tools-map-area3" >
-                <button className="btn btn-light" onClick={() => clickChangeMap()}>
-                    <img width="90" height="90" style={{ borderRadius: "10px" }} src={imgChangeMap} alt="" />
+                <button className="btn btn-light" onClick={() => clickChangeMap()} >
+                    <img width="90" height="90" style={{ borderRadius: "10px" }} src={imgChangeMap} alt="" onMouseOver={() => $("#changeMap").fadeIn()} />
                     <span style={{ position: "absolute", bottom: "15px", left: "25px", textAlign: "center" }}>
                         {txtChangeMap}
                     </span>
                 </button>
-                <div id="changeMap" style={{ display: "none" }}>
+                <div id="changeMap" style={{ display: "none" }} >
                     <span style={{ display: "flex", justifyContent: "space-around" }} >
-                        <span style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+                        <span style={{ display: "flex", flexDirection: "column", alignItems: "center" }} >
                             <button className="btn btn-light btn-sm" onClick={() => changeMap("Terrain")}>
                                 <img width="55" height="55" style={{ borderRadius: "10px" }} src="assets/images/icon-chang-map/Terrain.png" alt="" />
                             </button>

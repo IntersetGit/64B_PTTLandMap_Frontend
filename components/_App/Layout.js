@@ -10,7 +10,7 @@ import { Cookies } from 'react-cookie'
 import Preloader from './Preloader'
 import "moment/locale/th";
 
-function Layout({ children, isMap = false }) {
+function Layout({ children, isMap = false, navbarHide }) {
     const route = useRouter()
     const [loader, setLoader] = useState(false);
     const [slideNav, setslideNav] = useState("") //slide-nav
@@ -44,7 +44,7 @@ function Layout({ children, isMap = false }) {
                 </div>
             ) : (
                 <div className="main-wrapper-map">
-                    <Navbar isMap={isMap} />
+                    <Navbar isMap={isMap} navbarHide={navbarHide} />
                     <div className="page-wrapper-map">
                         <div className="content container-fluid-map">
                             {children}

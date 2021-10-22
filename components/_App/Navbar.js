@@ -5,7 +5,7 @@ import { Tooltip } from 'antd';
 import Link from 'next/link';
 import { useEffect, useState } from "react";
 
-const Navbar = ({ isMap, setslideNav, slideNav }) => {
+const Navbar = ({ isMap, setslideNav, slideNav, navbarHide }) => {
     const { user } = useSelector(({ user }) => user);
     const dispatch = useDispatch();
     const route = useRouter()
@@ -17,7 +17,7 @@ const Navbar = ({ isMap, setslideNav, slideNav }) => {
 
     return (
 
-        <div className="header">
+        <div className="header" hidden={navbarHide}>
 
             <div className="header-left">
                 <Link href={`/`} >
@@ -54,7 +54,7 @@ const Navbar = ({ isMap, setslideNav, slideNav }) => {
                     <li className="nav-item dropdown">
                         <Link href={`/`} >
                             <a className="dropdown-toggle nav-link" >
-                                <i className="fa fa-map" style={!isMap?{background:"linear-gradient(141deg, #0fb8ad 0%, #1fc8db 51%, #2cb5e8 75%)",WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent"}:null} />
+                                <i className="fa fa-map" style={!isMap ? { background: "linear-gradient(141deg, #0fb8ad 0%, #1fc8db 51%, #2cb5e8 75%)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" } : null} />
                             </a>
                         </Link>
                     </li>
@@ -64,7 +64,7 @@ const Navbar = ({ isMap, setslideNav, slideNav }) => {
                     <li className="nav-item dropdown">
 
                         <a className="dropdown-toggle nav-link">
-                            <i className="fa fa-book" style={!isMap?{background:"linear-gradient(141deg, #0fb8ad 0%, #1fc8db 51%, #2cb5e8 75%)",WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent"}:null}/>
+                            <i className="fa fa-book" style={!isMap ? { background: "linear-gradient(141deg, #0fb8ad 0%, #1fc8db 51%, #2cb5e8 75%)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" } : null} />
                         </a>
 
                     </li>
@@ -77,7 +77,7 @@ const Navbar = ({ isMap, setslideNav, slideNav }) => {
                             <li className="nav-item dropdown">
                                 <Link href={`/settings/dashboard/`} >
                                     <a className="dropdown-toggle nav-link" >
-                                        <i className="fa fa-cog" style={!isMap?{background:"linear-gradient(141deg, #0fb8ad 0%, #1fc8db 51%, #2cb5e8 75%)",WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent"}:null}/>
+                                        <i className="fa fa-cog" style={!isMap ? { background: "linear-gradient(141deg, #0fb8ad 0%, #1fc8db 51%, #2cb5e8 75%)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" } : null} />
                                     </a>
                                 </Link>
                             </li>
