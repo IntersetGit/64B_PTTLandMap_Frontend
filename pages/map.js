@@ -780,7 +780,15 @@ const mapPage = () => {
 
     const apiSearchData = async ({ layer_group = "", project_name = "", prov = "", search = "", tam = "", amp = "" }) => {
         try {
-            const { data } = await API.get(`/shp/getSearchData?layer_group=${layer_group}&project_name=${project_name}&prov=${prov}&search=${search}&tam=${tam}&amp=${amp}&`)
+            let url = `/shp/getSearchData?temp=1`
+            if (layer_group) url += `&layer_group=${layer_group}`
+            if (project_name) url += `&project_name=${project_name}`
+            if (prov) url += `&prov=${prov}`
+            if (search) url += `&search=${search}`
+            if (tam) url += `&tam=${tam}`
+            if (amp) url += `&amp=${amp}`
+
+            const { data } = await API.get(url)
             const _arr = []
             setAmount(data.items.amount_data)
             setSumData(10)
@@ -906,7 +914,7 @@ const mapPage = () => {
     const onFinishModalSearch = async (value) => {
         try {
             value.id = value.gid
-            console.log('value :>> ', value);
+            // console.log('value :>> ', value);
             await await API.post(`/shp/editShapeData`, value);
             const _searchList = [...searchList];
             const index = _searchList.findIndex(e => e.gid == value.gid)
@@ -928,15 +936,101 @@ const mapPage = () => {
     /* Dashboard */
     const [visibleDashboard, setVisibleDashboard] = useState(false);
     const [formDashboard] = Form.useForm();
+    const [plotDashboard, setPlotDashboard] = useState({
+        labels: [],
+        datasets: [],
+        list: [],
+    })
+    const [distanceDashboard, setDistanceDashboard] = useState({
+        labels: [],
+        datasets: [],
+        list: [],
+    })
 
     const onFinishDashboard = (value) => {
-        console.log('value :>> ', value);
+        // console.log('value :>> ', value);
+        apiDashboardData({ ...value })
     }
 
     const onFinishFailedDashboard = (error) => {
         console.log('error :>> ', error);
     }
 
+
+    const apiDashboardData = async ({ layer_group = "", project_name = "", prov = "", search = "", tam = "", amp = "" }) => {
+        try {
+            let url = `/shp/getFromProjectMap?temp=1`
+            if (layer_group) url += `&layer_group=${layer_group}`
+            if (project_name) url += `&project_name=${project_name}`
+            if (prov) url += `&prov=${prov}`
+            if (search) url += `&search=${search}`
+            if (tam) url += `&tam=${tam}`
+            if (amp) url += `&amp=${amp}`
+
+            const { data } = await API.get(url)
+            // console.log('data :>> ', data.items);
+
+            const { plot, distance } = data.items
+
+            /* plot */
+            const _plotDashboard = {
+                labels: [],
+                datasets: [{
+                    label: 'แปลง',
+                    data: [],
+                    backgroundColor: [
+                        'Red',
+                        'Orange',
+                        'Yellow',
+                        'Green',
+                        'Blue',
+                    ],
+                }],
+                list: [],
+            }
+
+            _plotDashboard.labels = plot.status
+            plot.data.forEach((e, i) => {
+                _plotDashboard.datasets[0].data.push(e)
+                _plotDashboard.list[i] = {
+                    name: plot.status[i],
+                    value: e
+                }
+            })
+
+            setPlotDashboard({ ..._plotDashboard })
+
+            /* distance */
+            const _distanceDashboard = {
+                labels: [],
+                datasets: [{
+                    label: 'ระยะทาง',
+                    data: [],
+                    backgroundColor: [
+                        'Red',
+                        'Orange',
+                        'Yellow',
+                        'Green',
+                        'Blue',
+                    ],
+                }],
+                list: [],
+            }
+            _distanceDashboard.labels = distance.status
+            distance.data.forEach((e, i) => {
+                _distanceDashboard.datasets[0].data.push(e)
+                _distanceDashboard.list[i] = {
+                    name: distance.status[i],
+                    value: e
+                }
+            })
+
+            setDistanceDashboard({ ..._distanceDashboard })
+
+        } catch (error) {
+            console.log('error :>> ', error);
+        }
+    }
 
     const option = {
         responsive: true,
@@ -1002,7 +1096,10 @@ const mapPage = () => {
             <div className="tools-dashboard">
                 <button
                     className="btn btn-light btn-sm"
-                    onClick={() => setVisibleDashboard(true)}
+                    onClick={() => {
+                        setVisibleDashboard(true)
+                        apiDashboardData({ project_name: "project_na" })
+                    }}
                 >
                     {/* <i className="fa fa-dashboard" /> */}
                     <img width="100%" src="/assets/images/fa-dashboard.png" alt="" />
@@ -1037,7 +1134,7 @@ const mapPage = () => {
                             className="btn btn-light btn-sm"
                             onClick={() => {
                                 if (firstSearc) {
-                                    apiSearchData({})
+                                    apiSearchData({ project_name: "project_na" })
                                     setFirstSearc(false)
                                 }
                                 setVisibleSearch(!visibleSearch)
@@ -1376,7 +1473,7 @@ const mapPage = () => {
             {/* Dashboard */}
             <Drawer
                 id="drawer-dashboard"
-                width={650}
+                width={750}
                 title="Process ส่งมอบโครงการ"
                 placement={"left"}
                 visible={visibleDashboard}
@@ -1388,6 +1485,9 @@ const mapPage = () => {
                     <div>
                         <Form
                             form={formDashboard}
+                            initialValues={{
+                                project_name: "project_na"
+                            }}
                             onFinish={onFinishDashboard}
                             onFinishFailed={onFinishFailedDashboard}
                             layout="vertical"
@@ -1490,33 +1590,17 @@ const mapPage = () => {
 
                     <h3>แปลง</h3>
                     <div className="row">
-                        <div className="col-9">
+                        <div className="col-8">
                             <Doughnut
                                 data={{
-                                    labels: ['Status1', 'Status2', 'Status3', 'Status4', 'Status5'],
-                                    datasets: [
-                                        {
-                                            label: 'Dataset 1',
-                                            data: [5, 20, 300, 45, 2],
-                                            backgroundColor: [
-                                                'Red',
-                                                'Orange',
-                                                'Yellow',
-                                                'Green',
-                                                'Blue',
-                                            ],
-                                        }
-                                    ]
+                                    labels: plotDashboard.labels,
+                                    datasets: plotDashboard.datasets
                                 }}
                                 options={option}
                             />
                         </div>
-                        <div className="col-3">
-                            <p>Status1 : 5 แปลง</p>
-                            <p>Status2 : 20 แปลง</p>
-                            <p>Status3 : 300 แปลง</p>
-                            <p>Status4 : 45 แปลง</p>
-                            <p>Status5 : 2 แปลง</p>
+                        <div className="col-4">
+                            {plotDashboard.list.map((e, i) => <p key={`plotDashboard-${i}`}>{e.name} : {e.value} แปลง</p>)}
                         </div>
                     </div>
 
@@ -1524,33 +1608,17 @@ const mapPage = () => {
 
                     <h3>ระยะทาง</h3>
                     <div className="row">
-                        <div className="col-9">
+                        <div className="col-8">
                             <Doughnut
                                 data={{
-                                    labels: ['Status1', 'Status2', 'Status3', 'Status4', 'Status5'],
-                                    datasets: [
-                                        {
-                                            label: 'Dataset 1',
-                                            data: [3, 86, 109, 65, 0.5],
-                                            backgroundColor: [
-                                                'Red',
-                                                'Orange',
-                                                'Yellow',
-                                                'Green',
-                                                'Blue',
-                                            ],
-                                        }
-                                    ]
+                                    labels: distanceDashboard.labels,
+                                    datasets: distanceDashboard.datasets
                                 }}
                                 options={option}
                             />
                         </div>
-                        <div className="col-3">
-                            <p>Status1 : 3 ก.ม.</p>
-                            <p>Status2 : 86 ก.ม.</p>
-                            <p>Status3 : 109 ก.ม.</p>
-                            <p>Status4 : 65 ก.ม.</p>
-                            <p>Status5 : 0.5 ก.ม.</p>
+                        <div className="col-4">
+                            {distanceDashboard.list.map((e, i) => <p key={`distanceDashboard-${i}`}>{e.name} : {e.value} ก.ม.</p>)}
                         </div>
                     </div>
 
