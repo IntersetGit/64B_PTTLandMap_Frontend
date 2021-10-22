@@ -803,7 +803,6 @@ const mapPage = () => {
     const switchGeom = async (value, item, i) => {
         // console.log('value :>> ', value);
         item.checked = value
-        item.parlabel1 = 500
         const _searchList = [...searchList]
         _searchList[i] = item
         setSearchList([..._searchList])
@@ -861,7 +860,7 @@ const mapPage = () => {
     }
 
     const editShapefileSearch = (item, index) => {
-        // console.log('item :>> ', item);
+        console.log('item :>> ', item);
         const formData = []
         const setFieldsValue = {}
 
@@ -871,7 +870,8 @@ const mapPage = () => {
             sort = []
 
         for (const [key, value] of Object.entries(item)) {
-            // console.log(`${key}: ${value}`);
+            // console.log(`${key}:key`);
+            // console.log(`${value}:value`);
             if (typeof value != "object" && !(hide.find(x => x == key))) {
                 formData.push({
                     label: key.toUpperCase(),
