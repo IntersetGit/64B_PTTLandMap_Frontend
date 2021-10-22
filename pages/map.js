@@ -860,13 +860,13 @@ const mapPage = () => {
     }
 
     const editShapefileSearch = (item, index) => {
-        console.log('item :>> ', item);
+        // console.log('item :>> ', item);
         const formData = []
         const setFieldsValue = {}
 
         const disabled = ["gid", "table_name"],
-            required = ["project_na"],
-            hide = ["index", "color", "status", "checked"],
+            required = ["project_na", "status"],
+            hide = ["index", "color", "checked"],
             sort = []
 
         for (const [key, value] of Object.entries(item)) {
@@ -905,8 +905,9 @@ const mapPage = () => {
 
     const onFinishModalSearch = async (value) => {
         try {
+            value.id = value.gid
             console.log('value :>> ', value);
-
+            await await API.post(`/shp/editShapeData`, value);
             const _searchList = [...searchList];
             const index = _searchList.findIndex(e => e.gid == value.gid)
             if (index != -1) {
@@ -1039,7 +1040,7 @@ const mapPage = () => {
                                     apiSearchData({})
                                     setFirstSearc(false)
                                 }
-                                setVisibleSearch(true)
+                                setVisibleSearch(!visibleSearch)
                             }}
                         >
                             <img width="100%" src="/assets/images/search.png" />
@@ -1310,6 +1311,7 @@ const mapPage = () => {
                                     >
                                         <Upload
                                             onChange={handleChange}
+                                            action={`${process.env.NEXT_PUBLIC_SERVICE}/demo/resTrue`}
                                             fileList={FileList}
                                             multiple={false}
                                         >
