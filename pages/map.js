@@ -647,31 +647,70 @@ const mapPage = () => {
     const [imgChangeMap, setImgChangeMap] = useState("https://images.adsttc.com/media/images/6141/d09d/f91c/8104/f800/009b/large_jpg/Feature_Image.jpg?1631703175")
     const [txtChangeMap, setTextChangeMap] = useState("Satellite")
     const [changeMapButtom, setChangeMapButtom] = useState(false)
+    const [buttomChangeMap, setButtomChangeMap] = useState({ terrain: false, traffic: false, transit: false }) //เมื่อคลิกที่ปุ่มไหนอยู่ จะเป็น true (ปุ่มterrain traffic transit)
+    const [clickButtomChangeMap, setClickButtomChangeMap] = useState({ statellite: false, map: true })
     const clickChangeMap = () => {
-
         setChangeMapButtom(!changeMapButtom)
         if (!changeMapButtom) {
             map.setMapTypeId(google.maps.MapTypeId.HYBRID)
             setTextChangeMap("satellite")
+            setClickButtomChangeMap({ statellite: true, map: false })
             setImgChangeMap("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTwyYk7BSUClNOfiGhMybXiO4KbV0xOI8nOg_Qy9T9quhUOT4fNB8ZcUrcTPinYtaEsLFU&usqp=CAU")
+            if (buttomChangeMap.terrain) {
+                map.setMapTypeId("terrain");
+            }
         } else {
             map.setMapTypeId(google.maps.MapTypeId.ROADMAP)
             setTextChangeMap("Map")
+            setClickButtomChangeMap({ statellite: false, map: true })
             setImgChangeMap("https://images.adsttc.com/media/images/6141/d09d/f91c/8104/f800/009b/large_jpg/Feature_Image.jpg?1631703175")
+            if (buttomChangeMap.terrain) {
+                map.setMapTypeId("terrain");
+            }
         }
     }
-    const changeMap = (info) => {
+    const changeMap = async (info) => {
         switch (info) {
             case "Terrain":
-                map.setMapTypeId("terrain");
+                if (buttomChangeMap.terrain) {
+                    setButtomChangeMap({ ...buttomChangeMap, terrain: false })
+                    $(".terrain").css("background-color", "white")
+                    if (clickButtomChangeMap.statellite) {
+                        map.setMapTypeId(google.maps.MapTypeId.HYBRID)
+                    } else {
+                        map.setMapTypeId(google.maps.MapTypeId.ROADMAP)
+                    }
+                } else {
+                    map.setMapTypeId("terrain");
+                    setButtomChangeMap({ ...buttomChangeMap, terrain: true })
+                    $(".terrain").css("background-color", "rgb(0, 102, 255)")
+                    // background-color: rgb(0, 102, 255);
+                }
                 break;
             case "Traffic":
                 const trafficLayer = new google.maps.TrafficLayer();
                 trafficLayer.setMap(map);
-                break
+                $(".traffic").css("background-color", "rgb(0, 102, 255)")
+
+                // if (buttomChangeMap.traffic) {
+                //     // kuyyyy.setMap(map);
+                //     kuyyyy = await new google.maps.TrafficLayer();
+
+                //     await kuyyyy.setMap(null);
+                //     alert("close")
+                //     await setButtomChangeMap({ ...buttomChangeMap, traffic: false })
+                // } else {
+                //     kuyyyy = await new google.maps.TrafficLayer();
+
+                //     alert("open")
+                //     await kuyyyy.setMap(map);
+                //     await setButtomChangeMap({ ...buttomChangeMap, traffic: true })
+                // }
+                break;
             case "Transit":
                 const transitLayer = new google.maps.TransitLayer();
                 transitLayer.setMap(map)
+                $(".transit").css("background-color", "rgb(0, 102, 255)")
                 break
             default:
                 break;
@@ -719,6 +758,12 @@ const mapPage = () => {
         });
 
         drawingManager.setMap(map);
+    }
+    const test = () => {
+        $("#changeMap").fadeIn()
+        setTimeout(() => {
+            $("#changeMap").fadeOut()
+        }, 15000)
     }
     /* -------------------------------------------------------------------------------------- */
 
@@ -848,7 +893,6 @@ const mapPage = () => {
     const ontimeslider = () => {
         setSlidemapshow(!slidemapshow)
     }
-
     return (
         <Layout isMap={true} navbarHide={hideNavbar}>
             <Head>
@@ -924,6 +968,7 @@ const mapPage = () => {
                         <img
                             width="100%"
                             src="/assets/images/Line.png"
+                            title="line"
                         />
                     </button>
                 </Col>
@@ -932,6 +977,7 @@ const mapPage = () => {
                         <img
                             width="100%"
                             src="/assets/images/-line_icon.png"
+                            title="split"
                         />
                     </button>
                 </Col>
@@ -940,6 +986,7 @@ const mapPage = () => {
                         <img
                             width="100%"
                             src="/assets/images/polegon.png"
+                            title="area distance"
                         />
                     </button>
                 </Col>
@@ -957,6 +1004,7 @@ const mapPage = () => {
                         <img
                             width="100%"
                             src="/assets/images/cross.png"
+                            title="clear map"
                         />
                     </button>
                 </Col>
@@ -996,28 +1044,30 @@ const mapPage = () => {
                 </Col>
             </div>
             <div className="tools-map-area3" >
-                <button className="btn btn-light" onClick={() => clickChangeMap()} >
-                    <img width="90" height="90" style={{ borderRadius: "10px" }} src={imgChangeMap} alt="" onMouseOver={() => $("#changeMap").fadeIn()} />
+                <button className="btn btn-light" onClick={() => clickChangeMap()} onMouseOver={() => test()} >
+                    <img width="90" height="90" style={{ borderRadius: "10px" }} src={imgChangeMap} alt="" />
+                    {/* onMouseOver={() => $("#changeMap").fadeIn()} */}
                     <span style={{ position: "absolute", bottom: "15px", left: "25px", textAlign: "center" }}>
                         {txtChangeMap}
                     </span>
                 </button>
                 <div id="changeMap" style={{ display: "none" }} >
+                    {/* onMouseLeave={() => { $("#changeMap").fadeOut() }} */}
                     <span style={{ display: "flex", justifyContent: "space-around" }} >
                         <span style={{ display: "flex", flexDirection: "column", alignItems: "center" }} >
-                            <button className="btn btn-light btn-sm" onClick={() => changeMap("Terrain")}>
+                            <button className="btn btn-light btn-sm terrain" onClick={() => changeMap("Terrain")} >
                                 <img width="55" height="55" style={{ borderRadius: "10px" }} src="assets/images/icon-chang-map/Terrain.png" alt="" />
                             </button>
                             <h5 className="text-info" >Terrain</h5>
                         </span>
                         <span style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
-                            <button className="btn btn-light btn-sm" onClick={() => changeMap("Traffic")}>
+                            <button className="btn btn-light btn-sm traffic" onClick={() => changeMap("Traffic")} >
                                 <img width="55" height="55" style={{ borderRadius: "10px" }} src="assets/images/icon-chang-map/Traffic.png" alt="" />
                             </button>
                             <h5 className="text-info" >Traffic</h5>
                         </span>
                         <span style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
-                            <button className="btn btn-light btn-sm" onClick={() => changeMap("Transit")}>
+                            <button className="btn btn-light btn-sm transit" onClick={() => changeMap("Transit")}>
                                 <img width="55" height="55" style={{ borderRadius: "10px" }} src="assets/images/icon-chang-map/Transit.png" alt="" />
                             </button>
                             <h5 className="text-info" >Transit</h5>
