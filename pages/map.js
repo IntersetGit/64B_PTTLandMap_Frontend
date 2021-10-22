@@ -22,7 +22,7 @@ import {
 import Head from "next/head";
 import { useSelector } from "react-redux";
 import { SketchPicker } from "react-color";
-import { CaretRightOutlined, UploadOutlined, EditFilled, ExpandOutlined } from "@ant-design/icons";
+import { CaretRightOutlined, UploadOutlined, EditFilled, ExpandOutlined, EyeFilled } from "@ant-design/icons";
 import API from "../util/Api";
 import RefreshToken from "../util/RefreshToken";
 import axios from "axios";
