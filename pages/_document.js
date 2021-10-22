@@ -14,6 +14,8 @@ export default class MyDocument extends Document {
           <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin />
           <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300&display=swap" rel="stylesheet" />
           <link rel="icon" type="image/png" href="/assets/images/PTT-herder.png"></link>
+          <script src='http://maps.google.com/maps/api/js?key=AIzaSyArK9veHmyKP3QdYMPW1381JzFHqUwDg9U&libraries=drawing,places,weekly&language=th&region=TH' defer></script>
+
         </Head>
         <body>
           <Main />
@@ -25,7 +27,11 @@ export default class MyDocument extends Document {
           <script src="/assets/js/jquery.slimscroll.min.js"></script>
           <script src="/assets/js/jscoord-1.1.1.js"></script>
           <script src="/assets/js/app.js"></script>
-          <script src="https://cdnjs.cloudflare.com/ajax/libs/split.js/1.5.11/split.min.js"></script>
+          <script src="https://cdnjs.cloudflare.com/ajax/libs/split.js/1.5.11/split.min.js" async defer></script>
+
+          <script src="http://imis.md.go.th/lib/wmsMapType.js" async defer></script>
+          <script src="http://imis.md.go.th/lib/arcgislink.js" async defer></script>
+
         </body>
       </html>
     );
