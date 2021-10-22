@@ -29,7 +29,7 @@ export default class MyDocument extends Document {
           <script src="/assets/js/app.js"></script>
           <script src="https://cdnjs.cloudflare.com/ajax/libs/split.js/1.5.11/split.min.js" async defer></script>
 
-          <script src="http://imis.md.go.th/lib/wmsMapType.js" async defer></script>
+          <script src="/assets/js/wmsmaptype.js" async defer></script>
           <script src="http://imis.md.go.th/lib/arcgislink.js" async defer></script>
 
         </body>

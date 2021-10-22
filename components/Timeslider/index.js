@@ -7,9 +7,9 @@ import {
     RightCircleOutlined,
     LeftCircleOutlined
 } from '@ant-design/icons';
-import { Slider, Button } from 'antd';
+import { Slider, Button, Image } from 'antd';
 import styled from 'styled-components';
-import Image from 'next/image'
+// import Image from 'next/image'
 import { DatePicker, ConfigProvider } from 'antd';
 const { RangePicker } = DatePicker;
 
