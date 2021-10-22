@@ -1,3 +1,4 @@
+//UPDATE BY AUNWA007
 
 function WmsMapType(name, url, params, options, type = "geoserver") {
     var TILE_SIZE = 256;
@@ -92,13 +93,14 @@ function WmsMapType(name, url, params, options, type = "geoserver") {
      * Add this MapType to a map at the given index, or on top of other layers
      * if index is omitted.
      */
-    this.addToMap = function (map, index) {
-        console.log(this)
+    this.addToMap = async function (map, index) {
+        // console.log(this)
         if (index !== undefined) {
             map.overlayMapTypes.insertAt(Math.min(index, map.overlayMapTypes.getLength()), this);
         } else {
             if (this.type == "geoserver" || this.type == null) {
-                map.overlayMapTypes.push(this);
+                await map.overlayMapTypes.push(this);
+                this.zoomToWms(map);
             } else {
                 this.Arcgiswms(map);
             }
@@ -169,7 +171,7 @@ function WmsMapType(name, url, params, options, type = "geoserver") {
         var thisWms = this;
         url = encodeURIComponent(url);
 
-        console.log('map :>> ', $('#map').GetWmsBoundary(url, this.params['layers']));
+        GetWmsBoundary(url, this.params['layers'], map);
         // angular.element('#ang-controller').scope().GetWmsBoundary(url, this.params['layers']);
         //console.log(angular.element('#ang-controller').scope())
         //console.log(url, this.params['layers'])
@@ -217,6 +219,7 @@ function WmsMapType(name, url, params, options, type = "geoserver") {
             }
         });*/
     };
+
     this.zoomToWmsSwipe = function (map) { /*-------------------- Zooomtowms ชองหน้า Swipe map----------------*/
 
         if (!this.params['layers'].length) {
@@ -313,6 +316,52 @@ function WmsMapType(name, url, params, options, type = "geoserver") {
      */
 
     /*---------------------------------------------------------------------------------------------------------------------*/
+    function GetWmsBoundary(url, layerName, map) {
+        if (url != null && url != "") {
+            var data = {};
+            data.url = url;
+            fetch("http://imis.md.go.th/IMIS_Service/api/Map/GetWmsBoundary",
+                {
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json'
+                    },
+                    method: "POST",
+                    body: JSON.stringify(data)
+                })
+                .then(async function (res) {
+                    let html = await res.json();
+
+                    if (html != "" & html != null && html.indexOf('version') > -1) {
+                        var wmsData = new WMSCapabilities().parse(html);
+
+                        if (wmsData != null && wmsData.Capability != null && wmsData.Capability.Layer != null && wmsData.Capability.Layer.Layer != null) {
+                            var layerList = wmsData.Capability.Layer.Layer;
+
+                            for (var i = 0; i < layerList.length; ++i) {
+                                if (layerList[i].Name == layerName || layerList[i].Title == layerName) {
+                                    if (layerList[i].LatLonBoundingBox != null) {
+                                        //return layerList[i].LatLonBoundingBox;
+                                        var bounds = new google.maps.LatLngBounds(
+                                            new google.maps.LatLng(layerList[i].LatLonBoundingBox[1], layerList[i].LatLonBoundingBox[0]),
+                                            new google.maps.LatLng(layerList[i].LatLonBoundingBox[3], layerList[i].LatLonBoundingBox[2])
+                                        );
+
+                                        var center = bounds.getCenter();
+
+                                        map.fitBounds(bounds);
+                                        return;
+                                    } else {
+                                        console.log('boundaryError');
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }).catch(function (res) { console.log(res) });
+        }
+    }
+
     function getBounds(x, y, z) {
         y = Math.pow(2, z) - y - 1; // Translate Y value
 

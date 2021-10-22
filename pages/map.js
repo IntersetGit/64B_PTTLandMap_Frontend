@@ -39,6 +39,8 @@ const { Meta } = Card;
 const { Option } = Select;
 const mapPage = () => {
     const [map, setMap] = useState(null);
+    const [mapLeft, setMapLeft] = useState(null);
+    const [mapRight, setMapRight] = useState(null);
     const googlemap = useRef(null);
     const { user } = useSelector(({ user }) => user);
     const centerMap = { lat: 13.78, lng: 100.55 }
@@ -56,7 +58,6 @@ const mapPage = () => {
     const [provinceList, setProvinceList] = useState([])
     const [districtList, setDistrictList] = useState([])
     const [subDistrictList, setSubDistrictList] = useState([])
-
     useEffect(() => {
         const loader = new Loader({
             apiKey: process.env.NEXT_PUBLIC_GOOGLE_API_KEY,
@@ -75,7 +76,7 @@ const mapPage = () => {
             google.maps.event.addListener(_map, "mousemove", (event) => {
                 getLatLon(event);
             });
-            clickMapShowLatLag(_map)
+            // clickMapShowLatLag(_map)
         });
         loadShapeFile()
         loadGetShapeProvince()
@@ -539,7 +540,7 @@ const mapPage = () => {
             })
         } else {
             google.maps.event.clearListeners(map, 'click');
-            clickMapShowLatLag(map)
+            // clickMapShowLatLag(map)
         }
     }
     /* เคลียเมพ */
@@ -569,14 +570,14 @@ const mapPage = () => {
                 streetViewControl: false,
                 mapTypeControl: false,
                 fullscreenControl: false,
-                center: centerMap,
+                center: map.getCenter(),
+                // center: centerMap,
             };
 
             // instantiate the map on the left with control positioning
             mapLeft = await new google.maps.Map(googlemapLeft.current, {
                 ...mapOptions,
                 mapTypeId: "satellite",
-                tilt: 0,
             });
             // instantiate the map on the right with control positioning
             mapRight = await new google.maps.Map(googlemapRight.current, {
@@ -588,6 +589,8 @@ const mapPage = () => {
                     position: google.maps.ControlPosition.RIGHT_BOTTOM,
                 },
             });
+            setMapLeft(mapLeft);
+            setMapRight(mapRight);
             // helper function to keep maps in sync
             function sync(...maps) {
                 let center, zoom;
@@ -635,6 +638,10 @@ const mapPage = () => {
             Split(["#left", "#right"], {
                 sizes: [50, 50],
             });
+        } else {
+            // console.log(mapRight);
+            mapRight.setCenter(map.getCenter());
+            mapRight.setZoom(map.getZoom());
         }
     }
     /* change map */
@@ -955,10 +962,13 @@ const mapPage = () => {
     }
     // -------------------------------------------WMS----------------------------
     const [selectwms, setSelectwms] = useState([])
+    const [selectwmsright, setSelectwmsright] = useState([])
     const [wmsopacity, setWmsopacity] = useState(100);
+    const [wmsopacityright, setWmsopacityright] = useState(100);
 
-    const Clickwms = (items) => {
+    const Clickwms = (items, Map = map) => {
         // console.log('itemswms :>> ', items);
+
         let maptype = new WmsMapType(
             items.id,
             items.url, {
@@ -968,25 +978,50 @@ const mapPage = () => {
             opacity: wmsopacity / 100
         }, items.type_server
         );
-        console.log('maptype :>> ', maptype);
-        if (selectwms.some((item) => item.name == maptype.name)) {
-            let cut = selectwms.filter((item) => item.name !== maptype.name)
-            setSelectwms(cut);
-            maptype.removeFromMap(map);
+        // console.log('maptype :>> ', maptype);
+        if (Map == map || Map == mapLeft) {
+            if (selectwms.some((item) => item.name == maptype.name)) {
+                let cut = selectwms.filter((item) => item.name !== maptype.name)
+                setSelectwms(cut);
+                maptype.removeFromMap(Map);
+            } else {
+                setSelectwms([...selectwms, maptype]);
+                maptype.addToMap(Map);
+            }
         } else {
-            setSelectwms([...selectwms, maptype]);
-            maptype.addToMap(map);
-            // maptype.zoomToWms(map);
+            if (selectwmsright.some((item) => item.name == maptype.name)) {
+                let cut = selectwmsright.filter((item) => item.name !== maptype.name)
+                setSelectwmsright(cut);
+                maptype.removeFromMap(Map);
+            } else {
+                setSelectwmsright([...selectwmsright, maptype]);
+                maptype.addToMap(Map);
+            }
         }
     }
-    const ChangeOpacity = (e) => {
-        setWmsopacity(e);
-    }
+    useEffect(() => {
+        selectwms.forEach((layer) => {
+            layer.removeFromMap(map);
+            layer.removeFromMap(mapLeft);
+        })
+        selectwmsright.forEach((layer) => {
+            layer.removeFromMap(mapRight);
+        })
+        setSelectwms([]);
+        setSelectwmsright([]);
+    }, [changmap])
+
     useEffect(() => {
         selectwms.forEach((wms) => {
             wms.setOpacity(wmsopacity / 100);
         })
     }, [wmsopacity]);
+    useEffect(() => {
+        selectwmsright.forEach((wms) => {
+            wms.setOpacity(wmsopacityright / 100);
+        })
+    }, [wmsopacityright]);
+
 
     return (
         <Layout isMap={true} navbarHide={hideNavbar}>
@@ -1033,7 +1068,7 @@ const mapPage = () => {
                 {user &&
                     (user.roles_id === "8a97ac7b-01dc-4e06-81c2-8422dffa0ca2" ||
                         user.roles_id === "cec6617f-b593-4ebc-9604-3059dfee0ac4") ? (
-                    <Col span={6}>
+                    !changmap && <Col span={6}>
                         <button
                             className="btn btn-light btn-sm"
                             onClick={() => {
@@ -1049,7 +1084,7 @@ const mapPage = () => {
                     </Col>
                 ) : null}
 
-                <Col span={6} className="pt-2">
+                {!changmap && <Col span={6} className="pt-2">
                     <button className="btn btn-light btn-sm" onClick={clickHome} >
                         <img
                             width="100%"
@@ -1057,8 +1092,8 @@ const mapPage = () => {
                             title="้home"
                         />
                     </button>
-                </Col>
-                <Col span={6} className="pt-2">
+                </Col>}
+                {!changmap && <Col span={6} className="pt-2">
                     <button className="btn btn-light btn-sm" onClick={clickLine} >
                         <img
                             width="100%"
@@ -1066,7 +1101,7 @@ const mapPage = () => {
                             title="line"
                         />
                     </button>
-                </Col>
+                </Col>}
                 <Col span={6} className="pt-2">
                     <button className="btn btn-light btn-sm" onClick={clickSplit}>
                         <img
@@ -1076,7 +1111,7 @@ const mapPage = () => {
                         />
                     </button>
                 </Col>
-                <Col span={6} className="pt-2">
+                {!changmap && <Col span={6} className="pt-2">
                     <button className="btn btn-light btn-sm" onClick={areaDistance}>
                         <img
                             width="100%"
@@ -1084,8 +1119,8 @@ const mapPage = () => {
                             title="area distance"
                         />
                     </button>
-                </Col>
-                <Col span={6} className="pt-2">
+                </Col>}
+                {!changmap && <Col span={6} className="pt-2">
                     <button className="btn btn-light btn-sm" onClick={ontimeslider} >
                         <img
                             width="100%"
@@ -1093,8 +1128,8 @@ const mapPage = () => {
                             title="timeslide"
                         />
                     </button>
-                </Col>
-                <Col span={6} className="pt-2">
+                </Col>}
+                {!changmap && <Col span={6} className="pt-2">
                     <button className="btn btn-light btn-sm" onClick={clickClearMap} >
                         <img
                             width="100%"
@@ -1102,7 +1137,7 @@ const mapPage = () => {
                             title="clear map"
                         />
                     </button>
-                </Col>
+                </Col>}
             </div>
             <div className="tools-map-area2">
                 <Col span={24} className="pt-2">
@@ -1811,7 +1846,7 @@ const mapPage = () => {
                 style={{ width: visibleRaster ? 350 : 0 }}
             >
                 <Tabs defaultActiveKey="1" style={{ marginBottom: "100px" }}>
-                    <TabPane tab="Left Layer WMS" key="1">
+                    <TabPane tab={changmap ? <b>Left Layer WMS</b> : <b>WMS Layer</b>} key="1">
                         <b className="text-info" >ภาพถ่ายทางอากาศ </b>
                         <Row className="pt-3" gutter={[16, 5]} style={{ margin: 0 }}>
                             {
@@ -1822,7 +1857,7 @@ const mapPage = () => {
                                                 className={`${selectwms.some((item) => item.name == data.id) ? "cardwa" : ""}`}
                                                 bodyStyle={{ padding: "5px", }}
                                                 bordered={false}
-                                                onClick={() => Clickwms(data)}
+                                                onClick={() => { !changmap ? Clickwms(data) : Clickwms(data, mapLeft) }}
                                                 hoverable
                                                 style={{ width: "100%", height: "100%", cursor: "pointer", }}
                                                 cover={<img style={{ objectFit: "cover", height: "70px" }} alt="example" src={`${process.env.NEXT_PUBLIC_SERVICE}/uploads/satellite-aerial-photographs/${data.id}.jpg`} />}
@@ -1855,7 +1890,7 @@ const mapPage = () => {
                                             className={`${selectwms.some((item) => item.name == data.id) ? "cardwa" : ""}`}
                                             bodyStyle={{ padding: "5px", }}
                                             bordered={false}
-                                            onClick={() => Clickwms(data)}
+                                            onClick={() => { !changmap ? Clickwms(data) : Clickwms(data, mapLeft) }}
                                             hoverable
                                             style={{ width: "100%", height: "100%", cursor: "pointer" }}
                                             cover={<img style={{ objectFit: "cover", height: "70px" }} alt="example" src={`${process.env.NEXT_PUBLIC_SERVICE}/uploads/satellite-aerial-photographs/${data.id}.jpg`} />}
@@ -1878,33 +1913,33 @@ const mapPage = () => {
                                 ) : null
                             }
                         </Row>
-                        <div style={{ position: "absolute", bottom: "10px", height: "70px", width: "300px", backgroundColor: "#f1eded", padding: "5px" }}>
+                        <div style={{ position: "absolute", bottom: "0px", height: "70px", width: "300px", backgroundColor: "#f1eded", padding: "5px" }}>
                             <span><b>Brightness</b></span>
                             <div style={{ display: "flex", flexDirection: "row", justifyContent: "center", alignItems: "baseline" }}>
                                 <span>🌘</span>
-                                <Slider onChange={ChangeOpacity} defaultValue={100} disabled={false} style={{ width: "80%" }} />
+                                <Slider onChange={(e) => setWmsopacity(e)} defaultValue={100} disabled={false} style={{ width: "80%" }} />
                                 <span>🌕</span>
                             </div>
                         </div>
                     </TabPane>
-                    <TabPane tab="Right Layer WMS" key="2">
+                    {changmap && <TabPane tab={<b>Right Layer WMS</b>} key="2">
                         <b className="text-info" >ภาพถ่ายทางอากาศ </b>
                         <Row className="pt-3" gutter={[16, 5]} style={{ margin: 0 }}>
                             {
                                 rasterDataDron1.slice(0, loadmore2.dronMore).map((data, index) => {
                                     return <Col span={8} key={index} >
                                         <Card
-                                            className={`${selectwms.some((item) => item.name == data.id) ? "cardwa" : ""}`}
+                                            className={`${selectwmsright.some((item) => item.name == data.id) ? "cardwa" : ""}`}
                                             bodyStyle={{ padding: "5px", }}
                                             bordered={false}
-                                            onClick={() => Clickwms(data)}
+                                            onClick={() => Clickwms(data, mapRight)}
                                             hoverable
                                             style={{ width: "100%", height: "100%", cursor: "pointer" }}
                                             cover={<img style={{ objectFit: "cover", height: "70px" }} alt="example" src={`${process.env.NEXT_PUBLIC_SERVICE}/uploads/satellite-aerial-photographs/${data.id}.jpg`} />}
                                         >
                                             <p style={{ flexWrap: "wrap" }}>{data.wms}</p>
                                             {
-                                                selectwms.some((item) => item.name == data.id) ?
+                                                selectwmsright.some((item) => item.name == data.id) ?
                                                     <EyeFilled style={{ position: "absolute", bottom: "5px", right: "5px", color: "#0f7fff" }} />
                                                     : null
                                             }
@@ -1927,17 +1962,17 @@ const mapPage = () => {
                                 rasterDataDow1.slice(0, loadmore2.dowMore).map((data, index) => {
                                     return <Col span={8} key={index} >
                                         <Card
-                                            className={`${selectwms.some((item) => item.name == data.id) ? "cardwa" : ""}`}
+                                            className={`${selectwmsright.some((item) => item.name == data.id) ? "cardwa" : ""}`}
                                             bodyStyle={{ padding: "5px", }}
                                             bordered={false}
-                                            onClick={() => Clickwms(data)}
+                                            onClick={() => Clickwms(data, mapRight)}
                                             hoverable
                                             style={{ width: "100%", height: "100%", cursor: "pointer" }}
                                             cover={<img style={{ objectFit: "cover", height: "70px" }} alt="example" src={`${process.env.NEXT_PUBLIC_SERVICE}/uploads/satellite-aerial-photographs/${data.id}.jpg`} />}
                                         >
                                             <p style={{ flexWrap: "wrap" }}>{data.wms}</p>
                                             {
-                                                selectwms.some((item) => item.name == data.id) ?
+                                                selectwmsright.some((item) => item.name == data.id) ?
                                                     <EyeFilled style={{ position: "absolute", bottom: "5px", right: "5px", color: "#0f7fff" }} />
                                                     : null
                                             }
@@ -1953,16 +1988,16 @@ const mapPage = () => {
                                 ) : null
                             }
                         </Row>
-                        <div style={{ position: "absolute", bottom: "10px", height: "70px", width: "300px", backgroundColor: "#f1eded", padding: "5px" }}>
+                        <div style={{ position: "absolute", bottom: "0px", height: "70px", width: "300px", backgroundColor: "#f1eded", padding: "5px" }}>
                             <span><b>Brightness</b></span>
                             <div style={{ display: "flex", flexDirection: "row", justifyContent: "center", alignItems: "baseline" }}>
                                 <span>🌘</span>
-                                <Slider defaultValue={100} disabled={false} style={{ width: "80%" }} />
+                                <Slider onChange={(e) => setWmsopacityright(e)} defaultValue={100} disabled={false} style={{ width: "80%" }} />
                                 <span>🌕</span>
                             </div>
                         </div>
                     </TabPane>
-
+                    }
                 </Tabs>
             </Drawer>
             <style global jsx>
