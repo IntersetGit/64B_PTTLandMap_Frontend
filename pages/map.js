@@ -566,6 +566,7 @@ const mapPage = () => {
     const googlemapLeft = useRef(null)
     const googlemapRight = useRef(null)
     const [count, setCount] = useState(false)
+
     const clickSplit = async () => {
         setChangeMap(!changmap)
         setCount(true)
@@ -1776,7 +1777,7 @@ const mapPage = () => {
                             }
                         </Row>
                         <b className="text-info pt-5">ภาพถ่ายดาวเทียม</b>
-                        <Row className="pt-3" gutter={[16, 5]} style={{ margin: 0 }}>
+                        <Row className="pt-3 pb-3" gutter={[16, 5]} style={{ margin: 0 }}>
                             {
                                 rasterDataDow1.slice(0, loadmore2.dowMore).map((data, index) => {
                                     return <Col span={8} key={index} >
