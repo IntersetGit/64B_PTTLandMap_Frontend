@@ -314,10 +314,7 @@ const mapPage = () => {
     }
 
     const goTolayer = (id, type) => {
-        console.log('id :>> ', id);
-        console.log('type :>> ', type);
         const arr = (type == "search") ? [...layerSearchData] : [...layerData]
-        console.log('arr :>> ', arr);
         const index = arr.findIndex(e => e.id == id)
         if (index != -1) {
             const layer = arr[index].layer
@@ -1137,7 +1134,7 @@ const mapPage = () => {
                     <TabPane tab="ชั้นข้อมูล" key="1">
                         {groupLayerList.map((e, i) =>
                             Object.assign(
-                                <div className="pt-2">
+                                <div className="pt-2" key={`maps-${e.id}`}>
                                     <Collapse
                                         expandIcon={({ isActive }) => e.symbol ? <img src={e.symbol} width={20} /> : <CaretRightOutlined rotate={isActive ? 90 : 0} />}
                                     >
@@ -1145,7 +1142,7 @@ const mapPage = () => {
                                             {e.children
                                                 ? e.children.map((x, index) =>
                                                     Object.assign(
-                                                        <div className="pt-2" key={index}>
+                                                        <div className="pt-2" key={`children-${x.id}`}>
                                                             <Row>
                                                                 <Col xs={19}>
                                                                     {/* <Checkbox
@@ -1241,7 +1238,7 @@ const mapPage = () => {
                                     >
                                         <Select>
                                             {groupLayerList.map((e, i) => (
-                                                <Option key={e.id} value={e.id}>
+                                                <Option key={`groupLayerList-${e.id}`} value={e.id}>
                                                     {e.group_name}
                                                 </Option>
                                             ))}
@@ -1330,7 +1327,7 @@ const mapPage = () => {
                 title="Process ส่งมอบโครงการ"
                 placement={"left"}
                 visible={visibleDashboard}
-                onClose={() => setVisibleDashboard(false)}
+                onClose={() => setVisibleDashboard(!visibleDashboard)}
                 maskClosable={false}
                 style={{ width: visibleDashboard ? 650 : 0 }}
             >
@@ -1376,7 +1373,7 @@ const mapPage = () => {
                                             placeholder="ชั้นข้อมูล"
                                             allowClear
                                         >
-                                            {layerList.map(e => <Option value={e.id}>{e.name_layer}</Option>)}
+                                            {layerList.map(e => <Option key={`layer_group-${e.id}`} value={e.id}>{e.name_layer}</Option>)}
                                         </Select>
                                     </Form.Item>
                                 </div>
@@ -1400,7 +1397,7 @@ const mapPage = () => {
                                             allowClear
                                             onChange={(e) => onChangeProv(e, formDashboard)}
                                         >
-                                            {provinceList.map(e => <Option value={e.name}>{e.name}</Option>)}
+                                            {provinceList.map(e => <Option key={`prov1-${e.id}`} value={e.name}>{e.name}</Option>)}
                                         </Select>
                                     </Form.Item>
                                 </div>
@@ -1414,7 +1411,7 @@ const mapPage = () => {
                                             allowClear
                                             onChange={(e) => onChangeAmp(e, formDashboard)}
                                         >
-                                            {districtList.map(e => <Option value={e.name}>{e.name}</Option>)}
+                                            {districtList.map(e => <Option key={`amp1-${e.id}`} value={e.name}>{e.name}</Option>)}
                                         </Select>
                                     </Form.Item>
                                 </div>
@@ -1427,7 +1424,7 @@ const mapPage = () => {
                                             placeholder="ตำบล"
                                             allowClear
                                         >
-                                            {subDistrictList.map(e => <Option value={e.name}>{e.name}</Option>)}
+                                            {subDistrictList.map(e => <Option key={`tam1-${e.id}`} value={e.name}>{e.name}</Option>)}
                                         </Select>
                                     </Form.Item>
                                 </div>
@@ -1515,7 +1512,7 @@ const mapPage = () => {
                 title="ต้นหา"
                 placement={"left"}
                 visible={visibleSearch}
-                onClose={() => setVisibleSearch(false)}
+                onClose={() => setVisibleSearch(!visibleSearch)}
                 maskClosable={false}
                 style={{ width: visibleSearch ? 650 : 0 }}
             >
@@ -1563,7 +1560,7 @@ const mapPage = () => {
                                         placeholder="ชั้นข้อมูล"
                                         allowClear
                                     >
-                                        {layerList.map(e => <Option value={e.id}>{e.name_layer}</Option>)}
+                                        {layerList.map(e => <Option key={`name-layer-${e.id}`} value={e.id}>{e.name_layer}</Option>)}
                                     </Select>
                                 </Form.Item>
                             </div>
@@ -1587,7 +1584,7 @@ const mapPage = () => {
                                         allowClear
                                         onChange={(e) => onChangeProv(e, formSearch)}
                                     >
-                                        {provinceList.map(e => <Option value={e.name}>{e.name}</Option>)}
+                                        {provinceList.map(e => <Option key={`prov-${e.id}`} value={e.name}>{e.name}</Option>)}
                                     </Select>
                                 </Form.Item>
                             </div>
@@ -1601,7 +1598,7 @@ const mapPage = () => {
                                         allowClear
                                         onChange={(e) => onChangeAmp(e, formSearch)}
                                     >
-                                        {districtList.map(e => <Option value={e.name}>{e.name}</Option>)}
+                                        {districtList.map(e => <Option key={`amp-${e.id}`} value={e.name}>{e.name}</Option>)}
                                     </Select>
                                 </Form.Item>
                             </div>
@@ -1614,7 +1611,7 @@ const mapPage = () => {
                                         placeholder="ตำบล"
                                         allowClear
                                     >
-                                        {subDistrictList.map(e => <Option value={e.name}>{e.name}</Option>)}
+                                        {subDistrictList.map(e => <Option key={`tam-${e.id}`} value={e.name}>{e.name}</Option>)}
                                     </Select>
                                 </Form.Item>
                             </div>
@@ -1723,24 +1720,26 @@ const mapPage = () => {
                         <Row className="pt-3" gutter={[16, 5]} style={{ margin: 0 }}>
                             {
                                 rasterDataDron1.slice(0, loadmore1.dronMore).map((data, index) => {
-                                    return <Col span={8} key={index} >
-                                        <Card
-                                            className={`${selectwms.some((item) => item.name == data.id) ? "cardwa" : ""}`}
-                                            bodyStyle={{ padding: "5px", }}
-                                            bordered={false}
-                                            onClick={() => Clickwms(data)}
-                                            hoverable
-                                            style={{ width: "100%", height: "100%", cursor: "pointer", }}
-                                            cover={<img style={{ objectFit: "cover", height: "70px" }} alt="example" src={`${process.env.NEXT_PUBLIC_SERVICE}/uploads/satellite-aerial-photographs/${data.id}.jpg`} />}
-                                        >
-                                            <p style={{ flexWrap: "wrap" }}>{data.wms}</p>
-                                            {
-                                                selectwms.some((item) => item.name == data.id) ?
-                                                    <EyeFilled style={{ position: "absolute", bottom: "5px", right: "5px", color: "#0f7fff" }} />
-                                                    : null
-                                            }
-                                        </Card>
-                                    </Col>
+                                    return (
+                                        <Col key={`dronMore-${index}`} span={8} key={index} >
+                                            <Card
+                                                className={`${selectwms.some((item) => item.name == data.id) ? "cardwa" : ""}`}
+                                                bodyStyle={{ padding: "5px", }}
+                                                bordered={false}
+                                                onClick={() => Clickwms(data)}
+                                                hoverable
+                                                style={{ width: "100%", height: "100%", cursor: "pointer", }}
+                                                cover={<img style={{ objectFit: "cover", height: "70px" }} alt="example" src={`${process.env.NEXT_PUBLIC_SERVICE}/uploads/satellite-aerial-photographs/${data.id}.jpg`} />}
+                                            >
+                                                <p style={{ flexWrap: "wrap" }}>{data.wms}</p>
+                                                {
+                                                    selectwms.some((item) => item.name == data.id) ?
+                                                        <EyeFilled style={{ position: "absolute", bottom: "5px", right: "5px", color: "#0f7fff" }} />
+                                                        : null
+                                                }
+                                            </Card>
+                                        </Col>
+                                    )
                                 })
                             }
                             {
