@@ -58,6 +58,8 @@ const mapPage = () => {
     const [provinceList, setProvinceList] = useState([])
     const [districtList, setDistrictList] = useState([])
     const [subDistrictList, setSubDistrictList] = useState([])
+    const [statusProject, setStatusProject] = useState([])
+
     useEffect(() => {
         const loader = new Loader({
             apiKey: process.env.NEXT_PUBLIC_GOOGLE_API_KEY,
@@ -80,8 +82,18 @@ const mapPage = () => {
         });
         loadShapeFile()
         loadGetShapeProvince()
+        getMasStatusProject()
     }, []);
 
+    const getMasStatusProject = async () => {
+        try {
+            const { data } = await API.get(`masterdata/masStatusProject`)
+            // console.log('data.items :>> ', data.items);
+            setStatusProject(data.items)
+        } catch (error) {
+
+        }
+    }
     const loadGetShapeProvince = async (layer_group = "f942a946-3bcb-4062-9207-d78ab437edf3") => {
         try {
             const { data } = await API.get(`/shp/getShapeProvince?layer_group=${layer_group}`)
@@ -91,6 +103,8 @@ const mapPage = () => {
                 ...provAmpTamAll, prov, amp, tam
             })
             setProvinceList(prov)
+            setDistrictList(amp)
+            setSubDistrictList(tam)
         } catch (error) {
 
         }
@@ -110,12 +124,22 @@ const mapPage = () => {
     }
 
     const onChangeAmp = (value, _form) => {
-        const find_amp = provAmpTamAll.amp.find(e => e.name == value)
+        let find_amp = provAmpTamAll.amp.find(e => e.name == value), provList
         if (find_amp) {
             const tamList = provAmpTamAll.tam.filter(e => e.amp_id == find_amp.id)
             setSubDistrictList(tamList)
         }
-        if (_form) _form.setFieldsValue({ ..._form, tam: null })
+        if (find_amp) provList = provAmpTamAll.prov.find(e => e.id == find_amp.prov_id)
+        if (_form) _form.setFieldsValue({ ..._form, prov: provList ? provList.name : _form.prov, tam: null })
+    }
+
+    const onChangeTam = (value, _form) => {
+        let tamList = provAmpTamAll.tam.find(e => e.name == value), ampList, provList
+        if (tamList) ampList = provAmpTamAll.amp.find(e => e.id == tamList.amp_id)
+        if (ampList) {
+            provList = provAmpTamAll.prov.find(e => e.id == ampList.prov_id)
+            if (_form) _form.setFieldsValue({ ..._form, amp: ampList.name, prov: provList.name })
+        }
     }
 
     const clickHome = () => {
@@ -802,6 +826,7 @@ const mapPage = () => {
             setSumData(10)
             data.items.data.forEach((e, i) => {
                 e.index = i + 1;
+                e.status = e.status.toString()
                 // if (e.color) {
                 //     const rgb = JSON.parse(e.color)
                 //     e.color = `rgb(${rgb.r},${rgb.g},${rgb.b},${rgb.a})`;
@@ -876,26 +901,34 @@ const mapPage = () => {
     }
 
     const editShapefileSearch = (item, index) => {
-        // console.log('item :>> ', item);
+        console.log('item :>> ', item);
         const formData = []
         const setFieldsValue = {}
 
         const disabled = ["gid", "table_name"],
             required = ["project_na", "status"],
             hide = ["index", "color", "checked"],
+            select = ["status"],
             sort = []
 
         for (const [key, value] of Object.entries(item)) {
             // console.log(`${key}:key`);
             // console.log(`${value}:value`);
             if (typeof value != "object" && !(hide.find(x => x == key))) {
-                formData.push({
-                    label: key.toUpperCase(),
-                    name: key,
-                    required: required.find(x => x == key) ? true : false,
-                    disabled: disabled.find(x => x == key) ? true : false,
-                    message: `Please input your ${key}!`,
-                })
+                const obj = {}
+                obj.label = key.toUpperCase()
+                obj.name = key;
+                obj.required = required.find(x => x == key) ? true : false;
+                obj.disabled = disabled.find(x => x == key) ? true : false;
+                obj.message = `Please input your ${key}!`;
+                obj.type = `input`
+                if (select.find(x => x == key)) {
+                    obj.type = `select`
+                    obj.list = statusProject
+                    obj.value = "status_code"
+                    obj.text = "name"
+                }
+                formData.push(obj)
                 setFieldsValue[key] = value
             }
         }
@@ -933,6 +966,7 @@ const mapPage = () => {
             setVisibleModalSearch(false)
         } catch (error) {
             console.log('error :>> ', error);
+            message.error("มีบางอย่างผิดพลาด !");
         }
     }
 
@@ -1612,6 +1646,7 @@ const mapPage = () => {
                                         <Select
                                             placeholder="ตำบล"
                                             allowClear
+                                            onChange={(e) => onChangeTam(e, formDashboard)}
                                         >
                                             {subDistrictList.map(e => <Option key={`tam1-${e.id}`} value={e.name}>{e.name}</Option>)}
                                         </Select>
@@ -1767,6 +1802,7 @@ const mapPage = () => {
                                     <Select
                                         placeholder="ตำบล"
                                         allowClear
+                                        onChange={(e) => onChangeTam(e, formSearch)}
                                     >
                                         {subDistrictList.map(e => <Option key={`tam-${e.id}`} value={e.name}>{e.name}</Option>)}
                                     </Select>
@@ -1892,14 +1928,32 @@ const mapPage = () => {
                     autoComplete="off"
                 >
                     {formDataShapefile.map((e, i) => (
-                        <Form.Item
-                            key={`form-modal-search-${i}`}
-                            label={e.label}
-                            name={e.name}
-                            rules={[{ required: e.required, message: e.message }]}
-                        >
-                            <Input disabled={e.disabled} />
-                        </Form.Item>
+                        <>
+                            {e.type === "select" ? (
+                                <Form.Item
+                                    key={`form-modal-search-${i}`}
+                                    label={e.label}
+                                    name={e.name}
+                                    rules={[{ required: e.required, message: e.message }]}
+                                >
+                                    <Select
+                                        placeholder={e.label}
+                                        allowClear
+                                    >
+                                        {e.list.map((x, index) => <Option key={`select-${e.name}-${index}`} value={x[e.value]}>{x[e.text]}</Option>)}
+                                    </Select>
+                                </Form.Item>
+                            ) : (
+                                <Form.Item
+                                    key={`form-modal-search-${i}`}
+                                    label={e.label}
+                                    name={e.name}
+                                    rules={[{ required: e.required, message: e.message }]}
+                                >
+                                    <Input disabled={e.disabled} />
+                                </Form.Item>
+                            )}
+                        </>
                     ))}
                 </Form>
             </Modal>
