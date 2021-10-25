@@ -58,6 +58,8 @@ const mapPage = () => {
     const [provinceList, setProvinceList] = useState([])
     const [districtList, setDistrictList] = useState([])
     const [subDistrictList, setSubDistrictList] = useState([])
+    const [statusProject, setStatusProject] = useState([])
+
     useEffect(() => {
         const loader = new Loader({
             apiKey: process.env.NEXT_PUBLIC_GOOGLE_API_KEY,
@@ -76,7 +78,7 @@ const mapPage = () => {
             google.maps.event.addListener(_map, "mousemove", (event) => {
                 getLatLon(event);
             });
-            // clickMapShowLatLag(_map)
+            clickMapShowLatLag(_map)
         });
         loadShapeFile()
         loadGetShapeProvince()
@@ -88,8 +90,18 @@ const mapPage = () => {
             cursor.style.left = x + "px";
             cursor.style.top = y + "px";
         })
+        getMasStatusProject()
     }, []);
 
+    const getMasStatusProject = async () => {
+        try {
+            const { data } = await API.get(`masterdata/masStatusProject`)
+            // console.log('data.items :>> ', data.items);
+            setStatusProject(data.items)
+        } catch (error) {
+
+        }
+    }
     const loadGetShapeProvince = async (layer_group = "f942a946-3bcb-4062-9207-d78ab437edf3") => {
         try {
             const { data } = await API.get(`/shp/getShapeProvince?layer_group=${layer_group}`)
@@ -99,6 +111,8 @@ const mapPage = () => {
                 ...provAmpTamAll, prov, amp, tam
             })
             setProvinceList(prov)
+            setDistrictList(amp)
+            setSubDistrictList(tam)
         } catch (error) {
 
         }
@@ -118,12 +132,22 @@ const mapPage = () => {
     }
 
     const onChangeAmp = (value, _form) => {
-        const find_amp = provAmpTamAll.amp.find(e => e.name == value)
+        let find_amp = provAmpTamAll.amp.find(e => e.name == value), provList
         if (find_amp) {
             const tamList = provAmpTamAll.tam.filter(e => e.amp_id == find_amp.id)
             setSubDistrictList(tamList)
         }
-        if (_form) _form.setFieldsValue({ ..._form, tam: null })
+        if (find_amp) provList = provAmpTamAll.prov.find(e => e.id == find_amp.prov_id)
+        if (_form) _form.setFieldsValue({ ..._form, prov: provList ? provList.name : _form.prov, tam: null })
+    }
+
+    const onChangeTam = (value, _form) => {
+        let tamList = provAmpTamAll.tam.find(e => e.name == value), ampList, provList
+        if (tamList) ampList = provAmpTamAll.amp.find(e => e.id == tamList.amp_id)
+        if (ampList) {
+            provList = provAmpTamAll.prov.find(e => e.id == ampList.prov_id)
+            if (_form) _form.setFieldsValue({ ..._form, amp: ampList.name, prov: provList.name })
+        }
     }
 
     const clickHome = () => {
@@ -529,9 +553,11 @@ const mapPage = () => {
     const clickLine = () => {
         setOpenLine(!openLine) // สลับปุ่มเปิดปิด
         google.maps.event.clearListeners(map, 'click');
-        let count = 0 //นับจำนวนครั้งที่กด วัดระยะ ถ้ากด3ครั้งให้ยกเลิกเมพใหม่
-        let origin //จุดมาร์คที่ 1
-        let destination //จุดมาร์คที่ 2
+        const distance = []
+        let count = 0 //นับจำนวนครั้งที่กด วัดระยะ
+        let max = [] //รวมระยะทางทั้งหมด
+        let sum = null
+        let infoWindow
         let path
         let markers = []
         const service = new google.maps.DistanceMatrixService();
@@ -556,10 +582,10 @@ const mapPage = () => {
                     }
                     if (count === 2) {
                         console.log(2);
-                        destination = event.latLng
+                        // destination = event.latLng
                         const request = {
                             origins: [origin],
-                            destinations: [destination],
+                            destinations: [event.latLng],
                             travelMode: google.maps.TravelMode.DRIVING,
                             unitSystem: google.maps.UnitSystem.METRIC,
                             avoidHighways: false,
@@ -567,24 +593,25 @@ const mapPage = () => {
                         };
                         const test = await service.getDistanceMatrix(request)
                         if (test.rows[0].elements[0].distance !== undefined) {
-                            let infoWindow = await new google.maps.InfoWindow({
-                                content: `ระยะทาง${test.rows[0].elements[0].distance.text}`,
-                                position: destination,
-                            })
+                            // let infoWindow = await new google.maps.InfoWindow({
+                            //     content: `ระยะทาง${test.rows[0].elements[0].distance.text}`,
+                            //     position: destination,
+                            // })
                             // infoWindow.open(map)
                             setDistanct(test.rows[0].elements[0].distance.text);
                         }
                     }
                 } else {
                     path.forEach(i => path.pop())
-                    for (let i = 0; i < markers.length; i++) {
-                        markers[i].setMap(null);
-                        path.pop()
-                    }
-                    markers = []
+                    // for (let i = 0; i < markers.length; i++) {
+                    //     markers[i].setMap(null);
+                    //     path.pop()
+                    // }
+                    // markers = []
                     count = 0
                     setDistanct(null)
                 }
+                // count++
             })
         } else {
             let path = poly.getPath();
@@ -723,6 +750,10 @@ const mapPage = () => {
             }
         }
     }
+    const [buttonMap, setbuttonMap] = useState(null)
+    useEffect(() => {
+        setbuttonMap({ traffic: new google.maps.TrafficLayer(), transit: new google.maps.TransitLayer() })
+    }, [])
     const changeMap = async (info) => {
         switch (info) {
             case "Terrain":
@@ -738,33 +769,29 @@ const mapPage = () => {
                     map.setMapTypeId("terrain");
                     setButtomChangeMap({ ...buttomChangeMap, terrain: true })
                     $(".terrain").css("background-color", "rgb(0, 102, 255)")
-                    // background-color: rgb(0, 102, 255);
                 }
                 break;
             case "Traffic":
-                const trafficLayer = new google.maps.TrafficLayer();
-                trafficLayer.setMap(map);
-                $(".traffic").css("background-color", "rgb(0, 102, 255)")
-
-                // if (buttomChangeMap.traffic) {
-                //     // kuyyyy.setMap(map);
-                //     kuyyyy = await new google.maps.TrafficLayer();
-
-                //     await kuyyyy.setMap(null);
-                //     alert("close")
-                //     await setButtomChangeMap({ ...buttomChangeMap, traffic: false })
-                // } else {
-                //     kuyyyy = await new google.maps.TrafficLayer();
-
-                //     alert("open")
-                //     await kuyyyy.setMap(map);
-                //     await setButtomChangeMap({ ...buttomChangeMap, traffic: true })
-                // }
+                if (buttomChangeMap.traffic) {
+                    buttonMap.traffic.setMap(null)
+                    setButtomChangeMap({ ...buttomChangeMap, traffic: false })
+                    $(".traffic").css("background-color", "white")
+                } else {
+                    buttonMap.traffic.setMap(map)
+                    setButtomChangeMap({ ...buttomChangeMap, traffic: true })
+                    $(".traffic").css("background-color", "rgb(0, 102, 255)")
+                }
                 break;
             case "Transit":
-                const transitLayer = new google.maps.TransitLayer();
-                transitLayer.setMap(map)
-                $(".transit").css("background-color", "rgb(0, 102, 255)")
+                if (buttomChangeMap.transit) {
+                    buttonMap.transit.setMap(null)
+                    setButtomChangeMap({ ...buttomChangeMap, transit: false })
+                    $(".transit").css("background-color", "white")
+                } else {
+                    buttonMap.transit.setMap(map)
+                    setButtomChangeMap({ ...buttomChangeMap, transit: true })
+                    $(".transit").css("background-color", "rgb(0, 102, 255)")
+                }
                 break
             default:
                 break;
@@ -855,6 +882,7 @@ const mapPage = () => {
             setSumData(10)
             data.items.data.forEach((e, i) => {
                 e.index = i + 1;
+                e.status = e.status.toString()
                 // if (e.color) {
                 //     const rgb = JSON.parse(e.color)
                 //     e.color = `rgb(${rgb.r},${rgb.g},${rgb.b},${rgb.a})`;
@@ -929,26 +957,34 @@ const mapPage = () => {
     }
 
     const editShapefileSearch = (item, index) => {
-        // console.log('item :>> ', item);
+        console.log('item :>> ', item);
         const formData = []
         const setFieldsValue = {}
 
         const disabled = ["gid", "table_name"],
             required = ["project_na", "status"],
             hide = ["index", "color", "checked"],
+            select = ["status"],
             sort = []
 
         for (const [key, value] of Object.entries(item)) {
             // console.log(`${key}:key`);
             // console.log(`${value}:value`);
             if (typeof value != "object" && !(hide.find(x => x == key))) {
-                formData.push({
-                    label: key.toUpperCase(),
-                    name: key,
-                    required: required.find(x => x == key) ? true : false,
-                    disabled: disabled.find(x => x == key) ? true : false,
-                    message: `Please input your ${key}!`,
-                })
+                const obj = {}
+                obj.label = key.toUpperCase()
+                obj.name = key;
+                obj.required = required.find(x => x == key) ? true : false;
+                obj.disabled = disabled.find(x => x == key) ? true : false;
+                obj.message = `Please input your ${key}!`;
+                obj.type = `input`
+                if (select.find(x => x == key)) {
+                    obj.type = `select`
+                    obj.list = statusProject
+                    obj.value = "status_code"
+                    obj.text = "name"
+                }
+                formData.push(obj)
                 setFieldsValue[key] = value
             }
         }
@@ -986,6 +1022,7 @@ const mapPage = () => {
             setVisibleModalSearch(false)
         } catch (error) {
             console.log('error :>> ', error);
+            message.error("มีบางอย่างผิดพลาด !");
         }
     }
 
@@ -1206,11 +1243,12 @@ const mapPage = () => {
 
             <div className="tools-map-cog" onClick={() => openCloseRaster()}>
                 <Col span={6}>
-                    <i
+                    {/* <i
                         className="fa fa-cog"
                         style={{ fontSize: "20px", marginTop: "2.5px" }}
                         id="config-map-cog"
-                    />
+                    /> */}
+                    <img src="assets/images/layer.PNG" alt="" width="23" />
                 </Col>
             </div>
 
@@ -1327,13 +1365,11 @@ const mapPage = () => {
             <div className="tools-map-area3" hidden={changmap} >
                 <button className="btn btn-light" onClick={() => clickChangeMap()} onMouseOver={() => test()} >
                     <img width="90" height="90" style={{ borderRadius: "10px" }} src={imgChangeMap} alt="" />
-                    {/* onMouseOver={() => $("#changeMap").fadeIn()} */}
                     <span style={{ position: "absolute", bottom: "15px", left: "25px", textAlign: "center" }}>
                         {txtChangeMap}
                     </span>
                 </button>
                 <div id="changeMap" style={{ display: "none" }} >
-                    {/* onMouseLeave={() => { $("#changeMap").fadeOut() }} */}
                     <span style={{ display: "flex", justifyContent: "space-around" }} >
                         <span style={{ display: "flex", flexDirection: "column", alignItems: "center" }} >
                             <button className="btn btn-light btn-sm terrain" onClick={() => changeMap("Terrain")} >
@@ -1666,6 +1702,7 @@ const mapPage = () => {
                                         <Select
                                             placeholder="ตำบล"
                                             allowClear
+                                            onChange={(e) => onChangeTam(e, formDashboard)}
                                         >
                                             {subDistrictList.map(e => <Option key={`tam1-${e.id}`} value={e.name}>{e.name}</Option>)}
                                         </Select>
@@ -1821,6 +1858,7 @@ const mapPage = () => {
                                     <Select
                                         placeholder="ตำบล"
                                         allowClear
+                                        onChange={(e) => onChangeTam(e, formSearch)}
                                     >
                                         {subDistrictList.map(e => <Option key={`tam-${e.id}`} value={e.name}>{e.name}</Option>)}
                                     </Select>
@@ -1946,14 +1984,32 @@ const mapPage = () => {
                     autoComplete="off"
                 >
                     {formDataShapefile.map((e, i) => (
-                        <Form.Item
-                            key={`form-modal-search-${i}`}
-                            label={e.label}
-                            name={e.name}
-                            rules={[{ required: e.required, message: e.message }]}
-                        >
-                            <Input disabled={e.disabled} />
-                        </Form.Item>
+                        <>
+                            {e.type === "select" ? (
+                                <Form.Item
+                                    key={`form-modal-search-${i}`}
+                                    label={e.label}
+                                    name={e.name}
+                                    rules={[{ required: e.required, message: e.message }]}
+                                >
+                                    <Select
+                                        placeholder={e.label}
+                                        allowClear
+                                    >
+                                        {e.list.map((x, index) => <Option key={`select-${e.name}-${index}`} value={x[e.value]}>{x[e.text]}</Option>)}
+                                    </Select>
+                                </Form.Item>
+                            ) : (
+                                <Form.Item
+                                    key={`form-modal-search-${i}`}
+                                    label={e.label}
+                                    name={e.name}
+                                    rules={[{ required: e.required, message: e.message }]}
+                                >
+                                    <Input disabled={e.disabled} />
+                                </Form.Item>
+                            )}
+                        </>
                     ))}
                 </Form>
             </Modal>
