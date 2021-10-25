@@ -1353,7 +1353,7 @@ const mapPage = () => {
                     </button>
                 </Col>
             </div>
-            <div className="tools-map-area3" >
+            <div className="tools-map-area3" hidden={changmap} >
                 <button className="btn btn-light" onClick={() => clickChangeMap()} onMouseOver={() => test()} >
                     <img width="90" height="90" style={{ borderRadius: "10px" }} src={imgChangeMap} alt="" />
                     <span style={{ position: "absolute", bottom: "15px", left: "25px", textAlign: "center" }}>
