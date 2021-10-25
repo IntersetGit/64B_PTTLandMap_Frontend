@@ -598,13 +598,15 @@ const mapPage = () => {
                         avoidTolls: false,
                     };
                     const test = await service.getDistanceMatrix(request)
-                    max.push(parseFloat(test.rows[0].elements[0].distance.text))
-                    sum = max.reduce((partial_sum, a) => partial_sum + a, 0);
-                    infoWindow = new google.maps.InfoWindow({
-                        content: `ระยะทาง${sum.toFixed(2)}`,
-                        position: event.latLng,
-                    })
-                    infoWindow.open(map)
+                    if (test.rows[0].elements[0].distance !== undefined) {
+                        max.push(parseFloat(test.rows[0].elements[0].distance.text))
+                        sum = max.reduce((partial_sum, a) => partial_sum + a, 0);
+                        infoWindow = new google.maps.InfoWindow({
+                            content: `ระยะทาง${sum.toFixed(2)}`,
+                            position: event.latLng,
+                        })
+                        infoWindow.open(map)
+                    }
                 }
                 count++
             })
@@ -1232,11 +1234,12 @@ const mapPage = () => {
 
             <div className="tools-map-cog" onClick={() => openCloseRaster()}>
                 <Col span={6}>
-                    <i
+                    {/* <i
                         className="fa fa-cog"
                         style={{ fontSize: "20px", marginTop: "2.5px" }}
                         id="config-map-cog"
-                    />
+                    /> */}
+                    <img src="assets/images/layer.PNG" alt="" width="23" />
                 </Col>
             </div>
 

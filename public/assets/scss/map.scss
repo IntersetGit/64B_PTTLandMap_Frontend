@@ -96,9 +96,8 @@ body {
   right:-17px;
   width: 50px;
   background: linear-gradient( 45deg, #e638e7, #6f33c9da, #2016d4c7);
-  // background: -webkit-linear-gradient(left, red , blue);
   cursor: pointer;
-  top: 125px;
+  top: 75px;
   color: aliceblue;
   padding: 7px;
   border-radius: 16px;
@@ -108,7 +107,7 @@ body {
 .tools-map-area {
   position: absolute !important;
   right: 5px;
-  top: 170px;
+  top: 125px;
   color: aliceblue;
   padding: 10px;
   border-radius: 15px;
@@ -129,7 +128,7 @@ body {
 .tools-map-area2 {
   position: absolute !important;
   right: 5px;
-  top: 455px;
+  top: 406px;
   color: aliceblue;
   padding: 10px;
   border-radius: 15px;
