@@ -65,11 +65,10 @@ const LoginPage = () => {
         }
       )
       .catch((error) => {
-        // console.log('error :>> ', error.response.status);
+        console.log('error :>> ', error.response.status);
+        console.log('error :>> ', error.response.data);
         message.error(
-          error.response && error.response.status == 500
-            ? error.response.data.error.message
-            : "มีบางอย่างผิดพลาด !"
+          error.response.data || error.response.status == 400 ? error.response.data.error.message : "มีบางอย่างผิดพลาด !"
         );
         cookies.remove("token");
         cookies.remove("refresh_token");
