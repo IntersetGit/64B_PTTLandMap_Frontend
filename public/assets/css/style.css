@@ -9522,3 +9522,10 @@ ul.comment-list li ul.children {
     box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
     transition: 0.3s;
 }
+
+#cursor {
+    position: absolute;
+    transition: 0s;
+    transform: translate(-10%, 100%);
+    z-index: 99;
+}

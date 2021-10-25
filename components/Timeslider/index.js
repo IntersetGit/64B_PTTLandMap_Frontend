@@ -10,7 +10,7 @@ import {
 import { Slider, Button, Image } from 'antd';
 import styled from 'styled-components';
 // import Image from 'next/image'
-import { DatePicker, ConfigProvider } from 'antd';
+import { DatePicker } from 'antd';
 const { RangePicker } = DatePicker;
 
 const RangePickerCustom = styled(RangePicker)`
@@ -184,7 +184,7 @@ function Timeslide({ data = testdata, onChange = (e) => { }, onDateChange = (e) 
                 </div>
                 <RangePickerCustom
                     value={hackValue || datevalue}
-                    disabledDate={disabledDate}
+                    // disabledDate={disabledDate}
                     onCalendarChange={val => setDates(val)}
                     onChange={val => setDatevalue(val)}
                     onOpenChange={onOpenChange}
@@ -196,7 +196,7 @@ function Timeslide({ data = testdata, onChange = (e) => { }, onDateChange = (e) 
                 <div className={[styles.timeslidebody]}>
                     <div className={styles.date} onClick={() => setShowdatetime(!showdatetime)}>
                         <span style={{ color: "white", fontWeight: "bold" }}>DATE</span>
-                        <Image src="/assets/images/Calender.PNG" width={35} height={35} />
+                        <Image preview={false} src="/assets/images/Calender.PNG" width={35} height={35} />
                     </div>
                     <div className={styles.player}>
                         <div className="btnplay" style={{ width: "10%", display: 'flex', justifyContent: "center" }}>
@@ -209,7 +209,7 @@ function Timeslide({ data = testdata, onChange = (e) => { }, onDateChange = (e) 
                         <div className="btnleft" style={{ width: "5%", textAlign: "center" }}>
                             <LeftCircleOutlined onClick={Previewstep} style={{ fontSize: "25px ", color: "#FFF", }} />
                         </div>
-                        <div className={styles.slide} style={{ width: "80%", flexDirection: "column", }}>
+                        <div style={{ width: "80%", flexDirection: "column", }}>
                             <span style={{ color: "white", fontWeight: "bold", padding: "0 5px" }}>Time Slider</span>
                             <span style={{ color: "white", fontWeight: "bold", padding: "0 5px" }}>{marks && marks[value]?.label ? marks[value]?.label : ""}</span>
                             <SliderCustom onChange={e => setValue(e)} value={value} tipFormatter={(e) => marks[e]?.label || e} step={10} max={max} marks={marks} defaultValue={0} trackStyle={{ backgroundColor: "#BC9945", }} />

@@ -80,6 +80,14 @@ const mapPage = () => {
         });
         loadShapeFile()
         loadGetShapeProvince()
+
+        var cursor = document.getElementById("cursor");
+        document.addEventListener("mousemove", (e) => {
+            var x = e.clientX;
+            var y = e.clientY;
+            cursor.style.left = x + "px";
+            cursor.style.top = y + "px";
+        })
     }, []);
 
     const loadGetShapeProvince = async (layer_group = "f942a946-3bcb-4062-9207-d78ab437edf3") => {
@@ -480,38 +488,75 @@ const mapPage = () => {
     }
     /* เปิดปิดเส้นวัดระยะ */
     const [openLine, setOpenLine] = useState(true) //ปุ่มเปิดปิด Line
+    const [poly, setPoly] = useState(null);
+    const [distanct, setDistanct] = useState(null);
+    useEffect(() => {
+        const symbolOne = {
+            path: google.maps.SymbolPath.CIRCLE,
+            scale: 6,
+            strokeColor: "#000000",
+            fillColor: "#ffffff",
+            fillOpacity: 1,
+            strokeWeight: 3,
+        };
+
+        let poly = new google.maps.Polyline({
+            fillOpacity: 0,
+            icons: [
+                {
+                    icon: symbolOne,
+                    offset: "0%",
+                },
+                {
+                    icon: {
+                        path: "M 0,-1 0,1",
+                        strokeOpacity: 1,
+                        scale: 2,
+                        rotation: 90,
+
+                    },
+                    offset: "10%",
+                    repeat: "20px",
+                },
+                {
+                    icon: symbolOne,
+                    offset: "100%",
+                },
+            ],
+        });
+        setPoly(poly);
+    }, []);
     const clickLine = () => {
+        setOpenLine(!openLine) // สลับปุ่มเปิดปิด
         google.maps.event.clearListeners(map, 'click');
         let count = 0 //นับจำนวนครั้งที่กด วัดระยะ ถ้ากด3ครั้งให้ยกเลิกเมพใหม่
         let origin //จุดมาร์คที่ 1
         let destination //จุดมาร์คที่ 2
         let path
         let markers = []
+        const service = new google.maps.DistanceMatrixService();
 
-        let poly = new google.maps.Polyline({
-            strokeColor: "#000000",
-            strokeOpacity: 1.0,
-            strokeWeight: 3,
-        });
-        poly.setMap(map);
-        setOpenLine(!openLine) // สลับปุ่มเปิดปิด
         if (openLine) {
+            poly.setMap(map);
+            map.setOptions({ draggableCursor: 'crosshair' });
+
             map.addListener("click", async (event) => {
                 if (count < 2) {
                     count++
-                    const marker = new google.maps.Marker({
-                        position: event.latLng,
-                        map: map
-                    })
-                    markers.push(marker)
+                    // const marker = new google.maps.Marker({
+                    //     position: event.latLng,
+                    //     map: map
+                    // })
+                    // markers.push(marker)
                     path = poly.getPath();
                     path.push(event.latLng);
                     if (count === 1) {
+                        console.log(1);
                         origin = event.latLng
                     }
                     if (count === 2) {
+                        console.log(2);
                         destination = event.latLng
-                        const service = new google.maps.DistanceMatrixService();
                         const request = {
                             origins: [origin],
                             destinations: [destination],
@@ -526,20 +571,28 @@ const mapPage = () => {
                                 content: `ระยะทาง${test.rows[0].elements[0].distance.text}`,
                                 position: destination,
                             })
-                            infoWindow.open(map)
+                            // infoWindow.open(map)
+                            setDistanct(test.rows[0].elements[0].distance.text);
                         }
                     }
                 } else {
+                    path.forEach(i => path.pop())
                     for (let i = 0; i < markers.length; i++) {
                         markers[i].setMap(null);
                         path.pop()
                     }
                     markers = []
                     count = 0
+                    setDistanct(null)
                 }
             })
         } else {
+            let path = poly.getPath();
+            path.forEach(i => path.pop())
+            map.setOptions({ draggableCursor: 'default' });
             google.maps.event.clearListeners(map, 'click');
+            setDistanct(null)
+
             // clickMapShowLatLag(map)
         }
     }
@@ -1122,6 +1175,7 @@ const mapPage = () => {
             <Head>
                 <title>PTT Land Map</title>
             </Head>
+            <div id="cursor" style={distanct && { borderRadius: "10%", padding: "5px", backgroundColor: "#FFF" }}>{distanct}</div>
             <Timeslide onClose={() => setSlidemapshow(false)} visible={slidemapshow} />
             <div className="tools-group-layer">
                 <button className="btn btn-light btn-sm" onClick={() => setVisibleShapeFile(true)}>
@@ -1270,7 +1324,7 @@ const mapPage = () => {
                     </button>
                 </Col>
             </div>
-            <div className="tools-map-area3" >
+            <div className="tools-map-area3" hidden={changmap} >
                 <button className="btn btn-light" onClick={() => clickChangeMap()} onMouseOver={() => test()} >
                     <img width="90" height="90" style={{ borderRadius: "10px" }} src={imgChangeMap} alt="" />
                     {/* onMouseOver={() => $("#changeMap").fadeIn()} */}
@@ -1303,9 +1357,8 @@ const mapPage = () => {
                 </div>
 
             </div>
-
+            {/* -------------------------------------Map-------------------------------------------- */}
             <div id="map" ref={googlemap} hidden={changmap} />
-
             <div id="container" hidden={!changmap}>
                 <div id="left">
                     <div id="map-left" className="map" ref={googlemapLeft}></div>
@@ -1314,6 +1367,7 @@ const mapPage = () => {
                     <div id="map-right" className="map" ref={googlemapRight}></div>
                 </div>
             </div>
+            {/* -----------------------------------------------------------------------------------  */}
             {/* Shape File */}
             <Drawer
                 width={350}
