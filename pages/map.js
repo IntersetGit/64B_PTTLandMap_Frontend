@@ -566,22 +566,24 @@ const mapPage = () => {
         //     google.maps.event.clearListeners(map, 'click');
         //     clickMapShowLatLag(map)
         // }
+        google.maps.event.clearListeners(map, 'click');
+        const distance = []
+        let count = 0 //นับจำนวนครั้งที่กด วัดระยะ
+        let max = [] //รวมระยะทางทั้งหมด
+        let sum = null
+        let infoWindow
+        let path
+        let poly = poly = new google.maps.Polyline({
+            strokeColor: "#000000",
+            strokeOpacity: 1.0,
+            strokeWeight: 3,
+        });
+        poly.setMap(map);
         setOpenLine(!openLine) // สลับปุ่มเปิดปิด
         if (openLine) {
-            google.maps.event.clearListeners(map, 'click');
-            let count = 0 //นับจำนวนครั้งที่กด วัดระยะ
-            let max = [] //รวมระยะทางทั้งหมด
-            let sum = null
-            let infoWindow
-            const distance = []
-            let poly = new google.maps.Polyline({
-                strokeColor: "#000000",
-                strokeOpacity: 1.0,
-                strokeWeight: 3,
-            });
-            poly.setMap(map);
+
             map.addListener("click", async (event) => {
-                const path = poly.getPath();
+                path = poly.getPath();
                 path.push(event.latLng);
                 distance.push(event.latLng.toJSON())
                 if (count > 0) {
