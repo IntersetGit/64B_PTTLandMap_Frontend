@@ -694,6 +694,10 @@ const mapPage = () => {
             }
         }
     }
+    const [buttonMap, setbuttonMap] = useState(null)
+    useEffect(() => {
+        setbuttonMap({ traffic: new google.maps.TrafficLayer(), transit: new google.maps.TransitLayer() })
+    }, [])
     const changeMap = async (info) => {
         switch (info) {
             case "Terrain":
@@ -709,33 +713,29 @@ const mapPage = () => {
                     map.setMapTypeId("terrain");
                     setButtomChangeMap({ ...buttomChangeMap, terrain: true })
                     $(".terrain").css("background-color", "rgb(0, 102, 255)")
-                    // background-color: rgb(0, 102, 255);
                 }
                 break;
             case "Traffic":
-                const trafficLayer = new google.maps.TrafficLayer();
-                trafficLayer.setMap(map);
-                $(".traffic").css("background-color", "rgb(0, 102, 255)")
-
-                // if (buttomChangeMap.traffic) {
-                //     // kuyyyy.setMap(map);
-                //     kuyyyy = await new google.maps.TrafficLayer();
-
-                //     await kuyyyy.setMap(null);
-                //     alert("close")
-                //     await setButtomChangeMap({ ...buttomChangeMap, traffic: false })
-                // } else {
-                //     kuyyyy = await new google.maps.TrafficLayer();
-
-                //     alert("open")
-                //     await kuyyyy.setMap(map);
-                //     await setButtomChangeMap({ ...buttomChangeMap, traffic: true })
-                // }
+                if (buttomChangeMap.traffic) {
+                    buttonMap.traffic.setMap(null)
+                    setButtomChangeMap({ ...buttomChangeMap, traffic: false })
+                    $(".traffic").css("background-color", "white")
+                } else {
+                    buttonMap.traffic.setMap(map)
+                    setButtomChangeMap({ ...buttomChangeMap, traffic: true })
+                    $(".traffic").css("background-color", "rgb(0, 102, 255)")
+                }
                 break;
             case "Transit":
-                const transitLayer = new google.maps.TransitLayer();
-                transitLayer.setMap(map)
-                $(".transit").css("background-color", "rgb(0, 102, 255)")
+                if (buttomChangeMap.transit) {
+                    buttonMap.transit.setMap(null)
+                    setButtomChangeMap({ ...buttomChangeMap, transit: false })
+                    $(".transit").css("background-color", "white")
+                } else {
+                    buttonMap.transit.setMap(map)
+                    setButtomChangeMap({ ...buttomChangeMap, transit: true })
+                    $(".transit").css("background-color", "rgb(0, 102, 255)")
+                }
                 break
             default:
                 break;
@@ -1307,13 +1307,11 @@ const mapPage = () => {
             <div className="tools-map-area3" >
                 <button className="btn btn-light" onClick={() => clickChangeMap()} onMouseOver={() => test()} >
                     <img width="90" height="90" style={{ borderRadius: "10px" }} src={imgChangeMap} alt="" />
-                    {/* onMouseOver={() => $("#changeMap").fadeIn()} */}
                     <span style={{ position: "absolute", bottom: "15px", left: "25px", textAlign: "center" }}>
                         {txtChangeMap}
                     </span>
                 </button>
                 <div id="changeMap" style={{ display: "none" }} >
-                    {/* onMouseLeave={() => { $("#changeMap").fadeOut() }} */}
                     <span style={{ display: "flex", justifyContent: "space-around" }} >
                         <span style={{ display: "flex", flexDirection: "column", alignItems: "center" }} >
                             <button className="btn btn-light btn-sm terrain" onClick={() => changeMap("Terrain")} >
