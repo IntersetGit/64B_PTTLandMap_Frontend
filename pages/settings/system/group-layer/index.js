@@ -368,7 +368,7 @@ const GroupLayerSystemPage = () => {
             <Input />
           </Form.Item>
           <Form.Item
-            name="Symbol"
+            name="symbol"
             label="Symbol"
             valuePropName="fileList"
             rules={[{ required: true }]}
@@ -421,7 +421,19 @@ const GroupLayerSystemPage = () => {
             extra="ขนาดรูปภาพไม่เกิน 50*50 pixcel"
           >
             {/* <ImgCrop rotate> */}
-            <Upload name="logo" action="/upload.do" listType="picture">
+            <Upload name="logo" action="/upload.do" listType="picture"
+              maxCount={1}
+            // defaultFileList={[
+            //   {
+            //     uid: '-1',
+            //     name: `${form.getFieldValue().id}.jpg`,
+            //     status: 'done',
+            //     url: `${process.env.NEXT_PUBLIC_SERVICE}/upload?Path=symbol_group&Length=1&Name=${form.getFieldValue().id}&SetType=jpg`,
+            //     thumbUrl: `${process.env.NEXT_PUBLIC_SERVICE}/upload?Path=symbol_group&Length=1&Name=${form.getFieldValue().id}&SetType=jpg`,
+
+            //   },
+            // ]}
+            >
               <Button icon={<UploadOutlined />}>Select File</Button>
             </Upload>
             {/* </ImgCrop> */}
