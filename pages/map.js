@@ -17,7 +17,8 @@ import {
     Button,
     message,
     Switch,
-    Slider
+    Slider,
+    Tooltip
 } from "antd";
 import Head from "next/head";
 import { useSelector } from "react-redux";
@@ -73,6 +74,9 @@ const mapPage = () => {
                 fullscreenControl: false,
                 center: centerMap,
                 zoom: 8,
+                streetViewControl: {
+                    streetViewControl: false
+                }
             });
             setMap(_map);
             google.maps.event.addListener(_map, "mousemove", (event) => {
@@ -551,75 +555,109 @@ const mapPage = () => {
         setPoly(poly);
     }, []);
     const clickLine = () => {
+        // setOpenLine(!openLine) // สลับปุ่มเปิดปิด
+        // google.maps.event.clearListeners(map, 'click');
+        // const distance = []
+        // let count = 0 //นับจำนวนครั้งที่กด วัดระยะ
+        // let max = [] //รวมระยะทางทั้งหมด
+        // let sum = null
+        // let infoWindow
+        // let path
+        // let markers = []
+        // const service = new google.maps.DistanceMatrixService();
+
+        // if (openLine) {
+        //     poly.setMap(map);
+        //     map.setOptions({ draggableCursor: 'crosshair' });
+
+        //     map.addListener("click", async (event) => {
+        //         if (count < 2) {
+        //             count++
+        //             // const marker = new google.maps.Marker({
+        //             //     position: event.latLng,
+        //             //     map: map
+        //             // })
+        //             // markers.push(marker)
+        //             path = poly.getPath();
+        //             path.push(event.latLng);
+        //             if (count === 1) {
+        //                 console.log(1);
+        //                 origin = event.latLng
+        //             }
+        //             if (count === 2) {
+        //                 console.log(2);
+        //                 // destination = event.latLng
+        //                 const request = {
+        //                     origins: [origin],
+        //                     destinations: [event.latLng],
+        //                     travelMode: google.maps.TravelMode.DRIVING,
+        //                     unitSystem: google.maps.UnitSystem.METRIC,
+        //                     avoidHighways: false,
+        //                     avoidTolls: false,
+        //                 };
+        //                 const test = await service.getDistanceMatrix(request)
+        //                 if (test.rows[0].elements[0].distance !== undefined) {
+        //                     // let infoWindow = await new google.maps.InfoWindow({
+        //                     //     content: `ระยะทาง${test.rows[0].elements[0].distance.text}`,
+        //                     //     position: destination,
+        //                     // })
+        //                     // infoWindow.open(map)
+        //                     setDistanct(test.rows[0].elements[0].distance.text);
+        //                 }
+        //             }
+        //         } else {
+        //             path.forEach(i => path.pop())
+        //             // for (let i = 0; i < markers.length; i++) {
+        //             //     markers[i].setMap(null);
+        //             //     path.pop()
+        //             // }
+        //             // markers = []
+        //             count = 0
+        //             setDistanct(null)
+        //         }
+        //         // count++
+        //     })
+        // } else {
+        //     let path = poly.getPath();
+        //     path.forEach(i => path.pop())
+        //     map.setOptions({ draggableCursor: 'default' });
+        //     google.maps.event.clearListeners(map, 'click');
+        //     setDistanct(null)
+
+        //     // clickMapShowLatLag(map)
+        // }
         setOpenLine(!openLine) // สลับปุ่มเปิดปิด
         google.maps.event.clearListeners(map, 'click');
-        const distance = []
-        let count = 0 //นับจำนวนครั้งที่กด วัดระยะ
+        var distance = [] //เก็บ lat lag แต่ละครั้ง
+        var count = 0 //นับจำนวนครั้งที่กด วัดระยะ
         let max = [] //รวมระยะทางทั้งหมด
-        let sum = null
-        let infoWindow
+        let sum = null //เก็บผลรวมระยาทาง
         let path
-        let markers = []
         const service = new google.maps.DistanceMatrixService();
-
-
         if (openLine) {
             poly.setMap(map);
             map.setOptions({ draggableCursor: 'crosshair' });
-
             map.addListener("click", async (event) => {
-                if (count < 2) {
-                    count++
-                    // const marker = new google.maps.Marker({
-                    //     position: event.latLng,
-                    //     map: map
-                    // })
-                    // markers.push(marker)
-                    path = poly.getPath();
-                    path.push(event.latLng);
-                    if (count === 1) {
-                        console.log(1);
-                        origin = event.latLng;
-                        map.addListener("mousemove", async (event) => {
-                            var sideLength = google.maps.geometry.spherical.computeDistanceBetween(origin, event.latLng);
-                            setDistanct((sideLength / 1000).toFixed(2))
-
-                        });
+                path = poly.getPath();
+                path.push(event.latLng);
+                distance.push(event.latLng.toJSON())
+                if (count > 0) {
+                    const request = await {
+                        origins: [distance[count - 1]],
+                        destinations: [distance[count]],
+                        travelMode: google.maps.TravelMode.DRIVING,
+                        unitSystem: google.maps.UnitSystem.METRIC,
+                        avoidHighways: false,
+                        avoidTolls: false,
+                    };
+                    const test = await service.getDistanceMatrix(request)
+                    if (test.rows[0].elements[0].distance !== undefined) {
+                        max.push(parseFloat(test.rows[0].elements[0].distance.text))
+                        sum = max.reduce((a, b) => a + b, 0)
+                        setDistanct(`ระยะทาง${sum.toFixed(2)}`);
                     }
-                    if (count === 2) {
-                        console.log(2);
-                        var sideLength = google.maps.geometry.spherical.computeDistanceBetween(origin, event.latLng);
-                        // destination = event.latLng
-                        const request = {
-                            origins: [origin],
-                            destinations: [event.latLng],
-                            travelMode: google.maps.TravelMode.DRIVING,
-                            unitSystem: google.maps.UnitSystem.METRIC,
-                            avoidHighways: false,
-                            avoidTolls: false,
-                        };
-                        const test = await service.getDistanceMatrix(request)
-                        if (test.rows[0].elements[0].distance !== undefined) {
-                            // let infoWindow = await new google.maps.InfoWindow({
-                            //     content: `ระยะทาง${test.rows[0].elements[0].distance.text}`,
-                            //     position: destination,
-                            // })
-                            // infoWindow.open(map)
-                            setDistanct((sideLength / 1000).toFixed(2) + "ก.ม");
-                        }
-                        google.maps.event.clearListeners(map, 'mousemove');
-                    }
-                } else {
-                    path.forEach(i => path.pop())
-                    // for (let i = 0; i < markers.length; i++) {
-                    //     markers[i].setMap(null);
-                    //     path.pop()
-                    // }
-                    // markers = []
-                    count = 0
-                    setDistanct(null)
                 }
-                // count++
+                count++ //เพิ่มจำนวนครั้งที่กด
             })
         } else {
             let path = poly.getPath();
@@ -627,8 +665,7 @@ const mapPage = () => {
             map.setOptions({ draggableCursor: 'default' });
             google.maps.event.clearListeners(map, 'click');
             setDistanct(null)
-
-            // clickMapShowLatLag(map)
+            clickMapShowLatLag(map)
         }
     }
     /* เคลียเมพ */
@@ -807,9 +844,9 @@ const mapPage = () => {
     }
 
     /* วัดขนาดพื่นที่ */
-    var drawings = [];
+
+    const [drawings, setDrawings] = useState([]);
     var selectedShape;
-    var labels = [];
 
 
     function clearSelection() {
@@ -837,7 +874,8 @@ const mapPage = () => {
             removePolygonInfoWindow(drawings[i].overlay.labels);
             drawings[i].overlay.setMap(null);
         }
-        drawings = [];
+        // drawings = [];
+        setDrawings([])
     }
     function attachPolygonInfoWindow(polygon) {
         if (!polygon.labels) polygon.labels = [];
@@ -892,7 +930,7 @@ const mapPage = () => {
         labels = [];
     }
     const areaDistance = () => {
-        setIsmenu("polygon");
+
         deleteAllShape();
         const drawingManager = new google.maps.drawing.DrawingManager({
             drawingControl: false,
@@ -908,7 +946,8 @@ const mapPage = () => {
             map: map
         });
         google.maps.event.addListener(drawingManager, 'overlaycomplete', function (e) {
-            drawings.push(e);
+            // drawings.push(e);
+            setDrawings([...drawings, e])
             var newShape = e.overlay;
             newShape.type = e.type;
             drawingManager.setDrawingMode(null);
@@ -1309,22 +1348,26 @@ const mapPage = () => {
             <div id="cursor" style={distanct && { borderRadius: "10%", padding: "5px", backgroundColor: "#FFF" }}>{distanct}</div>
             <Timeslide onClose={() => setSlidemapshow(false)} visible={slidemapshow} />
             <div className="tools-group-layer">
-                <button className="btn btn-light btn-sm" onClick={() => setVisibleShapeFile(true)}>
-                    {/* <i className="fa fa-window-restore" /> */}
-                    <img width="100%" src="/assets/images/fa-window-restore.png" alt="" />
-                </button>
+                <Tooltip placement="topRight" title={"Gis Layer"}>
+                    <button className="btn btn-light btn-sm" onClick={() => setVisibleShapeFile(true)}>
+                        {/* <i className="fa fa-window-restore" /> */}
+                        <img width="100%" src="/assets/images/fa-window-restore.png" alt="" />
+                    </button>
+                </Tooltip>
             </div>
             <div className="tools-dashboard">
-                <button
-                    className="btn btn-light btn-sm"
-                    onClick={() => {
-                        setVisibleDashboard(true)
-                        apiDashboardData({ project_name: "project_na" })
-                    }}
-                >
-                    {/* <i className="fa fa-dashboard" /> */}
-                    <img width="100%" src="/assets/images/fa-dashboard.png" alt="" />
-                </button>
+                <Tooltip placement="topRight" title={"Dashboard"}>
+                    <button
+                        className="btn btn-light btn-sm"
+                        onClick={() => {
+                            setVisibleDashboard(true)
+                            apiDashboardData({ project_name: "project_na" })
+                        }}
+                    >
+                        {/* <i className="fa fa-dashboard" /> */}
+                        <img width="100%" src="/assets/images/fa-dashboard.png" alt="" />
+                    </button>
+                </Tooltip>
             </div>
 
             <div className="map-info-area">
@@ -1342,7 +1385,9 @@ const mapPage = () => {
                         style={{ fontSize: "20px", marginTop: "2.5px" }}
                         id="config-map-cog"
                     /> */}
-                    <img src="assets/images/layer.PNG" alt="" width="23" />
+                    <Tooltip placement="left" title={"Images Layer"}>
+                        <img src="assets/images/layer.PNG" alt="" width="23" />
+                    </Tooltip>
                 </Col>
             </div>
 
@@ -1352,38 +1397,45 @@ const mapPage = () => {
                     (user.roles_id === "8a97ac7b-01dc-4e06-81c2-8422dffa0ca2" ||
                         user.roles_id === "cec6617f-b593-4ebc-9604-3059dfee0ac4") ? (
                     !changmap && <Col span={6}>
-                        <button
-                            className="btn btn-light btn-sm"
-                            onClick={() => {
-                                if (firstSearc) {
-                                    apiSearchData({ project_name: "project_na" })
-                                    setFirstSearc(false)
-                                }
-                                setVisibleSearch(!visibleSearch)
-                            }}
+                        <Tooltip
+                            placement="left" title={"Search"}
                         >
-                            <img width="100%" src="/assets/images/search.png" />
-                        </button>
+                            <button
+                                className="btn btn-light btn-sm"
+                                onClick={() => {
+                                    if (firstSearc) {
+                                        apiSearchData({ project_name: "project_na" })
+                                        setFirstSearc(false)
+                                    }
+                                    setVisibleSearch(!visibleSearch)
+                                }}
+                            >
+                                <img width="100%" src="/assets/images/search.png" />
+                            </button>
+                        </Tooltip>
                     </Col>
+
                 ) : null}
 
                 {!changmap && <Col span={6} className="pt-2">
-                    <button className="btn btn-light btn-sm" onClick={clickHome}  >
-                        <img
-                            width="100%"
-                            src="/assets/images/home.png"
-                            title="้home"
-                        />
-                    </button>
+                    <Tooltip placement="left" title={"Default"}>
+                        <button className="btn btn-light btn-sm" onClick={clickHome} >
+                            <img
+                                width="100%"
+                                src="/assets/images/home.png"
+                            />
+                        </button>
+                    </Tooltip>
                 </Col>}
                 {!changmap && <Col span={6} className="pt-2">
-                    <button className="btn btn-light btn-sm" onClick={clickLine} >
-                        <img
-                            width="100%"
-                            src="/assets/images/Line.png"
-                            title="line"
-                        />
-                    </button>
+                    <Tooltip placement="left" title={"Distance"}>
+                        <button className="btn btn-light btn-sm" onClick={clickLine} >
+                            <img
+                                width="100%"
+                                src="/assets/images/Line.png"
+                            />
+                        </button>
+                    </Tooltip>
                 </Col>}
                 {!changmap && <Col span={6} className="pt-2">
                     <button className="btn btn-light btn-sm" onClick={areaDistance} >
@@ -1395,66 +1447,74 @@ const mapPage = () => {
                     </button>
                 </Col>}
                 <Col span={6} className="pt-2">
-                    <button className="btn btn-light btn-sm" onClick={clickSplit}>
-                        <img
-                            width="100%"
-                            src="/assets/images/-line_icon.png"
-                            title="split"
-                        />
-                    </button>
+                    <Tooltip placement="left" title={"Swipe Map"}>
+                        <button className="btn btn-light btn-sm" onClick={clickSplit}>
+                            <img
+                                width="100%"
+                                src="/assets/images/-line_icon.png"
+                            />
+                        </button>
+                    </Tooltip>
                 </Col>
-
                 {!changmap && <Col span={6} className="pt-2">
-                    <button className="btn btn-light btn-sm" onClick={ontimeslider} >
-                        <img
-                            width="100%"
-                            src="/assets/images/arrow_back_time.png"
-                            title="timeslide"
-                        />
-                    </button>
+                    <Tooltip placement="left" title={"Time Silder"}>
+                        <button className="btn btn-light btn-sm" onClick={ontimeslider} >
+                            <img
+                                width="100%"
+                                src="/assets/images/arrow_back_time.png"
+                            />
+                        </button>
+                    </Tooltip>
                 </Col>}
                 {!changmap && <Col span={6} className="pt-2">
-                    <button className="btn btn-light btn-sm" onClick={clickClearMap} >
-                        <img
-                            width="100%"
-                            src="/assets/images/cross.png"
-                            title="clear map"
-                        />
-                    </button>
+                    <Tooltip placement="left" title={"Clear"}>
+                        <button className="btn btn-light btn-sm" onClick={clickClearMap} >
+                            <img
+                                width="100%"
+                                src="/assets/images/cross.png"
+                            />
+                        </button>
+                    </Tooltip>
                 </Col>}
             </div>
             <div className="tools-map-area2">
                 <Col span={24} className="pt-2">
-                    <button
-                        className="btn btn-light btn-sm "
-                        id="closeFullscreen"
-                        style={{ display: "none" }}
-                        onClick={() => clickButtomHideNavbar()}
-                    >
-                        <img
-                            width="100%"
-                            src="/assets/images/close_full_screen.png"
-                        />
-                    </button>
-                    <button
-                        className="btn btn-light btn-sm"
-                        id="openFullscreen"
-                        style={{ display: "none" }}
-                        onClick={() => openFullscreen()}
-                    >
-                        <img width="100%" src="/assets/images/open_full_screen.png" />
-                    </button>
-                    <button
-                        className="btn btn-light btn-sm"
-                        onClick={() => {
-                            menuOpenFullscreen();
-                        }}
-                    >
-                        <img
-                            width="100%"
-                            src="/assets/images/menu_full_screen.png"
-                        />
-                    </button>
+                    <Tooltip placement="bottom" title={"Menu Bar"}>
+                        <button
+                            className="btn btn-light btn-sm "
+                            id="closeFullscreen"
+                            style={{ display: "none" }}
+                            onClick={() => clickButtomHideNavbar()}
+                        >
+                            <img
+                                width="100%"
+                                src="/assets/images/close_full_screen.png"
+                            />
+                        </button>
+                    </Tooltip>
+                    <Tooltip placement="bottom" title={"FullScreen"}>
+                        <button
+                            className="btn btn-light btn-sm"
+                            id="openFullscreen"
+                            style={{ display: "none" }}
+                            onClick={() => openFullscreen()}
+                        >
+                            <img width="100%" src="/assets/images/open_full_screen.png" />
+                        </button>
+                    </Tooltip>
+                    <Tooltip placement="bottom" title={"ScreenTools"}>
+                        <button
+                            className="btn btn-light btn-sm"
+                            onClick={() => {
+                                menuOpenFullscreen();
+                            }}
+                        >
+                            <img
+                                width="100%"
+                                src="/assets/images/menu_full_screen.png"
+                            />
+                        </button>
+                    </Tooltip>
                 </Col>
             </div>
             <div className="tools-map-area3" hidden={changmap} >

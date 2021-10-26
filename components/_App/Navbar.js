@@ -50,7 +50,7 @@ const Navbar = ({ isMap, setslideNav, slideNav, navbarHide }) => {
 
             <ul className="nav user-menu">
 
-                <Tooltip placement="bottom" title={"แผนที่"}>
+                <Tooltip placement="bottom" title={"Land Map"}>
                     <li className="nav-item dropdown">
                         <Link href={`/`} >
                             <a className="dropdown-toggle nav-link" >
@@ -60,7 +60,7 @@ const Navbar = ({ isMap, setslideNav, slideNav, navbarHide }) => {
                     </li>
                 </Tooltip>
 
-                <Tooltip placement="bottom" title={"คู่มือการใช้งาน"}>
+                <Tooltip placement="bottom" title={"Manual"}>
                     <li className="nav-item dropdown">
 
                         <a className="dropdown-toggle nav-link">
@@ -73,7 +73,7 @@ const Navbar = ({ isMap, setslideNav, slideNav, navbarHide }) => {
                 {/* ระบบหลังบ้าน */}
                 {
                     (user && user.roles_id !== "0678bba5-a371-417f-9734-aec46b9579ad") ?
-                        <Tooltip placement="bottom" title={"ระบบหลังบ้าน"}>
+                        <Tooltip placement="bottom" title={"Back Office"}>
                             <li className="nav-item dropdown">
                                 <Link href={`/settings/dashboard/`} >
                                     <a className="dropdown-toggle nav-link" >
