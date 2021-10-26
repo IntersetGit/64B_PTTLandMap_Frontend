@@ -18,7 +18,8 @@ import {
     message,
     Switch,
     Slider,
-    Tooltip
+    Tooltip,
+    InputNumber
 } from "antd";
 import Head from "next/head";
 import { useSelector } from "react-redux";
@@ -30,6 +31,7 @@ import axios from "axios";
 import { Cookies } from "react-cookie";
 import jwt_decode from "jwt-decode";
 import Timeslide from "../components/Timeslider";
+import Color from '../components/Color'
 
 const cookies = new Cookies();
 
@@ -179,6 +181,13 @@ const mapPage = () => {
         hex: "red",
         rgb: { r: 255, g: 0, b: 0, a: 1 },
     });
+    const [colorFrame, setColorFrame] = useState({
+        hex: "#000000",
+        rgb: { r: 0, g: 0, b: 0, a: 1 },
+    });
+    const [inputValueOpacityColor, setInputValueOpacityColor] = useState(0.5) //Opacity
+    const [inputValueStrokColor, setInputValueStrokColor] = useState(1) //ความหนากรอบ
+
 
     const [formUpload] = Form.useForm();
 
@@ -204,7 +213,7 @@ const mapPage = () => {
                             .toLowerCase()
                             .toLowerCase()}`;
                         const nameType =
-                            type == "zip" || type == "rar" ? "shape file" : type;
+                            type == "zip" ? "shape file" : type;
                         setFileType(nameType);
                     }
                     return file;
@@ -340,7 +349,7 @@ const mapPage = () => {
             const layer = arr[index].layer
             layer.setStyle({
                 fillColor: color,
-                opacity: 0.5,
+                fillOpacity: 0.5,
                 strokeWeight: 1,
                 clickable: false
             });
@@ -380,15 +389,17 @@ const mapPage = () => {
         try {
             const { data } = await API.get(`/shp/shapeData?id=${id}`);
             const GeoJson = data.items.shape;
-            // console.log('GeoJson :>> ', GeoJson);
             const bounds = new google.maps.LatLngBounds();
             const layer = new google.maps.Data();
             layer.addGeoJson(GeoJson)
+
             layer.setStyle({
                 fillColor: color,
-                opacity: 0.5,
+                fillOpacity: 0.5,
                 strokeWeight: 1,
-                clickable: false
+                strokeColor: 'green',
+                clickable: false,
+                strokeOpacity: 1,
             });
             layer.setMap(map);
 
@@ -1059,7 +1070,7 @@ const mapPage = () => {
             layer.addGeoJson(GeoJson)
             layer.setStyle({
                 fillColor: item.color,
-                opacity: 0.5,
+                fillOpacity: 0.5,
                 strokeWeight: 1,
                 clickable: false
             });
@@ -1593,45 +1604,48 @@ const mapPage = () => {
                                                                             </a> : null
                                                                     }
                                                                 </Col>
-
-                                                                <Col xs={3} style={{ paddingTop: 3 }}>
-                                                                    <a onClick={() => openColor(i, index)}>
-                                                                        <div
-                                                                            style={{
-                                                                                width: "36px",
-                                                                                height: "20px",
-                                                                                borderRadius: "2px",
-                                                                                background: x.color_layer,
-                                                                                border: "1px solid black",
-                                                                            }}
-                                                                        />
-                                                                    </a>
-                                                                    {x.open ? (
-                                                                        <div
-                                                                            div
-                                                                            style={{
-                                                                                position: "fixed",
-                                                                                zIndex: "2",
-                                                                                textAlign: "end",
-                                                                            }}
-                                                                        >
-                                                                            <SketchPicker
-                                                                                color={!x.rgb ? x.color_layer : x.rgb}
-                                                                                onChange={(value) =>
-                                                                                    handleChangeShapeFile(value, i, index)
-                                                                                }
-                                                                            />
-                                                                            <footer className="footer-color">
-                                                                                <button
-                                                                                    className="btn btn-primary btn-sm"
-                                                                                    onClick={() => saveColor(i, index)}
+                                                                {
+                                                                    x.checked ?
+                                                                        <Col xs={3} style={{ paddingTop: 3 }}>
+                                                                            <a onClick={() => openColor(i, index)}>
+                                                                                <div
+                                                                                    style={{
+                                                                                        width: "36px",
+                                                                                        height: "20px",
+                                                                                        borderRadius: "2px",
+                                                                                        background: x.color_layer,
+                                                                                        border: "1px solid black",
+                                                                                    }}
+                                                                                />
+                                                                            </a>
+                                                                            {x.open ? (
+                                                                                <div
+                                                                                    div
+                                                                                    style={{
+                                                                                        position: "fixed",
+                                                                                        zIndex: "2",
+                                                                                        textAlign: "end",
+                                                                                    }}
                                                                                 >
-                                                                                    save
-                                                                                </button>
-                                                                            </footer>
-                                                                        </div>
-                                                                    ) : null}
-                                                                </Col>
+                                                                                    <SketchPicker
+                                                                                        color={!x.rgb ? x.color_layer : x.rgb}
+                                                                                        onChange={(value) =>
+                                                                                            handleChangeShapeFile(value, i, index)
+                                                                                        }
+                                                                                    />
+                                                                                    <footer className="footer-color">
+                                                                                        <button
+                                                                                            className="btn btn-primary btn-sm"
+                                                                                            onClick={() => saveColor(i, index)}
+                                                                                        >
+                                                                                            save
+                                                                                        </button>
+                                                                                    </footer>
+                                                                                </div>
+                                                                            ) : null}
+                                                                        </Col>
+                                                                        : null
+                                                                }
                                                             </Row>
                                                         </div>
                                                     )
@@ -1651,15 +1665,23 @@ const mapPage = () => {
                             <Card>
                                 <Form
                                     form={formUpload}
-                                    labelCol={{ span: 7 }}
-                                    wrapperCol={{ span: 18 }}
                                     onFinish={onFinishUpload}
                                     onFinishFailed={onFinishFailedUpload}
                                     autoComplete="off"
                                     size={"small"}
+                                    layout="vertical"
                                 >
+
                                     <Form.Item
-                                        label="ชั้นข้อมูล"
+                                        label="ชื่อชั้นข้อมูล"
+                                        name="name_layer"
+                                        rules={[{ required: true, message: "กรุณากรอกข้อมูล!" }]}
+                                    >
+                                        <Input />
+                                    </Form.Item>
+
+                                    <Form.Item
+                                        label="เลือกชั้นข้อมูล"
                                         name="group_layer_id"
                                         rules={[
                                             { required: true, message: "กรุณาเลือกชั้นข้อมูล!" },
@@ -1672,14 +1694,6 @@ const mapPage = () => {
                                                 </Option>
                                             ))}
                                         </Select>
-                                    </Form.Item>
-
-                                    <Form.Item
-                                        label="ชื่อ"
-                                        name="name_layer"
-                                        rules={[{ required: true, message: "กรุณากรอกข้อมูล!" }]}
-                                    >
-                                        <Input />
                                     </Form.Item>
 
                                     <Form.Item
@@ -1696,7 +1710,7 @@ const mapPage = () => {
                                         </Upload>
                                     </Form.Item>
 
-                                    <Form.Item label="ประเภทไฟล์">{FileType}</Form.Item>
+                                    {FileType ? <Form.Item label="ประเภทไฟล์">{FileType}</Form.Item> : null}
 
                                     <Form.Item label="สีชั้นข้อมูล">
                                         <a onClick={() => setOpenColorUpload(!openColorUpload)}>
@@ -1736,6 +1750,68 @@ const mapPage = () => {
                                                 </footer>
                                             </div>
                                         ) : null}
+                                    </Form.Item>
+
+                                    <Form.Item label="Opacity" name="Opacity">
+                                        <Row>
+                                            <Col span={12}>
+                                                <Slider
+                                                    min={0}
+                                                    max={1}
+                                                    step={0.01}
+                                                    onChange={(value) => {
+                                                        setInputValueOpacityColor(value)
+                                                    }}
+                                                    value={typeof inputValueOpacityColor === 'number' ? inputValueOpacityColor : 0}
+                                                />
+                                            </Col>
+                                            <Col span={4}>
+                                                <InputNumber
+                                                    min={0}
+                                                    max={1}
+                                                    style={{ margin: '0 16px' }}
+                                                    step={0.01}
+                                                    value={inputValueOpacityColor}
+                                                    onChange={(value) => {
+                                                        setInputValueOpacityColor(value)
+                                                    }}
+                                                />
+                                            </Col>
+                                        </Row>
+                                    </Form.Item>
+
+                                    <Form.Item label="สีกรอบ">
+                                        <Color color={colorFrame} onChangeColor={({ rgb, hex }) => setColorFrame({ ...colorUpload, rgb, hex })} callbackSaveColor={(velue) => {
+                                            console.log('velue Save :>> ', velue);
+                                        }} />
+                                    </Form.Item>
+
+                                    <Form.Item label="ความหนากรอบ">
+                                        <Row>
+                                            <Col span={12}>
+                                                <Slider
+                                                    min={0}
+                                                    max={10}
+                                                    step={0.01}
+                                                    onChange={(value) => {
+                                                        setInputValueStrokColor(value)
+                                                    }}
+                                                    value={typeof inputValueStrokColor === 'number' ? inputValueStrokColor : 0}
+                                                />
+                                            </Col>
+                                            <Col span={4}>
+                                                <InputNumber
+                                                    min={0}
+                                                    max={10}
+                                                    style={{ margin: '0 16px' }}
+                                                    step={0.01}
+                                                    value={inputValueStrokColor}
+                                                    onChange={(value) => {
+                                                        setInputValueStrokColor(value)
+                                                    }}
+                                                />
+                                            </Col>
+                                        </Row>
                                     </Form.Item>
 
                                     <Form.Item wrapperCol={{ offset: 8, span: 16 }}>
