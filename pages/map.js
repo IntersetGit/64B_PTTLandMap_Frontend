@@ -74,9 +74,6 @@ const mapPage = () => {
                 fullscreenControl: false,
                 center: centerMap,
                 zoom: 8,
-                streetViewControl: {
-                    streetViewControl: false
-                }
             });
             setMap(_map);
             google.maps.event.addListener(_map, "mousemove", (event) => {
