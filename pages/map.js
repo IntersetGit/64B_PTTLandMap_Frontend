@@ -47,7 +47,7 @@ const mapPage = () => {
     const [layerData, setLayerData] = useState([])
 
     const [slidemapshow, setSlidemapshow] = useState(false);
-
+    const [ismenu, setIsmenu] = useState(null);
     /* จ อ ต */
 
     const [provAmpTamAll, setProvAmpTamAll] = useState({
@@ -562,6 +562,7 @@ const mapPage = () => {
         let markers = []
         const service = new google.maps.DistanceMatrixService();
 
+
         if (openLine) {
             poly.setMap(map);
             map.setOptions({ draggableCursor: 'crosshair' });
@@ -578,10 +579,16 @@ const mapPage = () => {
                     path.push(event.latLng);
                     if (count === 1) {
                         console.log(1);
-                        origin = event.latLng
+                        origin = event.latLng;
+                        map.addListener("mousemove", async (event) => {
+                            var sideLength = google.maps.geometry.spherical.computeDistanceBetween(origin, event.latLng);
+                            setDistanct((sideLength / 1000).toFixed(2))
+
+                        });
                     }
                     if (count === 2) {
                         console.log(2);
+                        var sideLength = google.maps.geometry.spherical.computeDistanceBetween(origin, event.latLng);
                         // destination = event.latLng
                         const request = {
                             origins: [origin],
@@ -598,8 +605,9 @@ const mapPage = () => {
                             //     position: destination,
                             // })
                             // infoWindow.open(map)
-                            setDistanct(test.rows[0].elements[0].distance.text);
+                            setDistanct((sideLength / 1000).toFixed(2) + "ก.ม");
                         }
+                        google.maps.event.clearListeners(map, 'mousemove');
                     }
                 } else {
                     path.forEach(i => path.pop())
@@ -628,8 +636,8 @@ const mapPage = () => {
         var clearMap = new google.maps.Map(googlemap.current, {
             mapTypeControl: false,
             fullscreenControl: false,
-            center: centerMap,
-            zoom: 8,
+            center: map.getCenter(),
+            zoom: map.getZoom(),
         });
         setMap(clearMap)
     }
@@ -799,47 +807,133 @@ const mapPage = () => {
     }
 
     /* วัดขนาดพื่นที่ */
-    const areaDistance = () => {
-        const drawingManager = new google.maps.drawing.DrawingManager({
-            drawingMode: google.maps.drawing.OverlayType.CIRCLE,
-            drawingControl: true,
-            drawingControlOptions: {
-                position: google.maps.ControlPosition.TOP_CENTER,
-                drawingModes: [
-                    google.maps.drawing.OverlayType.CIRCLE,
-                    google.maps.drawing.OverlayType.POLYGON,
-                    google.maps.drawing.OverlayType.POLYLINE,
-                    google.maps.drawing.OverlayType.RECTANGLE,
-                ],
-            }
-        });
-        // google.maps.event.addListener(drawingManager, 'circlecomplete', function (circle) {
-        //     var radius = circle.getRadius();
-        //     alert(radius)
-        //     console.log(circle)
-        // });
-        google.maps.event.addListener(drawingManager, 'overlaycomplete', function (event) {
-            if (event.type == 'circle') {
-                var radius = event.overlay.getRadius();
-                // alert(radius)
-                // console.log(radius)
-                console.log(event.type)
-            }
-            if (event.type == 'polygon') {
-                console.log(event.overlay.latLngs)
-            }
+    var drawings = [];
+    var selectedShape;
+    var labels = [];
 
-            if (event.type == 'polyline') {
-                alert("polyline")
-            }
-            if (event.type == 'rectangle') {
-                alert("rectangle")
-            }
-            console.log(event.type)
-        });
 
-        drawingManager.setMap(map);
+    function clearSelection() {
+        if (selectedShape) {
+            selectedShape.setEditable(false);
+            selectedShape = null;
+        }
     }
+
+    function setSelection(shape) {
+        clearSelection();
+        selectedShape = shape;
+        shape.setEditable(true);
+
+    }
+
+    function deleteSelectedShape() {
+        if (selectedShape) {
+            selectedShape.setMap(null);
+        }
+    }
+
+    function deleteAllShape() {
+        for (var i = 0; i < drawings.length; i++) {
+            removePolygonInfoWindow(drawings[i].overlay.labels);
+            drawings[i].overlay.setMap(null);
+        }
+        drawings = [];
+    }
+    function attachPolygonInfoWindow(polygon) {
+        if (!polygon.labels) polygon.labels = [];
+        for (var i = 0; i < polygon.labels.length; i++) {
+            polygon.labels[i].setMap(null);
+        }
+        polygon.labels = [];
+        var path = polygon.getPath();
+        var points = path.getArray();
+        var area = google.maps.geometry.spherical
+            .computeArea(path.getArray())
+            .toFixed(0);
+        var bounds = new google.maps.LatLngBounds();
+        var i;
+
+        for (i = 0; i < points.length; i++) {
+            bounds.extend(points[i]);
+        }
+
+        var boundsCenter = bounds.getCenter();
+        var centerLabel = new MapLabel({
+            map: map,
+            fontSize: 13,
+            align: "center"
+        });
+
+        polygon.labels.push(centerLabel);
+
+        centerLabel.set("position", bounds.getCenter());
+        centerLabel.set("text", area + "ตร.ม");
+        if (path.getLength() < 2) return;
+        for (var i = 0; i < polygon.getPath().getLength(); i++) {
+            // for each side in path, compute center and length
+            var start = polygon.getPath().getAt(i);
+            var end = polygon.getPath().getAt(i < polygon.getPath().getLength() - 1 ? i + 1 : 0);
+            var sideLength = google.maps.geometry.spherical.computeDistanceBetween(start, end);
+            var sideCenter = google.maps.geometry.spherical.interpolate(start, end, 0.5);
+            var sideLabel = new MapLabel({
+                map: map,
+                fontSize: 13,
+                align: "center"
+            });
+            sideLabel.set("position", sideCenter);
+            sideLabel.set("text", sideLength.toFixed(2) + "ม");
+            polygon.labels.push(sideLabel);
+        }
+    }
+    function removePolygonInfoWindow(labels) {
+        for (var i = 0; i < labels.length; i++) {
+            labels[i].setMap(null);
+        }
+        labels = [];
+    }
+    const areaDistance = () => {
+        setIsmenu("polygon");
+        deleteAllShape();
+        const drawingManager = new google.maps.drawing.DrawingManager({
+            drawingControl: false,
+            drawingMode: google.maps.drawing.OverlayType.POLYGON,
+            polygonOptions: {
+                // strokeWeight: 1,
+                fillOpacity: 0.3,
+                editable: true,
+                draggable: true,
+                fillColor: "#F54",
+
+            },
+            map: map
+        });
+        google.maps.event.addListener(drawingManager, 'overlaycomplete', function (e) {
+            drawings.push(e);
+            var newShape = e.overlay;
+            newShape.type = e.type;
+            drawingManager.setDrawingMode(null);
+            if (e.type == 'polygon') {
+                var path = newShape.getPath();
+                google.maps.event.addListener(path, "insert_at", function () {
+                    attachPolygonInfoWindow(newShape);
+                });
+
+                google.maps.event.addListener(path, "set_at", function () {
+                    attachPolygonInfoWindow(newShape);
+                });
+
+                attachPolygonInfoWindow(newShape);
+
+                google.maps.event.addListener(newShape, 'click', function () {
+                    setSelection(newShape);
+                });
+                setSelection(newShape);
+            }
+
+        });
+
+    }
+
     const test = () => {
         $("#changeMap").fadeIn()
         setTimeout(() => {
@@ -1274,7 +1368,7 @@ const mapPage = () => {
                 ) : null}
 
                 {!changmap && <Col span={6} className="pt-2">
-                    <button className="btn btn-light btn-sm" onClick={clickHome} >
+                    <button className="btn btn-light btn-sm" onClick={clickHome}  >
                         <img
                             width="100%"
                             src="/assets/images/home.png"
@@ -1291,6 +1385,15 @@ const mapPage = () => {
                         />
                     </button>
                 </Col>}
+                {!changmap && <Col span={6} className="pt-2">
+                    <button className="btn btn-light btn-sm" onClick={areaDistance} >
+                        <img
+                            width="100%"
+                            src="/assets/images/polegon.png"
+                            title="area distance"
+                        />
+                    </button>
+                </Col>}
                 <Col span={6} className="pt-2">
                     <button className="btn btn-light btn-sm" onClick={clickSplit}>
                         <img
@@ -1300,15 +1403,7 @@ const mapPage = () => {
                         />
                     </button>
                 </Col>
-                {!changmap && <Col span={6} className="pt-2">
-                    <button className="btn btn-light btn-sm" onClick={areaDistance}>
-                        <img
-                            width="100%"
-                            src="/assets/images/polegon.png"
-                            title="area distance"
-                        />
-                    </button>
-                </Col>}
+
                 {!changmap && <Col span={6} className="pt-2">
                     <button className="btn btn-light btn-sm" onClick={ontimeslider} >
                         <img
