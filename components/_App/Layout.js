@@ -9,6 +9,9 @@ import { useRouter } from 'next/dist/client/router';
 import { Cookies } from 'react-cookie'
 import Preloader from './Preloader'
 import "moment/locale/th";
+import { useSelector } from 'react-redux';
+import jwt_decode from "jwt-decode";
+import RefreshToken from "../../util/RefreshToken";
 
 function Layout({ children, isMap = false, navbarHide }) {
     const route = useRouter()
@@ -18,7 +21,15 @@ function Layout({ children, isMap = false, navbarHide }) {
     useEffect(() => {
         const cookies = new Cookies();
         const token = cookies.get('token');
-        if (!token) route.push("/login")
+        if (token) {
+            const token_decode = jwt_decode(token);
+            if (token_decode.exp < ((Date.now() / 1000) - (10 * 60 * 1000))) {
+                console.log("หมดเวลาtoken");
+                const refresh_token = cookies.get('refresh_token');
+                RefreshToken(refresh_token);
+            }
+
+        } else route.push("/login")
     })
 
     // useEffect(() => {

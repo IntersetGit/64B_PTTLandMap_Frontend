@@ -1007,12 +1007,13 @@ const mapPage = () => {
             if (amp) url += `&amp=${amp}`
 
             const { data } = await API.get(url)
+            console.log('data :>> ', data.items);
             const _arr = []
             setAmount(data.items.amount_data)
             setSumData(10)
             data.items.data.forEach((e, i) => {
                 e.index = i + 1;
-                e.status = e.status.toString()
+                e.status = e.status ? e.status.toString() : null
                 // if (e.color) {
                 //     const rgb = JSON.parse(e.color)
                 //     e.color = `rgb(${rgb.r},${rgb.g},${rgb.b},${rgb.a})`;
@@ -1024,6 +1025,7 @@ const mapPage = () => {
 
         } catch (error) {
             console.log('error :>> ', error);
+            message.error("มีบางอย่างผิดพลาด !");
         }
     }
 
