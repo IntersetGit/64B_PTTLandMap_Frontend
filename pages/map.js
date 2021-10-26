@@ -551,67 +551,109 @@ const mapPage = () => {
         setPoly(poly);
     }, []);
     const clickLine = () => {
+        // setOpenLine(!openLine) // สลับปุ่มเปิดปิด
+        // google.maps.event.clearListeners(map, 'click');
+        // const distance = []
+        // let count = 0 //นับจำนวนครั้งที่กด วัดระยะ
+        // let max = [] //รวมระยะทางทั้งหมด
+        // let sum = null
+        // let infoWindow
+        // let path
+        // let markers = []
+        // const service = new google.maps.DistanceMatrixService();
+
+        // if (openLine) {
+        //     poly.setMap(map);
+        //     map.setOptions({ draggableCursor: 'crosshair' });
+
+        //     map.addListener("click", async (event) => {
+        //         if (count < 2) {
+        //             count++
+        //             // const marker = new google.maps.Marker({
+        //             //     position: event.latLng,
+        //             //     map: map
+        //             // })
+        //             // markers.push(marker)
+        //             path = poly.getPath();
+        //             path.push(event.latLng);
+        //             if (count === 1) {
+        //                 console.log(1);
+        //                 origin = event.latLng
+        //             }
+        //             if (count === 2) {
+        //                 console.log(2);
+        //                 // destination = event.latLng
+        //                 const request = {
+        //                     origins: [origin],
+        //                     destinations: [event.latLng],
+        //                     travelMode: google.maps.TravelMode.DRIVING,
+        //                     unitSystem: google.maps.UnitSystem.METRIC,
+        //                     avoidHighways: false,
+        //                     avoidTolls: false,
+        //                 };
+        //                 const test = await service.getDistanceMatrix(request)
+        //                 if (test.rows[0].elements[0].distance !== undefined) {
+        //                     // let infoWindow = await new google.maps.InfoWindow({
+        //                     //     content: `ระยะทาง${test.rows[0].elements[0].distance.text}`,
+        //                     //     position: destination,
+        //                     // })
+        //                     // infoWindow.open(map)
+        //                     setDistanct(test.rows[0].elements[0].distance.text);
+        //                 }
+        //             }
+        //         } else {
+        //             path.forEach(i => path.pop())
+        //             // for (let i = 0; i < markers.length; i++) {
+        //             //     markers[i].setMap(null);
+        //             //     path.pop()
+        //             // }
+        //             // markers = []
+        //             count = 0
+        //             setDistanct(null)
+        //         }
+        //         // count++
+        //     })
+        // } else {
+        //     let path = poly.getPath();
+        //     path.forEach(i => path.pop())
+        //     map.setOptions({ draggableCursor: 'default' });
+        //     google.maps.event.clearListeners(map, 'click');
+        //     setDistanct(null)
+
+        //     // clickMapShowLatLag(map)
+        // }
         setOpenLine(!openLine) // สลับปุ่มเปิดปิด
         google.maps.event.clearListeners(map, 'click');
-        const distance = []
-        let count = 0 //นับจำนวนครั้งที่กด วัดระยะ
+        var distance = [] //เก็บ lat lag แต่ละครั้ง
+        var count = 0 //นับจำนวนครั้งที่กด วัดระยะ
         let max = [] //รวมระยะทางทั้งหมด
-        let sum = null
-        let infoWindow
+        let sum = null //เก็บผลรวมระยาทาง
         let path
-        let markers = []
         const service = new google.maps.DistanceMatrixService();
-
         if (openLine) {
             poly.setMap(map);
             map.setOptions({ draggableCursor: 'crosshair' });
-
             map.addListener("click", async (event) => {
-                if (count < 2) {
-                    count++
-                    // const marker = new google.maps.Marker({
-                    //     position: event.latLng,
-                    //     map: map
-                    // })
-                    // markers.push(marker)
-                    path = poly.getPath();
-                    path.push(event.latLng);
-                    if (count === 1) {
-                        console.log(1);
-                        origin = event.latLng
+                path = poly.getPath();
+                path.push(event.latLng);
+                distance.push(event.latLng.toJSON())
+                if (count > 0) {
+                    const request = await {
+                        origins: [distance[count - 1]],
+                        destinations: [distance[count]],
+                        travelMode: google.maps.TravelMode.DRIVING,
+                        unitSystem: google.maps.UnitSystem.METRIC,
+                        avoidHighways: false,
+                        avoidTolls: false,
+                    };
+                    const test = await service.getDistanceMatrix(request)
+                    if (test.rows[0].elements[0].distance !== undefined) {
+                        max.push(parseFloat(test.rows[0].elements[0].distance.text))
+                        sum = max.reduce((a, b) => a + b, 0)
+                        setDistanct(`ระยะทาง${sum.toFixed(2)}`);
                     }
-                    if (count === 2) {
-                        console.log(2);
-                        // destination = event.latLng
-                        const request = {
-                            origins: [origin],
-                            destinations: [event.latLng],
-                            travelMode: google.maps.TravelMode.DRIVING,
-                            unitSystem: google.maps.UnitSystem.METRIC,
-                            avoidHighways: false,
-                            avoidTolls: false,
-                        };
-                        const test = await service.getDistanceMatrix(request)
-                        if (test.rows[0].elements[0].distance !== undefined) {
-                            // let infoWindow = await new google.maps.InfoWindow({
-                            //     content: `ระยะทาง${test.rows[0].elements[0].distance.text}`,
-                            //     position: destination,
-                            // })
-                            // infoWindow.open(map)
-                            setDistanct(test.rows[0].elements[0].distance.text);
-                        }
-                    }
-                } else {
-                    path.forEach(i => path.pop())
-                    // for (let i = 0; i < markers.length; i++) {
-                    //     markers[i].setMap(null);
-                    //     path.pop()
-                    // }
-                    // markers = []
-                    count = 0
-                    setDistanct(null)
                 }
-                // count++
+                count++ //เพิ่มจำนวนครั้งที่กด
             })
         } else {
             let path = poly.getPath();
@@ -619,8 +661,7 @@ const mapPage = () => {
             map.setOptions({ draggableCursor: 'default' });
             google.maps.event.clearListeners(map, 'click');
             setDistanct(null)
-
-            // clickMapShowLatLag(map)
+            clickMapShowLatLag(map)
         }
     }
     /* เคลียเมพ */
