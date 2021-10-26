@@ -17,7 +17,8 @@ import {
     Button,
     message,
     Switch,
-    Slider
+    Slider,
+    Tooltip
 } from "antd";
 import Head from "next/head";
 import { useSelector } from "react-redux";
@@ -73,6 +74,9 @@ const mapPage = () => {
                 fullscreenControl: false,
                 center: centerMap,
                 zoom: 8,
+                streetViewControl: {
+                    streetViewControl: false
+                }
             });
             setMap(_map);
             google.maps.event.addListener(_map, "mousemove", (event) => {
@@ -1256,22 +1260,26 @@ const mapPage = () => {
             <div id="cursor" style={distanct && { borderRadius: "10%", padding: "5px", backgroundColor: "#FFF" }}>{distanct}</div>
             <Timeslide onClose={() => setSlidemapshow(false)} visible={slidemapshow} />
             <div className="tools-group-layer">
-                <button className="btn btn-light btn-sm" onClick={() => setVisibleShapeFile(true)}>
-                    {/* <i className="fa fa-window-restore" /> */}
-                    <img width="100%" src="/assets/images/fa-window-restore.png" alt="" />
-                </button>
+                <Tooltip placement="topRight" title={"Gis Layer"}>
+                    <button className="btn btn-light btn-sm" onClick={() => setVisibleShapeFile(true)}>
+                        {/* <i className="fa fa-window-restore" /> */}
+                        <img width="100%" src="/assets/images/fa-window-restore.png" alt="" />
+                    </button>
+                </Tooltip>
             </div>
             <div className="tools-dashboard">
-                <button
-                    className="btn btn-light btn-sm"
-                    onClick={() => {
-                        setVisibleDashboard(true)
-                        apiDashboardData({ project_name: "project_na" })
-                    }}
-                >
-                    {/* <i className="fa fa-dashboard" /> */}
-                    <img width="100%" src="/assets/images/fa-dashboard.png" alt="" />
-                </button>
+                <Tooltip placement="topRight" title={"Dashboard"}>
+                    <button
+                        className="btn btn-light btn-sm"
+                        onClick={() => {
+                            setVisibleDashboard(true)
+                            apiDashboardData({ project_name: "project_na" })
+                        }}
+                    >
+                        {/* <i className="fa fa-dashboard" /> */}
+                        <img width="100%" src="/assets/images/fa-dashboard.png" alt="" />
+                    </button>
+                </Tooltip>
             </div>
 
             <div className="map-info-area">
@@ -1289,7 +1297,9 @@ const mapPage = () => {
                         style={{ fontSize: "20px", marginTop: "2.5px" }}
                         id="config-map-cog"
                     /> */}
-                    <img src="assets/images/layer.PNG" alt="" width="23" />
+                    <Tooltip placement="left" title={"Images Layer"}>
+                        <img src="assets/images/layer.PNG" alt="" width="23" />
+                    </Tooltip>
                 </Col>
             </div>
 
@@ -1299,108 +1309,126 @@ const mapPage = () => {
                     (user.roles_id === "8a97ac7b-01dc-4e06-81c2-8422dffa0ca2" ||
                         user.roles_id === "cec6617f-b593-4ebc-9604-3059dfee0ac4") ? (
                     !changmap && <Col span={6}>
-                        <button
-                            className="btn btn-light btn-sm"
-                            onClick={() => {
-                                if (firstSearc) {
-                                    apiSearchData({ project_name: "project_na" })
-                                    setFirstSearc(false)
-                                }
-                                setVisibleSearch(!visibleSearch)
-                            }}
+                        <Tooltip
+                            placement="left" title={"Search"}
                         >
-                            <img width="100%" src="/assets/images/search.png" />
-                        </button>
+                            <button
+                                className="btn btn-light btn-sm"
+                                onClick={() => {
+                                    if (firstSearc) {
+                                        apiSearchData({ project_name: "project_na" })
+                                        setFirstSearc(false)
+                                    }
+                                    setVisibleSearch(!visibleSearch)
+                                }}
+                            >
+                                <img width="100%" src="/assets/images/search.png" />
+                            </button>
+                        </Tooltip>
                     </Col>
+
                 ) : null}
 
                 {!changmap && <Col span={6} className="pt-2">
-                    <button className="btn btn-light btn-sm" onClick={clickHome} >
-                        <img
-                            width="100%"
-                            src="/assets/images/home.png"
-                            title="้home"
-                        />
-                    </button>
+                    <Tooltip placement="left" title={"Default"}>
+                        <button className="btn btn-light btn-sm" onClick={clickHome} >
+                            <img
+                                width="100%"
+                                src="/assets/images/home.png"
+                            />
+                        </button>
+                    </Tooltip>
                 </Col>}
                 {!changmap && <Col span={6} className="pt-2">
-                    <button className="btn btn-light btn-sm" onClick={clickLine} >
-                        <img
-                            width="100%"
-                            src="/assets/images/Line.png"
-                            title="line"
-                        />
-                    </button>
+                    <Tooltip placement="left" title={"Distance"}>
+                        <button className="btn btn-light btn-sm" onClick={clickLine} >
+                            <img
+                                width="100%"
+                                src="/assets/images/Line.png"
+                            />
+                        </button>
+                    </Tooltip>
                 </Col>}
                 <Col span={6} className="pt-2">
-                    <button className="btn btn-light btn-sm" onClick={clickSplit}>
-                        <img
-                            width="100%"
-                            src="/assets/images/-line_icon.png"
-                            title="split"
-                        />
-                    </button>
+                    <Tooltip placement="left" title={"Swipe Map"}>
+                        <button className="btn btn-light btn-sm" onClick={clickSplit}>
+                            <img
+                                width="100%"
+                                src="/assets/images/-line_icon.png"
+                            />
+                        </button>
+                    </Tooltip>
                 </Col>
                 {!changmap && <Col span={6} className="pt-2">
-                    <button className="btn btn-light btn-sm" onClick={areaDistance}>
-                        <img
-                            width="100%"
-                            src="/assets/images/polegon.png"
-                            title="area distance"
-                        />
-                    </button>
+                    <Tooltip placement="left" title={"Area"}>
+                        <button className="btn btn-light btn-sm" onClick={areaDistance}>
+                            <img
+                                width="100%"
+                                src="/assets/images/polegon.png"
+                                title="area distance"
+                            />
+                        </button>
+                    </Tooltip>
                 </Col>}
                 {!changmap && <Col span={6} className="pt-2">
-                    <button className="btn btn-light btn-sm" onClick={ontimeslider} >
-                        <img
-                            width="100%"
-                            src="/assets/images/arrow_back_time.png"
-                            title="timeslide"
-                        />
-                    </button>
+                    <Tooltip placement="left" title={"Time Silder"}>
+                        <button className="btn btn-light btn-sm" onClick={ontimeslider} >
+                            <img
+                                width="100%"
+                                src="/assets/images/arrow_back_time.png"
+                            />
+                        </button>
+                    </Tooltip>
                 </Col>}
                 {!changmap && <Col span={6} className="pt-2">
-                    <button className="btn btn-light btn-sm" onClick={clickClearMap} >
-                        <img
-                            width="100%"
-                            src="/assets/images/cross.png"
-                            title="clear map"
-                        />
-                    </button>
+                    <Tooltip placement="left" title={"Clear"}>
+                        <button className="btn btn-light btn-sm" onClick={clickClearMap} >
+                            <img
+                                width="100%"
+                                src="/assets/images/cross.png"
+                            />
+                        </button>
+                    </Tooltip>
                 </Col>}
             </div>
             <div className="tools-map-area2">
                 <Col span={24} className="pt-2">
-                    <button
-                        className="btn btn-light btn-sm "
-                        id="closeFullscreen"
-                        style={{ display: "none" }}
-                        onClick={() => clickButtomHideNavbar()}
-                    >
-                        <img
-                            width="100%"
-                            src="/assets/images/close_full_screen.png"
-                        />
-                    </button>
-                    <button
-                        className="btn btn-light btn-sm"
-                        id="openFullscreen"
-                        style={{ display: "none" }}
-                        onClick={() => openFullscreen()}
-                    >
-                        <img width="100%" src="/assets/images/open_full_screen.png" />
-                    </button>
-                    <button
-                        className="btn btn-light btn-sm"
-                        onClick={() => {
-                            menuOpenFullscreen();
-                        }}
-                    >
-                        <img
-                            width="100%"
-                            src="/assets/images/menu_full_screen.png"
-                        />
-                    </button>
+                    <Tooltip placement="bottom" title={"Menu Bar"}>
+                        <button
+                            className="btn btn-light btn-sm "
+                            id="closeFullscreen"
+                            style={{ display: "none" }}
+                            onClick={() => clickButtomHideNavbar()}
+                        >
+                            <img
+                                width="100%"
+                                src="/assets/images/close_full_screen.png"
+                            />
+                        </button>
+                    </Tooltip>
+                    <Tooltip placement="bottom" title={"FullScreen"}>
+                        <button
+                            className="btn btn-light btn-sm"
+                            id="openFullscreen"
+                            style={{ display: "none" }}
+                            onClick={() => openFullscreen()}
+                        >
+                            <img width="100%" src="/assets/images/open_full_screen.png" />
+                        </button>
+                    </Tooltip>
+                    <Tooltip placement="bottom" title={"ScreenTools"}>
+                        <button
+                            className="btn btn-light btn-sm"
+                            onClick={() => {
+                                menuOpenFullscreen();
+                            }}
+                        >
+                            <img
+                                width="100%"
+                                src="/assets/images/menu_full_screen.png"
+                            />
+                        </button>
+                    </Tooltip>
                 </Col>
             </div>
             <div className="tools-map-area3" hidden={changmap} >
