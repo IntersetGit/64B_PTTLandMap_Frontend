@@ -1887,8 +1887,8 @@ const mapPage = () => {
                                             allowClear
                                         >
                                             <Option value="project_na">ชื่อโครงการ</Option>
-                                            <Option value="objectid">เลขที่โฉนด</Option>
-                                            <Option value="parlabel1">ลำดับแปลงที่ดิน</Option>
+                                            <Option value="parlabel1">เลขที่โฉนด</Option>
+                                            <Option value="objectid">ลำดับแปลงที่ดิน</Option>
                                         </Select>
                                     </Form.Item>
                                 </div>
