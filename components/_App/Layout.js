@@ -9,17 +9,57 @@ import { useRouter } from 'next/dist/client/router';
 import { Cookies } from 'react-cookie'
 import Preloader from './Preloader'
 import "moment/locale/th";
+import { useDispatch } from 'react-redux';
+import jwt_decode from "jwt-decode";
+import RefreshToken from "../../util/RefreshToken";
+import { delToken } from '../../redux/actions/userActions';
 
 function Layout({ children, isMap = false, navbarHide }) {
     const route = useRouter()
+    const dispatch = useDispatch();
     const [loader, setLoader] = useState(false);
     const [slideNav, setslideNav] = useState("") //slide-nav
+    const [events, setEvents] = useState([
+        "load",
+        "mousemove",
+        "mousedown",
+        "click",
+        "scroll",
+        "keypress"])
 
     useEffect(() => {
         const cookies = new Cookies();
         const token = cookies.get('token');
-        if (!token) route.push("/login")
+        if (token) {
+            const token_decode = jwt_decode(token);
+            if (token_decode.exp < ((Date.now() / 1000) - (10 * 60 * 1000))) {
+                console.log("หมดเวลาtoken");
+                const refresh_token = cookies.get('refresh_token');
+                RefreshToken(refresh_token);
+            } else {
+                let timeout;
+                const setTime = () => {
+                    timeout = setTimeout(() => {
+                        console.log("logout");
+                        logout()
+                        clearTimeout(timeout);
+                    }, 1800000); // 1800000 = 30 min
+                }
+                for (var i in events) {/*ตรวจจับทุกอีเวน์ในการเคลื่อนไหว*/
+                    window.addEventListener(events[i], () => {
+                        clearTimeout(timeout);
+                        setTime()
+                    });
+                }
+            }
+
+        } else route.push("/login")
     })
+
+    const logout = () => {
+        dispatch(delToken())
+        route.push("/login")
+    }
 
     // useEffect(() => {
     //     setTimeout(() => setLoader(false), 500);
