@@ -48,6 +48,7 @@ const mapPage = () => {
     const { user } = useSelector(({ user }) => user);
     const centerMap = { lat: 13.78, lng: 100.55 }
     const [layerData, setLayerData] = useState([])
+    const [containerFluidMap, setContainerFluidMap] = useState(60)
 
     const [slidemapshow, setSlidemapshow] = useState(false);
     const [ismenu, setIsmenu] = useState(null);
@@ -538,6 +539,7 @@ const mapPage = () => {
     /* open close Navbar */
     const [hideNavbar, setHideNavbar] = useState(false)
     const clickButtomHideNavbar = () => { //
+        setContainerFluidMap(!hideNavbar ? 0 : 60)
         setHideNavbar(!hideNavbar)
     };
     const menuOpenFullscreen = () => {
@@ -2516,6 +2518,10 @@ const mapPage = () => {
           .col-4 , .col-3 {
             padding-right: 5px;
             padding-left: 5px;
+          }
+
+          .container-fluid-map {
+            padding-top:  ${containerFluidMap}px;
           }
         `}
             </style>
