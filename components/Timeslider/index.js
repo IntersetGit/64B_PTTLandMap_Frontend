@@ -7,10 +7,12 @@ import {
     RightCircleOutlined,
     LeftCircleOutlined
 } from '@ant-design/icons';
-import { Slider, Button, Image } from 'antd';
+import { Slider, Button, Image, Form } from 'antd';
 import styled from 'styled-components';
 // import Image from 'next/image'
 import { DatePicker } from 'antd';
+import moment from 'moment'
+
 const { RangePicker } = DatePicker;
 
 const RangePickerCustom = styled(RangePicker)`
@@ -36,32 +38,12 @@ let testdata = [
         name: "22/12/64",
         wms: "http://asdasdasdasdas.com"
     },
-    {
-        name: "23/12/64",
-        wms: "http://asdasdasdasdas55.com"
-    },
-    {
-        name: "24/12/64",
-        wms: "http://asdasdasdasdas.com"
-    },
-    {
-        name: "25/12/64",
-        wms: "http://asdasdasdasdas55.com"
-    },
-    {
-        name: "26/12/64",
-        wms: "http://asdasdasdasdas.com"
-    },
-    {
-        name: "27/12/64",
-        wms: "http://asdasdasdasdas55.com"
-    },
-
 ]
 
-function Timeslide({ data = testdata, onChange = (e) => { }, onDateChange = (e) => { }, onClose, keynameshow = "name", visible = true }) {
+function Timeslide({ data = testdata, onChange = (e) => { }, onDateChange = (e) => { }, onClose, keynameshow = "date", visible = true }) {
     const intervalIdRef = useRef(0);
     const [isRunning, setIsRunning] = useState(false);
+    const [form] = Form.useForm();
 
     const [max, setMax] = useState(0);
     const [value, setValue] = useState(0);
@@ -70,12 +52,11 @@ function Timeslide({ data = testdata, onChange = (e) => { }, onDateChange = (e) 
     const [datevalue, setDatevalue] = useState();
     const [dates, setDates] = useState([]);
     const [showdatetime, setShowdatetime] = useState(false);
-
     useEffect(() => {
         let ob = { 0: "" }
 
         data.forEach((item, index) => {
-            ob[(index + 1) * 10] = { ...item, label: item[keynameshow], style: { color: '#ffffff', } };
+            ob[(index + 1) * 10] = { ...item, /*label: moment(item[keynameshow]).format("D/M/YY"),*/ style: { color: '#ffffff', } };
         })
         let max = (Object.keys(ob).length - 1) * 10;
         setMax(max);
@@ -83,23 +64,23 @@ function Timeslide({ data = testdata, onChange = (e) => { }, onDateChange = (e) 
         dragElement(document.getElementById("mydiv"));
         dragElement(document.getElementById("datepicker"));
 
-    }, []);
+    }, [data]);
 
     useEffect(() => {
         if (isRunning) {
             intervalIdRef.current = setInterval(() => {
                 setValue((v) => v + 10);
             }, 2000);
-            console.log("run");
+            // console.log("run");
         }
         return () => {
-            console.log("clear");
+            // console.log("clear");
             return clearInterval(intervalIdRef.current);
         };
     }, [isRunning]);
 
     useEffect(() => {
-        onChange(value)
+        onChange(marks[value] && marks[value])
         let key = Object.keys(marks);
         if (value > key[key.length - 1] || value < key[0]) {
             setValue(0);
@@ -107,11 +88,11 @@ function Timeslide({ data = testdata, onChange = (e) => { }, onDateChange = (e) 
         }
     }, [value])
 
-    useEffect(() => {
-        if (datevalue) {
-            onDateChange(datevalue)
-        }
-    }, [datevalue]);
+    // useEffect(() => {
+    //     if (datevalue) {
+    //         onDateChange(datevalue)
+    //     }
+    // }, [datevalue]);
     const Nextstep = () => {
         setValue((v) => v + 10);
     }
@@ -182,14 +163,26 @@ function Timeslide({ data = testdata, onChange = (e) => { }, onDateChange = (e) 
                     <span style={{ textAlign: "center", marginBottom: "5px", color: "white", fontSize: "20px", fontWeight: "bold" }}>Time Slider</span>
                     <span onClick={() => setShowdatetime(!showdatetime)} style={{ fontSize: "20px", color: "#FFF", float: "right", cursor: "pointer" }}>x</span>
                 </div>
-                <RangePickerCustom
-                    value={hackValue || datevalue}
-                    // disabledDate={disabledDate}
-                    onCalendarChange={val => setDates(val)}
-                    onChange={val => setDatevalue(val)}
-                    onOpenChange={onOpenChange}
-                />
-                <Button type="primary" size="middle" style={{ width: "100px", alignSelf: "flex-end", marginTop: "8px", fontWeight: "bold" }}>Start</Button>
+                <Form form={form} onFinish={(e) => onDateChange(e.Datebetween)} layout="vertical" name="userForm">
+                    <Form.Item
+                        name="Datebetween"
+                        rules={[
+                            {
+                                required: true,
+                            },
+                        ]}
+                    >
+                        <RangePickerCustom
+                            value={hackValue || datevalue}
+                            // disabledDate={disabledDate}
+                            onCalendarChange={val => setDates(val)}
+                            onChange={val => setDatevalue(val)}
+                            onOpenChange={onOpenChange}
+                        />
+                    </Form.Item>
+
+                    <Button type="primary" htmlType="submit" size="middle" style={{ float: "right", marginTop: '-15px', width: "100px", alignSelf: "flex-end", fontWeight: "bold", }}>Start</Button>
+                </Form>
             </div>
             <div id="mydiv">
                 {/* -----------------------------PLAYER--------------------------------------------- */}
@@ -212,7 +205,7 @@ function Timeslide({ data = testdata, onChange = (e) => { }, onDateChange = (e) 
                         <div style={{ width: "80%", flexDirection: "column", }}>
                             <span style={{ color: "white", fontWeight: "bold", padding: "0 5px" }}>Time Slider</span>
                             <span style={{ color: "white", fontWeight: "bold", padding: "0 5px" }}>{marks && marks[value]?.label ? marks[value]?.label : ""}</span>
-                            <SliderCustom onChange={e => setValue(e)} value={value} tipFormatter={(e) => marks[e]?.label || e} step={10} max={max} marks={marks} defaultValue={0} trackStyle={{ backgroundColor: "#BC9945", }} />
+                            <SliderCustom onChange={e => setValue(e)} value={value} tipFormatter={(e) => marks[e]?.label || marks[e]?.date} step={10} max={max} marks={marks} defaultValue={0} trackStyle={{ backgroundColor: "#BC9945", }} />
                         </div>
                         <div className="btnright" style={{ width: "5%", textAlign: "center" }}>
                             <RightCircleOutlined onClick={Nextstep} style={{ fontSize: "25px ", color: "#FFF" }} />
