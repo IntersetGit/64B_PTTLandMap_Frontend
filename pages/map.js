@@ -323,8 +323,7 @@ const mapPage = () => {
         arr[index1].children[index2].rgb = rgb;
         // console.log('rgb :>> ', rgb);
         setGroupLayerList(arr);
-
-        changeColor(arr[index1].children[index2].id, arr[index1].children[index2].color_layer,)
+        changeColor(arr[index1].children[index2].id, arr[index1].children[index2].color_layer, arr[index1].children[index2].option_layer)
 
     };
 
@@ -336,22 +335,31 @@ const mapPage = () => {
             clearMapData(arr[index1].children[index2].id)
         } else {
             const item = arr[index1].children[index2];
-            await getDeoJson(item.id, item.color_layer)
+            // console.log('item :>> ', item);
+            await getDeoJson(item.id, item.color_layer, item.option_layer)
         }
         setGroupLayerList(arr)
     };
 
 
-    const changeColor = (id, color) => {
+    const changeColor = (id, color, option_layer) => {
         const arr = [...layerData]
         const index = arr.findIndex(e => e.id == id)
         if (index != -1) {
             const layer = arr[index].layer
+            // layer.setStyle({
+            //     fillColor: color,
+            //     fillOpacity: 0.5,
+            //     strokeWeight: 1,
+            //     clickable: false
+            // });
+            option_layer = option_layer ?? {}
             layer.setStyle({
                 fillColor: color,
-                fillOpacity: 0.5,
-                strokeWeight: 1,
-                clickable: false
+                fillOpacity: option_layer.fillOpacity ?? inputValueOpacityColor, //Opacity
+                strokeWeight: option_layer.strokeWeight ?? inputValueStrokColor,  //ความหนาขอบ
+                strokeColor: option_layer.strokeColor ?? colorFrame.hex, //เส้นขอบ
+                clickable: false,
             });
         }
     }
@@ -385,7 +393,7 @@ const mapPage = () => {
         }
     }
 
-    const getDeoJson = async (id, color) => {
+    const getDeoJson = async (id, color, option_layer) => {
         try {
             const { data } = await API.get(`/shp/shapeData?id=${id}`);
             const GeoJson = data.items.shape;
@@ -393,13 +401,13 @@ const mapPage = () => {
             const layer = new google.maps.Data();
             layer.addGeoJson(GeoJson)
 
+            option_layer = option_layer ?? {}
             layer.setStyle({
                 fillColor: color,
-                fillOpacity: 0.5,
-                strokeWeight: 1,
-                strokeColor: 'green',
+                fillOpacity: option_layer.fillOpacity ?? inputValueOpacityColor, //Opacity
+                strokeWeight: option_layer.strokeWeight ?? inputValueStrokColor,  //ความหนาขอบ
+                strokeColor: option_layer.strokeColor ?? colorFrame.hex, //เส้นขอบ
                 clickable: false,
-                strokeOpacity: 1,
             });
             layer.setMap(map);
 
@@ -413,7 +421,9 @@ const mapPage = () => {
             setLayerData([...layerData, { id, layer }])
             map.fitBounds(bounds);
 
-        } catch (error) { }
+        } catch (error) {
+            console.log('errr :>> ', error);
+        }
     };
 
     const openColor = (index1, index2) => {
@@ -1068,11 +1078,20 @@ const mapPage = () => {
 
 
             layer.addGeoJson(GeoJson)
+            // layer.setStyle({
+            //     fillColor: item.color,
+            //     fillOpacity: 0.5,
+            //     strokeWeight: 1,
+            //     clickable: false
+            // });
+
+            const option_layer = item.option_layer ?? {}
             layer.setStyle({
                 fillColor: item.color,
-                fillOpacity: 0.5,
-                strokeWeight: 1,
-                clickable: false
+                fillOpacity: option_layer.fillOpacity ?? inputValueOpacityColor, //Opacity
+                strokeWeight: option_layer.strokeWeight ?? inputValueStrokColor,  //ความหนาขอบ
+                strokeColor: option_layer.strokeColor ?? colorFrame.hex, //เส้นขอบ
+                clickable: false,
             });
             layer.setMap(map);
 
