@@ -885,7 +885,7 @@ const mapPage = () => {
     }
 
     /* วัดขนาดพื่นที่ */
-
+    const [areadistanemode, setAreadistanemode] = useState(true)
     const [drawings, setDrawings] = useState([]);
     var selectedShape;
 
@@ -971,7 +971,7 @@ const mapPage = () => {
         labels = [];
     }
     const areaDistance = () => {
-
+        setAreadistanemode(!areadistanemode)
         deleteAllShape();
         const drawingManager = new google.maps.drawing.DrawingManager({
             drawingControl: false,
@@ -984,33 +984,40 @@ const mapPage = () => {
                 fillColor: "#F54",
 
             },
-            map: map
+            // map: map
         });
-        google.maps.event.addListener(drawingManager, 'overlaycomplete', function (e) {
-            // drawings.push(e);
-            setDrawings([...drawings, e])
-            var newShape = e.overlay;
-            newShape.type = e.type;
-            drawingManager.setDrawingMode(null);
-            if (e.type == 'polygon') {
-                var path = newShape.getPath();
-                google.maps.event.addListener(path, "insert_at", function () {
+        if (areadistanemode) {
+            drawingManager.setMap(map);
+            google.maps.event.addListener(drawingManager, 'overlaycomplete', function (e) {
+                // drawings.push(e);
+                setDrawings([...drawings, e])
+                var newShape = e.overlay;
+                newShape.type = e.type;
+                if (e.type == 'polygon') {
+                    var path = newShape.getPath();
+                    google.maps.event.addListener(path, "insert_at", function () {
+                        attachPolygonInfoWindow(newShape);
+                    });
+
+                    google.maps.event.addListener(path, "set_at", function () {
+                        attachPolygonInfoWindow(newShape);
+                    });
+
                     attachPolygonInfoWindow(newShape);
-                });
 
-                google.maps.event.addListener(path, "set_at", function () {
-                    attachPolygonInfoWindow(newShape);
-                });
-
-                attachPolygonInfoWindow(newShape);
-
-                google.maps.event.addListener(newShape, 'click', function () {
+                    google.maps.event.addListener(newShape, 'click', function () {
+                        setSelection(newShape);
+                    });
                     setSelection(newShape);
-                });
-                setSelection(newShape);
-            }
+                    drawingManager.setDrawingMode(null);
+                }
+                drawingManager.setDrawingMode(null);
+            });
+        } else {
+            drawingManager.setDrawingMode(null);
+            map.setOptions({ draggableCursor: 'default' });
 
-        });
+        }
 
     }
 
@@ -1326,9 +1333,52 @@ const mapPage = () => {
             },
         }
     }
-    const ontimeslider = () => {
-        setSlidemapshow(!slidemapshow)
+
+    //--------------------------------Timeslider-----------------------------------------------------
+    const [datatimeslider, setDatatimeslider] = useState([]);
+    const [WMSTIMESLIDE, setWMSTIMESLIDE] = useState([])
+    const GetTimslide = (date) => {
+        API.get(`masterdata/getdateWms?startdate=${date[0].format("YYYY-MM-DD")}&enddate=${date[1].format("YYYY-MM-DD")}`).then(({ data: { items } }) => {
+            console.log('items :>> ', items);
+            if (items.length > 0) {
+                var setwms = [];
+                for (let i = 0; i < items.length; i++) {
+                    let maptype = new WmsMapType(
+                        items[i].id,
+                        items[i].url, {
+                        layers: items[i].layer_name,
+                        wmsProjectKey: items[i].id,
+                    }, {
+                        opacity: 0
+                    }, items[i].type_server
+                    );
+                    maptype.addToMap(map, false);
+                    setwms.push(maptype);
+                }
+                setWMSTIMESLIDE(setwms);
+            }
+            setDatatimeslider(items);
+        }).catch((error) => {
+            console.log('error :>> ', error);
+        })
     }
+    const OnPlaytimeslide = (e) => {
+        if (e) {
+            WMSTIMESLIDE.forEach((item) => item.name == e.id ? item.setOpacity(1) : item.setOpacity(0));
+        } else {
+            WMSTIMESLIDE.forEach((item) => item.setOpacity(0));
+        }
+    }
+    const ontimeslider = () => {
+        if (slidemapshow == false) {
+            console.log('close :>> ');
+            WMSTIMESLIDE.forEach((item) => item.removeFromMap(map));
+            setWMSTIMESLIDE([]);
+            setDatatimeslider([]);
+        }
+        setSlidemapshow(!slidemapshow);
+    }
+    //---------------------------------------------------------------------------------------------
     // -------------------------------------------WMS----------------------------
     const [selectwms, setSelectwms] = useState([])
     const [selectwmsright, setSelectwmsright] = useState([])
@@ -1398,7 +1448,7 @@ const mapPage = () => {
                 <title>PTT Land Map</title>
             </Head>
             <div id="cursor" style={distanct && { borderRadius: "10%", padding: "5px", backgroundColor: "#FFF" }}>{distanct}</div>
-            <Timeslide onClose={() => setSlidemapshow(false)} visible={slidemapshow} />
+            <Timeslide onChange={(e) => OnPlaytimeslide(e)} data={datatimeslider} onDateChange={GetTimslide} onClose={() => setSlidemapshow(false)} visible={slidemapshow} />
             <div className="tools-group-layer">
                 <Tooltip placement="topRight" title={"Gis Layer"}>
                     <button className="btn btn-light btn-sm" onClick={() => setVisibleShapeFile(true)}>
@@ -1490,13 +1540,15 @@ const mapPage = () => {
                     </Tooltip>
                 </Col>}
                 {!changmap && <Col span={6} className="pt-2">
-                    <button className="btn btn-light btn-sm" onClick={areaDistance} >
-                        <img
-                            width="100%"
-                            src="/assets/images/polegon.png"
-                            title="area distance"
-                        />
-                    </button>
+                    <Tooltip placement="left" title={"areaDistance"}>
+                        <button className="btn btn-light btn-sm" onClick={areaDistance} >
+                            <img
+                                width="100%"
+                                src="/assets/images/polegon.png"
+                                title="area distance"
+                            />
+                        </button>
+                    </Tooltip>
                 </Col>}
                 <Col span={6} className="pt-2">
                     <Tooltip placement="left" title={"Swipe Map"}>

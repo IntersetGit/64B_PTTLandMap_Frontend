@@ -93,16 +93,21 @@ function WmsMapType(name, url, params, options, type = "geoserver") {
      * Add this MapType to a map at the given index, or on top of other layers
      * if index is omitted.
      */
-    this.addToMap = async function (map, index) {
+    this.addToMap = async function (map, zoom = true, index) {
         // console.log(this)
         if (index !== undefined) {
             map.overlayMapTypes.insertAt(Math.min(index, map.overlayMapTypes.getLength()), this);
         } else {
             if (this.type == "geoserver" || this.type == null) {
                 await map.overlayMapTypes.push(this);
-                this.zoomToWms(map);
+                if (zoom) {
+                    this.zoomToWms(map);
+                }
             } else {
                 this.Arcgiswms(map);
+                if (zoom) {
+                    this.ZoomToArcgis(map);
+                }
             }
 
             //this.zoomToWms(map);
@@ -273,7 +278,7 @@ function WmsMapType(name, url, params, options, type = "geoserver") {
             opacity: 1,
         });
         map.overlayMapTypes.insertAt(0, agsType);
-        this.ZoomToArcgis(map);
+
 
     }
     this.ZoomToArcgis = function (map) {/*------------------------------------Arcgis wms addnew---------------------------*/
