@@ -79,6 +79,9 @@ const index = () => {
             if (_form) _form.setFieldsValue({ ..._form, amp: ampList.name, prov: provList.name })
         }
     }
+    const handleReport = (value) => {
+        console.log(value)
+    }
     return (
         <>
             <Head>
@@ -100,78 +103,73 @@ const index = () => {
                             initialValues={{
                                 project_name: "project_na"
                             }}
-                            onFinish={() => alert()}
+                            onFinish={handleReport}
                         >
-                            <Input.Group size="default">
-                                <Row gutter={8}>
-                                    <Col span={3}>
-                                        <Form.Item>
-                                            <Select
-                                                placeholder="ชื่อโครงการ"
-                                                allowClear
-                                            >
-                                                <Option value="project_na">ชื่อโครงการ</Option>
-                                                <Option value="objectid">เลขที่โฉนด</Option>
-                                                <Option value="parlabel1">ลำดับแปลงที่ดิน</Option>
-                                            </Select>
-                                        </Form.Item>
-                                    </Col>
-                                    <Col span={3}>
-                                        <Form.Item
-                                            label=""
-                                            name="layer_group"
+                            <div className="row">
+                                <div className="col-md-12 " style={{ marginBottom: "10px" }}>
+                                    <Button className="btn-success eiei" style={{ borderRadius: "2px", color: "white", marginLeft: "2px", float: "right" }} onClick={() => loadShapeFile()}>Export To Excel</Button>
+                                    <Button type="primary" style={{ marginLeft: "2px", float: "right" }} htmlType="submit">Report</Button>
+                                </div>
+                                <div className="col-md-2 ">
+                                    <Form.Item name="search">
+                                        <Input placeholder="Search" />
+                                    </Form.Item>
+                                </div>
+                                <div className="col-md-2 ">
+                                    <Form.Item name="project_name" >
+                                        <Select placeholder="ชื่อโครงการ asfsa" allowClear>
+                                            <Option value="project_na">ชื่อโครงการ</Option>
+                                            <Option value="objectid">เลขที่โฉนด</Option>
+                                            <Option value="parlabel1">ลำดับแปลงที่ดิน</Option>
+                                        </Select>
+                                    </Form.Item>
+                                </div>
+                                <div className="col-md-2 ">
+                                    <Form.Item name="layer_group">
+                                        <Select
+                                            placeholder="ชั้นข้อมูล"
+                                            allowClear
                                         >
-                                            <Select
-                                                placeholder="ชั้นข้อมูล"
-                                                allowClear
-                                            >
-                                                {layerList.map(e => <Option key={`layer_group-${e.id}`} value={e.id}>{e.name_layer}</Option>)}
-                                            </Select>
-                                        </Form.Item>
-                                    </Col>
-                                    <Col span={3}>
-                                        <Form.Item name="prov">
-                                            <Select placeholder="จังหวัด" style={{ width: "100%" }} onChange={(e) => onChangeProv(e, formDashboard)} allowClear>
-                                                {
-                                                    dataProvider.map(data => {
-                                                        return <Option key={`prov-${data.id}`} value={data.name}>{data.name}</Option>
-                                                    })
-                                                }
-                                            </Select>
-                                        </Form.Item>
-                                    </Col>
-                                    <Col span={3}>
-                                        <Form.Item name="amp">
-                                            <Select placeholder="อำเภอ" style={{ width: "100%" }} allowClear onChange={(e) => onChangeAmp(e, formDashboard)} >
-                                                {
-                                                    dataAmp.map(data => <Option key={`amp-${data.id}`} value={data.name}>{data.name}</Option>)
-                                                }
-                                            </Select>
-                                        </Form.Item>
-                                    </Col>
-                                    <Col span={3}>
-                                        <Form.Item name="tam">
-                                            <Select placeholder="ตำบล" style={{ width: "100%" }} allowClear onChange={(e) => onChangeTam(e, formDashboard)} >
-                                                {
-                                                    dataTam.map(data => <Option key={`tam-${data.id}`} value={data.name}>{data.name}</Option>)
-                                                }
-                                            </Select>
-                                        </Form.Item>
-                                    </Col>
-                                    <Col span={5} >
-                                        <Button type="primary" style={{ marginRight: "5px" }} htmlType="submit">Report</Button>
-                                        <Button className="btn-success" style={{ borderRadius: "2px", color: "white" }} onClick={() => loadShapeFile()}>Export To Excel</Button>
-                                    </Col>
-                                </Row>
-                            </Input.Group>
+                                            {layerList.map(e => <Option key={`layer_group-${e.id}`} value={e.id}>{e.name_layer}</Option>)}
+                                        </Select>
+                                    </Form.Item>
+                                </div>
+                                <div className="col-md-2 ">
+                                    <Form.Item name="prov">
+                                        <Select placeholder="จังหวัด" style={{ width: "100%" }} onChange={(e) => onChangeProv(e, formDashboard)} allowClear>
+                                            {
+                                                dataProvider.map(data => {
+                                                    return <Option key={`prov-${data.id}`} value={data.name}>{data.name}</Option>
+                                                })
+                                            }
+                                        </Select>
+                                    </Form.Item>
+                                </div>
+                                <div className="col-md-2 ">
+                                    <Form.Item name="amp">
+                                        <Select placeholder="อำเภอ" style={{ width: "100%" }} allowClear onChange={(e) => onChangeAmp(e, formDashboard)} >
+                                            {
+                                                dataAmp.map(data => <Option key={`amp-${data.id}`} value={data.name}>{data.name}</Option>)
+                                            }
+                                        </Select>
+                                    </Form.Item>
+                                </div>
+                                <div className="col-md-2 ">
+                                    <Form.Item name="tam">
+                                        <Select placeholder="ตำบล" style={{ width: "100%" }} allowClear onChange={(e) => onChangeTam(e, formDashboard)} >
+                                            {
+                                                dataTam.map(data => <Option key={`tam-${data.id}`} value={data.name}>{data.name}</Option>)
+                                            }
+                                        </Select>
+                                    </Form.Item>
+                                </div>
+                            </div>
                         </Form>
                     </Col>
                     <Col span={24}>
-                        <Table style={{ color: "red" }} dataSource={data}>
+                        {/* <Table dataSource={data}>
                             <ColumnGroup title="">
-                                <ColumnGroup>
-                                    <Column title="" dataIndex="firstName" key="firstName" />
-                                </ColumnGroup>
+                                <Column title="" dataIndex="land_all" />
                             </ColumnGroup>
                             <ColumnGroup title="ทั้งหมด">
                                 <Column title="แปลง" dataIndex="land_all" />
@@ -189,7 +187,52 @@ const index = () => {
                                 <Column title="แปลง" dataIndex="land_success" key="all" />
                                 <Column title="ระยะทาง (กม.)" dataIndex="distance_success" key="all" />
                             </ColumnGroup>
-                        </Table>
+                        </Table> */}
+                        <div className="table-responsive">
+                            <table className="table table-bordered">
+                                <colgroup span="2"></colgroup>
+                                <colgroup span="2"></colgroup>
+                                <tr>
+                                    <td rowspan="2"></td>
+                                    <th colspan="2" scope="colgroup" style={{ backgroundColor: "#adaaa9" }}>ทั้งหมด</th>
+                                    <th colspan="2" scope="colgroup" style={{ backgroundColor: "#a8d08d" }}>ได้รับอนุมัติให้ดำเนินการใหม่</th>
+                                    <th colspan="2" scope="colgroup" style={{ backgroundColor: "#ff98cb" }}>อยู่ระหว่างดำเนินการ</th>
+                                    <th colspan="2" scope="colgroup" style={{ backgroundColor: "#fe9a00" }}>ดำเนินการเรียบร้อยแล้ว</th>
+                                </tr>
+                                <tr>
+                                    <th scope="col" style={{ backgroundColor: "#adaaa9" }}>แปลง</th>
+                                    <th scope="col" style={{ backgroundColor: "#adaaa9" }}>ระยะทาง</th>
+                                    <th scope="col" style={{ backgroundColor: "#a8d08d" }}>แปลง</th>
+                                    <th scope="col" style={{ backgroundColor: "#a8d08d" }}>ระยะทาง</th>
+                                    <th scope="col" style={{ backgroundColor: "#ff98cb" }}>แปลง</th>
+                                    <th scope="col" style={{ backgroundColor: "#ff98cb" }}>ระยะทาง</th>
+                                    <th scope="col" style={{ backgroundColor: "#fe9a00" }}>แปลง</th>
+                                    <th scope="col" style={{ backgroundColor: "#fe9a00" }}>ระยะทาง</th>
+                                </tr>
+                                <tr>
+                                    <th scope="row">Teddy Bears</th>
+                                    <td style={{ backgroundColor: "#e6e6e6" }}>50,000</td>
+                                    <td style={{ backgroundColor: "#e6e6e6" }}>30,000</td>
+                                    <td style={{ backgroundColor: "#c3e0b4" }}>100,000</td>
+                                    <td style={{ backgroundColor: "#c3e0b4" }}>80,000</td>
+                                    <td style={{ backgroundColor: "#fce5d7" }}>100,000</td>
+                                    <td style={{ backgroundColor: "#fce5d7" }}>80,000</td>
+                                    <td style={{ backgroundColor: "#fec001" }}>100,000</td>
+                                    <td style={{ backgroundColor: "#fec001" }}>80,000</td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">Board Games</th>
+                                    <td style={{ backgroundColor: "#e6e6e6" }}>10,000</td>
+                                    <td style={{ backgroundColor: "#e6e6e6" }}>5,000</td>
+                                    <td style={{ backgroundColor: "#c3e0b4" }}>12,000</td>
+                                    <td style={{ backgroundColor: "#c3e0b4" }}>9,000</td>
+                                    <td style={{ backgroundColor: "#fce5d7" }}>12,000</td>
+                                    <td style={{ backgroundColor: "#fce5d7" }}>9,000</td>
+                                    <td style={{ backgroundColor: "#fec001" }}>12,000</td>
+                                    <td style={{ backgroundColor: "#fec001" }}>9,000</td>
+                                </tr>
+                            </table>
+                        </div>
                     </Col>
                 </Row>
             </System>
