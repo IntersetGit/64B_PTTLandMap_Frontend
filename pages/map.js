@@ -48,6 +48,7 @@ const mapPage = () => {
     const { user } = useSelector(({ user }) => user);
     const centerMap = { lat: 13.78, lng: 100.55 }
     const [layerData, setLayerData] = useState([])
+    const [containerFluidMap, setContainerFluidMap] = useState(60)
 
     const [slidemapshow, setSlidemapshow] = useState(false);
     const [ismenu, setIsmenu] = useState(null);
@@ -232,7 +233,7 @@ const mapPage = () => {
 
     const onFinishUpload = async (value) => {
         try {
-            // console.log('value :>> ', value);
+            console.log('value :>> ', value);
             // console.log('FileType :>> ', FileType);
             // console.log('colorUpload :>> ', colorUpload.hex);
             if (FileUpload) {
@@ -249,12 +250,16 @@ const mapPage = () => {
                         await RefreshToken(refresh_token);
                     }
 
+                    const option_layer = {
+                        fillOpacity: inputValueOpacityColor,
+                        strokeWeight: inputValueStrokColor,
+                        strokeColor: colorFrame,
+                    }
+                    console.log('option_layer :>> ', option_layer);
+
                     await axios({
                         method: "post",
-                        url: `${process.env.NEXT_PUBLIC_SERVICE
-                            }/shp/add?name_layer=${name_layer}&type=${FileType}&group_layer_id=${group_layer_id}&color=${JSON.stringify(
-                                colorUpload.rgb
-                            )}`,
+                        url: `${process.env.NEXT_PUBLIC_SERVICE}/shp/add?name_layer=${name_layer}&type=${FileType}&group_layer_id=${group_layer_id}&option_layer=${JSON.stringify(option_layer)}&color=${JSON.stringify(colorUpload.rgb)}`,
                         config: { headers: { "Content-Type": "multipart/form-data" } },
                         headers: { Authorization: "Bearer " + token },
                         data: formData,
@@ -280,6 +285,25 @@ const mapPage = () => {
         }
     };
 
+    const callbackActionUpload = async (value) => {
+        try {
+            const formData = new FormData();
+            formData.append("file", value);
+            const token = cookies.get("token");
+            const { data } = await axios({
+                method: "post",
+                url: `${process.env.NEXT_PUBLIC_SERVICE}/demo/check`,
+                config: { headers: { "Content-Type": "multipart/form-data" } },
+                headers: { Authorization: "Bearer " + token },
+                data: formData,
+            });
+            console.log('data :>> ', data.type);
+
+            return `${process.env.NEXT_PUBLIC_SERVICE}/demo/resTrue`
+        } catch (error) {
+            return `${process.env.NEXT_PUBLIC_SERVICE}/demo/resFalse`
+        }
+    }
     const onFinishFailedUpload = (error) => {
         message.error("มีบางอย่างผิดพลาด !");
     };
@@ -515,6 +539,7 @@ const mapPage = () => {
     /* open close Navbar */
     const [hideNavbar, setHideNavbar] = useState(false)
     const clickButtomHideNavbar = () => { //
+        setContainerFluidMap(!hideNavbar ? 0 : 60)
         setHideNavbar(!hideNavbar)
     };
     const menuOpenFullscreen = () => {
@@ -1038,7 +1063,7 @@ const mapPage = () => {
             if (amp) url += `&amp=${amp}`
 
             const { data } = await API.get(url)
-            console.log('data :>> ', data.items);
+            // console.log('data :>> ', data.items);
             const _arr = []
             setAmount(data.items.amount_data)
             setSumData(10)
@@ -1249,11 +1274,11 @@ const mapPage = () => {
                     label: 'แปลง',
                     data: [],
                     backgroundColor: [
-                        'Red',
-                        'Orange',
-                        'Yellow',
-                        'Green',
-                        'Blue',
+                        '#F6D7A7',
+                        '#F6EABE',
+                        '#C8E3D4',
+                        '#87AAAA',
+                        '#FF9B6A',
                     ],
                 }],
                 list: [],
@@ -1277,11 +1302,11 @@ const mapPage = () => {
                     label: 'ระยะทาง',
                     data: [],
                     backgroundColor: [
-                        'Red',
-                        'Orange',
-                        'Yellow',
-                        'Green',
-                        'Blue',
+                        '#D1E8E4',
+                        '#C37B89',
+                        '#BCCC9A',
+                        '#EAE7C6',
+                        '#FFCCD2',
                     ],
                 }],
                 list: [],
@@ -1776,7 +1801,7 @@ const mapPage = () => {
                                     >
                                         <Upload
                                             onChange={handleChange}
-                                            action={`${process.env.NEXT_PUBLIC_SERVICE}/demo/resTrue`}
+                                            action={callbackActionUpload}
                                             fileList={FileList}
                                             multiple={false}
                                         >
@@ -2031,7 +2056,7 @@ const mapPage = () => {
                             />
                         </div>
                         <div className="col-4">
-                            {plotDashboard.list.map((e, i) => <p key={`plotDashboard-${i}`}>{e.name} : {e.value} แปลง</p>)}
+                            {plotDashboard.list.map((e, i) => <p key={`plotDashboard-${i}`}><b>{e.name}</b> : {e.value} แปลง</p>)}
                         </div>
                     </div>
 
@@ -2049,7 +2074,7 @@ const mapPage = () => {
                             />
                         </div>
                         <div className="col-4">
-                            {distanceDashboard.list.map((e, i) => <p key={`distanceDashboard-${i}`}>{e.name} : {e.value} ก.ม.</p>)}
+                            {distanceDashboard.list.map((e, i) => <p key={`distanceDashboard-${i}`}><b>{e.name}</b> : {e.value} ก.ม.</p>)}
                         </div>
                     </div>
 
@@ -2496,6 +2521,10 @@ const mapPage = () => {
           .col-4 , .col-3 {
             padding-right: 5px;
             padding-left: 5px;
+          }
+
+          .container-fluid-map {
+            padding-top:  ${containerFluidMap}px;
           }
         `}
             </style>
