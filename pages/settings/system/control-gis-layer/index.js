@@ -583,7 +583,7 @@ const usersSystemPage = () => {
             <Radio />
           </Form.Item>
           <Form.Item name="" label="Symbol" rules={[{ required: true }]}
-            extra="ขนาดไม่เกิน 80 pixcel"
+            extra="ขนาดแนะนำ 25X35"
           >
 
             <Upload>

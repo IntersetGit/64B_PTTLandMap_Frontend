@@ -359,6 +359,9 @@ const mapPage = () => {
                             const rgb = JSON.parse(x.color_layer)
                             x.color_layer = `rgb(${rgb.r},${rgb.g},${rgb.b},${rgb.a})`;
                             x.rgb = rgb;
+                        } else {
+                            x.color_layer = colorUpload.rgb
+                            x.rgb = colorUpload
                         }
                     });
                 }
@@ -418,7 +421,7 @@ const mapPage = () => {
                 fillColor: color,
                 fillOpacity: option_layer.fillOpacity ?? inputValueOpacityColor, //Opacity
                 strokeWeight: option_layer.strokeWeight ?? inputValueStrokColor,  //ความหนาขอบ
-                strokeColor: option_layer.strokeColor ?? colorFrame.hex, //เส้นขอบ
+                strokeColor: option_layer.strokeColor ? option_layer.strokeColor.hex : colorFrame.hex, //เส้นขอบ
                 clickable: false,
             });
         }
@@ -460,14 +463,35 @@ const mapPage = () => {
             const bounds = new google.maps.LatLngBounds();
             const layer = new google.maps.Data();
             layer.addGeoJson(GeoJson)
-
             option_layer = option_layer ?? {}
+            let icon = null
+            if (option_layer.symbol) {
+                let width = 25, height = 35
+                // const img = new Image();
+                // img.onload = function () {
+                //     width = Math.floor(this.width * 0.5)
+                //     height = Math.floor(this.height * 0.5)
+                //     console.log('width :>> ', width);
+                //     console.log('height :>> ', height);
+                // }
+
+                // img.src = option_layer.symbol.location;
+                icon = {
+                    url: option_layer.symbol.location,
+                    scaledSize: new google.maps.Size(width, height), // scaled size
+                    origin: new google.maps.Point(0, 0), // origin
+                    anchor: new google.maps.Point(0, 0) // anchor
+                }
+            }
+
+            // console.log('option_layer :>> ', option_layer);
             layer.setStyle({
                 fillColor: color,
                 fillOpacity: option_layer.fillOpacity ?? inputValueOpacityColor, //Opacity
                 strokeWeight: option_layer.strokeWeight ?? inputValueStrokColor,  //ความหนาขอบ
-                strokeColor: option_layer.strokeColor ?? colorFrame.hex, //เส้นขอบ
+                strokeColor: option_layer.strokeColor ? option_layer.strokeColor.hex : colorFrame.hex, //เส้นขอบ
                 clickable: false,
+                icon,
             });
             layer.setMap(map);
 
@@ -1161,7 +1185,7 @@ const mapPage = () => {
                 fillColor: item.color,
                 fillOpacity: option_layer.fillOpacity ?? inputValueOpacityColor, //Opacity
                 strokeWeight: option_layer.strokeWeight ?? inputValueStrokColor,  //ความหนาขอบ
-                strokeColor: option_layer.strokeColor ?? colorFrame.hex, //เส้นขอบ
+                strokeColor: option_layer.strokeColor ? option_layer.strokeColor.hex : colorFrame.hex, //เส้นขอบ
                 clickable: false,
             });
             layer.setMap(map);
@@ -1740,7 +1764,7 @@ const mapPage = () => {
                                                                     }
                                                                 </Col>
                                                                 {
-                                                                    x.checked ?
+                                                                    x.checked && x.type_geo != "Point" ?
                                                                         <Col xs={3} style={{ paddingTop: 3 }}>
                                                                             <a onClick={() => openColor(i, index)}>
                                                                                 <div
@@ -1847,112 +1871,116 @@ const mapPage = () => {
 
                                     {FileType ? <Form.Item label="ประเภทไฟล์">{FileType}</Form.Item> : null}
 
-                                    <Form.Item label="สีชั้นข้อมูล">
-                                        <a onClick={() => setOpenColorUpload(!openColorUpload)}>
-                                            <div
-                                                style={{
-                                                    width: "36px",
-                                                    height: "20px",
-                                                    borderRadius: "2px",
-                                                    background: colorUpload.hex,
-                                                    border: "1px solid black",
-                                                }}
-                                            />
-                                        </a>
-                                        {openColorUpload ? (
-                                            <div
-                                                div
-                                                style={{
-                                                    position: "fixed",
-                                                    zIndex: "2",
-                                                    textAlign: "end",
-                                                }}
-                                            >
-                                                <SketchPicker
-                                                    color={colorUpload.rgb}
-                                                    onChange={({ rgb, hex }) =>
-                                                        setColorUpload({ ...colorUpload, rgb, hex })
-                                                    }
-                                                />
-                                                <footer className="footer-color">
-                                                    <button
-                                                        type="button"
-                                                        className="btn btn-primary btn-sm"
-                                                        onClick={() => setOpenColorUpload(!openColorUpload)}
+                                    {FileType !== "Point" ?
+                                        <>
+                                            <Form.Item label="สีชั้นข้อมูล">
+                                                <a onClick={() => setOpenColorUpload(!openColorUpload)}>
+                                                    <div
+                                                        style={{
+                                                            width: "36px",
+                                                            height: "20px",
+                                                            borderRadius: "2px",
+                                                            background: colorUpload.hex,
+                                                            border: "1px solid black",
+                                                        }}
+                                                    />
+                                                </a>
+                                                {openColorUpload ? (
+                                                    <div
+                                                        div
+                                                        style={{
+                                                            position: "fixed",
+                                                            zIndex: "2",
+                                                            textAlign: "end",
+                                                        }}
                                                     >
-                                                        save
-                                                    </button>
-                                                </footer>
-                                            </div>
-                                        ) : null}
-                                    </Form.Item>
+                                                        <SketchPicker
+                                                            color={colorUpload.rgb}
+                                                            onChange={({ rgb, hex }) =>
+                                                                setColorUpload({ ...colorUpload, rgb, hex })
+                                                            }
+                                                        />
+                                                        <footer className="footer-color">
+                                                            <button
+                                                                type="button"
+                                                                className="btn btn-primary btn-sm"
+                                                                onClick={() => setOpenColorUpload(!openColorUpload)}
+                                                            >
+                                                                save
+                                                            </button>
+                                                        </footer>
+                                                    </div>
+                                                ) : null}
+                                            </Form.Item>
 
-                                    <Form.Item label="Opacity" name="Opacity">
-                                        <Row>
-                                            <Col span={12}>
-                                                <Slider
-                                                    min={0}
-                                                    max={1}
-                                                    step={0.01}
-                                                    onChange={(value) => {
-                                                        setInputValueOpacityColor(value)
-                                                    }}
-                                                    value={typeof inputValueOpacityColor === 'number' ? inputValueOpacityColor : 0}
-                                                />
-                                            </Col>
-                                            <Col span={4}>
-                                                <InputNumber
-                                                    min={0}
-                                                    max={1}
-                                                    style={{ margin: '0 16px' }}
-                                                    step={0.01}
-                                                    value={inputValueOpacityColor}
-                                                    onChange={(value) => {
-                                                        setInputValueOpacityColor(value)
-                                                    }}
-                                                />
-                                            </Col>
-                                        </Row>
-                                    </Form.Item>
+                                            <Form.Item label="Opacity" name="Opacity">
+                                                <Row>
+                                                    <Col span={12}>
+                                                        <Slider
+                                                            min={0}
+                                                            max={1}
+                                                            step={0.01}
+                                                            onChange={(value) => {
+                                                                setInputValueOpacityColor(value)
+                                                            }}
+                                                            value={typeof inputValueOpacityColor === 'number' ? inputValueOpacityColor : 0}
+                                                        />
+                                                    </Col>
+                                                    <Col span={4}>
+                                                        <InputNumber
+                                                            min={0}
+                                                            max={1}
+                                                            style={{ margin: '0 16px' }}
+                                                            step={0.01}
+                                                            value={inputValueOpacityColor}
+                                                            onChange={(value) => {
+                                                                setInputValueOpacityColor(value)
+                                                            }}
+                                                        />
+                                                    </Col>
+                                                </Row>
+                                            </Form.Item>
 
-                                    <Form.Item label="สีกรอบ">
-                                        <Color color={colorFrame} onChangeColor={({ rgb, hex }) => setColorFrame({ ...colorUpload, rgb, hex })} callbackSaveColor={(velue) => {
-                                            console.log('velue Save :>> ', velue);
-                                        }} />
-                                    </Form.Item>
+                                            <Form.Item label="สีกรอบ">
+                                                <Color color={colorFrame} onChangeColor={({ rgb, hex }) => setColorFrame({ ...colorUpload, rgb, hex })} callbackSaveColor={(velue) => {
+                                                    console.log('velue Save :>> ', velue);
+                                                }} />
+                                            </Form.Item>
 
-                                    <Form.Item label="ความหนากรอบ">
-                                        <Row>
-                                            <Col span={12}>
-                                                <Slider
-                                                    min={0}
-                                                    max={10}
-                                                    step={0.01}
-                                                    onChange={(value) => {
-                                                        setInputValueStrokColor(value)
-                                                    }}
-                                                    value={typeof inputValueStrokColor === 'number' ? inputValueStrokColor : 0}
-                                                />
-                                            </Col>
-                                            <Col span={4}>
-                                                <InputNumber
-                                                    min={0}
-                                                    max={10}
-                                                    style={{ margin: '0 16px' }}
-                                                    step={0.01}
-                                                    value={inputValueStrokColor}
-                                                    onChange={(value) => {
-                                                        setInputValueStrokColor(value)
-                                                    }}
-                                                />
-                                            </Col>
-                                        </Row>
-                                    </Form.Item>
-
+                                            <Form.Item label="ความหนากรอบ">
+                                                <Row>
+                                                    <Col span={12}>
+                                                        <Slider
+                                                            min={0}
+                                                            max={10}
+                                                            step={0.01}
+                                                            onChange={(value) => {
+                                                                setInputValueStrokColor(value)
+                                                            }}
+                                                            value={typeof inputValueStrokColor === 'number' ? inputValueStrokColor : 0}
+                                                        />
+                                                    </Col>
+                                                    <Col span={4}>
+                                                        <InputNumber
+                                                            min={0}
+                                                            max={10}
+                                                            style={{ margin: '0 16px' }}
+                                                            step={0.01}
+                                                            value={inputValueStrokColor}
+                                                            onChange={(value) => {
+                                                                setInputValueStrokColor(value)
+                                                            }}
+                                                        />
+                                                    </Col>
+                                                </Row>
+                                            </Form.Item>
+                                        </>
+                                        : null}
                                     {FileType === "Point" ? (
                                         <Form.Item
                                             label="Symbol"
                                             rules={[{ required: true, message: "กรุณาเลือกไฟล์!" }]}
+                                            extra="ขนาดแนะนำ 25X35"
                                         >
                                             <Upload
                                                 onChange={handleChangeSymbol}
@@ -2176,8 +2204,8 @@ const mapPage = () => {
                                         allowClear
                                     >
                                         <Option value="project_na">ชื่อโครงการ</Option>
-                                        <Option value="objectid">เลขที่โฉนด</Option>
-                                        <Option value="parlabel1">ลำดับแปลงที่ดิน</Option>
+                                        <Option value="parlabel1">เลขที่โฉนด</Option>
+                                        <Option value="objectid">ลำดับแปลงที่ดิน</Option>
                                     </Select>
                                 </Form.Item>
                             </div>
@@ -2281,6 +2309,11 @@ const mapPage = () => {
                                         <div className="row">
                                             <label>PARTYPE :</label>
                                             <p className="pl-3">{e.partype}</p>
+                                        </div>
+
+                                        <div className="row">
+                                            <label>ลำดับแปลงที่ดิน (OBJECT_ID) :</label>
+                                            <p className="pl-3">{e.objectid}</p>
                                         </div>
 
                                         <div className="pl-2">
