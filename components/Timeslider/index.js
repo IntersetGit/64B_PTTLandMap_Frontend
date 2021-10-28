@@ -56,7 +56,7 @@ function Timeslide({ data = testdata, onChange = (e) => { }, onDateChange = (e) 
         let ob = { 0: "" }
 
         data.forEach((item, index) => {
-            ob[(index + 1) * 10] = { ...item, /*label: moment(item[keynameshow]).format("D/M/YY"),*/ style: { color: '#ffffff', } };
+            ob[(index + 1) * 10] = { ...item, label: moment(item[keynameshow]).format("D/M/YY"), style: { color: '#ffffff', } };
         })
         let max = (Object.keys(ob).length - 1) * 10;
         setMax(max);

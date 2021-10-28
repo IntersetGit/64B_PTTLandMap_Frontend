@@ -967,11 +967,14 @@ const mapPage = () => {
             drawingManager.setMap(map);
             google.maps.event.addListener(drawingManager, 'overlaycomplete', function (e) {
                 // drawings.push(e);
+
                 setDrawings([...drawings, e])
                 var newShape = e.overlay;
                 newShape.type = e.type;
                 if (e.type == 'polygon') {
                     var path = newShape.getPath();
+
+                    console.log('path :>> ', path);
                     google.maps.event.addListener(path, "insert_at", function () {
                         attachPolygonInfoWindow(newShape);
                     });
@@ -1347,7 +1350,7 @@ const mapPage = () => {
         }
     }
     const ontimeslider = () => {
-        if (slidemapshow == false) {
+        if (slidemapshow) {
             console.log('close :>> ');
             WMSTIMESLIDE.forEach((item) => item.removeFromMap(map));
             setWMSTIMESLIDE([]);
