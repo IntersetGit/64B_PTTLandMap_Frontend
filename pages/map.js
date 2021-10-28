@@ -1706,12 +1706,12 @@ const mapPage = () => {
             {/* -----------------------------------------------------------------------------------  */}
             {/* Shape File */}
             <Drawer
-                width={350}
+                width={450}
                 placement={"left"}
                 visible={visibleShapeFile}
                 onClose={() => setVisibleShapeFile(false)}
                 maskClosable={false}
-                style={{ width: visibleShapeFile ? 350 : 0 }}
+                style={{ width: visibleShapeFile ? 550 : 0 }}
             >
                 <Tabs>
                     <TabPane tab="ชั้นข้อมูล" key="1">
@@ -1804,7 +1804,7 @@ const mapPage = () => {
                                     onFinishFailed={onFinishFailedUpload}
                                     autoComplete="off"
                                     size={"small"}
-                                    layout="vertical"
+                                // layout="vertical"
                                 >
 
                                     <Form.Item
