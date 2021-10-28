@@ -175,7 +175,9 @@ const mapPage = () => {
     const [groupLayerList, setGroupLayerList] = useState([]);
     const [layerList, setLayerList] = useState([]);
     const [FileList, setFileList] = useState([]);
+    const [FileListSymbol, setFileListSymbol] = useState([]);
     const [FileUpload, setFileUpload] = useState(null);
+    const [FileUploadSymbol, setFileUploadSymbol] = useState(null);
     const [FileType, setFileType] = useState(null);
     const [openColorUpload, setOpenColorUpload] = useState(false);
     const [colorUpload, setColorUpload] = useState({
@@ -213,9 +215,9 @@ const mapPage = () => {
                             .substring(file.name.lastIndexOf(".") + 1)
                             .toLowerCase()
                             .toLowerCase()}`;
-                        const nameType =
-                            type == "zip" ? "shape file" : type;
-                        setFileType(nameType);
+                        // const nameType =
+                        //     type == "zip" ? "shape file" : type;
+                        // setFileType(nameType);
                     }
                     return file;
                 });
@@ -227,15 +229,47 @@ const mapPage = () => {
         if (fileList.length > 0) setFileUpload(fileList[0]);
         else {
             setFileUpload(null);
-            setFileType(null);
+            // setFileType(null);
         }
+    };
+
+    const handleChangeSymbol = (info) => {
+        let fileList = [...info.fileList];
+        fileList = fileList.slice(-1);
+        if (fileList.length > 0) {
+            const infoFileList = fileList[0];
+            if (infoFileList.status === "done") fileList = fileList.map((file) => file);
+        }
+        setFileListSymbol(fileList);
+        if (fileList.length > 0) setFileUploadSymbol(fileList[0]);
+        else setFileUploadSymbol(null);
     };
 
     const onFinishUpload = async (value) => {
         try {
-            console.log('value :>> ', value);
+            // console.log('value :>> ', value);
             // console.log('FileType :>> ', FileType);
             // console.log('colorUpload :>> ', colorUpload.hex);
+            let Symbol = [];
+            if (FileType === "Point") {
+                if (FileUploadSymbol) {
+                    const formDataSymbol = new FormData();
+                    formDataSymbol.append("file0", FileUploadSymbol.originFileObj);
+                    const token = cookies.get("token");
+                    const { data } = await axios({
+                        method: "post",
+                        url: `${process.env.NEXT_PUBLIC_SERVICE}/upload?Path=symbol_point&Length=1`,
+                        config: { headers: { "Content-Type": "multipart/form-data" } },
+                        headers: { Authorization: "Bearer " + token },
+                        data: formDataSymbol,
+                    });
+                    Symbol = data.items[0]
+                } else {
+                    message.error("กรุณาเลือก Symbol!");
+                    return false
+                }
+            }
+
             if (FileUpload) {
                 const formData = new FormData();
                 formData.append("file", FileUpload.originFileObj);
@@ -254,15 +288,16 @@ const mapPage = () => {
                         fillOpacity: inputValueOpacityColor,
                         strokeWeight: inputValueStrokColor,
                         strokeColor: colorFrame,
+                        symbol: Symbol ?? {},
                     }
-                    console.log('option_layer :>> ', option_layer);
-
+                    formData.append("option_layer", JSON.stringify(option_layer));
                     await axios({
                         method: "post",
-                        url: `${process.env.NEXT_PUBLIC_SERVICE}/shp/add?name_layer=${name_layer}&type=${FileType}&group_layer_id=${group_layer_id}&option_layer=${JSON.stringify(option_layer)}&color=${JSON.stringify(colorUpload.rgb)}`,
+                        url: `${process.env.NEXT_PUBLIC_SERVICE}/shp/add?name_layer=${name_layer}&type=${FileType}&group_layer_id=${group_layer_id}&color=${JSON.stringify(colorUpload.rgb)}`,
                         config: { headers: { "Content-Type": "multipart/form-data" } },
                         headers: { Authorization: "Bearer " + token },
                         data: formData,
+                        Symbol
                     });
                     await loadShapeFile();
                     setFileList([]);
@@ -292,18 +327,19 @@ const mapPage = () => {
             const token = cookies.get("token");
             const { data } = await axios({
                 method: "post",
-                url: `${process.env.NEXT_PUBLIC_SERVICE}/demo/check`,
+                url: `${process.env.NEXT_PUBLIC_SERVICE}/shp/checkUploadFile`,
                 config: { headers: { "Content-Type": "multipart/form-data" } },
                 headers: { Authorization: "Bearer " + token },
                 data: formData,
             });
-            console.log('data :>> ', data.type);
-
+            // console.log('data :>> ', data.items.type);
+            setFileType(data.items.type);
             return `${process.env.NEXT_PUBLIC_SERVICE}/demo/resTrue`
         } catch (error) {
             return `${process.env.NEXT_PUBLIC_SERVICE}/demo/resFalse`
         }
     }
+
     const onFinishFailedUpload = (error) => {
         message.error("มีบางอย่างผิดพลาด !");
     };
@@ -1912,6 +1948,23 @@ const mapPage = () => {
                                             </Col>
                                         </Row>
                                     </Form.Item>
+
+                                    {FileType === "Point" ? (
+                                        <Form.Item
+                                            label="Symbol"
+                                            rules={[{ required: true, message: "กรุณาเลือกไฟล์!" }]}
+                                        >
+                                            <Upload
+                                                onChange={handleChangeSymbol}
+                                                action={`${process.env.NEXT_PUBLIC_SERVICE}/demo/resTrue`}
+                                                fileList={FileListSymbol}
+                                                multiple={false}
+                                            >
+                                                <Button icon={<UploadOutlined />}>Upload</Button>
+                                            </Upload>
+                                        </Form.Item>
+                                    ) : null}
+
 
                                     <Form.Item wrapperCol={{ offset: 8, span: 16 }}>
                                         <Button type="primary" htmlType="submit">
