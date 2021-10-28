@@ -4,7 +4,7 @@ import System from "../../../../components/_App/System";
 import Api from "../../../../util/Api";
 import moment from "moment";
 import Swal from "sweetalert2";
-import { MoreOutlined, RedoOutlined } from "@ant-design/icons";
+import { MoreOutlined, RedoOutlined, UploadOutlined } from "@ant-design/icons";
 import {
   Table,
   Input,
@@ -16,9 +16,12 @@ import {
   Select,
   Menu,
   Dropdown,
+  InputNumber,
+  Slider,
   // Upload,
   Radio,
-  DatePicker
+  DatePicker,
+  Upload
 } from "antd";
 import { SketchPicker } from "react-color";
 const { Search } = Input;
@@ -44,6 +47,9 @@ const usersSystemPage = () => {
   const [form] = Form.useForm();
   const [formCreate] = Form.useForm();
   const [formEdit] = Form.useForm();
+
+
+
   const columns = [
     {
       key: "1",
@@ -290,6 +296,7 @@ const usersSystemPage = () => {
   };
 
 
+
   // const onFinish = async (value) => {
   //   setLoading(true);
   //   Api.post("/system/addUserAD", {
@@ -518,6 +525,71 @@ const usersSystemPage = () => {
               </div>
             ) : null}
             {/* <Input type="color" style={{ width: '15%' }} /> */}
+          </Form.Item>
+          <Form.Item label="Opacity" rules={[{ required: true }]} >
+            <Slider
+              min={1}
+              max={100}
+            // onChange={onChange}
+            // value={typeof inputValue === 'number' ? inputValue : 0}
+            />
+          </Form.Item>
+          <Form.Item name="color_layer" label="สีของกรอบ" rules={[{ required: true }]}>
+            <a onClick={() => setOpenColorUpload(!openColorUpload)}>
+              <div
+                style={{
+                  width: "36px",
+                  height: "24px",
+                  borderRadius: "2px",
+                  background: colorUpload.hex,
+                  border: "1px solid black",
+                }}
+              />
+            </a>
+            {openColorUpload ? (
+              <div
+                div
+                style={{
+                  position: "fixed",
+                  zIndex: "2",
+                  textAlign: "end",
+                }}
+              >
+                <SketchPicker
+                  color={colorUpload.rgb}
+                  onChange={({ rgb, hex }) =>
+                    setColorUpload({ ...colorUpload, rgb, hex })
+                  }
+                />
+                <footer className="footer-color">
+                  <button
+                    type="button"
+                    className="btn btn-primary btn-sm"
+                    onClick={() => setOpenColorUpload(!openColorUpload)}
+                  >
+                    save
+                  </button>
+                </footer>
+              </div>
+            ) : null}
+            {/* <Input type="color" style={{ width: '15%' }} /> */}
+          </Form.Item>
+          <Form.Item name="" label="ความหนาของกรอบ" rules={[{ required: true }]} >
+            <InputNumber />
+          </Form.Item>
+          <Form.Item name="" label="Style ของกรอบ" rules={[{ required: true }]} >
+            <Radio />
+            <br />
+            <Radio />
+          </Form.Item>
+          <Form.Item name="" label="Symbol" rules={[{ required: true }]}
+            extra="ขนาดไม่เกิน 80 pixcel"
+          >
+
+            <Upload>
+              {/* (สำหรับ shape file ประเภท Point) */}
+              <Button icon={<UploadOutlined />}>Upload</Button>
+            </Upload>
           </Form.Item>
         </Form>
       </Modal>

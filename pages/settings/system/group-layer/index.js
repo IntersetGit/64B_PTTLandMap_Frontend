@@ -423,16 +423,16 @@ const GroupLayerSystemPage = () => {
             {/* <ImgCrop rotate> */}
             <Upload name="logo" action="/upload.do" listType="picture"
               maxCount={1}
-            // defaultFileList={[
-            //   {
-            //     uid: '-1',
-            //     name: `${form.getFieldValue().id}.jpg`,
-            //     status: 'done',
-            //     url: `${process.env.NEXT_PUBLIC_SERVICE}/upload?Path=symbol_group&Length=1&Name=${form.getFieldValue().id}&SetType=jpg`,
-            //     thumbUrl: `${process.env.NEXT_PUBLIC_SERVICE}/upload?Path=symbol_group&Length=1&Name=${form.getFieldValue().id}&SetType=jpg`,
+              defaultFileList={[
+                {
+                  uid: '-1',
+                  name: `${form.getFieldValue().id}.jpg`,
+                  status: 'done',
+                  url: `${process.env.NEXT_PUBLIC_SERVICE}/upload?Path=symbol_group&Length=1&Name=${form.getFieldValue().id}&SetType=jpg`,
+                  thumbUrl: `${process.env.NEXT_PUBLIC_SERVICE}/upload?Path=symbol_group&Length=1&Name=${form.getFieldValue().id}&SetType=jpg`,
 
-            //   },
-            // ]}
+                },
+              ]}
             >
               <Button icon={<UploadOutlined />}>Select File</Button>
             </Upload>
