@@ -88,7 +88,7 @@ const LoginPage = () => {
           <Col style={{ padding: '0 0 15%' }}>
             <img width="50%" src="/assets/images/logo_PTT.png" preview={false} />
           </Col>
-          <h2><b>Sing in</b></h2>
+          <h2><b>Sign in</b></h2>
           <Form
             form={form}
             name="normal_login"
