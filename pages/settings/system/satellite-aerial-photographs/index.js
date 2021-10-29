@@ -272,7 +272,6 @@ const index = () => {
     showModal("edit");
     $(window).ready(function () {
       $(`#arcgisserver`).click();
-      $(`#imageserver`).click();
       $(`#${filterData.type_server}`).click();
     });
   };
@@ -436,7 +435,6 @@ const index = () => {
               }}
             >
               <Radio value="arcgisserver">ArcGIS Server</Radio>
-              <Radio value="imageserver">Image Server</Radio>
               <Radio value="geoserver">Geoserver</Radio>
             </Radio.Group>
           </Form.Item>
@@ -528,9 +526,6 @@ const index = () => {
             >
               <Radio value="arcgisserver" id="arcgisserver">
                 ArcGIS Server
-              </Radio>
-              <Radio value="imageserver" id="imageserver">
-                Image Server
               </Radio>
               <Radio value="geoserver" id="geoserver">
                 Geoserver
