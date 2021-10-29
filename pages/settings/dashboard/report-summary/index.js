@@ -34,7 +34,7 @@ const index = () => {
         try {
             Api.get(`/shp/getDataLayer`).then(data => {
                 const find = data.data.items.find(e => e.id === "f942a946-3bcb-4062-9207-d78ab437edf3")
-                if (find) setLayerList(find.children)
+                if (find) setLayerList(find.children ?? [])
             })
         } catch (error) {
 
