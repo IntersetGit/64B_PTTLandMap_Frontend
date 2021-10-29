@@ -300,7 +300,7 @@ const usersSystemPage = () => {
               <RedoOutlined />
             </Button>
           </Col>
-          <Col xs={8} sm={8} md={8} lg={8} xl={8} xxl={11}>
+          <Col xs={8} sm={8} md={8} lg={8} xl={8} xxl={8}>
             <Button
               type="primary"
               onClick={() => showModal("create")}

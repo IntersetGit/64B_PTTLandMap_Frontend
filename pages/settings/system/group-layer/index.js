@@ -63,8 +63,8 @@ const GroupLayerSystemPage = () => {
   const onFinish = async (value) => {
     console.log(value);
     let fd = new FormData();
-    //console.log(value.Symbol[0].originFileObj)
-    fd.append("file0", value.Symbol[0].originFileObj);
+    console.log(value.symbol[0].originFileObj)
+    fd.append("file0", value.symbol[0].originFileObj);
     Api.post("/masterdata/masLayers", {
       group_name: value.group_name,
       isuse: 1
@@ -232,7 +232,7 @@ const GroupLayerSystemPage = () => {
           });
           let fd = new FormData();
           //console.log(value.Symbol[0].originFileObj)
-          fd.append("file0", data.Symbol[0].originFileObj);
+          fd.append("file0", data.symbol[0].originFileObj);
           const upload = await axios.post(
             `${process.env.NEXT_PUBLIC_SERVICE}/upload?Path=symbol_group&Length=1&Name=${form.getFieldValue().id}&SetType=jpg`,
             fd
