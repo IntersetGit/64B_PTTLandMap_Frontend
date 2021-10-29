@@ -295,7 +295,6 @@ const usersSystemPage = () => {
         if (result.isConfirmed) {
           edit(data)
         }
-        console.log("sdasd", form.getFieldValue())
       });
     } catch (error) {
       console.log(error);
@@ -305,7 +304,8 @@ const usersSystemPage = () => {
 
   const edit = async (value) => {
     try {
-      let Symbol = {};
+      console.log('value :>> ', value);
+      let Symbol = null;
       if (FileUploadSymbol) {
         const formDataSymbol = new FormData();
         formDataSymbol.append("file0", FileUploadSymbol.originFileObj);
@@ -318,15 +318,14 @@ const usersSystemPage = () => {
           data: formDataSymbol,
         });
         Symbol = data.items[0]
-      } else {
-        return false
       }
+
 
       const option_layer = {
         fillOpacity: inputValueOpacityColor,
         strokeWeight: inputValueStrokColor,
         strokeColor: colorFrame,
-        symbol: Symbol ?? {},
+        symbol: Symbol ?? FileListSymbol[0],
       }
 
       let resp = await Api.post("masterdata/masLayersShape", {
