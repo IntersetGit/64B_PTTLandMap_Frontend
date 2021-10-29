@@ -780,6 +780,7 @@ const mapPage = () => {
             zoom: map.getZoom(),
         });
         setMap(clearMap)
+        setSlidemapshow(false)
     }
     /* เปิดปิดสวิทเมพ */
     const [changmap, setChangeMap] = useState(false) // ปุ่มเปิดปิด split map
