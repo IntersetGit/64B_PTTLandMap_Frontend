@@ -250,7 +250,7 @@ const mapPage = () => {
             // console.log('value :>> ', value);
             // console.log('FileType :>> ', FileType);
             // console.log('colorUpload :>> ', colorUpload.hex);
-            let Symbol = [];
+            let Symbol = {};
             if (FileType === "Point") {
                 if (FileUploadSymbol) {
                     const formDataSymbol = new FormData();

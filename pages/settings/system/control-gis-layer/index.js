@@ -5,6 +5,8 @@ import Api from "../../../../util/Api";
 import moment from "moment";
 import Swal from "sweetalert2";
 import { MoreOutlined, RedoOutlined, UploadOutlined } from "@ant-design/icons";
+import { Cookies } from "react-cookie";
+import axios from "axios";
 import {
   Table,
   Input,
@@ -24,9 +26,12 @@ import {
   Upload
 } from "antd";
 import { SketchPicker } from "react-color";
+import Color from "../../../../components/Color";
 const { Search } = Input;
 const { Option } = Select;
+const cookies = new Cookies();
 const usersSystemPage = () => {
+  const [editId, setEditId] = useState(null)
   const [loading, setLoading] = useState(true);
   const [roles, setRoles] = useState([]);
   const [data, setData] = useState([]);
@@ -43,12 +48,19 @@ const usersSystemPage = () => {
     hex: "red",
     rgb: { r: 255, g: 0, b: 0, a: 1 },
   });
+  const [colorFrame, setColorFrame] = useState({
+    hex: "#000000",
+    rgb: { r: 0, g: 0, b: 0, a: 1 },
+  });
   // const [buttonCreate, setButtonCreate] = useState(true); //สถานะเปิดปิดsubmit ตอนmodal create
   const [form] = Form.useForm();
   const [formCreate] = Form.useForm();
   const [formEdit] = Form.useForm();
 
-
+  const [FileListSymbol, setFileListSymbol] = useState([]);
+  const [FileUploadSymbol, setFileUploadSymbol] = useState(null);
+  const [inputValueOpacityColor, setInputValueOpacityColor] = useState(0.5) //Opacity
+  const [inputValueStrokColor, setInputValueStrokColor] = useState(1) //ความหนากรอบ
 
   const columns = [
     {
@@ -230,15 +242,46 @@ const usersSystemPage = () => {
   };
 
   const handleEdit = async (show) => {
-    setColorUpload(JSON.parse(show.color_layer))
+    // console.log(`show`, show)
+    const { data } = await Api.get(`masterdata/masLayersShape/${show.id}`);
+    setEditId(show.id)
+    const items = data.items
+    console.log('items :>> ', items);
     setIsModalVisible(true)
-    console.log(`show`, show)
-    form.setFieldsValue(show);
+
+    if (items.color_layer) {
+      const rgb = JSON.parse(items.color_layer)
+      items.color_layer = `rgb(${rgb.r},${rgb.g},${rgb.b},${rgb.a})`;
+      items.rgb = rgb;
+    } else {
+      items.color_layer = colorUpload.rgb
+      items.rgb = colorUpload
+    }
+
+    setColorUpload({ ...colorUpload, hex: items.color_layer, rgb: items.rgb })
+    let arr = []
+    if (items.option_layer) {
+      setInputValueOpacityColor(items.option_layer.fillOpacity ?? 0.5)
+      setInputValueStrokColor(items.option_layer.strokeWeight ?? 1)
+      setColorFrame({
+        hex: items.option_layer.strokeColor.hex,
+        rgb: items.option_layer.strokeColor.rgb,
+      });
+      if (items.option_layer.symbol) {
+        items.option_layer.symbol.url = items.option_layer.symbol.location
+        items.option_layer.symbol.name = items.option_layer.symbol.nameOld
+        arr = [...arr, items.option_layer.symbol]
+      }
+      setFileListSymbol(arr);
+    } else {
+      items.option_layer = {}
+    }
+
+
+    form.setFieldsValue(data.items);
   }
 
   const onFinishEdit = async (data) => {
-    console.log(`data`, data)
-    console.log('colorUpload', colorUpload);
     try {
       Swal.fire({
         title: "กรุณายืนยันการแก้ไขข้อมูล",
@@ -250,14 +293,7 @@ const usersSystemPage = () => {
         cancelButtonText: "ยกเลิก",
       }).then(async (result) => {
         if (result.isConfirmed) {
-          let resp = await Api.post("masterdata/masLayersShape", {
-            ...data,
-            color_layer: JSON.stringify(colorUpload),
-            id: form.getFieldValue().id,
-          });
-          await Swal.fire("", "แก้ไขข้อมูลเรียบร้อยแล้ว", "success");
-          reload();
-          handleCancel();
+          edit(data)
         }
         console.log("sdasd", form.getFieldValue())
       });
@@ -267,6 +303,57 @@ const usersSystemPage = () => {
     }
   };
 
+  const edit = async (value) => {
+    try {
+      let Symbol = {};
+      if (FileUploadSymbol) {
+        const formDataSymbol = new FormData();
+        formDataSymbol.append("file0", FileUploadSymbol.originFileObj);
+        const token = cookies.get("token");
+        const { data } = await axios({
+          method: "post",
+          url: `${process.env.NEXT_PUBLIC_SERVICE}/upload?Path=symbol_point&Length=1`,
+          config: { headers: { "Content-Type": "multipart/form-data" } },
+          headers: { Authorization: "Bearer " + token },
+          data: formDataSymbol,
+        });
+        Symbol = data.items[0]
+      } else {
+        return false
+      }
+
+      const option_layer = {
+        fillOpacity: inputValueOpacityColor,
+        strokeWeight: inputValueStrokColor,
+        strokeColor: colorFrame,
+        symbol: Symbol ?? {},
+      }
+
+      let resp = await Api.post("masterdata/masLayersShape", {
+        ...value,
+        color_layer: JSON.stringify(colorUpload.color_layer),
+        option_layer,
+        id: editId,
+      });
+      console.log('resp :>> ', resp);
+      setInputValueOpacityColor(0.5)
+      setInputValueStrokColor(1)
+      setColorUpload({
+        hex: "red",
+        rgb: { r: 255, g: 0, b: 0, a: 1 },
+      })
+      setColorFrame({
+        hex: "#000000",
+        rgb: { r: 0, g: 0, b: 0, a: 1 },
+      });
+
+      await Swal.fire("", "แก้ไขข้อมูลเรียบร้อยแล้ว", "success");
+      reload();
+      handleCancel();
+    } catch (error) {
+      console.log('error :>> ', error);
+    }
+  }
   const showModal = () => {
     setIsModalVisible(true);
   };
@@ -316,6 +403,20 @@ const usersSystemPage = () => {
   //     });
   //   form.resetFields();
   // };
+
+  /* Symbol */
+  const handleChangeSymbol = (info) => {
+    let fileList = [...info.fileList];
+    fileList = fileList.slice(-1);
+    if (fileList.length > 0) {
+      const infoFileList = fileList[0];
+      if (infoFileList.status === "done") fileList = fileList.map((file) => file);
+    }
+    console.log('fileList :>> ', fileList);
+    setFileListSymbol(fileList);
+    if (fileList.length > 0) setFileUploadSymbol(fileList[0]);
+    else setFileUploadSymbol(null);
+  };
 
   return (
     <>
@@ -378,6 +479,7 @@ const usersSystemPage = () => {
           </Col>
         </Row>
       </System>
+
       <Modal
         title="เพิ่ม WMS ของ GIS Layer"
         visible={isModalVisible2}
@@ -471,14 +573,15 @@ const usersSystemPage = () => {
           >
             <Input />
           </Form.Item>
+
           <Form.Item
             name="group_layer_id"
             label="Group Layer"
             rules={[
               { required: true, message: "กรุณากรอกข้อมูล กลุ่มผู้ใช้งาน" },
             ]}
-          ><Select
-            placeholder="กลุ่มผู้ใช้งาน">
+          >
+            <Select placeholder="กลุ่มผู้ใช้งาน">
               {select && select.map((data, index) => (
                 <Option key={index} value={data.id}>
                   {data.group_name}
@@ -486,111 +589,88 @@ const usersSystemPage = () => {
               ))}
             </Select>
           </Form.Item>
+
           <Form.Item name="color_layer" label="สีชั้นข้อมูล" rules={[{ required: true }]}>
-            <a onClick={() => setOpenColorUpload(!openColorUpload)}>
-              <div
-                style={{
-                  width: "36px",
-                  height: "24px",
-                  borderRadius: "2px",
-                  background: colorUpload.hex,
-                  border: "1px solid black",
-                }}
-              />
-            </a>
-            {openColorUpload ? (
-              <div
-                div
-                style={{
-                  position: "fixed",
-                  zIndex: "2",
-                  textAlign: "end",
-                }}
-              >
-                <SketchPicker
-                  color={colorUpload.rgb}
-                  onChange={({ rgb, hex }) =>
-                    setColorUpload({ ...colorUpload, rgb, hex })
-                  }
+            <Color color={colorUpload} onChangeColor={({ rgb, hex }) => setColorUpload({ ...colorUpload, rgb, hex })} callbackSaveColor={(velue) => { }} />
+          </Form.Item>
+
+          <Form.Item label="Opacity" name="Opacity">
+            <Row>
+              <Col span={12}>
+                <Slider
+                  min={0}
+                  max={1}
+                  step={0.01}
+                  onChange={(value) => {
+                    setInputValueOpacityColor(value)
+                  }}
+                  value={typeof inputValueOpacityColor === 'number' ? inputValueOpacityColor : 0}
                 />
-                <footer className="footer-color">
-                  <button
-                    type="button"
-                    className="btn btn-primary btn-sm"
-                    onClick={() => setOpenColorUpload(!openColorUpload)}
-                  >
-                    save
-                  </button>
-                </footer>
-              </div>
-            ) : null}
-            {/* <Input type="color" style={{ width: '15%' }} /> */}
-          </Form.Item>
-          <Form.Item label="Opacity" rules={[{ required: true }]} >
-            <Slider
-              min={1}
-              max={100}
-            // onChange={onChange}
-            // value={typeof inputValue === 'number' ? inputValue : 0}
-            />
-          </Form.Item>
-          <Form.Item name="color_layer" label="สีของกรอบ" rules={[{ required: true }]}>
-            <a onClick={() => setOpenColorUpload(!openColorUpload)}>
-              <div
-                style={{
-                  width: "36px",
-                  height: "24px",
-                  borderRadius: "2px",
-                  background: colorUpload.hex,
-                  border: "1px solid black",
-                }}
-              />
-            </a>
-            {openColorUpload ? (
-              <div
-                div
-                style={{
-                  position: "fixed",
-                  zIndex: "2",
-                  textAlign: "end",
-                }}
-              >
-                <SketchPicker
-                  color={colorUpload.rgb}
-                  onChange={({ rgb, hex }) =>
-                    setColorUpload({ ...colorUpload, rgb, hex })
-                  }
+              </Col>
+              <Col span={4}>
+                <InputNumber
+                  min={0}
+                  max={1}
+                  style={{ margin: '0 16px' }}
+                  step={0.01}
+                  value={inputValueOpacityColor}
+                  onChange={(value) => {
+                    setInputValueOpacityColor(value)
+                  }}
                 />
-                <footer className="footer-color">
-                  <button
-                    type="button"
-                    className="btn btn-primary btn-sm"
-                    onClick={() => setOpenColorUpload(!openColorUpload)}
-                  >
-                    save
-                  </button>
-                </footer>
-              </div>
-            ) : null}
-            {/* <Input type="color" style={{ width: '15%' }} /> */}
+              </Col>
+            </Row>
           </Form.Item>
-          <Form.Item name="" label="ความหนาของกรอบ" rules={[{ required: true }]} >
-            <InputNumber />
+
+          <Form.Item label="สีกรอบ">
+            <Color color={colorFrame} onChangeColor={({ rgb, hex }) => setColorFrame({ ...colorUpload, rgb, hex })} callbackSaveColor={(velue) => {
+              console.log('velue Save :>> ', velue);
+            }} />
           </Form.Item>
-          <Form.Item name="" label="Style ของกรอบ" rules={[{ required: true }]} >
-            <Radio />
-            <br />
-            <Radio />
+
+          <Form.Item label="ความหนากรอบ">
+            <Row>
+              <Col span={12}>
+                <Slider
+                  min={0}
+                  max={10}
+                  step={0.01}
+                  onChange={(value) => {
+                    setInputValueStrokColor(value)
+                  }}
+                  value={typeof inputValueStrokColor === 'number' ? inputValueStrokColor : 0}
+                />
+              </Col>
+              <Col span={4}>
+                <InputNumber
+                  min={0}
+                  max={10}
+                  style={{ margin: '0 16px' }}
+                  step={0.01}
+                  value={inputValueStrokColor}
+                  onChange={(value) => {
+                    setInputValueStrokColor(value)
+                  }}
+                />
+              </Col>
+            </Row>
           </Form.Item>
-          <Form.Item name="" label="Symbol" rules={[{ required: true }]}
+
+          <Form.Item
+            label="Symbol"
+            rules={[{ required: true, message: "กรุณาเลือกไฟล์!" }]}
             extra="ขนาดแนะนำ 25X35"
           >
-
-            <Upload>
-              {/* (สำหรับ shape file ประเภท Point) */}
+            <Upload
+              onChange={handleChangeSymbol}
+              action={`${process.env.NEXT_PUBLIC_SERVICE}/demo/resTrue`}
+              fileList={FileListSymbol}
+              multiple={false}
+            >
               <Button icon={<UploadOutlined />}>Upload</Button>
             </Upload>
           </Form.Item>
+
         </Form>
       </Modal>
     </>
