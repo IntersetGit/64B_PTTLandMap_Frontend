@@ -364,9 +364,9 @@ const mapPage = () => {
                             x.rgb = colorUpload
                         }
                     });
-                }
+                } else e.children = []
             });
-            // console.log('data :>> ', data.items);
+            console.log('data :>> ', data.items);
             setGroupLayerList(data.items)
 
             /* layerList */
