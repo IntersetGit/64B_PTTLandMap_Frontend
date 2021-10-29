@@ -542,8 +542,8 @@ const mapPage = () => {
     const [visibleRaster, setVisibleRaster] = useState(false)
     const [rasterDataDron1, setRasterDataDron1] = useState([]) // ข้อมูล raster ภาพถ่ายจากดาวเทียม
     const [rasterDataDow1, setRasterDataDow1] = useState([]) // ข้อมูล raster ภาพถ่ายทางอากาศจากโดรน
-    const [loadmore1, setLoadmore1] = useState({ dronMore: 3, dowMore: 3 })
-    const [loadmore2, setLoadmore2] = useState({ dronMore: 3, dowMore: 3 })
+    const [loadmore1, setLoadmore1] = useState({ dronMore: 6, dowMore: 6 })
+    const [loadmore2, setLoadmore2] = useState({ dronMore: 6, dowMore: 6 })
     /* แสดง Loadmore ข้อมูลเพิ่มเตืม */
     const [showMoreDow, setShowMoreDow] = useState({ dow1: false, dow2: false }) //โชวLoadmore  ภาพถ่ายจากดาวเทียม
     const [showMoreDron, setShowMoreDron] = useState({ dron1: false, dron2: false }) //โชวLoadmore  ภาพถ่ายทางอากาศจากโดรน
@@ -757,7 +757,7 @@ const mapPage = () => {
                     if (test.rows[0].elements[0].distance !== undefined) {
                         max.push(parseFloat(test.rows[0].elements[0].distance.text))
                         sum = max.reduce((a, b) => a + b, 0)
-                        setDistanct(`ระยะทาง${sum.toFixed(2)}`);
+                        setDistanct(`ระยะทาง${sum.toFixed(2)} กม.`);
                     }
                 }
                 count++ //เพิ่มจำนวนครั้งที่กด
@@ -1002,13 +1002,14 @@ const mapPage = () => {
         var centerLabel = new MapLabel({
             map: map,
             fontSize: 13,
-            align: "center"
+            align: "center",
+
         });
 
         polygon.labels.push(centerLabel);
 
         centerLabel.set("position", bounds.getCenter());
-        centerLabel.set("text", area + "ตร.ม");
+        centerLabel.set("text", (parseFloat(area)).toLocaleString('en-US') + " ตร.ม");
         if (path.getLength() < 2) return;
         for (var i = 0; i < polygon.getPath().getLength(); i++) {
             // for each side in path, compute center and length
@@ -1019,10 +1020,10 @@ const mapPage = () => {
             var sideLabel = new MapLabel({
                 map: map,
                 fontSize: 13,
-                align: "center"
+                align: "center",
             });
             sideLabel.set("position", sideCenter);
-            sideLabel.set("text", sideLength.toFixed(2) + "ม");
+            sideLabel.set("text", (parseFloat(sideLength.toFixed(2))).toLocaleString('en-US') + " ม");
             polygon.labels.push(sideLabel);
         }
     }
@@ -1043,7 +1044,7 @@ const mapPage = () => {
                 fillOpacity: 0.3,
                 editable: true,
                 draggable: true,
-                fillColor: "#F54",
+                fillColor: "#44ff7c",
 
             },
             // map: map
@@ -2467,7 +2468,7 @@ const mapPage = () => {
                                 })
                             }
                             {
-                                rasterDataDron1.length > 3 ? (
+                                rasterDataDron1.length > 6 ? (
                                     <h5 style={{ cursor: "pointer", marginLeft: "220px" }} className="text-info" hidden={showMoreDron.dron1} onClick={() => { setLoadmore1({ ...loadmore1, dronMore: rasterDataDow1.length }), setShowMoreDron({ ...showMoreDron, dron1: true }) }}>
                                         ...Load More
                                     </h5>
@@ -2499,7 +2500,7 @@ const mapPage = () => {
                                 })
                             }
                             {
-                                rasterDataDow1.length > 3 ? (
+                                rasterDataDow1.length > 6 ? (
                                     <h5 style={{ cursor: "pointer", marginLeft: "220px" }} className="text-info" hidden={showMoreDow.dow1} onClick={() => { setLoadmore1({ ...loadmore1, dowMore: rasterDataDow1.length }), setShowMoreDow({ ...showMoreDow, dow1: true }) }}>
                                         ...Load More
                                     </h5>
