@@ -135,10 +135,16 @@ function WmsMapType(name, url, params, options, type = "geoserver") {
      * Change opacity on demand.
      */
     this.setOpacity = function (opacity) {
+        console.log('this :>> ', this);
         this.options['opacity'] = opacity;
 
-        for (var i in this.tiles) {
-            this.tiles[i].style.opacity = opacity;
+        if (this.type == "geoserver" || this.type == null) {
+            for (var i in this.tiles) {
+                this.tiles[i].style.opacity = opacity;
+            }
+        } else {
+            this.arcgis.setOpacity(opacity);
+            // console.log("opacityset");
         }
     }
 
@@ -277,6 +283,7 @@ function WmsMapType(name, url, params, options, type = "geoserver") {
             name: this.name,
             opacity: 1,
         });
+        this.arcgis = agsType;
         map.overlayMapTypes.insertAt(0, agsType);
 
 
