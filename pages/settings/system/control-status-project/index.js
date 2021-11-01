@@ -332,7 +332,7 @@ const index = () => {
       </Row>
 
       <Modal
-        title="จัดการ Status"
+        title="Status ของ โครงการ"
         visible={isModalVisible.create}
         onOk={() => handleOk("formCreate")}
         onCancel={handleCancel}
@@ -348,17 +348,17 @@ const index = () => {
 
           <Form.Item
             name="status_code"
-            label="Status Code"
+            label="รหัสสถานภาพ"
             rules={[{ required: true }]}
           >
-            <InputNumber min={1} max={10} defaultValue={1} />
+            <Input placeholder="รหัสสถานภาพ" type="number" style={{ width: '40%' }} />
           </Form.Item>
           <Form.Item
             name="name"
-            label="Status"
+            label="ความหมาย"
             rules={[{ required: true }]}
           >
-            <Input placeholder="Status" />
+            <Input placeholder="ความหมาย" />
           </Form.Item>
 
         </Form>
