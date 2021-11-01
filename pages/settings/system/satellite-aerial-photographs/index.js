@@ -332,7 +332,7 @@ const index = () => {
         }}
       >
         <Col span={24}>
-          <h3>จัดการ ภาพถ่ายดาวเทียม และภาพถ่ายทางอากาศ</h3>
+          <h3 className="mb-4">จัดการ ภาพถ่ายดาวเทียม และภาพถ่ายทางอากาศ</h3>
         </Col>
         <Col xs={8} sm={8} md={8} lg={8} xl={8} xxl={5}>
           <Search
@@ -347,7 +347,7 @@ const index = () => {
             <RedoOutlined />
           </Button>
         </Col>
-        <Col xs={8} sm={8} md={8} lg={8} xl={8} xxl={8}>
+        <Col xs={8} sm={8} md={8} lg={8} xl={8} xxl={8} >
           <Button
             type="primary"
             style={{ float: "right" }}

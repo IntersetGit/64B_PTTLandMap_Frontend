@@ -299,10 +299,10 @@ const GroupLayerSystemPage = () => {
               " rgba(0, 0, 0, 0.12) 0px 1px 3px, rgba(0, 0, 0, 0.24) 0px 1px 2px",
           }}>
           <Col span={24}>
-            <h3>จัดการ Group Layer</h3>
+            <h3 className="mb-4">จัดการ Group Layer</h3>
           </Col>
 
-          <Col xs={8} sm={8} md={8} lg={8} xl={5} xxl={5}>
+          <Col xs={8} sm={8} md={8} lg={8} xl={8} xxl={5}>
             <Search placeholder="input search text" onSearch={search} />
           </Col>
           <Col xs={8} sm={8} md={8} lg={8} xl={8} xxl={11}>

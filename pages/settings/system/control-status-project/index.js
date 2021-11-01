@@ -291,9 +291,9 @@ const index = () => {
         }}
       >
         <Col span={24}>
-          <h3>จัดการ Status โครงการ</h3>{dataEdit.layer_name}
+          <h3 className="mb-4">จัดการ Status โครงการ</h3>{dataEdit.layer_name}
         </Col>
-        <Col xs={8} sm={8} md={8} lg={8} xl={5} xxl={5}>
+        <Col xs={8} sm={8} md={8} lg={8} xl={8} xxl={5}>
           <Search
             placeholder="input search text"
             onSearch={onSearch}
@@ -313,7 +313,7 @@ const index = () => {
             + เพิ่ม Status
           </Button>
         </Col>
-        <Col xs={24} sm={24} md={24} lg={24} xl={24} xxl={24}>
+        <Col span={24}>
           <Table
             scroll={{ x: true }}
             loading={loading}
