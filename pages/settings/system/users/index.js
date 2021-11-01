@@ -220,6 +220,9 @@ const usersSystemPage = () => {
     }
   };
   const onSearch = async (value) => {
+    setStatusValidation({
+      help: `กำลังโหลดข้อมูล...`,
+    });
     Api.get(`/system/findUserAD?username=${value}`)
       .then((data) => {
         setStatusValidation({
