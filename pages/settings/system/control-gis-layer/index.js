@@ -151,6 +151,7 @@ const usersSystemPage = () => {
         setIsModalVisible2({ create: false, edit: false });
         reload();
         setLoading(false);
+        setIsModalVisible2(false)
         formCreate.resetFields();
         await Swal.fire("", "บันทึกข้อมูลเรียบร้อย", "success");
         window.location.reload();
@@ -520,13 +521,13 @@ const usersSystemPage = () => {
           <Form.Item name="url" label="URL" rules={[{ required: true }, { type: "url" }]}>
             <Input placeholder="URL" />
           </Form.Item>
-          <Form.Item
+          {/* <Form.Item
             name="wms_name"
             label="Layer Name"
             rules={[{ required: true }]}
           >
             <Input placeholder="Layer Name" />
-          </Form.Item>
+          </Form.Item> */}
 
           {menuItem}
           <Form.Item
@@ -542,7 +543,6 @@ const usersSystemPage = () => {
               }}
             >
               <Radio value="arcgisserver">ArcGIS Server</Radio>
-              <Radio value="imageserver">ArcGIS Image Server</Radio>
               <Radio value="geoserver">GEO Server</Radio>
             </Radio.Group>
           </Form.Item>
