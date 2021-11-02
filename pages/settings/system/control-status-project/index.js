@@ -59,11 +59,30 @@ const index = () => {
     },
     {
       key: "3",
-      title: "Status",
+      title: "ชื่อสถานะโครงการ",
       dataIndex: "name",
-      width: '30%',
+      width: '20%',
       sorter: (record1, record2) => {
         return record1.Status > record2.Status;
+      },
+    },
+    {
+      key: "3",
+      title: "สีสถานะ",
+      dataIndex: "status_color",
+      width: '15%',
+      render: (color) => {
+        return (
+          <div
+            style={{
+              width: "30px",
+              height: "30px",
+              borderRadius: "6px",
+              background: color === "" || color === null ? "<No Color>" : color,
+              border: "1px solid gray",
+            }}
+          />
+        )
       },
     },
     {
@@ -164,7 +183,7 @@ const index = () => {
   }
 
   const onFinishEdit = async (data) => {
-    console.log(`data`, data)
+    // console.log(`data`, data)
     try {
       Swal.fire({
         title: "กรุณายืนยันการแก้ไขข้อมูล",
@@ -184,10 +203,10 @@ const index = () => {
           reload();
           handleCancel2();
         }
-        console.log("sdasd", form.getFieldValue())
+        // console.log("sdasd", form.getFieldValue())
       });
     } catch (error) {
-      console.log(error);
+      // console.log(error);
       Swal.fire("", "มีบางอย่างผิดพลาด", "success");
     }
   };
@@ -332,7 +351,7 @@ const index = () => {
       </Row>
 
       <Modal
-        title="Status ของ โครงการ"
+        title="เพิ่มสถานะโครงการ"
         visible={isModalVisible.create}
         onOk={() => handleOk("formCreate")}
         onCancel={handleCancel}
@@ -348,17 +367,33 @@ const index = () => {
 
           <Form.Item
             name="status_code"
-            label="รหัสสถานภาพ"
+            label="Status code"
             rules={[{ required: true }]}
           >
-            <Input placeholder="รหัสสถานภาพ" type="number" style={{ width: '40%' }} />
+            <Input placeholder="number..." type="number" style={{ width: '40%' }} />
           </Form.Item>
           <Form.Item
             name="name"
-            label="ความหมาย"
+            label="ชื่อสถานะโครงการ"
             rules={[{ required: true }]}
           >
-            <Input placeholder="ความหมาย" />
+            <Input placeholder="กรอกชื่อสถานะโครงการ..." />
+          </Form.Item>
+
+          <Form.Item
+            name="status_color"
+            label="สีสถานะ"
+            rules={[{ required: true }]}
+          >
+            <Input
+              type="color"
+              style={{
+                width: "50px",
+                height: "30px",
+                borderRadius: "6px",
+                border: "0.5px solid gray",
+              }} />
+
           </Form.Item>
 
         </Form>
@@ -387,10 +422,26 @@ const index = () => {
           </Form.Item>
           <Form.Item
             name="name"
-            label="Status"
+            label="ชื่อสถานะโครงการ"
             rules={[{ required: true }]}
           >
             <Input placeholder="Status" />
+          </Form.Item>
+
+          <Form.Item
+            name="status_color"
+            label="สีสถานะ"
+            rules={[{ required: true }]}
+          >
+            <Input
+              type="color"
+              style={{
+                width: "50px",
+                height: "30px",
+                borderRadius: "6px",
+                border: "0.5px solid gray",
+              }} />
+
           </Form.Item>
 
         </Form>
