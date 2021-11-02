@@ -4,7 +4,7 @@ import { Input, Col, Row, Select, Button, Table, Form } from 'antd'
 import Api from "../../../../util/Api"
 import { useEffect, useState } from 'react';
 const { Option } = Select;
-const { Column, ColumnGroup } = Table
+import ReactHTMLTable from 'react-html-table-to-excel'
 const index = () => {
     const [dataProvider, setDataProvider] = useState([]) //จังหวัด
     const [dataAmp, setDataAmp] = useState([]) //อำเภอ
@@ -40,16 +40,6 @@ const index = () => {
 
         }
     }
-    const data = [{
-        land_all: "676",
-        distance_all: "630",
-        land_new_appove: "49",
-        distance_new_appove: "130",
-        land_distance: "110",
-        distance_distance_all: "200",
-        land_success: "511",
-        distance_success: "300",
-    }]
     const onChangeProv = (value, _form) => {
         const find_prov = provAmpTamAll.prov.find(e => e.name == value)
         console.log(find_prov)
@@ -105,9 +95,12 @@ const index = () => {
                             }}
                             onFinish={handleReport}
                         >
-                            <div className="row">
+                            <div className="row" >
                                 <div className="col-md-12 " style={{ marginBottom: "10px" }}>
-                                    <Button className="btn-success eiei" style={{ borderRadius: "2px", color: "white", marginLeft: "2px", float: "right" }} onClick={() => loadShapeFile()}>Export To Excel</Button>
+                                    <div hidden={true}>
+                                        <ReactHTMLTable className="export_excel" table="dashboard_table" filename="dashboard" buttonText="Export To Excel" />
+                                    </div>
+                                    <Button className="btn-success " style={{ borderRadius: "2px", color: "white", marginLeft: "2px", float: "right" }} onClick={() => $(".export_excel").click()}>Export To Excel</Button>
                                     <Button type="primary" style={{ marginLeft: "2px", float: "right" }} htmlType="submit">Report</Button>
                                 </div>
                                 <div className="col-md-2 ">
@@ -167,29 +160,8 @@ const index = () => {
                         </Form>
                     </Col>
                     <Col span={24}>
-                        {/* <Table dataSource={data}>
-                            <ColumnGroup title="">
-                                <Column title="" dataIndex="land_all" />
-                            </ColumnGroup>
-                            <ColumnGroup title="ทั้งหมด">
-                                <Column title="แปลง" dataIndex="land_all" />
-                                <Column title="ระยะทาง (กม.)" dataIndex="distance_all" />
-                            </ColumnGroup>
-                            <ColumnGroup title="ได้รับอนุมัติให้ดำเนินการใหม่">
-                                <Column title="แปลง" dataIndex="land_new_appove" />
-                                <Column title="ระยะทาง (กม.)" dataIndex="distance_new_appove" />
-                            </ColumnGroup>
-                            <ColumnGroup title="อยู่ระหว่างดำเนินการ">
-                                <Column title="แปลง" dataIndex="land_distance" key="land" />
-                                <Column title="ระยะทาง (กม.)" dataIndex="distance_distance_all" key="all" />
-                            </ColumnGroup>
-                            <ColumnGroup title="ดำเนินการเรียบร้อยแล้ว">
-                                <Column title="แปลง" dataIndex="land_success" key="all" />
-                                <Column title="ระยะทาง (กม.)" dataIndex="distance_success" key="all" />
-                            </ColumnGroup>
-                        </Table> */}
                         <div className="table-responsive">
-                            <table className="table table-bordered">
+                            <table className="table table-bordered" id="dashboard_table">
                                 <colgroup span="2"></colgroup>
                                 <colgroup span="2"></colgroup>
                                 <tr>
