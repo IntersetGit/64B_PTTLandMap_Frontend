@@ -226,7 +226,7 @@ const usersSystemPage = () => {
     Api.get(`/system/findUserAD?username=${value}`)
       .then((data) => {
         setStatusValidation({
-          help: "พบรหัสผู้ใช้ใน AD",
+          help: `${data.data.items.displayName}`,
         });
         setButtonCreate(false);
       })
