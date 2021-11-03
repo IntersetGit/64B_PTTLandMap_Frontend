@@ -258,21 +258,20 @@ body {
 
 
 
-@media only screen and (max-height: 570px) {
+@media only screen and (max-height: 573px) {
+ 
   .tools-map-area {
-    // display: none;
-    width:100px;
+    right: 50px;
+    top: 65px;
   }
   .tools-map-area2 {
-    // display: none;
     width:100px;
-  }
-  .tools-map-cog{
-    // display: none;
+    right: 10px;
+    top: 325px;
   }
 }
 
-@media only screen and (max-height: 400px) {
+@media only screen and (max-height: 375px) {
   .tools-map-area {
     display: none;
   }
