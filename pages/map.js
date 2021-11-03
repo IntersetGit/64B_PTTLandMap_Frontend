@@ -1228,7 +1228,7 @@ const mapPage = () => {
             const bounds = new google.maps.LatLngBounds();
             const layer = new google.maps.Data();
             layer.addGeoJson(GeoJson)
-
+            const fillColor = GeoJson ? GeoJson.features[0].properties.status_color : item.color
 
             layer.addGeoJson(GeoJson)
             // layer.setStyle({
@@ -1237,10 +1237,10 @@ const mapPage = () => {
             //     strokeWeight: 1,
             //     clickable: false
             // });
-
+            // console.log('item :>> ', item);
             const option_layer = item.option_layer ?? {}
             layer.setStyle({
-                fillColor: item.color,
+                fillColor,
                 fillOpacity: option_layer.fillOpacity ?? inputValueOpacityColor, //Opacity
                 strokeWeight: option_layer.strokeWeight ?? inputValueStrokColor,  //ความหนาขอบ
                 strokeColor: option_layer.strokeColor ? option_layer.strokeColor.hex : colorFrame.hex, //เส้นขอบ
