@@ -1095,6 +1095,28 @@ const mapPage = () => {
             $("#changeMap").fadeOut()
         }, 15000)
     }
+    const [dowSwipeMap, setDowSwipMap] = useState({ mapLeft: true, mapRight: false })
+    const clickdowSwipMap = (type) => {
+        if (type === 'left') {
+            if (dowSwipeMap.mapLeft) {
+                mapLeft.setMapTypeId(google.maps.MapTypeId.ROADMAP)
+                setDowSwipMap({ ...dowSwipeMap, mapLeft: false })
+            } else {
+                mapLeft.setMapTypeId(google.maps.MapTypeId.HYBRID)
+                setDowSwipMap({ ...dowSwipeMap, mapLeft: true })
+
+            }
+        } else {
+            if (dowSwipeMap.mapRight) {
+                mapRight.setMapTypeId(google.maps.MapTypeId.ROADMAP)
+                setDowSwipMap({ ...dowSwipeMap, mapRight: false })
+            } else {
+                mapRight.setMapTypeId(google.maps.MapTypeId.HYBRID)
+                setDowSwipMap({ ...dowSwipeMap, mapRight: true })
+            }
+
+        }
+    }
     /* -------------------------------------------------------------------------------------- */
 
     /* Search */
@@ -2437,7 +2459,7 @@ const mapPage = () => {
                 placement="right"
                 onClose={() => openCloseRaster()}
                 visible={visibleRaster}
-                width={350}
+                width={400}
                 maskClosable={false}
                 style={{ width: visibleRaster ? 350 : 0 }}
             >
@@ -2471,7 +2493,7 @@ const mapPage = () => {
                             }
                             {
                                 rasterDataDron1.length > 6 ? (
-                                    <h5 style={{ cursor: "pointer", marginLeft: "220px" }} className="text-info" hidden={showMoreDron.dron1} onClick={() => { setLoadmore1({ ...loadmore1, dronMore: rasterDataDow1.length }), setShowMoreDron({ ...showMoreDron, dron1: true }) }}>
+                                    <h5 style={{ cursor: "pointer", marginLeft: "230px" }} className="text-info" hidden={showMoreDron.dron1} onClick={() => { setLoadmore1({ ...loadmore1, dronMore: rasterDataDow1.length }), setShowMoreDron({ ...showMoreDron, dron1: true }) }}>
                                         ...Load More
                                     </h5>
                                 ) : null
@@ -2479,6 +2501,27 @@ const mapPage = () => {
                         </Row>
                         <b className="text-info pt-5">ภาพถ่ายดาวเทียม</b>
                         <Row className="pt-3 pb-3" gutter={[16, 5]} style={{ margin: 0 }}>
+                            {
+                                changmap ? (
+                                    <Col span={8}>
+                                        <Card
+                                            className={dowSwipeMap.mapLeft ? "cardwa" : ""}
+                                            onClick={() => clickdowSwipMap("left")}
+                                            bodyStyle={{ padding: "5px", }}
+                                            bordered={false}
+                                            hoverable
+                                            style={{ width: "100%", height: "100%", cursor: "pointer" }}
+                                            cover={<img style={{ objectFit: "cover", height: "70px" }} alt="example" src={`https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTwyYk7BSUClNOfiGhMybXiO4KbV0xOI8nOg_Qy9T9quhUOT4fNB8ZcUrcTPinYtaEsLFU&usqp=CAU`} />}
+                                        >
+                                            <p style={{ flexWrap: "wrap" }}>ภาพถ่ายดาวเทียม</p>
+                                            {
+                                                dowSwipeMap.mapLeft ? <EyeFilled style={{ position: "absolute", bottom: "5px", right: "5px", color: "#0f7fff" }} />
+                                                    : null
+                                            }
+                                        </Card>
+                                    </Col>
+                                ) : null
+                            }
                             {
                                 rasterDataDow1.slice(0, loadmore1.dowMore).map((data, index) => {
                                     return <Col span={8} key={index} >
@@ -2503,7 +2546,7 @@ const mapPage = () => {
                             }
                             {
                                 rasterDataDow1.length > 6 ? (
-                                    <h5 style={{ cursor: "pointer", marginLeft: "220px" }} className="text-info" hidden={showMoreDow.dow1} onClick={() => { setLoadmore1({ ...loadmore1, dowMore: rasterDataDow1.length }), setShowMoreDow({ ...showMoreDow, dow1: true }) }}>
+                                    <h5 style={{ cursor: "pointer", marginLeft: "230px" }} className="text-info" hidden={showMoreDow.dow1} onClick={() => { setLoadmore1({ ...loadmore1, dowMore: rasterDataDow1.length }), setShowMoreDow({ ...showMoreDow, dow1: true }) }}>
                                         ...Load More
                                     </h5>
                                 ) : null
@@ -2545,8 +2588,8 @@ const mapPage = () => {
                                 })
                             }
                             {
-                                rasterDataDron1.length > 3 ? (
-                                    <h5 style={{ cursor: "pointer", marginLeft: "220px" }} className="text-info" hidden={showMoreDron.dron2} onClick={() => { setLoadmore2({ ...loadmore2, dronMore: rasterDataDow1.length }), setShowMoreDron({ ...showMoreDron, dron2: true }) }}>
+                                rasterDataDron1.length > 6 ? (
+                                    <h5 style={{ cursor: "pointer", marginLeft: "230px" }} className="text-info" hidden={showMoreDron.dron2} onClick={() => { setLoadmore2({ ...loadmore2, dronMore: rasterDataDow1.length }), setShowMoreDron({ ...showMoreDron, dron2: true }) }}>
                                         ...Load More
                                     </h5>
                                 ) : null
@@ -2554,6 +2597,27 @@ const mapPage = () => {
                         </Row>
                         <b className="text-info pt-5">ภาพถ่ายดาวเทียม</b>
                         <Row className="pt-3 pb-3" gutter={[16, 5]} style={{ margin: 0 }}>
+                            {
+                                changmap ? (
+                                    <Col span={8}>
+                                        <Card
+                                            className={dowSwipeMap.mapRight ? "cardwa" : ""}
+                                            onClick={() => clickdowSwipMap("right")}
+                                            bodyStyle={{ padding: "5px", }}
+                                            bordered={false}
+                                            hoverable
+                                            style={{ width: "100%", height: "100%", cursor: "pointer" }}
+                                            cover={<img style={{ objectFit: "cover", height: "70px" }} alt="example" src={`https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTwyYk7BSUClNOfiGhMybXiO4KbV0xOI8nOg_Qy9T9quhUOT4fNB8ZcUrcTPinYtaEsLFU&usqp=CAU`} />}
+                                        >
+                                            <p style={{ flexWrap: "wrap" }}>ภาพถ่ายดาวเทียม</p>
+                                            {
+                                                dowSwipeMap.mapRight ? <EyeFilled style={{ position: "absolute", bottom: "5px", right: "5px", color: "#0f7fff" }} />
+                                                    : null
+                                            }
+                                        </Card>
+                                    </Col>
+                                ) : null
+                            }
                             {
                                 rasterDataDow1.slice(0, loadmore2.dowMore).map((data, index) => {
                                     return <Col span={8} key={index} >
@@ -2577,8 +2641,8 @@ const mapPage = () => {
                                 })
                             }
                             {
-                                rasterDataDow1.length > 3 ? (
-                                    <h5 style={{ cursor: "pointer", marginLeft: "220px" }} className="text-info" hidden={showMoreDow.dow2} onClick={() => { setLoadmore2({ ...loadmore2, dowMore: rasterDataDow1.length }), setShowMoreDow({ ...showMoreDow, dow2: true }) }}>
+                                rasterDataDow1.length > 6 ? (
+                                    <h5 style={{ cursor: "pointer", marginLeft: "230px" }} className="text-info" hidden={showMoreDow.dow2} onClick={() => { setLoadmore2({ ...loadmore2, dowMore: rasterDataDow1.length }), setShowMoreDow({ ...showMoreDow, dow2: true }) }}>
                                         ...Load More
                                     </h5>
                                 ) : null
