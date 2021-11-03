@@ -21,6 +21,7 @@ import {
   InputNumber,
   Slider,
   // Upload,
+  Checkbox,
   Radio,
   DatePicker,
   Upload
@@ -61,6 +62,7 @@ const usersSystemPage = () => {
   const [FileUploadSymbol, setFileUploadSymbol] = useState(null);
   const [inputValueOpacityColor, setInputValueOpacityColor] = useState(0.5) //Opacity
   const [inputValueStrokColor, setInputValueStrokColor] = useState(1) //ความหนากรอบ
+  const [configColor, setConfigColor] = useState(false)
 
   const columns = [
     {
@@ -247,8 +249,9 @@ const usersSystemPage = () => {
     const { data } = await Api.get(`masterdata/masLayersShape/${show.id}`);
     setEditId(show.id)
     const items = data.items
-    console.log('items :>> ', items);
+    // console.log('items :>> ', items);
     setIsModalVisible(true)
+    setConfigColor(items.config_color ?? false)
 
     if (items.color_layer) {
       const rgb = JSON.parse(items.color_layer)
@@ -333,6 +336,7 @@ const usersSystemPage = () => {
         ...value,
         color_layer: JSON.stringify(colorUpload.color_layer),
         option_layer,
+        config_color: configColor,
         id: editId,
       });
       console.log('resp :>> ', resp);
@@ -589,8 +593,15 @@ const usersSystemPage = () => {
             </Select>
           </Form.Item>
 
-          <Form.Item name="color_layer" label="สีชั้นข้อมูล" rules={[{ required: true }]}>
-            <Color color={colorUpload} onChangeColor={({ rgb, hex }) => setColorUpload({ ...colorUpload, rgb, hex })} callbackSaveColor={(velue) => { }} />
+          <Form.Item name="color_layer" label="สีชั้นข้อมูล" >
+            <Row>
+              <Col span={6}>
+                <Color color={colorUpload} onChangeColor={({ rgb, hex }) => setColorUpload({ ...colorUpload, rgb, hex })} callbackSaveColor={(velue) => { }} />
+              </Col>
+              <Col span={18}>
+                <Checkbox defaultChecked={configColor} checked={configColor} onChange={(value) => setConfigColor(value.target.checked)} className="text-red">ใช้สีนี้ในการแสดงผลบนแผนที่</Checkbox>
+              </Col>
+            </Row>
           </Form.Item>
 
           <Form.Item label="Opacity" name="Opacity">
