@@ -67,7 +67,7 @@ const index = () => {
       title: "Layer Name",
       dataIndex: "layer_name",
       sorter: (record1, record2) => {
-        return record1.user_name > record2.user_name;
+        return record1.layer_name > record2.layer_name;
       },
     },
     {
@@ -75,7 +75,7 @@ const index = () => {
       title: "ชื่อข้อมูล (WMS)",
       dataIndex: "wms",
       sorter: (record1, record2) => {
-        return record1.roles_name > record2.roles_name;
+        return record1.wms > record2.wms;
       },
     },
     {
@@ -83,7 +83,7 @@ const index = () => {
       title: "Type Server",
       dataIndex: "type_server",
       sorter: (record1, record2) => {
-        return record1.roles_name > record2.roles_name;
+        return record1.type_server > record2.type_server;
       },
     },
     {
@@ -91,7 +91,7 @@ const index = () => {
       title: "Date",
       dataIndex: "date",
       sorter: (record1, record2) => {
-        return record1.roles_name > record2.roles_name;
+        return record1.date > record2.date;
       },
     },
     {
