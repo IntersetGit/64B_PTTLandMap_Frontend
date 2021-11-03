@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Row, Col, Image, Input, Button, Form, Checkbox, message } from "antd";
 import { UserOutlined, LockOutlined } from "@ant-design/icons";
 import { Cookies } from "react-cookie";
@@ -15,6 +15,7 @@ const LoginPage = () => {
   const cookies = new Cookies();
   const route = useRouter();
   const dispatch = useDispatch();
+  const [isBlock, setisBlock] = useState(false)
 
   const isComponentMounted = useRef(true);
 
@@ -22,8 +23,15 @@ const LoginPage = () => {
     if (isComponentMounted.current) {
       (() => {
         const token = cookies.get("token");
+        const _isBlock = cookies.get("isBlock");
         /* จ้องเช็คว่า Token หมด อายุยัง */
         if (token) route.push("/");
+        // if (isBlock) {
+        //   console.log('_isBlock :>> ', _isBlock);
+        //   setisBlock(true)
+        // } else {
+        //   setisBlock(false)
+        // }
       })();
     }
 
@@ -65,15 +73,35 @@ const LoginPage = () => {
         }
       )
       .catch((error) => {
-        console.log('error :>> ', error.response.status);
-        console.log('error :>> ', error.response.data);
+        // console.log('error :>> ', error.response.status);
+        // console.log('error :>> ', error.response.data);
         message.error(
           error.response.data || error.response.status == 400 ? error.response.data.error.message : "มีบางอย่างผิดพลาด !"
         );
+
+        if (error.response.status == 400) {
+          if (error.response.data.error.message === "ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง !") blockLogin()
+        }
+
         cookies.remove("token");
         cookies.remove("refresh_token");
       });
   };
+
+  const blockLogin = () => {
+
+    const block = cookies.get("block");
+    const countBlock = Number(block) + 1
+    if (countBlock) cookies.set("block", countBlock, { path: "/" });
+    else cookies.set("block", 1, { path: "/" });
+
+    if (countBlock >= 5) {
+      cookies.set("isBlock", new Date().getTime(), { path: "/" });
+      cookies.remove("block", { path: "/" });
+    }
+
+
+  }
 
   return (
     <div className="">

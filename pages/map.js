@@ -180,6 +180,7 @@ const mapPage = () => {
     const [FileUploadSymbol, setFileUploadSymbol] = useState(null);
     const [FileType, setFileType] = useState(null);
     const [openColorUpload, setOpenColorUpload] = useState(false);
+    const [listWms, setListWms] = useState([])
     const [colorUpload, setColorUpload] = useState({
         hex: "red",
         rgb: { r: 255, g: 0, b: 0, a: 1 },
@@ -393,15 +394,47 @@ const mapPage = () => {
     const checkboxLayer = async (value, index1, index2) => {
         const arr = [...groupLayerList]
         arr[index1].children[index2].checked = value
-        if (!value) {
-            arr[index1].children[index2].checked = value
-            clearMapData(arr[index1].children[index2].id)
+
+        if (arr[index1].children[index2].type == "wms") {
+            const setwms = []
+            const items = arr[index1].children[index2]
+            console.log('items :>> ', items);
+            // "https://services.arcgisonline.com/arcgis/rest/services/Reference/World_Reference_Overlay/MapServer/"
+            let maptype = new WmsMapType(
+                items.id,
+                items.url, {
+                layers: items.layer_name,
+                wmsProjectKey: items.id,
+            }, {
+                opacity: 100 / 100
+            }, items.type_server
+            );
+            // console.log('maptype :>> ', maptype);
+
+            if (listWms.some((item) => item.name == maptype.name)) {
+                let cut = listWms.filter((item) => item.name !== maptype.name)
+                setListWms(cut);
+                maptype.removeFromMap(map);
+            } else {
+                setListWms([...listWms, maptype]);
+                maptype.addToMap(map, false);
+                setwms.push(maptype);
+            }
+
+            // listWms, setListWms
+
         } else {
-            const item = arr[index1].children[index2];
-            // console.log('item :>> ', item);
-            await getDeoJson(item.id, item.color_layer, item.option_layer)
+            if (!value) {
+                arr[index1].children[index2].checked = value
+                clearMapData(arr[index1].children[index2].id)
+            } else {
+                const item = arr[index1].children[index2];
+                // console.log('item :>> ', item);
+                await getDeoJson(item.id, item.color_layer, item.option_layer)
+            }
+            setGroupLayerList(arr)
         }
-        setGroupLayerList(arr)
+
     };
 
 
@@ -1476,7 +1509,7 @@ const mapPage = () => {
     const [wmsopacityright, setWmsopacityright] = useState(100);
 
     const Clickwms = (items, Map = map) => {
-        // console.log('itemswms :>> ', items);
+        console.log('itemswms :>> ', items);
 
         let maptype = new WmsMapType(
             items.id,
@@ -1768,6 +1801,7 @@ const mapPage = () => {
                             Object.assign(
                                 <div className="pt-2" key={`maps-${e.id}`}>
                                     <Collapse
+                                        collapsible={!e.children || e.children.length <= 0 ? "disabled" : "vertical"}
                                         expandIcon={({ isActive }) => e.symbol ? <img src={e.symbol} width={20} /> : <CaretRightOutlined rotate={isActive ? 90 : 0} />}
                                     >
                                         <Panel header={e.group_name} key={i}>
@@ -1782,14 +1816,14 @@ const mapPage = () => {
 
                                                                 <Col xs={2} >
                                                                     {
-                                                                        x.checked ?
+                                                                        x.checked && x.type != "wms" ?
                                                                             <a onClick={() => goTolayer(x.id)}>
                                                                                 <ExpandOutlined />
                                                                             </a> : null
                                                                     }
                                                                 </Col>
                                                                 {
-                                                                    x.checked && x.type_geo != "Point" ?
+                                                                    x.checked && x.type_geo != "Point" && x.type != "wms" ?
                                                                         <Col xs={3} style={{ paddingTop: 3 }}>
                                                                             <a onClick={() => openColor(i, index)}>
                                                                                 <div
@@ -2678,6 +2712,11 @@ const mapPage = () => {
 
           .container-fluid-map {
             padding-top:  ${containerFluidMap}px;
+          }
+
+          .ant-collapse .ant-collapse-item-disabled > .ant-collapse-header, .ant-collapse .ant-collapse-item-disabled > .ant-collapse-header > .arrow {
+            color: rgba(0, 0, 0, 1);
+            cursor: inherit;
           }
         `}
             </style>
