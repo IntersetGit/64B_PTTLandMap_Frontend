@@ -606,15 +606,16 @@ const mapPage = () => {
         $("#openFullscreen").fadeToggle();
         $("#closeFullscreen").fadeToggle("slow");
     };
-    /* click map show lat lag */
     const clickMapShowLatLag = (map) => {
+        let test = new google.maps.InfoWindow()
+        test.open(map);
         google.maps.event.addListener(map, "click", (event) => {
-
-            let infoWindow = new google.maps.InfoWindow({
+            test.close()
+            test = new google.maps.InfoWindow({
                 content: `${event.latLng}`,
                 position: event.latLng,
             })
-            infoWindow.open(map)
+            test.open(map)
         })
     }
     /* เปิดปิดเส้นวัดระยะ */
