@@ -1586,7 +1586,7 @@ const mapPage = () => {
 
                 ) : null}
 
-                {!changmap && <Col span={6} className="pt-2">
+                {!changmap && <Col span={6} className="pt-1">
                     <Tooltip placement="left" title={"Default"}>
                         <button className="btn btn-light btn-sm" onClick={clickHome} >
                             <img
@@ -1596,7 +1596,7 @@ const mapPage = () => {
                         </button>
                     </Tooltip>
                 </Col>}
-                {!changmap && <Col span={6} className="pt-2">
+                {!changmap && <Col span={6} className="pt-1">
                     <Tooltip placement="left" title={"Distance"}>
                         <button className="btn btn-light btn-sm" onClick={clickLine} >
                             <img
@@ -1606,7 +1606,7 @@ const mapPage = () => {
                         </button>
                     </Tooltip>
                 </Col>}
-                {!changmap && <Col span={6} className="pt-2">
+                {!changmap && <Col span={6} className="pt-1">
                     <Tooltip placement="left" title={"areaDistance"}>
                         <button className="btn btn-light btn-sm" onClick={areaDistance} >
                             <img
@@ -1617,7 +1617,7 @@ const mapPage = () => {
                         </button>
                     </Tooltip>
                 </Col>}
-                <Col span={6} className="pt-2">
+                <Col span={6} className="pt-1">
                     <Tooltip placement="left" title={"Swipe Map"}>
                         <button className="btn btn-light btn-sm" onClick={clickSplit}>
                             <img
@@ -1627,7 +1627,7 @@ const mapPage = () => {
                         </button>
                     </Tooltip>
                 </Col>
-                {!changmap && <Col span={6} className="pt-2">
+                {!changmap && <Col span={6} className="pt-1">
                     <Tooltip placement="left" title={"Time Silder"}>
                         <button className="btn btn-light btn-sm" onClick={ontimeslider} >
                             <img
@@ -1637,7 +1637,7 @@ const mapPage = () => {
                         </button>
                     </Tooltip>
                 </Col>}
-                {!changmap && <Col span={6} className="pt-2">
+                {!changmap && <Col span={6} className="pt-1">
                     <Tooltip placement="left" title={"Clear"}>
                         <button className="btn btn-light btn-sm" onClick={clickClearMap} >
                             <img
@@ -1649,7 +1649,7 @@ const mapPage = () => {
                 </Col>}
             </div>
             <div className="tools-map-area2">
-                <Col span={24} className="pt-2">
+                <Col span={24} className="pt-1">
                     <Tooltip placement="bottom" title={"Menu Bar"}>
                         <button
                             className="btn btn-light btn-sm "
