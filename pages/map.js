@@ -2053,7 +2053,8 @@ const mapPage = () => {
             <Drawer
                 id="drawer-dashboard"
                 width={750}
-                title="Process ส่งมอบโครงการ"
+                // title="Process ส่งมอบโครงการ"
+                title={false}
                 placement={"left"}
                 visible={visibleDashboard}
                 onClose={() => setVisibleDashboard(!visibleDashboard)}
