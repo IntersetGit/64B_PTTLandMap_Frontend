@@ -69,16 +69,14 @@ const usersSystemPage = () => {
   const columns = [
     {
       key: "1",
-      title: "ลำดับ",
-      // dataIndex: "number",
-      sorter: (record1, record2) => {
-        return record1.number > record2.number;
-      },
-      render: (a, b, i) => i + 1
+      title: <b>ลำดับ</b>,
+      dataIndex: "number",
+      render: (a, b, i) => (i + 1).toString(),
+
     },
     {
       key: "2",
-      title: "ชื่อ",
+      title: <b>ชื่อ</b>,
       dataIndex: "name_layer",
       sorter: (record1, record2) => {
         return record1.name_layer > record2.name_layer;
@@ -86,7 +84,7 @@ const usersSystemPage = () => {
     },
     {
       key: "3",
-      title: "Group Layer",
+      title: <b>Group Layer</b>,
       dataIndex: "group_name",
       sorter: (record1, record2) => {
         return record1.group_name > record2.group_name;
@@ -94,7 +92,7 @@ const usersSystemPage = () => {
     },
     {
       key: "5",
-      title: "จัดการ",
+      title: <b>จัดการ</b>,
       // width: 200,
       dataIndex: "id",
       render: (id, show) => {
