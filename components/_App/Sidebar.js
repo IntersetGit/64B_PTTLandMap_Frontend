@@ -72,13 +72,13 @@ function Sidebar() {
                             </li>
                         ) : null}
                         {/* Administrator And Editor */}
-                        {(user && (user.roles_id === "8a97ac7b-01dc-4e06-81c2-8422dffa0ca2" || user.roles_id === "cec6617f-b593-4ebc-9604-3059dfee0ac4")) ? (
+                        {/* {(user && (user.roles_id === "8a97ac7b-01dc-4e06-81c2-8422dffa0ca2" || user.roles_id === "cec6617f-b593-4ebc-9604-3059dfee0ac4")) ? (
                             <li className={activeHref(`/settings/system/streetview/`)}>
                                 <Link href={`/settings/system/streetview/`} >
                                     <a><img src="/assets/images/icon/9.png" className=" pb-2" alt="" width={25} /> <span >จัดการ ภาพถ่ายStreetView</span></a>
                                 </Link>
                             </li>
-                        ) : null}
+                        ) : null} */}
 
                         {/* Administrator */}
                         {(user && user.roles_id === "8a97ac7b-01dc-4e06-81c2-8422dffa0ca2") ? (

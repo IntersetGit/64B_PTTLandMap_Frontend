@@ -2208,16 +2208,16 @@ const mapPage = () => {
 
             {/* Search */}
             <Drawer
-                id="drawer-search"
+                id="drawer-searchwa"
                 width={650}
-                title="ต้นหา"
+                title={false}
                 placement={"left"}
                 visible={visibleSearch}
                 onClose={() => setVisibleSearch(!visibleSearch)}
                 maskClosable={false}
-                style={{ width: visibleSearch ? 650 : 0 }}
+                style={{ width: visibleSearch ? 650 : 0, }}
             >
-                <div>
+                <div style={{ backgroundColor: "#4b5159", padding: "22px 22px 0px 22px" }}>
                     <Form
                         form={formSearch}
                         initialValues={{
@@ -2714,7 +2714,7 @@ const mapPage = () => {
             position: relative;
             z-index: 1;
             overflow: auto;
-            background-color: #cccaca;
+            background-color: #ececec;
             background-clip: padding-box;
             border: 0;
         }
@@ -2733,7 +2733,7 @@ const mapPage = () => {
             -webkit-font-feature-settings: 'tnum', "tnum";
             -moz-font-feature-settings: 'tnum', "tnum";
             font-feature-settings: 'tnum', "tnum";
-            background-color: #cccaca;
+            background-color: #ececec;
             border: 2px solid #979797;
             border-bottom: 0;
             border-radius: 5px;
@@ -2758,7 +2758,7 @@ const mapPage = () => {
             -moz-font-feature-settings: 'tnum', "tnum";
             font-feature-settings: 'tnum', "tnum";
             position: relative;
-            background: #cccaca;
+            background: #ededed;
             border-radius: 2px;
         }
 
@@ -2790,7 +2790,7 @@ const mapPage = () => {
             /* z-index: 100; */
         }
         .header {
-            background: #fff;
+            background: #008cff;
             border-bottom: 1px solid #ededed;
             -webkit-box-shadow: 0 1px 1px 0 rgb(0 0 0 / 20%);
             box-shadow: 0 1px 1px 0 rgb(0 0 0 / 20%);
@@ -2803,8 +2803,7 @@ const mapPage = () => {
         }
 
         .ant-tabs-card > .ant-tabs-nav .ant-tabs-tab-active, .ant-tabs-card > div > .ant-tabs-nav .ant-tabs-tab-active {
-            color: #4368ff;
-            background: #cccaca;
+            background: #ececec;
         }
 
         .ant-tabs-top > .ant-tabs-nav::before, .ant-tabs-bottom > .ant-tabs-nav::before, .ant-tabs-top > div > .ant-tabs-nav::before, .ant-tabs-bottom > div > .ant-tabs-nav::before {
@@ -2818,17 +2817,19 @@ const mapPage = () => {
 
         .ant-tabs-card.ant-tabs-top > .ant-tabs-nav .ant-tabs-tab, .ant-tabs-card.ant-tabs-top > div > .ant-tabs-nav .ant-tabs-tab {
             border-radius: 2px 2px 0 0;
+            border-color: #000;
         }
 
-        // .ant-tabs-card > .ant-tabs-nav .ant-
-        //     padding: 8px 16px;
-        //     background: #cccaca;
-        //     border: 1px solid #999999;
-        //     -webkit-transition: all 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
-        //     transition: all 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
-        // }tabs-tab, .ant-tabs-card > div > .ant-tabs-nav .ant-tabs-tab {
-        //     margin: 0;
-       
+
+         {/* .ant-tabs-card > .ant-tabs-nav .ant-
+             padding: 8px 16px;
+             background: #cccaca;
+             border: 1px solid #999999;
+             -webkit-transition: all 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
+             transition: all 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
+         }tabs-tab, .ant-tabs-card > div > .ant-tabs-nav .ant-tabs-tab {
+             margin: 0; */}
+
 
         `}
             </style>
