@@ -50,7 +50,7 @@ const index = () => {
 
         {
             key: "2",
-            title: <b>Lat,Lng</b>,
+            title: <b>Latitude,Longitude</b>,
             dataIndex: "Lat,Lng",
             sorter: (record1, record2) => {
                 return record1.layer_name > record2.layer_name;
