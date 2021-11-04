@@ -39,7 +39,7 @@ function Sidebar() {
                         {(user && user.roles_id === "8a97ac7b-01dc-4e06-81c2-8422dffa0ca2") ? (
                             <li className={activeHref(`/settings/system/users/`)}>
                                 <Link href={`/settings/system/users/`} >
-                                    <a><img src="/assets/images/icon/11.png" className=" pb-2" alt="" width={25} /><span>จัดการผู้ใช้ระบบ</span></a>
+                                    <a><img src="/assets/images/icon/11.png" className=" pb-2" alt="" width={25} /><span>จัดการ ผู้ใช้ระบบ</span></a>
                                 </Link>
                             </li>
                         ) : null}
@@ -68,6 +68,14 @@ function Sidebar() {
                             <li className={activeHref(`/settings/system/satellite-aerial-photographs/`)}>
                                 <Link href={`/settings/system/satellite-aerial-photographs/`} >
                                     <a><img src="/assets/images/icon/7.png" className=" pb-2" alt="" width={25} /> <span >จัดการ ภาพถ่ายดาวเทียม<h5 className="pt-2">และภาพถ่ายทางอากาศ</h5></span></a>
+                                </Link>
+                            </li>
+                        ) : null}
+                        {/* Administrator And Editor */}
+                        {(user && (user.roles_id === "8a97ac7b-01dc-4e06-81c2-8422dffa0ca2" || user.roles_id === "cec6617f-b593-4ebc-9604-3059dfee0ac4")) ? (
+                            <li className={activeHref(`/settings/system/streetview/`)}>
+                                <Link href={`/settings/system/streetview/`} >
+                                    <a><img src="/assets/images/icon/9.png" className=" pb-2" alt="" width={25} /> <span >จัดการ ภาพถ่ายStreetView</span></a>
                                 </Link>
                             </li>
                         ) : null}
