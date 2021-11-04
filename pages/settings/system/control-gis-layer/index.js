@@ -64,6 +64,8 @@ const usersSystemPage = () => {
   const [inputValueStrokColor, setInputValueStrokColor] = useState(1) //ความหนากรอบ
   const [configColor, setConfigColor] = useState(false)
 
+  const [modalexport, setModalexport] = useState({ id: null, visible: false });
+
   const columns = [
     {
       key: "1",
@@ -108,6 +110,9 @@ const usersSystemPage = () => {
                 </Menu.Item>
                 <Menu.Item key="2" onClick={() => handleDelete(id)}>
                   ลบ
+                </Menu.Item>
+                <Menu.Item key="2" onClick={() => handleExport(id)}>
+                  Export
                 </Menu.Item>
               </Menu>
             }
@@ -284,6 +289,15 @@ const usersSystemPage = () => {
 
     form.setFieldsValue(data.items);
   }
+  const handleExport = (id) => {
+    setModalexport({ id: id, visible: true });
+  }
+  const onFinishExport = (val) => {
+    console.log('val :>> ', val, modalexport.id);
+
+
+  }
+
 
   const onFinishEdit = async (data) => {
     try {
@@ -681,6 +695,35 @@ const usersSystemPage = () => {
             </Upload>
           </Form.Item>
 
+        </Form>
+      </Modal>
+      <Modal onCancel={() => setModalexport({ ...modalexport, visible: false })} title={<b>Export To</b>} visible={modalexport.visible} footer={false} >
+        <Form
+          name="customized_form_controls"
+          layout="inline"
+          onFinish={onFinishExport}
+        >
+          <Form.Item
+            name="Export"
+            label={"Export To"}
+          >
+            <Select
+              style={{
+                width: "250px",
+                margin: '0 8px',
+              }}
+            >
+              <Option value="KMZ">KMZ</Option>
+              <Option value="KML">KML</Option>
+              <Option value="CSV">CSV</Option>
+              <Option value="XLS">XLS</Option>
+            </Select>
+          </Form.Item>
+          <Form.Item>
+            <Button type="primary" htmlType="submit">
+              SaveTo
+            </Button>
+          </Form.Item>
         </Form>
       </Modal>
     </>
