@@ -38,6 +38,7 @@ const cookies = new Cookies();
 const { TabPane } = Tabs;
 const { Panel } = Collapse;
 const { Meta } = Card;
+const { size } = useState;
 
 const { Option } = Select;
 const mapPage = () => {
@@ -1795,7 +1796,7 @@ const mapPage = () => {
                 maskClosable={false}
                 style={{ width: visibleShapeFile ? 550 : 0 }}
             >
-                <Tabs>
+                <Tabs defaultActiveKey="1" type="card" size={size}>
                     <TabPane tab="ชั้นข้อมูล" key="1">
                         {groupLayerList.map((e, i) =>
                             Object.assign(
@@ -2695,8 +2696,7 @@ const mapPage = () => {
                 </Tabs>
             </Drawer>
             <style global jsx>
-                {`
-          .ant-collapse > .ant-collapse-item > .ant-collapse-header {
+                {` .ant-collapse > .ant-collapse-item > .ant-collapse-header {
             position: relative;
             padding: 10px 0px;
           }
@@ -2713,11 +2713,140 @@ const mapPage = () => {
           .container-fluid-map {
             padding-top:  ${containerFluidMap}px;
           }
+          .ant-collapse>.ant-collapse-item>.ant-collapse-header {
+            position: relative;
+            /* padding: initial; */
+        }
+        .ant-collapse > .ant-collapse-item > .ant-collapse-header {
+            position: relative;
+            padding: 12px 16px;
+            color: rgba(0, 0, 0, 0.85);
+            line-height: 1.5715;
+            cursor: pointer;
+            -webkit-transition: all 0.3s, visibility 0s;
+            transition: all 0.3s, visibility 0s;
+        }
 
-          .ant-collapse .ant-collapse-item-disabled > .ant-collapse-header, .ant-collapse .ant-collapse-item-disabled > .ant-collapse-header > .arrow {
-            color: rgba(0, 0, 0, 1);
-            cursor: inherit;
-          }
+        .ant-drawer-content {
+            position: relative;
+            z-index: 1;
+            overflow: auto;
+            background-color: #cccaca;
+            background-clip: padding-box;
+            border: 0;
+        }
+
+        .ant-collapse {
+            -webkit-box-sizing: border-box;
+            -moz-box-sizing: border-box;
+            box-sizing: border-box;
+            margin-top: 0;
+            padding: 0;
+            color: rgba(0, 0, 0, 0.85);
+            font-size: 14px;
+            font-variant: tabular-nums;
+            line-height: 1.5715;
+            list-style: none;
+            -webkit-font-feature-settings: 'tnum', "tnum";
+            -moz-font-feature-settings: 'tnum', "tnum";
+            font-feature-settings: 'tnum', "tnum";
+            background-color: #cccaca;
+            border: 2px solid #979797;
+            border-bottom: 0;
+            border-radius: 5px;
+        }
+
+        .ant-collapse > .ant-collapse-item {
+            border-bottom: 2px solid #9f9f9f;
+        }
+
+        .ant-card {
+            -webkit-box-sizing: border-box;
+            -moz-box-sizing: border-box;
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            color: rgba(0, 0, 0, 0.85);
+            font-size: 14px;
+            font-variant: tabular-nums;
+            line-height: 1.5715;
+            list-style: none;
+            -webkit-font-feature-settings: 'tnum', "tnum";
+            -moz-font-feature-settings: 'tnum', "tnum";
+            font-feature-settings: 'tnum', "tnum";
+            position: relative;
+            background: #cccaca;
+            border-radius: 2px;
+        }
+
+        .ant-card-bordered {
+            border: 2px solid #9f9f9f;
+            border-radius: 10px;
+        }
+
+        .ant-drawer-body {
+            -webkit-flex-grow: 1;
+            -moz-box-flex: 1;
+            flex-grow: 1;
+            padding: 24px;
+            overflow: auto;
+            font-size: 14px;
+            line-height: 1.5715;
+            word-wrap: break-word;
+            margin-top: 10%;
+        }
+
+        .ant-drawer-header-no-title .ant-drawer-close {
+            margin-right: var(--scroll-bar);
+            padding-right: -webkit-calc(20px - var(--scroll-bar));
+            padding-right: calc(20px - var(--scroll-bar));
+            margin-top: 13%;
+        }
+
+        .header {
+            /* z-index: 100; */
+        }
+        .header {
+            background: #fff;
+            border-bottom: 1px solid #ededed;
+            -webkit-box-shadow: 0 1px 1px 0 rgb(0 0 0 / 20%);
+            box-shadow: 0 1px 1px 0 rgb(0 0 0 / 20%);
+            height: 60px;
+            left: 0;
+            position: fixed;
+            right: 0;
+            top: 0;
+            z-index: 1002;
+        }
+
+        .ant-tabs-card > .ant-tabs-nav .ant-tabs-tab-active, .ant-tabs-card > div > .ant-tabs-nav .ant-tabs-tab-active {
+            color: #4368ff;
+            background: #cccaca;
+        }
+
+        .ant-tabs-top > .ant-tabs-nav::before, .ant-tabs-bottom > .ant-tabs-nav::before, .ant-tabs-top > div > .ant-tabs-nav::before, .ant-tabs-bottom > div > .ant-tabs-nav::before {
+            position: absolute;
+            right: 0;
+            left: 0;
+            border-bottom: 1px solid #cccaca;
+            content: '';
+            z-index: 1002;
+        }
+
+        .ant-tabs-card.ant-tabs-top > .ant-tabs-nav .ant-tabs-tab, .ant-tabs-card.ant-tabs-top > div > .ant-tabs-nav .ant-tabs-tab {
+            border-radius: 2px 2px 0 0;
+        }
+
+        // .ant-tabs-card > .ant-tabs-nav .ant-
+        //     padding: 8px 16px;
+        //     background: #cccaca;
+        //     border: 1px solid #999999;
+        //     -webkit-transition: all 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
+        //     transition: all 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
+        // }tabs-tab, .ant-tabs-card > div > .ant-tabs-nav .ant-tabs-tab {
+        //     margin: 0;
+       
+
         `}
             </style>
         </Layout >
