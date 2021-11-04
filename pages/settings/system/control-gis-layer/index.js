@@ -21,6 +21,7 @@ import {
   InputNumber,
   Slider,
   // Upload,
+  Checkbox,
   Radio,
   DatePicker,
   Upload
@@ -61,20 +62,21 @@ const usersSystemPage = () => {
   const [FileUploadSymbol, setFileUploadSymbol] = useState(null);
   const [inputValueOpacityColor, setInputValueOpacityColor] = useState(0.5) //Opacity
   const [inputValueStrokColor, setInputValueStrokColor] = useState(1) //ความหนากรอบ
+  const [configColor, setConfigColor] = useState(false)
+
+  const [modalexport, setModalexport] = useState({ id: null, visible: false });
 
   const columns = [
     {
       key: "1",
-      title: "ลำดับ",
-      // dataIndex: "number",
-      sorter: (record1, record2) => {
-        return record1.number > record2.number;
-      },
-      render: (a, b, i) => i + 1
+      title: <b>ลำดับ</b>,
+      dataIndex: "number",
+      render: (a, b, i) => (i + 1).toString(),
+
     },
     {
       key: "2",
-      title: "ชื่อ",
+      title: <b>ชื่อ</b>,
       dataIndex: "name_layer",
       sorter: (record1, record2) => {
         return record1.name_layer > record2.name_layer;
@@ -82,7 +84,7 @@ const usersSystemPage = () => {
     },
     {
       key: "3",
-      title: "Group Layer",
+      title: <b>Group Layer</b>,
       dataIndex: "group_name",
       sorter: (record1, record2) => {
         return record1.group_name > record2.group_name;
@@ -98,7 +100,7 @@ const usersSystemPage = () => {
     },
     {
       key: "5",
-      title: "จัดการ",
+      title: <b>จัดการ</b>,
       // width: 200,
       dataIndex: "id",
       render: (id, show) => {
@@ -114,6 +116,9 @@ const usersSystemPage = () => {
                 </Menu.Item>
                 <Menu.Item key="2" onClick={() => handleDelete(id)}>
                   ลบ
+                </Menu.Item>
+                <Menu.Item key="2" onClick={() => handleExport(id)}>
+                  Export
                 </Menu.Item>
               </Menu>
             }
@@ -255,8 +260,9 @@ const usersSystemPage = () => {
     const { data } = await Api.get(`masterdata/masLayersShape/${show.id}`);
     setEditId(show.id)
     const items = data.items
-    console.log('items :>> ', items);
+    // console.log('items :>> ', items);
     setIsModalVisible(true)
+    setConfigColor(items.config_color ?? false)
 
     if (items.color_layer) {
       const rgb = JSON.parse(items.color_layer)
@@ -289,6 +295,15 @@ const usersSystemPage = () => {
 
     form.setFieldsValue(data.items);
   }
+  const handleExport = (id) => {
+    setModalexport({ id: id, visible: true });
+  }
+  const onFinishExport = (val) => {
+    console.log('val :>> ', val, modalexport.id);
+
+
+  }
+
 
   const onFinishEdit = async (data) => {
     try {
@@ -341,6 +356,7 @@ const usersSystemPage = () => {
         ...value,
         color_layer: JSON.stringify(colorUpload.color_layer),
         option_layer,
+        config_color: configColor,
         id: editId,
       });
       console.log('resp :>> ', resp);
@@ -597,8 +613,15 @@ const usersSystemPage = () => {
             </Select>
           </Form.Item>
 
-          <Form.Item name="color_layer" label="สีชั้นข้อมูล" rules={[{ required: true }]}>
-            <Color color={colorUpload} onChangeColor={({ rgb, hex }) => setColorUpload({ ...colorUpload, rgb, hex })} callbackSaveColor={(velue) => { }} />
+          <Form.Item name="color_layer" label="สีชั้นข้อมูล" >
+            <Row>
+              <Col span={6}>
+                <Color color={colorUpload} onChangeColor={({ rgb, hex }) => setColorUpload({ ...colorUpload, rgb, hex })} callbackSaveColor={(velue) => { }} />
+              </Col>
+              <Col span={18}>
+                <Checkbox defaultChecked={configColor} checked={configColor} onChange={(value) => setConfigColor(value.target.checked)} className="text-red">ใช้สีนี้ในการแสดงผลบนแผนที่</Checkbox>
+              </Col>
+            </Row>
           </Form.Item>
 
           <Form.Item label="Opacity" name="Opacity">
@@ -678,6 +701,35 @@ const usersSystemPage = () => {
             </Upload>
           </Form.Item>
 
+        </Form>
+      </Modal>
+      <Modal onCancel={() => setModalexport({ ...modalexport, visible: false })} title={<b>Export To</b>} visible={modalexport.visible} footer={false} >
+        <Form
+          name="customized_form_controls"
+          layout="inline"
+          onFinish={onFinishExport}
+        >
+          <Form.Item
+            name="Export"
+            label={"Export To"}
+          >
+            <Select
+              style={{
+                width: "250px",
+                margin: '0 8px',
+              }}
+            >
+              <Option value="KMZ">KMZ</Option>
+              <Option value="KML">KML</Option>
+              <Option value="CSV">CSV</Option>
+              <Option value="XLS">XLS</Option>
+            </Select>
+          </Form.Item>
+          <Form.Item>
+            <Button type="primary" htmlType="submit">
+              SaveTo
+            </Button>
+          </Form.Item>
         </Form>
       </Modal>
     </>

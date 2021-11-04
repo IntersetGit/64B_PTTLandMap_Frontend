@@ -38,6 +38,7 @@ const cookies = new Cookies();
 const { TabPane } = Tabs;
 const { Panel } = Collapse;
 const { Meta } = Card;
+const { size } = useState;
 
 const { Option } = Select;
 const mapPage = () => {
@@ -180,6 +181,7 @@ const mapPage = () => {
     const [FileUploadSymbol, setFileUploadSymbol] = useState(null);
     const [FileType, setFileType] = useState(null);
     const [openColorUpload, setOpenColorUpload] = useState(false);
+    const [listWms, setListWms] = useState([])
     const [colorUpload, setColorUpload] = useState({
         hex: "red",
         rgb: { r: 255, g: 0, b: 0, a: 1 },
@@ -393,15 +395,47 @@ const mapPage = () => {
     const checkboxLayer = async (value, index1, index2) => {
         const arr = [...groupLayerList]
         arr[index1].children[index2].checked = value
-        if (!value) {
-            arr[index1].children[index2].checked = value
-            clearMapData(arr[index1].children[index2].id)
+
+        if (arr[index1].children[index2].type == "wms") {
+            const setwms = []
+            const items = arr[index1].children[index2]
+            console.log('items :>> ', items);
+            // "https://services.arcgisonline.com/arcgis/rest/services/Reference/World_Reference_Overlay/MapServer/"
+            let maptype = new WmsMapType(
+                items.id,
+                items.url, {
+                layers: items.layer_name,
+                wmsProjectKey: items.id,
+            }, {
+                opacity: 100 / 100
+            }, items.type_server
+            );
+            // console.log('maptype :>> ', maptype);
+
+            if (listWms.some((item) => item.name == maptype.name)) {
+                let cut = listWms.filter((item) => item.name !== maptype.name)
+                setListWms(cut);
+                maptype.removeFromMap(map);
+            } else {
+                setListWms([...listWms, maptype]);
+                maptype.addToMap(map, false);
+                setwms.push(maptype);
+            }
+
+            // listWms, setListWms
+
         } else {
-            const item = arr[index1].children[index2];
-            // console.log('item :>> ', item);
-            await getDeoJson(item.id, item.color_layer, item.option_layer)
+            if (!value) {
+                arr[index1].children[index2].checked = value
+                clearMapData(arr[index1].children[index2].id)
+            } else {
+                const item = arr[index1].children[index2];
+                // console.log('item :>> ', item);
+                await getDeoJson(item.id, item.color_layer, item.option_layer)
+            }
+            setGroupLayerList(arr)
         }
-        setGroupLayerList(arr)
+
     };
 
 
@@ -417,12 +451,14 @@ const mapPage = () => {
             //     clickable: false
             // });
             option_layer = option_layer ?? {}
-            layer.setStyle({
-                fillColor: color,
-                fillOpacity: option_layer.fillOpacity ?? inputValueOpacityColor, //Opacity
-                strokeWeight: option_layer.strokeWeight ?? inputValueStrokColor,  //ความหนาขอบ
-                strokeColor: option_layer.strokeColor ? option_layer.strokeColor.hex : colorFrame.hex, //เส้นขอบ
-                clickable: false,
+            layer.setStyle((e) => {
+                return {
+                    fillColor: e.h.status_color ?? color,
+                    fillOpacity: option_layer.fillOpacity ?? inputValueOpacityColor, //Opacity
+                    strokeWeight: option_layer.strokeWeight ?? inputValueStrokColor,  //ความหนาขอบ
+                    strokeColor: option_layer.strokeColor ? option_layer.strokeColor.hex : colorFrame.hex, //เส้นขอบ
+                    clickable: false,
+                }
             });
         }
     }
@@ -467,15 +503,6 @@ const mapPage = () => {
             let icon = null
             if (option_layer.symbol) {
                 let width = 25, height = 35
-                // const img = new Image();
-                // img.onload = function () {
-                //     width = Math.floor(this.width * 0.5)
-                //     height = Math.floor(this.height * 0.5)
-                //     console.log('width :>> ', width);
-                //     console.log('height :>> ', height);
-                // }
-
-                // img.src = option_layer.symbol.location;
                 icon = {
                     url: option_layer.symbol.location,
                     scaledSize: new google.maps.Size(width, height), // scaled size
@@ -485,13 +512,15 @@ const mapPage = () => {
             }
 
             // console.log('option_layer :>> ', option_layer);
-            layer.setStyle({
-                fillColor: color,
-                fillOpacity: option_layer.fillOpacity ?? inputValueOpacityColor, //Opacity
-                strokeWeight: option_layer.strokeWeight ?? inputValueStrokColor,  //ความหนาขอบ
-                strokeColor: option_layer.strokeColor ? option_layer.strokeColor.hex : colorFrame.hex, //เส้นขอบ
-                clickable: false,
-                icon,
+            layer.setStyle((e) => {
+                return {
+                    fillColor: e.h.status_color ?? color,
+                    fillOpacity: option_layer.fillOpacity ?? inputValueOpacityColor, //Opacity
+                    strokeWeight: option_layer.strokeWeight ?? inputValueStrokColor,  //ความหนาขอบ
+                    strokeColor: option_layer.strokeColor ? option_layer.strokeColor.hex : colorFrame.hex, //เส้นขอบ
+                    clickable: false,
+                    icon,
+                }
             });
             layer.setMap(map);
 
@@ -606,15 +635,16 @@ const mapPage = () => {
         $("#openFullscreen").fadeToggle();
         $("#closeFullscreen").fadeToggle("slow");
     };
-    /* click map show lat lag */
     const clickMapShowLatLag = (map) => {
+        let test = new google.maps.InfoWindow()
+        test.open(map);
         google.maps.event.addListener(map, "click", (event) => {
-
-            let infoWindow = new google.maps.InfoWindow({
+            test.close()
+            test = new google.maps.InfoWindow({
                 content: `${event.latLng}`,
                 position: event.latLng,
             })
-            infoWindow.open(map)
+            test.open(map)
         })
     }
     /* เปิดปิดเส้นวัดระยะ */
@@ -1094,6 +1124,28 @@ const mapPage = () => {
             $("#changeMap").fadeOut()
         }, 15000)
     }
+    const [dowSwipeMap, setDowSwipMap] = useState({ mapLeft: true, mapRight: false })
+    const clickdowSwipMap = (type) => {
+        if (type === 'left') {
+            if (dowSwipeMap.mapLeft) {
+                mapLeft.setMapTypeId(google.maps.MapTypeId.ROADMAP)
+                setDowSwipMap({ ...dowSwipeMap, mapLeft: false })
+            } else {
+                mapLeft.setMapTypeId(google.maps.MapTypeId.HYBRID)
+                setDowSwipMap({ ...dowSwipeMap, mapLeft: true })
+
+            }
+        } else {
+            if (dowSwipeMap.mapRight) {
+                mapRight.setMapTypeId(google.maps.MapTypeId.ROADMAP)
+                setDowSwipMap({ ...dowSwipeMap, mapRight: false })
+            } else {
+                mapRight.setMapTypeId(google.maps.MapTypeId.HYBRID)
+                setDowSwipMap({ ...dowSwipeMap, mapRight: true })
+            }
+
+        }
+    }
     /* -------------------------------------------------------------------------------------- */
 
     /* Search */
@@ -1172,7 +1224,7 @@ const mapPage = () => {
             const bounds = new google.maps.LatLngBounds();
             const layer = new google.maps.Data();
             layer.addGeoJson(GeoJson)
-
+            const fillColor = GeoJson ? GeoJson.features[0].properties.status_color : item.color
 
             layer.addGeoJson(GeoJson)
             // layer.setStyle({
@@ -1181,10 +1233,10 @@ const mapPage = () => {
             //     strokeWeight: 1,
             //     clickable: false
             // });
-
+            // console.log('item :>> ', item);
             const option_layer = item.option_layer ?? {}
             layer.setStyle({
-                fillColor: item.color,
+                fillColor,
                 fillOpacity: option_layer.fillOpacity ?? inputValueOpacityColor, //Opacity
                 strokeWeight: option_layer.strokeWeight ?? inputValueStrokColor,  //ความหนาขอบ
                 strokeColor: option_layer.strokeColor ? option_layer.strokeColor.hex : colorFrame.hex, //เส้นขอบ
@@ -1327,7 +1379,7 @@ const mapPage = () => {
             const { data } = await API.get(url)
             // console.log('data :>> ', data.items);
 
-            const { plot, distance } = data.items
+            const { plot, distance, status_color } = data.items
 
             /* plot */
             const _plotDashboard = {
@@ -1335,13 +1387,7 @@ const mapPage = () => {
                 datasets: [{
                     label: 'แปลง',
                     data: [],
-                    backgroundColor: [
-                        '#F6D7A7',
-                        '#F6EABE',
-                        '#C8E3D4',
-                        '#87AAAA',
-                        '#FF9B6A',
-                    ],
+                    backgroundColor: status_color,
                 }],
                 list: [],
             }
@@ -1363,13 +1409,7 @@ const mapPage = () => {
                 datasets: [{
                     label: 'ระยะทาง',
                     data: [],
-                    backgroundColor: [
-                        '#D1E8E4',
-                        '#C37B89',
-                        '#BCCC9A',
-                        '#EAE7C6',
-                        '#FFCCD2',
-                    ],
+                    backgroundColor: status_color,
                 }],
                 list: [],
             }
@@ -1453,7 +1493,7 @@ const mapPage = () => {
     const [wmsopacityright, setWmsopacityright] = useState(100);
 
     const Clickwms = (items, Map = map) => {
-        // console.log('itemswms :>> ', items);
+        console.log('itemswms :>> ', items);
 
         let maptype = new WmsMapType(
             items.id,
@@ -1586,7 +1626,7 @@ const mapPage = () => {
 
                 ) : null}
 
-                {!changmap && <Col span={6} className="pt-2">
+                {!changmap && <Col span={6} className="pt-1">
                     <Tooltip placement="left" title={"Default"}>
                         <button className="btn btn-light btn-sm" onClick={clickHome} >
                             <img
@@ -1596,7 +1636,7 @@ const mapPage = () => {
                         </button>
                     </Tooltip>
                 </Col>}
-                {!changmap && <Col span={6} className="pt-2">
+                {!changmap && <Col span={6} className="pt-1">
                     <Tooltip placement="left" title={"Distance"}>
                         <button className="btn btn-light btn-sm" onClick={clickLine} >
                             <img
@@ -1606,7 +1646,7 @@ const mapPage = () => {
                         </button>
                     </Tooltip>
                 </Col>}
-                {!changmap && <Col span={6} className="pt-2">
+                {!changmap && <Col span={6} className="pt-1">
                     <Tooltip placement="left" title={"areaDistance"}>
                         <button className="btn btn-light btn-sm" onClick={areaDistance} >
                             <img
@@ -1617,7 +1657,7 @@ const mapPage = () => {
                         </button>
                     </Tooltip>
                 </Col>}
-                <Col span={6} className="pt-2">
+                <Col span={6} className="pt-1">
                     <Tooltip placement="left" title={"Swipe Map"}>
                         <button className="btn btn-light btn-sm" onClick={clickSplit}>
                             <img
@@ -1627,7 +1667,7 @@ const mapPage = () => {
                         </button>
                     </Tooltip>
                 </Col>
-                {!changmap && <Col span={6} className="pt-2">
+                {!changmap && <Col span={6} className="pt-1">
                     <Tooltip placement="left" title={"Time Silder"}>
                         <button className="btn btn-light btn-sm" onClick={ontimeslider} >
                             <img
@@ -1637,7 +1677,7 @@ const mapPage = () => {
                         </button>
                     </Tooltip>
                 </Col>}
-                {!changmap && <Col span={6} className="pt-2">
+                {!changmap && <Col span={6} className="pt-1">
                     <Tooltip placement="left" title={"Clear"}>
                         <button className="btn btn-light btn-sm" onClick={clickClearMap} >
                             <img
@@ -1649,7 +1689,7 @@ const mapPage = () => {
                 </Col>}
             </div>
             <div className="tools-map-area2">
-                <Col span={24} className="pt-2">
+                <Col span={24} className="pt-1">
                     <Tooltip placement="bottom" title={"Menu Bar"}>
                         <button
                             className="btn btn-light btn-sm "
@@ -1739,12 +1779,13 @@ const mapPage = () => {
                 maskClosable={false}
                 style={{ width: visibleShapeFile ? 550 : 0 }}
             >
-                <Tabs>
+                <Tabs defaultActiveKey="1" type="card" size={size}>
                     <TabPane tab="ชั้นข้อมูล" key="1">
                         {groupLayerList.map((e, i) =>
                             Object.assign(
                                 <div className="pt-2" key={`maps-${e.id}`}>
                                     <Collapse
+                                        collapsible={!e.children || e.children.length <= 0 ? "disabled" : "vertical"}
                                         expandIcon={({ isActive }) => e.symbol ? <img src={e.symbol} width={20} /> : <CaretRightOutlined rotate={isActive ? 90 : 0} />}
                                     >
                                         <Panel header={e.group_name} key={i}>
@@ -1759,14 +1800,14 @@ const mapPage = () => {
 
                                                                 <Col xs={2} >
                                                                     {
-                                                                        x.checked ?
+                                                                        x.checked && x.type != "wms" ?
                                                                             <a onClick={() => goTolayer(x.id)}>
                                                                                 <ExpandOutlined />
                                                                             </a> : null
                                                                     }
                                                                 </Col>
                                                                 {
-                                                                    x.checked && x.type_geo != "Point" ?
+                                                                    x.checked && x.type_geo != "Point" && x.type != "wms" ?
                                                                         <Col xs={3} style={{ paddingTop: 3 }}>
                                                                             <a onClick={() => openColor(i, index)}>
                                                                                 <div
@@ -2167,16 +2208,16 @@ const mapPage = () => {
 
             {/* Search */}
             <Drawer
-                id="drawer-search"
+                id="drawer-searchwa"
                 width={650}
-                title="ต้นหา"
+                title={false}
                 placement={"left"}
                 visible={visibleSearch}
                 onClose={() => setVisibleSearch(!visibleSearch)}
                 maskClosable={false}
-                style={{ width: visibleSearch ? 650 : 0 }}
+                style={{ width: visibleSearch ? 650 : 0, }}
             >
-                <div>
+                <div style={{ backgroundColor: "#4b5159", padding: "22px 22px 0px 22px" }}>
                     <Form
                         form={formSearch}
                         initialValues={{
@@ -2436,7 +2477,7 @@ const mapPage = () => {
                 placement="right"
                 onClose={() => openCloseRaster()}
                 visible={visibleRaster}
-                width={350}
+                width={400}
                 maskClosable={false}
                 style={{ width: visibleRaster ? 350 : 0 }}
             >
@@ -2470,7 +2511,7 @@ const mapPage = () => {
                             }
                             {
                                 rasterDataDron1.length > 6 ? (
-                                    <h5 style={{ cursor: "pointer", marginLeft: "220px" }} className="text-info" hidden={showMoreDron.dron1} onClick={() => { setLoadmore1({ ...loadmore1, dronMore: rasterDataDow1.length }), setShowMoreDron({ ...showMoreDron, dron1: true }) }}>
+                                    <h5 style={{ cursor: "pointer", marginLeft: "230px" }} className="text-info" hidden={showMoreDron.dron1} onClick={() => { setLoadmore1({ ...loadmore1, dronMore: rasterDataDow1.length }), setShowMoreDron({ ...showMoreDron, dron1: true }) }}>
                                         ...Load More
                                     </h5>
                                 ) : null
@@ -2478,6 +2519,27 @@ const mapPage = () => {
                         </Row>
                         <b className="text-info pt-5">ภาพถ่ายดาวเทียม</b>
                         <Row className="pt-3 pb-3" gutter={[16, 5]} style={{ margin: 0 }}>
+                            {
+                                changmap ? (
+                                    <Col span={8}>
+                                        <Card
+                                            className={dowSwipeMap.mapLeft ? "cardwa" : ""}
+                                            onClick={() => clickdowSwipMap("left")}
+                                            bodyStyle={{ padding: "5px", }}
+                                            bordered={false}
+                                            hoverable
+                                            style={{ width: "100%", height: "100%", cursor: "pointer" }}
+                                            cover={<img style={{ objectFit: "cover", height: "70px" }} alt="example" src={`https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTwyYk7BSUClNOfiGhMybXiO4KbV0xOI8nOg_Qy9T9quhUOT4fNB8ZcUrcTPinYtaEsLFU&usqp=CAU`} />}
+                                        >
+                                            <p style={{ flexWrap: "wrap" }}>ภาพถ่ายดาวเทียม</p>
+                                            {
+                                                dowSwipeMap.mapLeft ? <EyeFilled style={{ position: "absolute", bottom: "5px", right: "5px", color: "#0f7fff" }} />
+                                                    : null
+                                            }
+                                        </Card>
+                                    </Col>
+                                ) : null
+                            }
                             {
                                 rasterDataDow1.slice(0, loadmore1.dowMore).map((data, index) => {
                                     return <Col span={8} key={index} >
@@ -2502,7 +2564,7 @@ const mapPage = () => {
                             }
                             {
                                 rasterDataDow1.length > 6 ? (
-                                    <h5 style={{ cursor: "pointer", marginLeft: "220px" }} className="text-info" hidden={showMoreDow.dow1} onClick={() => { setLoadmore1({ ...loadmore1, dowMore: rasterDataDow1.length }), setShowMoreDow({ ...showMoreDow, dow1: true }) }}>
+                                    <h5 style={{ cursor: "pointer", marginLeft: "230px" }} className="text-info" hidden={showMoreDow.dow1} onClick={() => { setLoadmore1({ ...loadmore1, dowMore: rasterDataDow1.length }), setShowMoreDow({ ...showMoreDow, dow1: true }) }}>
                                         ...Load More
                                     </h5>
                                 ) : null
@@ -2544,8 +2606,8 @@ const mapPage = () => {
                                 })
                             }
                             {
-                                rasterDataDron1.length > 3 ? (
-                                    <h5 style={{ cursor: "pointer", marginLeft: "220px" }} className="text-info" hidden={showMoreDron.dron2} onClick={() => { setLoadmore2({ ...loadmore2, dronMore: rasterDataDow1.length }), setShowMoreDron({ ...showMoreDron, dron2: true }) }}>
+                                rasterDataDron1.length > 6 ? (
+                                    <h5 style={{ cursor: "pointer", marginLeft: "230px" }} className="text-info" hidden={showMoreDron.dron2} onClick={() => { setLoadmore2({ ...loadmore2, dronMore: rasterDataDow1.length }), setShowMoreDron({ ...showMoreDron, dron2: true }) }}>
                                         ...Load More
                                     </h5>
                                 ) : null
@@ -2553,6 +2615,27 @@ const mapPage = () => {
                         </Row>
                         <b className="text-info pt-5">ภาพถ่ายดาวเทียม</b>
                         <Row className="pt-3 pb-3" gutter={[16, 5]} style={{ margin: 0 }}>
+                            {
+                                changmap ? (
+                                    <Col span={8}>
+                                        <Card
+                                            className={dowSwipeMap.mapRight ? "cardwa" : ""}
+                                            onClick={() => clickdowSwipMap("right")}
+                                            bodyStyle={{ padding: "5px", }}
+                                            bordered={false}
+                                            hoverable
+                                            style={{ width: "100%", height: "100%", cursor: "pointer" }}
+                                            cover={<img style={{ objectFit: "cover", height: "70px" }} alt="example" src={`https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTwyYk7BSUClNOfiGhMybXiO4KbV0xOI8nOg_Qy9T9quhUOT4fNB8ZcUrcTPinYtaEsLFU&usqp=CAU`} />}
+                                        >
+                                            <p style={{ flexWrap: "wrap" }}>ภาพถ่ายดาวเทียม</p>
+                                            {
+                                                dowSwipeMap.mapRight ? <EyeFilled style={{ position: "absolute", bottom: "5px", right: "5px", color: "#0f7fff" }} />
+                                                    : null
+                                            }
+                                        </Card>
+                                    </Col>
+                                ) : null
+                            }
                             {
                                 rasterDataDow1.slice(0, loadmore2.dowMore).map((data, index) => {
                                     return <Col span={8} key={index} >
@@ -2576,8 +2659,8 @@ const mapPage = () => {
                                 })
                             }
                             {
-                                rasterDataDow1.length > 3 ? (
-                                    <h5 style={{ cursor: "pointer", marginLeft: "220px" }} className="text-info" hidden={showMoreDow.dow2} onClick={() => { setLoadmore2({ ...loadmore2, dowMore: rasterDataDow1.length }), setShowMoreDow({ ...showMoreDow, dow2: true }) }}>
+                                rasterDataDow1.length > 6 ? (
+                                    <h5 style={{ cursor: "pointer", marginLeft: "230px" }} className="text-info" hidden={showMoreDow.dow2} onClick={() => { setLoadmore2({ ...loadmore2, dowMore: rasterDataDow1.length }), setShowMoreDow({ ...showMoreDow, dow2: true }) }}>
                                         ...Load More
                                     </h5>
                                 ) : null
@@ -2596,8 +2679,7 @@ const mapPage = () => {
                 </Tabs>
             </Drawer>
             <style global jsx>
-                {`
-          .ant-collapse > .ant-collapse-item > .ant-collapse-header {
+                {` .ant-collapse > .ant-collapse-item > .ant-collapse-header {
             position: relative;
             padding: 10px 0px;
           }
@@ -2614,6 +2696,141 @@ const mapPage = () => {
           .container-fluid-map {
             padding-top:  ${containerFluidMap}px;
           }
+          .ant-collapse>.ant-collapse-item>.ant-collapse-header {
+            position: relative;
+            /* padding: initial; */
+        }
+        .ant-collapse > .ant-collapse-item > .ant-collapse-header {
+            position: relative;
+            padding: 12px 16px;
+            color: rgba(0, 0, 0, 0.85);
+            line-height: 1.5715;
+            cursor: pointer;
+            -webkit-transition: all 0.3s, visibility 0s;
+            transition: all 0.3s, visibility 0s;
+        }
+
+        .ant-drawer-content {
+            position: relative;
+            z-index: 1;
+            overflow: auto;
+            background-color: #ececec;
+            background-clip: padding-box;
+            border: 0;
+        }
+
+        .ant-collapse {
+            -webkit-box-sizing: border-box;
+            -moz-box-sizing: border-box;
+            box-sizing: border-box;
+            margin-top: 0;
+            padding: 0;
+            color: rgba(0, 0, 0, 0.85);
+            font-size: 14px;
+            font-variant: tabular-nums;
+            line-height: 1.5715;
+            list-style: none;
+            -webkit-font-feature-settings: 'tnum', "tnum";
+            -moz-font-feature-settings: 'tnum', "tnum";
+            font-feature-settings: 'tnum', "tnum";
+            background-color: #ececec;
+            border: 2px solid #979797;
+            border-bottom: 0;
+            border-radius: 5px;
+        }
+
+        .ant-collapse > .ant-collapse-item {
+            border-bottom: 2px solid #9f9f9f;
+        }
+
+        .ant-card {
+            -webkit-box-sizing: border-box;
+            -moz-box-sizing: border-box;
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            color: rgba(0, 0, 0, 0.85);
+            font-size: 14px;
+            font-variant: tabular-nums;
+            line-height: 1.5715;
+            list-style: none;
+            -webkit-font-feature-settings: 'tnum', "tnum";
+            -moz-font-feature-settings: 'tnum', "tnum";
+            font-feature-settings: 'tnum', "tnum";
+            position: relative;
+            background: #ededed;
+            border-radius: 2px;
+        }
+
+        .ant-card-bordered {
+            border: 2px solid #9f9f9f;
+            border-radius: 10px;
+        }
+
+        .ant-drawer-body {
+            -webkit-flex-grow: 1;
+            -moz-box-flex: 1;
+            flex-grow: 1;
+            padding: 24px;
+            overflow: auto;
+            font-size: 14px;
+            line-height: 1.5715;
+            word-wrap: break-word;
+            margin-top: 10%;
+        }
+
+        .ant-drawer-header-no-title .ant-drawer-close {
+            margin-right: var(--scroll-bar);
+            padding-right: -webkit-calc(20px - var(--scroll-bar));
+            padding-right: calc(20px - var(--scroll-bar));
+            margin-top: 13%;
+        }
+
+        .header {
+            /* z-index: 100; */
+        }
+        .header {
+            background: #008cff;
+            border-bottom: 1px solid #ededed;
+            -webkit-box-shadow: 0 1px 1px 0 rgb(0 0 0 / 20%);
+            box-shadow: 0 1px 1px 0 rgb(0 0 0 / 20%);
+            height: 60px;
+            left: 0;
+            position: fixed;
+            right: 0;
+            top: 0;
+            z-index: 1002;
+        }
+
+        .ant-tabs-card > .ant-tabs-nav .ant-tabs-tab-active, .ant-tabs-card > div > .ant-tabs-nav .ant-tabs-tab-active {
+            background: #ececec;
+        }
+
+        .ant-tabs-top > .ant-tabs-nav::before, .ant-tabs-bottom > .ant-tabs-nav::before, .ant-tabs-top > div > .ant-tabs-nav::before, .ant-tabs-bottom > div > .ant-tabs-nav::before {
+            position: absolute;
+            right: 0;
+            left: 0;
+            border-bottom: 1px solid #cccaca;
+            content: '';
+            z-index: 1002;
+        }
+
+        .ant-tabs-card.ant-tabs-top > .ant-tabs-nav .ant-tabs-tab, .ant-tabs-card.ant-tabs-top > div > .ant-tabs-nav .ant-tabs-tab {
+            border-radius: 2px 2px 0 0;
+            border-color: #000;
+        }
+
+
+         {/* .ant-tabs-card > .ant-tabs-nav .ant-
+             padding: 8px 16px;
+             background: #cccaca;
+             border: 1px solid #999999;
+             -webkit-transition: all 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
+             transition: all 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
+         }tabs-tab, .ant-tabs-card > div > .ant-tabs-nav .ant-tabs-tab {
+             margin: 0; */}
+
+
         `}
             </style>
         </Layout >

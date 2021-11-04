@@ -32,7 +32,7 @@ function Layout({ children, isMap = false, navbarHide }) {
         const token = cookies.get('token');
         if (token) {
             const token_decode = jwt_decode(token);
-            if (token_decode.exp < ((Date.now() / 1000) - (10 * 60 * 1000))) {
+            if ((token_decode.exp * 1000) - (10 * 60 * 1000) <= new Date().getTime()) {
                 console.log("หมดเวลาtoken");
                 const refresh_token = cookies.get('refresh_token');
                 RefreshToken(refresh_token);
