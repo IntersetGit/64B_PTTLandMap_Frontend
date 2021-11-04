@@ -89,6 +89,14 @@ const usersSystemPage = () => {
       },
     },
     {
+      key: "4",
+      title: "ประเภทไฟล์",
+      dataIndex: "type",
+      sorter: (record1, record2) => {
+        return record1.group_name > record2.group_name;
+      },
+    },
+    {
       key: "5",
       title: "จัดการ",
       // width: 200,
