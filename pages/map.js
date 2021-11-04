@@ -451,12 +451,14 @@ const mapPage = () => {
             //     clickable: false
             // });
             option_layer = option_layer ?? {}
-            layer.setStyle({
-                fillColor: color,
-                fillOpacity: option_layer.fillOpacity ?? inputValueOpacityColor, //Opacity
-                strokeWeight: option_layer.strokeWeight ?? inputValueStrokColor,  //ความหนาขอบ
-                strokeColor: option_layer.strokeColor ? option_layer.strokeColor.hex : colorFrame.hex, //เส้นขอบ
-                clickable: false,
+            layer.setStyle((e) => {
+                return {
+                    fillColor: e.h.status_color ?? color,
+                    fillOpacity: option_layer.fillOpacity ?? inputValueOpacityColor, //Opacity
+                    strokeWeight: option_layer.strokeWeight ?? inputValueStrokColor,  //ความหนาขอบ
+                    strokeColor: option_layer.strokeColor ? option_layer.strokeColor.hex : colorFrame.hex, //เส้นขอบ
+                    clickable: false,
+                }
             });
         }
     }
@@ -501,15 +503,6 @@ const mapPage = () => {
             let icon = null
             if (option_layer.symbol) {
                 let width = 25, height = 35
-                // const img = new Image();
-                // img.onload = function () {
-                //     width = Math.floor(this.width * 0.5)
-                //     height = Math.floor(this.height * 0.5)
-                //     console.log('width :>> ', width);
-                //     console.log('height :>> ', height);
-                // }
-
-                // img.src = option_layer.symbol.location;
                 icon = {
                     url: option_layer.symbol.location,
                     scaledSize: new google.maps.Size(width, height), // scaled size
@@ -519,13 +512,15 @@ const mapPage = () => {
             }
 
             // console.log('option_layer :>> ', option_layer);
-            layer.setStyle({
-                fillColor: color,
-                fillOpacity: option_layer.fillOpacity ?? inputValueOpacityColor, //Opacity
-                strokeWeight: option_layer.strokeWeight ?? inputValueStrokColor,  //ความหนาขอบ
-                strokeColor: option_layer.strokeColor ? option_layer.strokeColor.hex : colorFrame.hex, //เส้นขอบ
-                clickable: false,
-                icon,
+            layer.setStyle((e) => {
+                return {
+                    fillColor: e.h.status_color ?? color,
+                    fillOpacity: option_layer.fillOpacity ?? inputValueOpacityColor, //Opacity
+                    strokeWeight: option_layer.strokeWeight ?? inputValueStrokColor,  //ความหนาขอบ
+                    strokeColor: option_layer.strokeColor ? option_layer.strokeColor.hex : colorFrame.hex, //เส้นขอบ
+                    clickable: false,
+                    icon,
+                }
             });
             layer.setMap(map);
 
@@ -1384,7 +1379,7 @@ const mapPage = () => {
             const { data } = await API.get(url)
             // console.log('data :>> ', data.items);
 
-            const { plot, distance } = data.items
+            const { plot, distance, status_color } = data.items
 
             /* plot */
             const _plotDashboard = {
@@ -1392,13 +1387,7 @@ const mapPage = () => {
                 datasets: [{
                     label: 'แปลง',
                     data: [],
-                    backgroundColor: [
-                        '#F6D7A7',
-                        '#F6EABE',
-                        '#C8E3D4',
-                        '#87AAAA',
-                        '#FF9B6A',
-                    ],
+                    backgroundColor: status_color,
                 }],
                 list: [],
             }
@@ -1420,13 +1409,7 @@ const mapPage = () => {
                 datasets: [{
                     label: 'ระยะทาง',
                     data: [],
-                    backgroundColor: [
-                        '#D1E8E4',
-                        '#C37B89',
-                        '#BCCC9A',
-                        '#EAE7C6',
-                        '#FFCCD2',
-                    ],
+                    backgroundColor: status_color,
                 }],
                 list: [],
             }
