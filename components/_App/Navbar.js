@@ -46,7 +46,9 @@ const Navbar = ({ isMap, setslideNav, slideNav, navbarHide }) => {
             {/* id="mobile_btn" */}
             <a className="mobile_btn" href="#sidebar" onClick={() => {
                 setslideNav(slideNav ? "" : "slide-nav")
-            }}><i className="fa fa-bars" /></a>
+            }}>
+                {!isMap ? <i className="fa fa-bars" /> : null}
+            </a>
 
             <ul className="nav user-menu">
 
