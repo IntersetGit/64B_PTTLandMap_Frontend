@@ -75,7 +75,7 @@ const Navbar = ({ isMap, setslideNav, slideNav, navbarHide }) => {
                     (user && (user.roles_id === "8a97ac7b-01dc-4e06-81c2-8422dffa0ca2" || user.roles_id === "cec6617f-b593-4ebc-9604-3059dfee0ac4")) ?
                         <Tooltip placement="bottom" title={"Back Office"}>
                             <li className="nav-item dropdown">
-                                <Link href={`/settings/dashboard/`} >
+                                <Link href={`/settings/dashboard/report-summary/`} >
                                     <a className="dropdown-toggle nav-link" >
                                         <i className="fa fa-cog" style={!isMap ? { background: "linear-gradient(141deg, #0fb8ad 0%, #1fc8db 51%, #2cb5e8 75%)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" } : null} />
                                     </a>
@@ -109,7 +109,7 @@ const Navbar = ({ isMap, setslideNav, slideNav, navbarHide }) => {
 
                                 <a className="dropdown-item">คู่มือการใช้งาน</a>
 
-                                <Link href={`/settings/dashboard/`} >
+                                <Link href={`/settings/dashboard/report-summary/`} >
                                     <a className="dropdown-item">ระบบหลังบ้าน</a>
                                 </Link>
                             </>
