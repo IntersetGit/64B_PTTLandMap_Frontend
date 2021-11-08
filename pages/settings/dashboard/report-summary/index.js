@@ -258,14 +258,14 @@ const index = () => {
                                                     </h4>
                                                 }
                                             </th>
-                                            <td style={{ backgroundColor: "#e6e6e6" }} align="center">{data.sum_pot.toFixed(2)}</td>
-                                            <td style={{ backgroundColor: "#e6e6e6" }} align="center">{data.sum_area.toFixed(2)}</td>
-                                            <td style={{ backgroundColor: "#c3e0b4" }} align="center">{data.Pot_status_1.toFixed(2)}</td>
-                                            <td style={{ backgroundColor: "#c3e0b4" }} align="center">{data.Area_status_1.toFixed(2)}</td>
-                                            <td style={{ backgroundColor: "#fce4d6" }} align="center">{data.Pot_status_2.toFixed(2)}</td>
-                                            <td style={{ backgroundColor: "#fce4d6" }} align="center">{data.Area_status_2.toFixed(2)}</td>
-                                            <td style={{ backgroundColor: "#fce5d7" }} align="center">{data.Pot_status_3.toFixed(2)}</td>
-                                            <td style={{ backgroundColor: "#fce5d7" }} align="center">{data.Area_status_3.toFixed(2)}</td>
+                                            <td style={{ backgroundColor: "#e6e6e6" }} align="center">{data.sum_pot.toFixed(0)}</td>
+                                            <td style={{ backgroundColor: "#e6e6e6" }} align="center">{data.sum_area.toFixed(0)}</td>
+                                            <td style={{ backgroundColor: "#c3e0b4" }} align="center">{data.Pot_status_1.toFixed(0)}</td>
+                                            <td style={{ backgroundColor: "#c3e0b4" }} align="center">{data.Area_status_1.toFixed(0)}</td>
+                                            <td style={{ backgroundColor: "#fce4d6" }} align="center">{data.Pot_status_2.toFixed(0)}</td>
+                                            <td style={{ backgroundColor: "#fce4d6" }} align="center">{data.Area_status_2.toFixed(0)}</td>
+                                            <td style={{ backgroundColor: "#fce5d7" }} align="center">{data.Pot_status_3.toFixed(0)}</td>
+                                            <td style={{ backgroundColor: "#fce5d7" }} align="center">{data.Area_status_3.toFixed(0)}</td>
                                         </tr>
                                     )
                                 }
