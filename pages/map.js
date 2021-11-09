@@ -715,12 +715,11 @@ const mapPage = () => {
     const clickLine = () => {
         setOpenLine(!openLine) // สลับปุ่มเปิดปิด
         google.maps.event.clearListeners(map, 'click');
-        var distance = [] //เก็บ lat lag แต่ละครั้ง
         var count = 0 //นับจำนวนครั้งที่กด วัดระยะ
+        var distance = [] //เก็บ lat lag แต่ละครั้ง
+        let path
         let max = [] //รวมระยะทางทั้งหมด
         let sum = null //เก็บผลรวมระยาทาง
-        let path
-        const service = new google.maps.DistanceMatrixService();
         if (openLine) {
             poly.setMap(map);
             map.setOptions({ draggableCursor: 'crosshair' });
@@ -729,20 +728,14 @@ const mapPage = () => {
                 path.push(event.latLng);
                 distance.push(event.latLng.toJSON())
                 if (count > 0) {
-                    const request = await {
-                        origins: [distance[count - 1]],
-                        destinations: [distance[count]],
-                        travelMode: google.maps.TravelMode.DRIVING,
-                        unitSystem: google.maps.UnitSystem.METRIC,
-                        avoidHighways: false,
-                        avoidTolls: false,
-                    };
-                    const test = await service.getDistanceMatrix(request)
-                    if (test.rows[0].elements[0].distance !== undefined) {
-                        max.push(parseFloat(test.rows[0].elements[0].distance.text))
-                        sum = max.reduce((a, b) => a + b, 0)
-                        setDistanct(`ระยะทาง${sum.toFixed(2)} กม.`);
-                    }
+                    var _kCord = new google.maps.LatLng(distance[count - 1].lat, distance[count - 1].lng);
+                    var _pCord = new google.maps.LatLng(distance[count].lat, distance[count].lng);
+                    var procressDistance = google.maps.geometry.spherical
+                        .computeDistanceBetween(_kCord, _pCord)
+                    max.push(procressDistance)
+                    sum = max.reduce((a, b) => a + b, 0)
+                    let mToCm = sum / 1000
+                    setDistanct(`ระยะทาง${mToCm.toFixed(2)} กม.`);
                 }
                 count++ //เพิ่มจำนวนครั้งที่กด
             })
