@@ -254,7 +254,7 @@ const index = () => {
                                                     <h4 style={{ marginLeft: data.amp_name ? "20px" : data.tam_name ? "40px" : null }}>
                                                         {data.prov_name}
 
-                                                        {data.supersub ? null : <DownCircleOutlined onClick={() => showHideTable(data.prov_name)} />}
+                                                        {data.supersub ? null : <DownCircleOutlined style={{ marginLeft: "10px" }} onClick={() => showHideTable(data.prov_name)} />}
                                                     </h4>
                                                 }
                                             </th>
