@@ -51,15 +51,16 @@ const index = () => {
         {
             key: "2",
             title: <b>Latitude,Longitude</b>,
-            dataIndex: "Lat,Lng",
+            dataIndex: "coordinate",
             sorter: (record1, record2) => {
                 return record1.layer_name > record2.layer_name;
             },
+            render: (t) => { return (t.lat + "," + t.log) }
         },
         {
             key: "3",
             title: <b>ชื่อภาพถ่าย</b>,
-            dataIndex: "ชื่อภาพถ่าย",
+            dataIndex: "name",
             sorter: (record1, record2) => {
                 return record1.wms > record2.wms;
             },
@@ -68,7 +69,7 @@ const index = () => {
             key: "4",
             title: <b>จัดการ</b>,
             dataIndex: "id",
-            render: (id) => {
+            render: (id, row) => {
                 return (
                     <Dropdown
                         overlay={
@@ -76,9 +77,8 @@ const index = () => {
                                 <Menu.Item
                                     key="1"
                                     onClick={async () => {
-                                        await handleEdit(id),
-                                            await handleCancel(),
-                                            await handleEdit(id);
+                                        await handleCancel(),
+                                            await handleEdit(row);
                                     }}
                                 >
                                     แก้ไข
@@ -129,33 +129,21 @@ const index = () => {
     };
     const onFinishCreate = (value) => {
         setLoading(true);
-        const data = {
-            image_type: value.typename,
-            layer_name: value.layerName ?? null,
-            type_server: value.typeserver,
-            wms: value.wms,
-            url: value.url,
-            date: value["date"].format("YYYY-MM-DD"),
-        };
-        let fd = new FormData();
-        fd.append("file0", value.upload[0].originFileObj);
-        Api.post("/masterdata/datLayers", data)
+        let data = {
+            coordinate: {
+                lat: value.Lat, log: value.Lng
+            },
+            name: value.name,
+            url: value.url
+        }
+        Api.post("/streetview/createAndEditDatStreetView", data)
             .then(async (data) => {
                 setIsModalVisible({ create: false, edit: false });
                 reload();
                 setLoading(false);
                 formCreate.resetFields();
-                const upload = await axios.post(
-                    `${process.env.NEXT_PUBLIC_SERVICE}/upload?Path=satellite-aerial-photographs&Length=1&Name=${data.data.items.id}&SetType=jpg`,
-                    fd,
-                    {
-                        headers: {
-                            "Content-Type": "multipart/form-data",
-                        },
-                    }
-                );
                 await Swal.fire("", "บันทึกข้อมูลเรียบร้อย", "success");
-                window.location.reload();
+                // window.location.reload();
             })
             .catch((error) => {
                 console.log(error);
@@ -164,6 +152,7 @@ const index = () => {
     };
     const onFinishEdit = async (value) => {
         try {
+
             Swal.fire({
                 title: "กรุณายืนยันการแก้ไขข้อมูล",
                 icon: "warning",
@@ -174,34 +163,25 @@ const index = () => {
                 cancelButtonText: "ยกเลิก",
             }).then(async (result) => {
                 if (result.isConfirmed) {
-                    const data = {
+                    let data = {
                         id: value.id,
-                        image_type: value.image_type,
-                        layer_name: value.layerName ?? null,
-                        type_server: value.typeserver,
-                        wms: value.wms,
-                        url: value.url,
-                        date: value["date"].format("YYYY-MM-DD"),
-                    };
-                    const fd = new FormData();
-                    const respData = await Api.put("/masterdata/datLayers", data);
-                    if (!!value.upload) {
-                        fd.append("file0", value.upload[0].originFileObj);
-                        const respImage = await axios.post(
-                            `${process.env.NEXT_PUBLIC_SERVICE}/upload?Path=satellite-aerial-photographs&Length=1&Name=${value.id}&SetType=jpg`,
-                            fd,
-                            {
-                                headers: {
-                                    "Content-Type": "multipart/form-data",
-                                },
-                            }
-                        );
+                        coordinate: {
+                            lat: value.Lat, log: value.Lng
+                        },
+                        name: value.name,
+                        url: value.url
                     }
-                    setIsModalVisible({ create: false, edit: false });
-                    setLoading(false);
-                    await Swal.fire("", "แก้ไขข้อมูลเรียบร้อยแล้ว", "success");
-                    window.location.reload();
-                    formEdit.resetFields();
+                    Api.post("/streetview/createAndEditDatStreetView", data).then(async (data) => {
+                        console.log('data :>> ', data);
+                        setIsModalVisible({ create: false, edit: false });
+                        setLoading(false);
+                        await Swal.fire("", "แก้ไขข้อมูลเรียบร้อยแล้ว", "success");
+                        window.location.reload();
+                        formEdit.resetFields();
+                    }).catch((error) => {
+                        console.log('error :>> ', error);
+                    })
+
                 }
             });
         } catch (error) {
@@ -223,9 +203,7 @@ const index = () => {
             }).then(async (result) => {
                 if (result.isConfirmed) {
                     setLoading(true);
-                    const resp = await Api.delete("/masterdata/datLayers", {
-                        data: { id: id },
-                    });
+                    const resp = await Api.delete("/streetview/deleteDatStreetView?id=" + id);
                     Swal.fire("", "ลบข้อมูลเรียบร้อยแล้ว", "success");
                     reload();
                 }
@@ -236,14 +214,11 @@ const index = () => {
             setLoading(false);
         }
     };
-    const handleEdit = async (id) => {
-        let filterData = await data.find((data) => data.id === id);
-        setDataEdit(filterData);
+    const handleEdit = async (row) => {
+        console.log('row :>> ', row);
+        formEdit.setFieldsValue({ ...row, Lat: row.coordinate?.lat, Lng: row.coordinate?.log })
         showModal("edit");
-        $(window).ready(function () {
-            $(`#arcgisserver`).click();
-            $(`#${filterData.type_server}`).click();
-        });
+
     };
     const changeTypeServer = (e) => {
         const type = e.target.value;
@@ -264,9 +239,7 @@ const index = () => {
     };
     const reload = async (search = null) => {
         try {
-            const respData = await Api.get(
-                `/masterdata/datLayers${search != null ? "?search=" + search : ""}`
-            );
+            const respData = await Api.get(`streetview/getAllDatStreetView`);
             let tempDataArray = [];
             respData.data.items.forEach((data, key) => {
                 tempDataArray = [
@@ -277,7 +250,7 @@ const index = () => {
                     },
                 ];
             });
-            // setData(tempDataArray);
+            setData(tempDataArray);
             setLoading(false);
         } catch (error) {
             console.log(error);
@@ -313,9 +286,7 @@ const index = () => {
                     />
                 </Col>
                 <Col xs={8} sm={8} md={8} lg={8} xl={8} xxl={11}>
-                    <Button onClick={() => reload()}>
-                        <RedoOutlined />
-                    </Button>
+
                 </Col>
                 <Col xs={8} sm={8} md={8} lg={8} xl={8} xxl={8} >
                     <Button
@@ -360,21 +331,39 @@ const index = () => {
                     onFinish={onFinishCreate}
                 >
                     <Form.Item
-                        name="wms"
+                        name="name"
                         label="ชื่อ"
                         rules={[{ required: true }]}
                     >
                         <Input placeholder="ชื่อ" />
                     </Form.Item>
+                    <Form.Item label="Lat,Lng" rules={[{ required: true }]} style={{ marginBottom: 0 }}>
+                        <Form.Item
+                            name="Lat"
+                            rules={[{ required: true }]}
+                            style={{ display: 'inline-block', width: 'calc(50% - 12px)' }}
+                        >
+                            <Input placeholder="Lat" />
+                        </Form.Item>
+                        <span
+                            style={{ display: 'inline-block', width: '24px', lineHeight: '32px', textAlign: 'center' }}
+                        >
+                            -
+                        </span>
+                        <Form.Item
+                            name="Lng"
+                            rules={[{ required: true }]}
+                            style={{ display: 'inline-block', width: 'calc(50% - 12px)' }}>
+                            <Input placeholder="Lng" />
+                        </Form.Item>
+                    </Form.Item>
                     <Form.Item
-                        name="typename"
-                        label="LAT,LNG"
+                        name="url"
+                        label="Url"
                         rules={[{ required: true }]}
                     >
-                        <Input placeholder="LAT,LNG" />
+                        <Input placeholder="Url" />
                     </Form.Item>
-
-
                 </Form>
             </Modal>
 
@@ -392,36 +381,43 @@ const index = () => {
                     labelCol={{ span: 7 }}
                     wrapperCol={{ span: 14 }}
                     onFinish={onFinishEdit}
-                    initialValues={{
-                        id: dataEdit.id,
-                        nameWms: dataEdit.wms,
-                        wms: dataEdit.wms,
-                        url: dataEdit.url,
-                        layerName: dataEdit.layer_name,
-                        date: moment(dataEdit.date),
-                        typeserver: dataEdit.type_server,
-                        type_name: dataEdit.image_type,
-                    }}
+
                 >
                     <Form.Item name="id" label="id" hidden>
                         <Input />
                     </Form.Item>
                     <Form.Item
-                        name="wms"
+                        name="name"
                         label="ชื่อ"
                         rules={[{ required: true }]}
                     >
                         <Input placeholder="ชื่อ" />
                     </Form.Item>
+                    <Form.Item label="Lat,Lng" style={{ marginBottom: 0 }}>
+                        <Form.Item
+                            name="Lat"
+                            style={{ display: 'inline-block', width: 'calc(50% - 12px)' }}
+                        >
+                            <Input placeholder="Lat" />
+                        </Form.Item>
+                        <span
+                            style={{ display: 'inline-block', width: '24px', lineHeight: '32px', textAlign: 'center' }}
+                        >
+                            -
+                        </span>
+                        <Form.Item
+                            name="Lng"
+                            style={{ display: 'inline-block', width: 'calc(50% - 12px)' }}>
+                            <Input placeholder="Lng" />
+                        </Form.Item>
+                    </Form.Item>
                     <Form.Item
-                        name="typename"
-                        label="LAT,LNG"
+                        name="url"
+                        label="Url"
                         rules={[{ required: true }]}
                     >
-                        <Input placeholder="LAT,LNG" />
+                        <Input placeholder="Url" />
                     </Form.Item>
-
-
                 </Form>
             </Modal>
         </System>
