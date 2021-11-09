@@ -50,6 +50,15 @@ const mapPage = () => {
     const centerMap = { lat: 13.78, lng: 100.55 }
     const [layerData, setLayerData] = useState([])
     const [containerFluidMap, setContainerFluidMap] = useState(60)
+    const [width, setWidth] = useState(0);
+    const [height, setHeight] = useState(0);
+    const [events, setEvents] = useState([
+        "load",
+        "mousemove",
+        "mousedown",
+        "click",
+        "scroll",
+        "keypress"])
 
     const [slidemapshow, setSlidemapshow] = useState(false);
     const [ismenu, setIsmenu] = useState(null);
@@ -96,7 +105,23 @@ const mapPage = () => {
             cursor.style.top = y + "px";
         })
         getMasStatusProject()
+
+
+
     }, []);
+
+    useEffect(() => {
+        for (var i in events) {/*ตรวจจับทุกอีเวน์ในการเคลื่อนไหว*/
+            window.addEventListener(events[i], () => {
+                const { innerWidth: width, innerHeight: height } = window;
+                // console.log('width :>> ', width);
+                // console.log('height :>> ', height);
+                setWidth(width)
+                setHeight(height)
+            });
+        }
+
+    }, [])
 
     const getMasStatusProject = async () => {
         try {
@@ -1771,7 +1796,7 @@ const mapPage = () => {
             {/* -----------------------------------------------------------------------------------  */}
             {/* Shape File */}
             <Drawer
-                width={450}
+                width={width <= 450 ? width <= 400 ? 300 : 400 : 450}
                 placement={"left"}
                 visible={visibleShapeFile}
                 onClose={() => setVisibleShapeFile(false)}
@@ -2051,7 +2076,7 @@ const mapPage = () => {
             {/* Dashboard */}
             <Drawer
                 id="drawer-dashboard"
-                width={750}
+                width={width <= 750 ? width <= 400 ? 300 : 400 : 750}
                 // title="Process ส่งมอบโครงการ"
                 title={false}
                 placement={"left"}
@@ -2061,7 +2086,7 @@ const mapPage = () => {
                 style={{ width: visibleDashboard ? 650 : 0 }}
             >
                 <>
-                    <div>
+                    <div style={{ backgroundColor: "#4b5159", padding: "22px 22px 0px 22px" }}>
                         <Form
                             form={formDashboard}
                             initialValues={{
@@ -2073,7 +2098,7 @@ const mapPage = () => {
                             autoComplete="off"
                         >
                             <div className="row">
-                                <div className="col-4">
+                                <div className="col-md-4">
                                     <Form.Item
                                         label=""
                                         name="search"
@@ -2081,7 +2106,7 @@ const mapPage = () => {
                                         <Input placeholder="Search" />
                                     </Form.Item>
                                 </div>
-                                <div className="col-3">
+                                <div className="col-md-3">
                                     <Form.Item
                                         label=""
                                         name="project_name"
@@ -2096,7 +2121,7 @@ const mapPage = () => {
                                         </Select>
                                     </Form.Item>
                                 </div>
-                                <div className="col-3">
+                                <div className="col-md-3">
                                     <Form.Item
                                         label=""
                                         name="layer_group"
@@ -2109,17 +2134,19 @@ const mapPage = () => {
                                         </Select>
                                     </Form.Item>
                                 </div>
-                                <div className="col-2">
-                                    <Form.Item>
+                                <div className="col-md-2">
+
+                                    {width > 750 ? <Form.Item>
                                         <Button type="primary" htmlType="submit">
                                             ค้นหา
                                         </Button>
-                                    </Form.Item>
+                                    </Form.Item> : null}
+
                                 </div>
                             </div>
 
                             <div className="row">
-                                <div className="col-4">
+                                <div className="col-md-4">
                                     <Form.Item
                                         label=""
                                         name="prov"
@@ -2133,7 +2160,7 @@ const mapPage = () => {
                                         </Select>
                                     </Form.Item>
                                 </div>
-                                <div className="col-4">
+                                <div className="col-md-4">
                                     <Form.Item
                                         label=""
                                         name="amp"
@@ -2147,7 +2174,7 @@ const mapPage = () => {
                                         </Select>
                                     </Form.Item>
                                 </div>
-                                <div className="col-4">
+                                <div className="col-md-4">
                                     <Form.Item
                                         label=""
                                         name="tam"
@@ -2161,6 +2188,14 @@ const mapPage = () => {
                                         </Select>
                                     </Form.Item>
                                 </div>
+                                {width <= 750 ?
+                                    <div className="col-md-12">
+                                        <Form.Item>
+                                            <Button type="primary" htmlType="submit">
+                                                ค้นหา
+                                            </Button>
+                                        </Form.Item>
+                                    </div> : null}
                             </div>
 
 
@@ -2170,7 +2205,7 @@ const mapPage = () => {
 
                     <h3>แปลง</h3>
                     <div className="row">
-                        <div className="col-8">
+                        <div className={width <= 750 ? "col-12" : "col-8"}>
                             <Doughnut
                                 data={{
                                     labels: plotDashboard.labels,
@@ -2179,7 +2214,7 @@ const mapPage = () => {
                                 options={option}
                             />
                         </div>
-                        <div className="col-4">
+                        <div className={width <= 750 ? "col-12" : "col-4"}>
                             {plotDashboard.list.map((e, i) => <p key={`plotDashboard-${i}`}><b>{e.name}</b> : {e.value} แปลง</p>)}
                         </div>
                     </div>
@@ -2188,7 +2223,7 @@ const mapPage = () => {
 
                     <h3>ระยะทาง</h3>
                     <div className="row">
-                        <div className="col-8">
+                        <div className={width <= 750 ? "col-12" : "col-8"}>
                             <Doughnut
                                 data={{
                                     labels: distanceDashboard.labels,
@@ -2197,7 +2232,7 @@ const mapPage = () => {
                                 options={option}
                             />
                         </div>
-                        <div className="col-4">
+                        <div className={width <= 750 ? "col-12" : "col-4"}>
                             {distanceDashboard.list.map((e, i) => <p key={`distanceDashboard-${i}`}><b>{e.name}</b> : {e.value} ก.ม.</p>)}
                         </div>
                     </div>
@@ -2209,7 +2244,7 @@ const mapPage = () => {
             {/* Search */}
             <Drawer
                 id="drawer-searchwa"
-                width={650}
+                width={width <= 650 ? width <= 400 ? 300 : 400 : 650}
                 title={false}
                 placement={"left"}
                 visible={visibleSearch}
@@ -2229,7 +2264,7 @@ const mapPage = () => {
                         autoComplete="off"
                     >
                         <div className="row">
-                            <div className="col-4">
+                            <div className="col-md-4">
                                 <Form.Item
                                     label=""
                                     name="search"
@@ -2237,7 +2272,7 @@ const mapPage = () => {
                                     <Input placeholder="Search" />
                                 </Form.Item>
                             </div>
-                            <div className="col-3">
+                            <div className="col-md-3">
                                 <Form.Item
                                     label=""
                                     name="project_name"
@@ -2252,7 +2287,7 @@ const mapPage = () => {
                                     </Select>
                                 </Form.Item>
                             </div>
-                            <div className="col-3">
+                            <div className="col-md-3">
                                 <Form.Item
                                     label=""
                                     name="layer_group"
@@ -2265,17 +2300,21 @@ const mapPage = () => {
                                     </Select>
                                 </Form.Item>
                             </div>
-                            <div className="col-2">
-                                <Form.Item>
-                                    <Button type="primary" htmlType="submit">
-                                        ค้นหา
-                                    </Button>
-                                </Form.Item>
+                            <div className="col-md-2">
+
+                                {width > 650 ?
+                                    <Form.Item>
+                                        <Button type="primary" htmlType="submit">
+                                            ค้นหา
+                                        </Button>
+                                    </Form.Item>
+                                    : null}
+
                             </div>
                         </div>
 
                         <div className="row">
-                            <div className="col-4">
+                            <div className="col-md-4">
                                 <Form.Item
                                     label=""
                                     name="prov"
@@ -2289,7 +2328,7 @@ const mapPage = () => {
                                     </Select>
                                 </Form.Item>
                             </div>
-                            <div className="col-4">
+                            <div className="col-md-4">
                                 <Form.Item
                                     label=""
                                     name="amp"
@@ -2303,7 +2342,7 @@ const mapPage = () => {
                                     </Select>
                                 </Form.Item>
                             </div>
-                            <div className="col-4">
+                            <div className="col-md-4">
                                 <Form.Item
                                     label=""
                                     name="tam"
@@ -2317,6 +2356,15 @@ const mapPage = () => {
                                     </Select>
                                 </Form.Item>
                             </div>
+                            {width <= 650 ? <div className="col-md-12">
+                                <Form.Item>
+                                    <Form.Item>
+                                        <Button type="primary" htmlType="submit">
+                                            ค้นหา
+                                        </Button>
+                                    </Form.Item>
+                                </Form.Item>
+                            </div> : null}
                         </div>
 
 
@@ -2325,13 +2373,13 @@ const mapPage = () => {
                 <hr />
 
                 <div>
-                    <h4 className="pb-3">พบข้อมูลจำนวน <span className="text-red">{amount}</span> Recorde</h4>
+                    <h4 className="pb-3">พบข้อมูลจำนวน <span className="text-red">{amount}</span> Record</h4>
                     {
                         searchList.map((e, i) => (
                             <div key={`SearchList-${i}`}>
                                 {e.index})
                                 <div className="row pt-2">
-                                    <div className="col-1">
+                                    <div className="col-md-1">
                                         <div
                                             style={{
                                                 width: "25px",
@@ -2342,7 +2390,7 @@ const mapPage = () => {
                                             }}
                                         />
                                     </div>
-                                    <div className="col-11">
+                                    <div className="col-md-11">
 
                                         <div className="row">
                                             <label>PROJECT_NAME :</label>
@@ -2361,19 +2409,19 @@ const mapPage = () => {
 
                                         <div className="pl-2">
                                             <div className="row">
-                                                <div className="col-4">
+                                                <div className="col-md-4">
                                                     <div className="row">
                                                         <label>PARLABEL1 :</label>
                                                         <p className="pl-3">{e.parlabel1}</p>
                                                     </div>
                                                 </div>
-                                                <div className="col-4">
+                                                <div className="col-md-4">
                                                     <div className="row">
                                                         <label>PARLABEL2 :</label>
                                                         <p className="pl-3">{e.parlabel2}</p>
                                                     </div>
                                                 </div>
-                                                <div className="col-4">
+                                                <div className="col-md-4">
                                                     <div className="row">
                                                         <label>PARLABEL3 :</label>
                                                         <p className="pl-3">{e.parlabel3}</p>
@@ -2382,19 +2430,19 @@ const mapPage = () => {
                                             </div>
 
                                             <div className="row">
-                                                <div className="col-4">
+                                                <div className="col-md-4">
                                                     <div className="row">
                                                         <label>PARLABEL4 :</label>
                                                         <p className="pl-3">{e.parlabel4}</p>
                                                     </div>
                                                 </div>
-                                                <div className="col-4">
+                                                <div className="col-md-4">
                                                     <div className="row">
                                                         <label>PARLABEL5 :</label>
                                                         <p className="pl-3">{e.parlabel5}</p>
                                                     </div>
                                                 </div>
-                                                <div className="col-4">
+                                                <div className="col-md-4">
                                                     <button className="btn" onClick={() => editShapefileSearch(e, i)}><EditFilled /></button>
                                                     <Switch size="small" checked={e.checked} onChange={(value) => switchGeom(value, e, i)} />
                                                     {e.checked ?
