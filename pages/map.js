@@ -1647,12 +1647,11 @@ const mapPage = () => {
                     </Tooltip>
                 </Col>}
                 {!changmap && <Col span={6} className="pt-1">
-                    <Tooltip placement="left" title={"areaDistance"}>
+                    <Tooltip placement="left" title={"Area Distance"}>
                         <button className="btn btn-light btn-sm" onClick={areaDistance} >
                             <img
                                 width="100%"
                                 src="/assets/images/polegon.png"
-                                title="area distance"
                             />
                         </button>
                     </Tooltip>
