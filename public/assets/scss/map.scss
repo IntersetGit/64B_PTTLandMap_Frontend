@@ -302,3 +302,19 @@ body {
     }
   }
 }
+.NameHighlights {
+  position:relative;
+}
+
+.NameHighlights #changeMap {
+  display: none;
+}
+
+.NameHighlightsHover {
+  position:relative;
+}
+
+
+.NameHighlightsHover #changeMap {
+  display:block;
+}

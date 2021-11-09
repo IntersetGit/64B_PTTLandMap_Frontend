@@ -1064,13 +1064,16 @@ const mapPage = () => {
         }
 
     }
-
-    const test = () => {
-        $("#changeMap").fadeIn()
-        setTimeout(() => {
-            $("#changeMap").fadeOut()
-        }, 15000)
-    }
+    useEffect(() => {
+        $(document).ready(() => {
+            $(".NameHighlights").mouseover(() => {
+                $(".NameHighlights").addClass("NameHighlightsHover")
+            })
+            $(".NameHighlights").mouseout(() => {
+                $(".NameHighlights").removeClass("NameHighlightsHover")
+            })
+        })
+    }, [])
     const [dowSwipeMap, setDowSwipMap] = useState({ mapLeft: true, mapRight: false })
     const clickdowSwipMap = (type) => {
         if (type === 'left') {
@@ -1674,14 +1677,14 @@ const mapPage = () => {
                     </Tooltip>
                 </Col>
             </div>
-            <div className="tools-map-area3" hidden={changmap} >
-                <button className="btn btn-light" onClick={() => clickChangeMap()} onMouseOver={() => test()} >
+            <span className="tools-map-area3 NameHighlights" hidden={changmap}   >
+                <button className="btn btn-light" onClick={() => clickChangeMap()} >
                     <img width="90" height="90" style={{ borderRadius: "10px" }} src={imgChangeMap} alt="" />
                     <span style={{ position: "absolute", bottom: "15px", left: "25px", textAlign: "center" }}>
                         {txtChangeMap}
                     </span>
                 </button>
-                <div id="changeMap" style={{ display: "none" }} >
+                <div id="changeMap"  >
                     <span style={{ display: "flex", justifyContent: "space-around" }} >
                         <span style={{ display: "flex", flexDirection: "column", alignItems: "center" }} >
                             <button className="btn btn-light btn-sm terrain" onClick={() => changeMap("Terrain")} >
@@ -1703,8 +1706,7 @@ const mapPage = () => {
                         </span>
                     </span>
                 </div>
-
-            </div>
+            </span>
             {/* -------------------------------------Map-------------------------------------------- */}
             <div id="map" ref={googlemap} hidden={changmap} />
             <div id="container" hidden={!changmap}>
