@@ -717,12 +717,11 @@ const mapPage = () => {
     const clickLine = () => {
         setOpenLine(!openLine) // สลับปุ่มเปิดปิด
         google.maps.event.clearListeners(map, 'click');
-        var distance = [] //เก็บ lat lag แต่ละครั้ง
         var count = 0 //นับจำนวนครั้งที่กด วัดระยะ
+        var distance = [] //เก็บ lat lag แต่ละครั้ง
+        let path
         let max = [] //รวมระยะทางทั้งหมด
         let sum = null //เก็บผลรวมระยาทาง
-        let path
-        const service = new google.maps.DistanceMatrixService();
         if (openLine) {
             poly.setMap(map);
             map.setOptions({ draggableCursor: 'crosshair' });
@@ -731,20 +730,14 @@ const mapPage = () => {
                 path.push(event.latLng);
                 distance.push(event.latLng.toJSON())
                 if (count > 0) {
-                    const request = await {
-                        origins: [distance[count - 1]],
-                        destinations: [distance[count]],
-                        travelMode: google.maps.TravelMode.DRIVING,
-                        unitSystem: google.maps.UnitSystem.METRIC,
-                        avoidHighways: false,
-                        avoidTolls: false,
-                    };
-                    const test = await service.getDistanceMatrix(request)
-                    if (test.rows[0].elements[0].distance !== undefined) {
-                        max.push(parseFloat(test.rows[0].elements[0].distance.text))
-                        sum = max.reduce((a, b) => a + b, 0)
-                        setDistanct(`ระยะทาง${sum.toFixed(2)} กม.`);
-                    }
+                    var _kCord = new google.maps.LatLng(distance[count - 1].lat, distance[count - 1].lng);
+                    var _pCord = new google.maps.LatLng(distance[count].lat, distance[count].lng);
+                    var procressDistance = google.maps.geometry.spherical
+                        .computeDistanceBetween(_kCord, _pCord)
+                    max.push(procressDistance)
+                    sum = max.reduce((a, b) => a + b, 0)
+                    let mToCm = sum / 1000
+                    setDistanct(`ระยะทาง${mToCm.toFixed(2)} กม.`);
                 }
                 count++ //เพิ่มจำนวนครั้งที่กด
             })
@@ -1073,13 +1066,16 @@ const mapPage = () => {
         }
 
     }
-
-    const test = () => {
-        $("#changeMap").fadeIn()
-        setTimeout(() => {
-            $("#changeMap").fadeOut()
-        }, 15000)
-    }
+    useEffect(() => {
+        $(document).ready(() => {
+            $(".NameHighlights").mouseover(() => {
+                $(".NameHighlights").addClass("NameHighlightsHover")
+            })
+            $(".NameHighlights").mouseout(() => {
+                $(".NameHighlights").removeClass("NameHighlightsHover")
+            })
+        })
+    }, [])
     const [dowSwipeMap, setDowSwipMap] = useState({ mapLeft: true, mapRight: false })
     const clickdowSwipMap = (type) => {
         if (type === 'left') {
@@ -1735,14 +1731,16 @@ const mapPage = () => {
                     </Tooltip>
                 </Col>
             </div>
-            <div className="tools-map-area3" hidden={changmap} >
-                <button className="btn btn-light" onClick={() => clickChangeMap()} onMouseOver={() => test()} >
-                    <img width="90" height="90" style={{ borderRadius: "10px" }} src={imgChangeMap} alt="" />
-                    <span style={{ position: "absolute", bottom: "15px", left: "25px", textAlign: "center" }}>
+            <span className="tools-map-area3 NameHighlights" hidden={changmap}   >
+                <button className="btn btn-light" onClick={() => clickChangeMap()} >
+                    <img width="90" height="90" style={{ borderRadius: "10px" }} src={imgChangeMap} alt="" className="res_computer" />
+                    <img width="35" src="https://icon-library.com/images/layers-icon/layers-icon-24.jpg" alt="" className="res_mobile" />
+                    <span style={{ position: "absolute", bottom: "15px", left: "25px", textAlign: "center" }} className="res_mobile_text">
                         {txtChangeMap}
                     </span>
                 </button>
-                <div id="changeMap" style={{ display: "none" }} >
+
+                <div id="changeMap"  >
                     <span style={{ display: "flex", justifyContent: "space-around" }} >
                         <span style={{ display: "flex", flexDirection: "column", alignItems: "center" }} >
                             <button className="btn btn-light btn-sm terrain" onClick={() => changeMap("Terrain")} >
@@ -1764,8 +1762,7 @@ const mapPage = () => {
                         </span>
                     </span>
                 </div>
-
-            </div>
+            </span>
             {/* -------------------------------------Map-------------------------------------------- */}
             <div id="map" ref={googlemap} hidden={changmap} />
             <div id="container" hidden={!changmap}>
