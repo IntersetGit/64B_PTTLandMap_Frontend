@@ -43,6 +43,7 @@ const index = () => {
             key: "1",
             title: <b>ลำดับ</b>,
             dataIndex: "number",
+            width: 200,
             sorter: (record1, record2) => {
                 return record1.number > record2.number;
             },
@@ -52,6 +53,7 @@ const index = () => {
             key: "2",
             title: <b>Latitude,Longitude</b>,
             dataIndex: "coordinate",
+            width: 200,
             sorter: (record1, record2) => {
                 return record1.layer_name > record2.layer_name;
             },
@@ -127,7 +129,45 @@ const index = () => {
         formCreate.resetFields();
         formEdit.resetFields();
     };
+    const onValuechangeAdd = (e) => {
+        let key = Object.keys(e);
+        if (key[0] == "url") {
+            let latlng = filterlatlng(e[key[0]]);
+            if (latlng) {
+                formCreate.setFieldsValue({ Lat: latlng.lat, Lng: latlng.lng })
+            } else {
+                formCreate.setFieldsValue({ Lat: "", Lng: "" })
+            }
+        }
+    }
+    const onValuechangeEdit = (e) => {
+        let key = Object.keys(e);
+        if (key[0] == "url") {
+            let latlng = filterlatlng(e[key[0]]);
+            if (latlng) {
+                formEdit.setFieldsValue({ Lat: latlng.lat, Lng: latlng.lng })
+            } else {
+                formEdit.setFieldsValue({ Lat: "", Lng: "" })
+            }
+        }
+    }
+
+    function filterlatlng(url) {
+        let result = url.split('/');
+        let res = result.filter(i => i.startsWith("@")).toString();
+        let cutstring = res.replace('@', '');
+        let rescut = cutstring.split(',').slice(0, 2);
+        if (rescut == "") {
+            return false;
+        } else {
+            return {
+                lat: rescut[0],
+                lng: rescut[1]
+            }
+        }
+    }
     const onFinishCreate = (value) => {
+        console.log('latlng :>> ', filterlatlng(value.url));
         setLoading(true);
         let data = {
             coordinate: {
@@ -220,23 +260,7 @@ const index = () => {
         showModal("edit");
 
     };
-    const changeTypeServer = (e) => {
-        const type = e.target.value;
-        setMenuItem([]);
-        if (type !== "arcgisserver") {
-            setMenuItem(
-                <>
-                    <Form.Item
-                        name="layerName"
-                        label="Layer Name"
-                        rules={[{ required: true }]}
-                    >
-                        <Input placeholder="Layer Name" />
-                    </Form.Item>
-                </>
-            );
-        }
-    };
+
     const reload = async (search = null) => {
         try {
             const respData = await Api.get(`streetview/getAllDatStreetView`);
@@ -323,12 +347,15 @@ const index = () => {
                 onOk={() => handleOk("formCreate")}
                 onCancel={handleCancel}
                 centered
+
             >
                 <Form
                     form={formCreate}
                     labelCol={{ span: 7 }}
                     wrapperCol={{ span: 14 }}
                     onFinish={onFinishCreate}
+                    onValuesChange={onValuechangeAdd}
+
                 >
                     <Form.Item
                         name="name"
@@ -337,13 +364,20 @@ const index = () => {
                     >
                         <Input placeholder="ชื่อ" />
                     </Form.Item>
+                    <Form.Item
+                        name="url"
+                        label="Url"
+                        rules={[{ required: true, message: "กรุณากรอก url จาก GoogleMap" }]}
+                    >
+                        <Input placeholder="Url" />
+                    </Form.Item>
                     <Form.Item label="Lat,Lng" rules={[{ required: true }]} style={{ marginBottom: 0 }}>
                         <Form.Item
                             name="Lat"
-                            rules={[{ required: true }]}
+                            rules={[{ required: true, message: "กรุณาตรวจสอบ url " }]}
                             style={{ display: 'inline-block', width: 'calc(50% - 12px)' }}
                         >
-                            <Input placeholder="Lat" />
+                            <Input placeholder="Lat" disabled />
                         </Form.Item>
                         <span
                             style={{ display: 'inline-block', width: '24px', lineHeight: '32px', textAlign: 'center' }}
@@ -352,17 +386,10 @@ const index = () => {
                         </span>
                         <Form.Item
                             name="Lng"
-                            rules={[{ required: true }]}
+                            rules={[{ required: true, message: "กรุณาตรวจสอบ url " }]}
                             style={{ display: 'inline-block', width: 'calc(50% - 12px)' }}>
-                            <Input placeholder="Lng" />
+                            <Input placeholder="Lng" disabled />
                         </Form.Item>
-                    </Form.Item>
-                    <Form.Item
-                        name="url"
-                        label="Url"
-                        rules={[{ required: true }]}
-                    >
-                        <Input placeholder="Url" />
                     </Form.Item>
                 </Form>
             </Modal>
@@ -381,7 +408,7 @@ const index = () => {
                     labelCol={{ span: 7 }}
                     wrapperCol={{ span: 14 }}
                     onFinish={onFinishEdit}
-
+                    onValuesChange={onValuechangeEdit}
                 >
                     <Form.Item name="id" label="id" hidden>
                         <Input />
@@ -393,12 +420,20 @@ const index = () => {
                     >
                         <Input placeholder="ชื่อ" />
                     </Form.Item>
+                    <Form.Item
+                        name="url"
+                        label="Url"
+                        rules={[{ required: true }]}
+                    >
+                        <Input placeholder="Url" />
+                    </Form.Item>
                     <Form.Item label="Lat,Lng" style={{ marginBottom: 0 }}>
                         <Form.Item
                             name="Lat"
+                            rules={[{ required: true, message: "กรุณาตรวจสอบ url " }]}
                             style={{ display: 'inline-block', width: 'calc(50% - 12px)' }}
                         >
-                            <Input placeholder="Lat" />
+                            <Input placeholder="Lat" disabled />
                         </Form.Item>
                         <span
                             style={{ display: 'inline-block', width: '24px', lineHeight: '32px', textAlign: 'center' }}
@@ -407,16 +442,10 @@ const index = () => {
                         </span>
                         <Form.Item
                             name="Lng"
+                            rules={[{ required: true, message: "กรุณาตรวจสอบ url " }]}
                             style={{ display: 'inline-block', width: 'calc(50% - 12px)' }}>
-                            <Input placeholder="Lng" />
+                            <Input placeholder="Lng" disabled />
                         </Form.Item>
-                    </Form.Item>
-                    <Form.Item
-                        name="url"
-                        label="Url"
-                        rules={[{ required: true }]}
-                    >
-                        <Input placeholder="Url" />
                     </Form.Item>
                 </Form>
             </Modal>

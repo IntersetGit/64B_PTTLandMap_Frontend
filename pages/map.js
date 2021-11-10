@@ -31,7 +31,7 @@ import axios from "axios";
 import { Cookies } from "react-cookie";
 import jwt_decode from "jwt-decode";
 import Timeslide from "../components/Timeslider";
-import Color from '../components/Color'
+import Color from '../components/Color';
 
 const cookies = new Cookies();
 
@@ -107,8 +107,10 @@ const mapPage = () => {
         getMasStatusProject()
 
 
-
     }, []);
+    useEffect(() => {
+        GetStreetView()
+    }, [map]);
 
     useEffect(() => {
         for (var i in events) {/*ตรวจจับทุกอีเวน์ในการเคลื่อนไหว*/
@@ -1501,7 +1503,47 @@ const mapPage = () => {
             wms.setOpacity(wmsopacityright / 100);
         })
     }, [wmsopacityright]);
+    const [visiblestreetview, setVisiblestreetview] = useState(true);
+    const [streetviewdata, setStreetviewdata] = useState([]);
+    const GetStreetView = () => {
+        API.get(`/streetview/getAllDatStreetView`).then(({ data: { items } }) => {
 
+            let mapdata = items.map((i) => {
+                const image = {
+                    url: "https://cdn-icons.flaticon.com/png/512/367/premium/367662.png?token=exp=1636542846~hmac=805fe21b7e9d4daa75948f4e3516dd46",
+                    scaledSize: new google.maps.Size(25, 25), // scaled size
+                    // origin: new google.maps.Point(0, 0), // origin
+                    // anchor: new google.maps.Point(0, 0) // anchor
+                };
+                const marker = new google.maps.Marker({
+                    position: { lat: parseFloat(i.coordinate.lat), lng: parseFloat(i.coordinate.log) },
+                    icon: image,
+                    title: "คลิ้กเพื่อดูภาพ",
+                });
+                marker.addListener("click", () => {
+                    let panorama = map.getStreetView();
+                    panorama.setPosition({ lat: parseFloat(i.coordinate.lat), lng: parseFloat(i.coordinate.log) });
+                    panorama.setPov({
+                        heading: 0,
+                        pitch: 0,
+                    });
+                    panorama.setVisible(true);
+                });
+                return marker;
+            })
+            setStreetviewdata(mapdata)
+        }).catch((error) => {
+            console.log(`error`, error)
+        })
+    }
+    const StreetViewVisible = () => {
+        if (visiblestreetview) {
+            streetviewdata.forEach((i) => i.setMap(map));
+        } else {
+            streetviewdata.forEach((i) => i.setMap(null));
+        }
+        setVisiblestreetview(!visiblestreetview);
+    }
 
     return (
         <Layout isMap={true} navbarHide={hideNavbar}>
@@ -1529,6 +1571,18 @@ const mapPage = () => {
                     >
                         {/* <i className="fa fa-dashboard" /> */}
                         <img width="100%" src="/assets/images/fa-dashboard.png" alt="" />
+                    </button>
+                </Tooltip>
+            </div>
+            <div className="tools-dashboard" style={{ top: 215 }}>
+                <Tooltip placement="topRight" title={"ShowStreetView"}>
+                    <button
+                        className="btn btn-light btn-sm"
+                        onClick={() => {
+                            StreetViewVisible()
+                        }}
+                    >
+                        <img width="100%" src="https://cdn-icons.flaticon.com/png/512/367/premium/367662.png?token=exp=1636542846~hmac=805fe21b7e9d4daa75948f4e3516dd46" alt="" />
                     </button>
                 </Tooltip>
             </div>
