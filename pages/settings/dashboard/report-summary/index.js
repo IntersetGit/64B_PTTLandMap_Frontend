@@ -90,52 +90,33 @@ const index = () => {
     const modifyApi = (data) => {
         let newData = []
         data.PATM.forEach(item_prov => {
+            item_prov.relationship = 1
             newData.push(item_prov)
-            if (item_prov.amp.length) { //ถ้ามีอำเภอให้เข้า IF
+            if (item_prov.amp.length) {//ถ้ามีอำเภอให้เข้า IF
                 item_prov.amp.forEach(item_amp => {
                     item_amp.prov_name = item_amp.amp_name
-                    item_amp.sub = item_prov.prov_name
+                    item_amp.parent = item_prov.prov_name
+                    item_amp.relationship = 2
                     newData.push(item_amp)
                     if (item_amp.tam.length) { //ถ้ามีตำบลให้เข้าIF
                         item_amp.tam.forEach(item_tam => {
+                            item_tam.parent = item_amp.amp_name
                             item_tam.prov_name = item_tam.tam_name
-                            item_tam.sub = item_amp.amp_name
-                            item_tam.supersub = true // คือไม่มีลูกแล้ว
+                            item_tam.relationship = 3
+                            item_tam.super_parent = item_prov.prov_name
+                            item_tam.supersub = true
                             newData.push(item_tam)
                         })
                     }
                 })
             }
         })
+        console.log(data)
         setDataTable(newData)
-
-
-        // let newData = []
-        // data.PATM.forEach((item_prov, indexProv) => {
-        //     item_prov.prov_id = indexProv;
-        //     newData.push((item_prov))
-        //     if (item_prov.amp.length) { //ถ้ามีอำเภอให้เข้า IF
-        //         item_prov.amp.forEach(item_amp => {
-        //             item_amp.prov_id = indexProv
-        //             item_amp.prov_name = item_amp.amp_name                          //ชื่อมัน
-        //             newData.push(item_amp)
-        //             if (item_amp.tam.length) { //ถ้ามีตำบลให้เข้าIF
-        //                 item_amp.tam.forEach(item_tam => {
-        //                     item_tam.prov_id = indexProv
-        //                     item_tam.prov_name = item_tam.tam_name                    //ชื่อมัน
-        //                     newData.push(item_tam)
-        //                 })
-        //             }
-        //         })
-        //     }
-        // })
-        // setDataTable(newData)
-
-
     }
-    const showHideTable = (prov_name) => {
+    const showHideTable = (prov_name, relationship) => {
+        $(`.sub${prov_name}`).hide()
         $(`.${prov_name}`).toggle()
-        console.log(prov_name)
     }
     return (
         <>
@@ -248,12 +229,14 @@ const index = () => {
                                 </tr>
                                 {
                                     dataTable.map(data =>
-                                        <tr style={{ display: data.amp_name || data.tam_name ? "none" : null }} className={`${data.children || data.sub}`} >
+                                        <tr style={{ display: !data.parent || "none" }} className={`
+                                        ${data.relationship != 1 ? data.parent : null}
+                                        ${data.super_parent ? "sub" + data.super_parent : null}
+                                        `}>
                                             <th scope="row">
                                                 {
                                                     <h4 style={{ marginLeft: data.amp_name ? "20px" : data.tam_name ? "40px" : null }}>
                                                         {data.prov_name}
-
                                                         {data.supersub ? null : <DownCircleOutlined style={{ marginLeft: "10px" }} onClick={() => showHideTable(data.prov_name)} />}
                                                     </h4>
                                                 }
@@ -271,51 +254,6 @@ const index = () => {
                                 }
                             </table>
 
-
-                            {/* <table className="table table-bordered" id="dashboard_table" >
-                                <colgroup span="2"></colgroup>
-                                <colgroup span="2"></colgroup>
-                                <tr align="center" >
-                                    <td rowspan="2"></td>
-                                    <th colspan="2" scope="colgroup" style={{ backgroundColor: "#adaaa9" }}>ทั้งหมด</th>
-                                    <th colspan="2" scope="colgroup" style={{ backgroundColor: "#a8d08d" }}>ได้รับอนุมัติให้ดำเนินการใหม่</th>
-                                    <th colspan="2" scope="colgroup" style={{ backgroundColor: "#ff98cb" }}>อยู่ระหว่างดำเนินการ</th>
-                                    <th colspan="2" scope="colgroup" style={{ backgroundColor: "#fe9a00" }}>ดำเนินการเรียบร้อยแล้ว</th>
-                                </tr>
-                                <tr align="center">
-                                    <th scope="col" style={{ backgroundColor: "#adaaa9" }}>แปลง</th>
-                                    <th scope="col" style={{ backgroundColor: "#adaaa9" }}>ระยะทาง</th>
-                                    <th scope="col" style={{ backgroundColor: "#a8d08d" }}>แปลง</th>
-                                    <th scope="col" style={{ backgroundColor: "#a8d08d" }}>ระยะทาง</th>
-                                    <th scope="col" style={{ backgroundColor: "#ff98cb" }}>แปลง</th>
-                                    <th scope="col" style={{ backgroundColor: "#ff98cb" }}>ระยะทาง</th>
-                                    <th scope="col" style={{ backgroundColor: "#fe9a00" }}>แปลง</th>
-                                    <th scope="col" style={{ backgroundColor: "#fe9a00" }}>ระยะทาง</th>
-                                </tr>
-                                {
-                                    dataTable.map(data =>
-                                        <tr style={{ display: data.amp_name || data.tam_name ? "none" : null }} >
-                                            <th scope="row">
-                                                {
-                                                    <h4 style={{ marginLeft: data.amp_name ? "20px" : data.tam_name ? "40px" : null }}>
-                                                        {data.prov_name}
-
-                                                        {data.supersub ? null : <DownCircleOutlined onClick={() => showHideTable(data.prov_name)} />}
-                                                    </h4>
-                                                }
-                                            </th>
-                                            <td style={{ backgroundColor: "#e6e6e6" }} align="center">{data.sum_pot.toFixed(2)}</td>
-                                            <td style={{ backgroundColor: "#e6e6e6" }} align="center">{data.sum_area.toFixed(2)}</td>
-                                            <td style={{ backgroundColor: "#c3e0b4" }} align="center">{data.Pot_status_1.toFixed(2)}</td>
-                                            <td style={{ backgroundColor: "#c3e0b4" }} align="center">{data.Area_status_1.toFixed(2)}</td>
-                                            <td style={{ backgroundColor: "#fce4d6" }} align="center">{data.Pot_status_2.toFixed(2)}</td>
-                                            <td style={{ backgroundColor: "#fce4d6" }} align="center">{data.Area_status_2.toFixed(2)}</td>
-                                            <td style={{ backgroundColor: "#fce5d7" }} align="center">{data.Pot_status_3.toFixed(2)}</td>
-                                            <td style={{ backgroundColor: "#fce5d7" }} align="center">{data.Area_status_3.toFixed(2)}</td>
-                                        </tr>
-                                    )
-                                }
-                            </table> */}
                         </div>
                     </Col>
                 </Row>
