@@ -293,6 +293,21 @@ body {
     display: none;
   }
 }
+@media only screen and(max-width:360px){
+  .tools-map-area3 {
+    button{
+      img{
+        width: 52px;
+        height: 52px;
+      }
+      padding: 0;
+    }
+  }
+  .txtChangeMap{
+    display: none;
+  }
+}
+
 
 
 
