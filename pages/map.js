@@ -1733,9 +1733,8 @@ const mapPage = () => {
             </div>
             <span className="tools-map-area3 NameHighlights" hidden={changmap}   >
                 <button className="btn btn-light" onClick={() => clickChangeMap()} >
-                    <img width="90" height="90" style={{ borderRadius: "10px" }} src={imgChangeMap} alt="" className="res_computer" />
-                    <img width="35" src="https://icon-library.com/images/layers-icon/layers-icon-24.jpg" alt="" className="res_mobile" />
-                    <span style={{ position: "absolute", bottom: "15px", left: "25px", textAlign: "center" }} className="res_mobile_text">
+                    <img width="90" height="90" style={{ borderRadius: "10px" }} src={imgChangeMap} alt="" />
+                    <span style={{ position: "absolute", bottom: "15px", left: "25px", textAlign: "center" }} >
                         {txtChangeMap}
                     </span>
                 </button>
