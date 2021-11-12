@@ -71,8 +71,9 @@ const usersSystemPage = () => {
       key: "1",
       title: <b>ลำดับ</b>,
       dataIndex: "number",
-      render: (a, b, i) => (i + 1).toString(),
-
+      sorter: (record1, record2) => {
+        return record1.number > record2.number;
+      },
     },
     {
       key: "2",
@@ -184,10 +185,11 @@ const usersSystemPage = () => {
       .then(({ data: { items } }) => {
         let tempDataArray = [];
         console.log(`data`, data)
-        items.forEach((data) => {
+        items.forEach((data, i) => {
           tempDataArray = [
             ...tempDataArray,
             {
+              number: i + 1,
               ...data,
             },
           ];
