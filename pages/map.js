@@ -1506,7 +1506,7 @@ const mapPage = () => {
 
             let mapdata = items.map((i) => {
                 const image = {
-                    url: "https://cdn-icons.flaticon.com/png/512/367/premium/367662.png?token=exp=1636542846~hmac=805fe21b7e9d4daa75948f4e3516dd46",
+                    url: "/assets/images/icons8-street-view-80.png",
                     scaledSize: new google.maps.Size(25, 25), // scaled size
                     // origin: new google.maps.Point(0, 0), // origin
                     // anchor: new google.maps.Point(0, 0) // anchor
