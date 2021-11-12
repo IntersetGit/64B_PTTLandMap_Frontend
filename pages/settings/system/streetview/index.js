@@ -263,7 +263,7 @@ const index = () => {
 
     const reload = async (search = null) => {
         try {
-            const respData = await Api.get(`streetview/getAllDatStreetView`);
+            const respData = await Api.get(`streetview/getAllDatStreetView?search=${search}`);
             let tempDataArray = [];
             respData.data.items.forEach((data, key) => {
                 tempDataArray = [
