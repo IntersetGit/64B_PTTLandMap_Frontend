@@ -1578,7 +1578,7 @@ const mapPage = () => {
                             StreetViewVisible()
                         }}
                     >
-                        <img width="100%" src="https://cdn-icons.flaticon.com/png/512/367/premium/367662.png?token=exp=1636542846~hmac=805fe21b7e9d4daa75948f4e3516dd46" alt="" />
+                        <img width="100%" src="/assets/images/icons8-street-view-80.png" alt="" />
                     </button>
                 </Tooltip>
             </div>
