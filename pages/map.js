@@ -98,13 +98,7 @@ const mapPage = () => {
         loadShapeFile()
         loadGetShapeProvince()
 
-        var cursor = document.getElementById("cursor");
-        document.addEventListener("mousemove", (e) => {
-            var x = e.clientX;
-            var y = e.clientY;
-            cursor.style.left = x + "px";
-            cursor.style.top = y + "px";
-        })
+
         getMasStatusProject()
 
 
@@ -679,6 +673,7 @@ const mapPage = () => {
     const [openLine, setOpenLine] = useState(true) //ปุ่มเปิดปิด Line
     const [poly, setPoly] = useState(null);
     const [distanct, setDistanct] = useState(null);
+    const [distanceTest, setDistanceTest] = useState(null)
     useEffect(() => {
         const symbolOne = {
             path: google.maps.SymbolPath.CIRCLE,
@@ -714,6 +709,12 @@ const mapPage = () => {
             ],
         });
         setPoly(poly);
+        var centerLabel = new MapLabel({
+            map: map,
+            fontSize: 13,
+            align: "center",
+        });
+        setDistanceTest(centerLabel)
     }, []);
     const clickLine = () => {
         setOpenLine(!openLine) // สลับปุ่มเปิดปิด
@@ -724,6 +725,7 @@ const mapPage = () => {
         let max = [] //รวมระยะทางทั้งหมด
         let sum = null //เก็บผลรวมระยาทาง
         if (openLine) {
+            distanceTest.setMap(map)
             poly.setMap(map);
             map.setOptions({ draggableCursor: 'crosshair' });
             map.addListener("click", async (event) => {
@@ -739,22 +741,16 @@ const mapPage = () => {
                     sum = max.reduce((a, b) => a + b, 0)
                     let mToCm = sum / 1000
                     setDistanct(`ระยะทาง${mToCm.toFixed(2)} กม.`);
-                    var centerLabel = new MapLabel({
-                        map: map,
-                        fontSize: 13,
-                        align: "center",
-
-                    });
-
-
-                    centerLabel.set("position", event.latLng);
-                    centerLabel.set("text", `ระยะทาง${mToCm.toFixed(2)} กม.`);
+                    distanceTest.set("position", event.latLng);
+                    distanceTest.set("text", `                               ระยะทาง${mToCm.toFixed(2)} กม.`);
                 }
                 count++ //เพิ่มจำนวนครั้งที่กด
             })
         } else {
             let path = poly.getPath();
             path.forEach(i => path.pop())
+            distanceTest.set("text", "");
+            distanceTest.setMap(null)
             map.setOptions({ draggableCursor: 'default' });
             google.maps.event.clearListeners(map, 'click');
             setDistanct(null)
@@ -1557,7 +1553,6 @@ const mapPage = () => {
             <Head>
                 <title>PTT Land Map</title>
             </Head>
-            <div id="cursor" style={distanct && { borderRadius: "10%", padding: "5px", backgroundColor: "#FFF" }}>{distanct}</div>
             <Timeslide onChange={(e) => OnPlaytimeslide(e)} data={datatimeslider} onDateChange={GetTimslide} onClose={() => setSlidemapshow(false)} visible={slidemapshow} />
             <div className="tools-group-layer">
                 <Tooltip placement="topRight" title={"Gis Layer"}>
