@@ -87,6 +87,7 @@ const mapPage = () => {
                 fullscreenControl: false,
                 center: centerMap,
                 zoom: 8,
+                scaleControl: true
             });
             setMap(_map);
             google.maps.event.addListener(_map, "mousemove", (event) => {
@@ -738,6 +739,16 @@ const mapPage = () => {
                     sum = max.reduce((a, b) => a + b, 0)
                     let mToCm = sum / 1000
                     setDistanct(`ระยะทาง${mToCm.toFixed(2)} กม.`);
+                    var centerLabel = new MapLabel({
+                        map: map,
+                        fontSize: 13,
+                        align: "center",
+
+                    });
+
+
+                    centerLabel.set("position", event.latLng);
+                    centerLabel.set("text", `ระยะทาง${mToCm.toFixed(2)} กม.`);
                 }
                 count++ //เพิ่มจำนวนครั้งที่กด
             })
