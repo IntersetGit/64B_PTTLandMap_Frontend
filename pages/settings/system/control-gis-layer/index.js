@@ -462,17 +462,13 @@ const usersSystemPage = () => {
           <Col span={24}>
             <h3 className="mb-4">จัดการข้อมูล GIS Layer</h3>
           </Col>
-          <Col xs={10} sm={8} md={8} lg={8} xl={8} xxl={5}>
+          <Col xs={8} sm={8} md={8} lg={8} xl={8} xxl={5}>
             <Search placeholder="input search text"
               onSearch={onSearch}
             />
           </Col>
           <Col xs={8} sm={8} md={8} lg={8} xl={8} xxl={11}>
-            <Button
-              onClick={() => {
-                reload();
-              }}
-            >
+            <Button onClick={() => reload()}>
               <RedoOutlined />
             </Button>
           </Col>
@@ -511,6 +507,7 @@ const usersSystemPage = () => {
         visible={isModalVisible2}
         onOk={() => handleOk2("formCreate")}
         onCancel={handleCancel2}
+        style={{ top: 45 }}
       >
         <Form
           form={formCreate}
@@ -520,6 +517,7 @@ const usersSystemPage = () => {
           labelAlign="left"
           colon={false}
           style={{ padding: "0%  0%  0% 10%" }}
+
         >
           <Form.Item
             name="name_layer"
@@ -583,6 +581,7 @@ const usersSystemPage = () => {
         visible={isModalVisible}
         onOk={handleOk}
         onCancel={handleCancel}
+        style={{ top: 45 }}
       >
         <Form
           form={form}
