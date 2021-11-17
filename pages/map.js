@@ -994,7 +994,6 @@ const mapPage = () => {
         });
 
         polygon.labels.push(centerLabel);
-
         centerLabel.set("position", boundsCenter);
         centerLabel.set("text", (parseFloat(area)).toLocaleString('en-US') + " ตร.ม");
         if (path.getLength() < 2) return;
@@ -1009,6 +1008,7 @@ const mapPage = () => {
                 fontSize: 13,
                 align: "center",
             });
+
             sideLabel.set("position", sideCenter);
             sideLabel.set("text", (parseFloat(sideLength.toFixed(2))).toLocaleString('en-US') + " ม");
             polygon.labels.push(sideLabel);
@@ -1045,6 +1045,7 @@ const mapPage = () => {
                 setDrawings([...drawings, e])
                 var newShape = e.overlay;
                 newShape.type = e.type;
+                console.log('newShape :>> ', e);
                 if (e.type == 'polygon') {
                     var path = newShape.getPath();
 

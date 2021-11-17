@@ -37,7 +37,7 @@ function MapLabel(opt_options) {
     this.set('strokeColor', '#ffffff');
     this.set('align', 'center');
 
-    this.set('zIndex', 1);
+    this.set('zIndex', 99);
 
     this.setValues(opt_options);
 }
@@ -80,7 +80,7 @@ MapLabel.prototype.drawCanvas_ = function () {
     ctx.strokeStyle = this.get('strokeColor');
     ctx.fillStyle = this.get('fontColor');
     ctx.font = this.get('fontSize') + 'px ' + this.get('fontFamily');
-    var strokeWeight = Number(this.get('strokeWeight'));
+    var strokeWeight = Number(this.get('     '));
 
     var text = this.get('text');
     if (text) {
@@ -161,7 +161,7 @@ MapLabel.prototype.draw = function () {
 
     var style = this.canvas_.style;
 
-    style['top'] = pos.y + 'px';
+    style['top'] = 10 + 'px';
     style['left'] = pos.x + 'px';
 
     style['visibility'] = this.getVisible_();
