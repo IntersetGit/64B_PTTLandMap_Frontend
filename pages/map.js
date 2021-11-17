@@ -1555,7 +1555,7 @@ const mapPage = () => {
             </Head>
             <Timeslide onChange={(e) => OnPlaytimeslide(e)} data={datatimeslider} onDateChange={GetTimslide} onClose={() => setSlidemapshow(false)} visible={slidemapshow} />
             <div className="tools-group-layer">
-                <Tooltip placement="topRight" title={"Gis Layer"}>
+                <Tooltip placement="topRight" title={"GIS Layers"}>
                     <button className="btn btn-light btn-sm" onClick={() => setVisibleShapeFile(true)}>
                         {/* <i className="fa fa-window-restore" /> */}
                         <img width="100%" src="/assets/images/fa-window-restore.png" alt="" />
@@ -1604,7 +1604,7 @@ const mapPage = () => {
                         style={{ fontSize: "20px", marginTop: "2.5px" }}
                         id="config-map-cog"
                     /> */}
-                    <Tooltip placement="left" title={"Images Layer"}>
+                    <Tooltip placement="left" title={"Imagery Layers"}>
                         <img src="assets/images/layer.PNG" alt="" width="23" />
                     </Tooltip>
                 </Col>
@@ -2604,7 +2604,7 @@ const mapPage = () => {
                             }
                         </Row>
                         <div style={{ position: "absolute", bottom: "0px", height: "70px", width: "300px", backgroundColor: "#f1eded", padding: "5px" }}>
-                            <span><b>Brightness</b></span>
+                            <span><b>Transparent</b></span>
                             <div style={{ display: "flex", flexDirection: "row", justifyContent: "center", alignItems: "baseline" }}>
                                 <span>🌘</span>
                                 <Slider onChange={(e) => setWmsopacity(e)} defaultValue={100} disabled={false} style={{ width: "80%" }} />
@@ -2700,7 +2700,7 @@ const mapPage = () => {
                             }
                         </Row>
                         <div style={{ position: "absolute", bottom: "0px", height: "70px", width: "300px", backgroundColor: "#f1eded", padding: "5px" }}>
-                            <span><b>Brightness</b></span>
+                            <span><b>Transparent</b></span>
                             <div style={{ display: "flex", flexDirection: "row", justifyContent: "center", alignItems: "baseline" }}>
                                 <span>🌘</span>
                                 <Slider onChange={(e) => setWmsopacityright(e)} defaultValue={100} disabled={false} style={{ width: "80%" }} />
