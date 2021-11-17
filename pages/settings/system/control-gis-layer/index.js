@@ -93,7 +93,7 @@ const usersSystemPage = () => {
     },
     {
       key: "4",
-      title: "ประเภทไฟล์",
+      title: <b>ประเภทไฟล์</b>,
       dataIndex: "type",
       sorter: (record1, record2) => {
         return record1.group_name > record2.group_name;
