@@ -78,7 +78,7 @@ const mapPage = () => {
         const loader = new Loader({
             apiKey: process.env.NEXT_PUBLIC_GOOGLE_API_KEY,
             version: "weekly",
-            libraries: ["drawing", "places"],
+            libraries: ["drawing", "places", "geometry", "weekly"],
         });
         loader.load().then(() => {
             const google = window.google;
@@ -515,11 +515,14 @@ const mapPage = () => {
     }
 
     const getDeoJson = async (id, color, option_layer) => {
+        google.maps.event.clearListeners(map, 'click');
+
         try {
             const { data } = await API.get(`/shp/shapeData?id=${id}`);
             const GeoJson = data.items.shape;
             const bounds = new google.maps.LatLngBounds();
             const layer = new google.maps.Data();
+
             layer.addGeoJson(GeoJson)
             option_layer = option_layer ?? {}
             let icon = null
@@ -535,16 +538,23 @@ const mapPage = () => {
 
             // console.log('option_layer :>> ', option_layer);
             layer.setStyle((e) => {
+
                 return {
                     fillColor: e.h.status_color ?? color,
                     fillOpacity: option_layer.fillOpacity ?? inputValueOpacityColor, //Opacity
                     strokeWeight: option_layer.strokeWeight ?? inputValueStrokColor,  //ความหนาขอบ
                     strokeColor: option_layer.strokeColor ? option_layer.strokeColor.hex : colorFrame.hex, //เส้นขอบ
-                    clickable: false,
+                    // clickable: false,
                     icon,
                 }
             });
+
+
             layer.setMap(map);
+            layer.addListener('click', (e) => {
+                console.log('e :>> ', e);
+                setInfoWindowWA(e);
+            })
 
             layer.forEach((feature) => {
                 // console.log('feature :>> ', feature);
@@ -560,6 +570,20 @@ const mapPage = () => {
             console.log('errr :>> ', error);
         }
     };
+    function setInfoWindowWA(feature) {
+        var infowindow = new google.maps.InfoWindow();
+        let key = Object.keys(feature.feature.h);
+        var content = "<div id='infoBox'><center><strong>รายละเอียดข้อมูล</strong></center><br />";
+        key.forEach((a, i) => {
+            // console.log('a :>> ', a);
+            content += a + ": " + feature.feature.h[a] + "<br />";
+        });
+        content += "</div>";
+        infowindow.setContent(content);
+        infowindow.setPosition(feature.latLng);
+        infowindow.open(map);
+
+    }
 
     const openColor = (index1, index2) => {
         const arr = [...groupLayerList];
@@ -986,16 +1010,38 @@ const mapPage = () => {
         }
 
         var boundsCenter = bounds.getCenter();
-        var centerLabel = new MapLabel({
+        // var centerLabel = new MapLabel({
+        //     map: map,
+        //     fontSize: 13,
+        //     align: "center",
+        //     zIndex: 98
+
+        // });
+        // polygon.labels.push(centerLabel);
+        // centerLabel.set("position", boundsCenter);
+        // centerLabel.set("text", (parseFloat(area)).toLocaleString('en-US') + " ตร.ม");
+        let markerwa1 = new google.maps.Marker({
             map: map,
-            fontSize: 13,
-            align: "center",
+            animation: google.maps.Animation.DROP,
+            position: boundsCenter,
+            icon: {
+                url: 'http://image.flaticon.com/icons/svg/252/252025.svg',
+                scaledSize: new google.maps.Size(80, 80),
+                origin: new google.maps.Point(0, 0),
+                anchor: new google.maps.Point(32, 65),
+                labelOrigin: new google.maps.Point(40, 33),
 
+            },
+            label: {
+                text: (parseFloat(area)).toLocaleString('en-US') + " ตร.ม",
+                color: "#eb3a3a",
+                fontSize: "13px",
+                fontWeight: "bold",
+
+            },
+            zIndex: 99
         });
-
-        polygon.labels.push(centerLabel);
-        centerLabel.set("position", boundsCenter);
-        centerLabel.set("text", (parseFloat(area)).toLocaleString('en-US') + " ตร.ม");
+        polygon.labels.push(markerwa1);
         if (path.getLength() < 2) return;
         for (var i = 0; i < polygon.getPath().getLength(); i++) {
             // for each side in path, compute center and length
@@ -1003,15 +1049,36 @@ const mapPage = () => {
             var end = polygon.getPath().getAt(i < polygon.getPath().getLength() - 1 ? i + 1 : 0);
             var sideLength = google.maps.geometry.spherical.computeDistanceBetween(start, end);
             var sideCenter = google.maps.geometry.spherical.interpolate(start, end, 0.5);
-            var sideLabel = new MapLabel({
-                map: map,
-                fontSize: 13,
-                align: "center",
-            });
+            // var sideLabel = new MapLabel({
+            //     map: map,
+            //     fontSize: 13,
+            //     align: "center",
+            // });
 
-            sideLabel.set("position", sideCenter);
-            sideLabel.set("text", (parseFloat(sideLength.toFixed(2))).toLocaleString('en-US') + " ม");
-            polygon.labels.push(sideLabel);
+            // sideLabel.set("position", sideCenter);
+            // sideLabel.set("text", (parseFloat(sideLength.toFixed(2))).toLocaleString('en-US') + " ม.");
+            // polygon.labels.push(sideLabel);
+
+            let markerwa2 = new google.maps.Marker({
+                map: map,
+                animation: google.maps.Animation.DROP,
+                position: sideCenter,
+                icon: {
+                    url: 'http://image.flaticon.com/icons/svg/252/252025.svg',
+                    scaledSize: new google.maps.Size(80, 80),
+                    origin: new google.maps.Point(0, 0),
+                    anchor: new google.maps.Point(32, 65),
+                    labelOrigin: new google.maps.Point(40, 33),
+                },
+                label: {
+                    text: (parseFloat(sideLength.toFixed(2))).toLocaleString('en-US') + " ม.",
+                    color: "#eb3a3a",
+                    fontSize: "13px",
+                    fontWeight: "bold"
+                },
+                zIndex: 99
+            });
+            polygon.labels.push(markerwa2);
 
         }
     }
@@ -1028,12 +1095,14 @@ const mapPage = () => {
             drawingControl: false,
             drawingMode: google.maps.drawing.OverlayType.POLYGON,
             polygonOptions: {
-                strokeWeight: 1,
+                strokeColor: "#008cff",
+                strokeWeight: 1.5,
                 fillOpacity: 0.3,
                 editable: true,
-                draggable: false,
-                fillColor: "#44ff7c",
+                draggable: true,
+                fillColor: "#008cff",
                 zIndex: 0,
+
             },
             // map: map
         });

@@ -16,6 +16,7 @@ export default class MyDocument extends Document {
           <link rel="icon" type="image/png" href="/assets/images/PTT-herder.png"></link>
           <script src='http://maps.google.com/maps/api/js?key=AIzaSyArK9veHmyKP3QdYMPW1381JzFHqUwDg9U&libraries=drawing,places,weekly,geometry&language=th&region=TH' defer></script>
           <script src="/assets/js/maplabel.js" defer></script>
+
         </Head>
         <body>
           <Main />
