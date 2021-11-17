@@ -2029,20 +2029,50 @@ const mapPage = () => {
                                         </>
                                         : null}
                                     {FileType === "Point" ? (
-                                        <Form.Item
-                                            label="Symbol"
-                                            rules={[{ required: true, message: "กรุณาเลือกไฟล์!" }]}
-                                            extra="ขนาดแนะนำ 25X35"
-                                        >
-                                            <Upload
-                                                onChange={handleChangeSymbol}
-                                                action={`${process.env.NEXT_PUBLIC_SERVICE}/demo/resTrue`}
-                                                fileList={FileListSymbol}
-                                                multiple={false}
+                                        <>
+                                            <Form.Item
+                                                label="Symbol"
+                                                rules={[{ required: true, message: "กรุณาเลือกไฟล์!" }]}
+                                                extra="ขนาดแนะนำ 25X35"
                                             >
-                                                <Button icon={<UploadOutlined />}>Upload</Button>
-                                            </Upload>
-                                        </Form.Item>
+                                                <Upload
+                                                    onChange={handleChangeSymbol}
+                                                    action={`${process.env.NEXT_PUBLIC_SERVICE}/demo/resTrue`}
+                                                    fileList={FileListSymbol}
+                                                    multiple={false}
+                                                >
+                                                    <Button icon={<UploadOutlined />}>Upload</Button>
+                                                </Upload>
+
+                                            </Form.Item>
+                                            {/* <Form.Item
+                                                label="Default Symbol"
+                                            >
+                                                <Button onClick={() => $(".symbol_point").fadeToggle()}>Symbol</Button>
+                                                <div className="symbol_point" style={{ display: "none" }}>
+                                                    <div>
+                                                        <img src="assets/images/symbol_point/attention-png-5a38115be571a6.2447209915136238999398.jpg" alt="" />
+                                                        ssss
+                                                    </div>
+                                                    <div>
+                                                        <img src="assets/images/symbol_point/pngtree-vector-location-icon-png-image_956422.jpg" alt="" />
+                                                        ssssss
+                                                    </div>
+                                                    <div>
+                                                        3
+                                                    </div>
+                                                    <div>
+                                                        4
+                                                    </div>
+                                                    <div>
+                                                        5
+                                                    </div>
+                                                    <div>
+                                                        6
+                                                    </div>
+                                                </div>
+                                            </Form.Item> */}
+                                        </>
                                     ) : null}
 
 
