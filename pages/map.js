@@ -19,12 +19,14 @@ import {
     Switch,
     Slider,
     Tooltip,
-    InputNumber
+    InputNumber,
+    Table,
+    Pagination
 } from "antd";
 import Head from "next/head";
 import { useSelector } from "react-redux";
 import { SketchPicker } from "react-color";
-import { CaretRightOutlined, UploadOutlined, EditFilled, ExpandOutlined, EyeFilled } from "@ant-design/icons";
+import { CaretRightOutlined, UploadOutlined, EditFilled, ExpandOutlined, EyeFilled, UnorderedListOutlined, TableOutlined } from "@ant-design/icons";
 import API from "../util/Api";
 import RefreshToken from "../util/RefreshToken";
 import axios from "axios";
@@ -1117,6 +1119,85 @@ const mapPage = () => {
     const [searchAllList, setSearchAllList] = useState([])
     const [firstSearc, setFirstSearc] = useState(true)
 
+    /* Detail */
+    const [pageDetailSearch, setPageDetailSearch] = useState(1)
+
+    /* table */
+    const [modeSearch, setModeSearch] = useState("Detail");
+    const [pageSearch, setPageSearch] = useState(1)
+    const [totalSearch, setTotalSearch] = useState(0)
+    const [limitSearch, setLimitSearch] = useState(10)
+
+    const columnsSearch = [
+        {
+            title: 'ลำดับ',
+            dataIndex: 'num',
+            key: 'num',
+            align: "center",
+            width: 100,
+            render: (text, record, index) => {
+                index += ((pageSearch - 1) * limitSearch)
+                return index + 1
+            },
+        },
+        {
+            title: 'OBJECTID',
+            dataIndex: 'objectid',
+            key: 'objectid',
+            width: 150,
+            align: "center",
+            render: (text, record) => text ?? "-",
+        },
+        {
+            title: 'Shape',
+            dataIndex: 'Shape',
+            key: 'Shape',
+            width: 150,
+            align: "center",
+            render: (text, record) => text ?? "-",
+        },
+        {
+            title: 'PARID',
+            dataIndex: 'PARID',
+            key: 'PARID',
+            width: 150,
+            align: "center",
+            render: (text, record) => text ?? "-",
+        },
+        {
+            title: 'PARDEEDNO',
+            dataIndex: 'PARDEEDNO',
+            key: 'PARDEEDNO',
+            width: 150,
+            align: "center",
+            render: (text, record) => text ?? "-",
+        },
+        {
+            title: 'PARLOTNO',
+            dataIndex: 'PARLOTNO',
+            key: 'PARLOTNO',
+            width: 150,
+            align: "center",
+            render: (text, record) => text ?? "-",
+        },
+        {
+            title: 'PARTYPE',
+            dataIndex: 'partype',
+            key: 'partype',
+            width: 150,
+            align: "center",
+            render: (text, record) => text ?? "-",
+        },
+        {
+            title: 'AREARAI',
+            dataIndex: 'row_distan',
+            key: 'row_distan',
+            width: 200,
+            align: "center",
+            render: (text, record) => text ?? "-",
+        },
+    ]
+
     const onFinishSearch = (value) => {
         apiSearchData({ ...value })
     }
@@ -1226,8 +1307,17 @@ const mapPage = () => {
 
     }
 
+    const paginationSearchData = (page, _limit) => {
+        const _arr = [...searchAllList]
+        const trimStart = (page - 1) * _limit
+        const trimEnd = trimStart + _limit
+        const trimmedData = _arr.slice(trimStart, trimEnd)
+        setSearchList(trimmedData)
+        setPageDetailSearch(page)
+    }
+
     const editShapefileSearch = (item, index) => {
-        console.log('item :>> ', item);
+        // console.log('item :>> ', item);
         const formData = []
         const setFieldsValue = {}
 
@@ -1304,11 +1394,17 @@ const mapPage = () => {
     /* Dashboard */
     const [visibleDashboard, setVisibleDashboard] = useState(false);
     const [formDashboard] = Form.useForm();
+    const [sumDashboard, setSumDashboard] = useState({
+        distance: 0,
+        plot: 0,
+    })
+
     const [plotDashboard, setPlotDashboard] = useState({
         labels: [],
         datasets: [],
         list: [],
     })
+
     const [distanceDashboard, setDistanceDashboard] = useState({
         labels: [],
         datasets: [],
@@ -1334,7 +1430,10 @@ const mapPage = () => {
             if (search) url += `&search=${search}`
             if (tam) url += `&tam=${tam}`
             if (amp) url += `&amp=${amp}`
-
+            let sum = {
+                distance: 0,
+                plot: 0,
+            }
             const { data } = await API.get(url)
             // console.log('data :>> ', data.items);
 
@@ -1358,6 +1457,7 @@ const mapPage = () => {
                     name: plot.status[i],
                     value: e
                 }
+                sum.plot += Number(e)
             })
 
             setPlotDashboard({ ..._plotDashboard })
@@ -1379,8 +1479,9 @@ const mapPage = () => {
                     name: distance.status[i],
                     value: e
                 }
+                sum.distance += Number(e)
             })
-
+            setSumDashboard({ ...sumDashboard, distance: sum.distance, plot: sum.plot })
             setDistanceDashboard({ ..._distanceDashboard })
 
         } catch (error) {
@@ -1555,19 +1656,25 @@ const mapPage = () => {
             </Head>
             <Timeslide onChange={(e) => OnPlaytimeslide(e)} data={datatimeslider} onDateChange={GetTimslide} onClose={() => setSlidemapshow(false)} visible={slidemapshow} />
             <div className="tools-group-layer">
-                <Tooltip placement="topRight" title={"GIS Layers"}>
-                    <button className="btn btn-light btn-sm" onClick={() => setVisibleShapeFile(true)}>
+                <Tooltip placement="right" title={"GIS Layers"}>
+                    <button className="btn btn-light btn-sm" onClick={() => {
+                        setVisibleShapeFile(!visibleShapeFile)
+                        setVisibleDashboard(false)
+                        setVisibleSearch(false)
+                    }}>
                         {/* <i className="fa fa-window-restore" /> */}
                         <img width="100%" src="/assets/images/fa-window-restore.png" alt="" />
                     </button>
                 </Tooltip>
             </div>
             <div className="tools-dashboard">
-                <Tooltip placement="topRight" title={"Dashboard"}>
+                <Tooltip placement="right" title={"Dashboard"}>
                     <button
                         className="btn btn-light btn-sm"
                         onClick={() => {
-                            setVisibleDashboard(true)
+                            setVisibleShapeFile(false)
+                            setVisibleDashboard(!visibleDashboard)
+                            setVisibleSearch(false)
                             apiDashboardData({ project_name: "project_na" })
                         }}
                     >
@@ -1577,7 +1684,7 @@ const mapPage = () => {
                 </Tooltip>
             </div>
             <div className="tools-dashboard" style={{ top: 215 }}>
-                <Tooltip placement="topRight" title={"ShowStreetView"}>
+                <Tooltip placement="right" title={"ShowStreetView"}>
                     <button
                         className="btn btn-light btn-sm"
                         onClick={() => {
@@ -1626,6 +1733,9 @@ const mapPage = () => {
                                         apiSearchData({ project_name: "project_na" })
                                         setFirstSearc(false)
                                     }
+
+                                    setVisibleShapeFile(false)
+                                    setVisibleDashboard(false)
                                     setVisibleSearch(!visibleSearch)
                                 }}
                             >
@@ -2217,8 +2327,7 @@ const mapPage = () => {
                         </Form>
                     </div>
                     <hr />
-
-                    <h3>แปลง</h3>
+                    <h3>แปลง ({sumDashboard.plot.toLocaleString()}  แปลง)</h3>
                     <div className="row">
                         <div className={width <= 750 ? "col-12" : "col-8"}>
                             <Doughnut
@@ -2236,7 +2345,7 @@ const mapPage = () => {
 
                     <hr />
 
-                    <h3>ระยะทาง</h3>
+                    <h3>ระยะทาง ({sumDashboard.distance.toLocaleString()} ก.ม.)</h3>
                     <div className="row">
                         <div className={width <= 750 ? "col-12" : "col-8"}>
                             <Doughnut
@@ -2388,97 +2497,131 @@ const mapPage = () => {
                 <hr />
 
                 <div>
-                    <h4 className="pb-3">พบข้อมูลจำนวน <span className="text-red">{amount}</span> Record</h4>
-                    {
-                        searchList.map((e, i) => (
-                            <div key={`SearchList-${i}`}>
-                                {e.index})
-                                <div className="row pt-2">
-                                    <div className="col-md-1">
-                                        <div
-                                            style={{
-                                                width: "25px",
-                                                height: "25px",
-                                                borderRadius: "2px",
-                                                background: e.color,
-                                                border: "1px solid black",
-                                            }}
-                                        />
-                                    </div>
-                                    <div className="col-md-11">
-
-                                        <div className="row">
-                                            <label>PROJECT_NAME :</label>
-                                            <p className="pl-3">{e.project_na}</p>
-                                        </div>
-
-                                        <div className="row">
-                                            <label>PARTYPE :</label>
-                                            <p className="pl-3">{e.partype}</p>
-                                        </div>
-
-                                        <div className="row">
-                                            <label>ลำดับแปลงที่ดิน (OBJECT_ID) :</label>
-                                            <p className="pl-3">{e.objectid}</p>
-                                        </div>
-
-                                        <div className="pl-2">
-                                            <div className="row">
-                                                <div className="col-md-4">
-                                                    <div className="row">
-                                                        <label>PARLABEL1 :</label>
-                                                        <p className="pl-3">{e.parlabel1}</p>
+                    <Row>
+                        <Col span={12}>
+                            <h4 className="pb-3">พบข้อมูลจำนวน <span className="text-red">{amount.toLocaleString()}</span> Records</h4>
+                        </Col>
+                        <Col span={12} style={{ textAlign: "end" }}>
+                            <Tooltip placement="bottom" title={"Details"}>
+                                <a style={{ fontSize: 18 }} onClick={() => setModeSearch("Detail")} ><UnorderedListOutlined /></a>
+                            </Tooltip>
+                            &nbsp;&nbsp;&nbsp;
+                            <Tooltip placement="bottom" title={"Lists"}>
+                                <a style={{ fontSize: 18 }} onClick={() => setModeSearch("Table")}><TableOutlined /></a>
+                            </Tooltip>
+                        </Col>
+                    </Row>
+                    <>
+                        {
+                            modeSearch === "Detail" ?
+                                <div>
+                                    {
+                                        searchList.map((e, i) => (
+                                            <div key={`SearchList-${i}`}>
+                                                {e.index.toLocaleString()})
+                                                <div className="row pt-2">
+                                                    <div className="col-md-1">
+                                                        <div
+                                                            style={{
+                                                                width: "25px",
+                                                                height: "25px",
+                                                                borderRadius: "2px",
+                                                                background: e.color,
+                                                                border: "1px solid black",
+                                                            }}
+                                                        />
                                                     </div>
-                                                </div>
-                                                <div className="col-md-4">
-                                                    <div className="row">
-                                                        <label>PARLABEL2 :</label>
-                                                        <p className="pl-3">{e.parlabel2}</p>
+                                                    <div className="col-md-11">
+
+                                                        <div className="row">
+                                                            <label>PROJECT_NAME :</label>
+                                                            <p className="pl-3">{e.project_na}</p>
+                                                        </div>
+
+                                                        <div className="row">
+                                                            <label>PARTYPE :</label>
+                                                            <p className="pl-3">{e.partype}</p>
+                                                        </div>
+
+                                                        <div className="row">
+                                                            <label>ลำดับแปลงที่ดิน (OBJECT_ID) :</label>
+                                                            <p className="pl-3">{e.objectid}</p>
+                                                        </div>
+
+                                                        <div className="pl-2">
+                                                            <div className="row">
+                                                                <div className="col-md-4">
+                                                                    <div className="row">
+                                                                        <label>PARLABEL1 :</label>
+                                                                        <p className="pl-3">{e.parlabel1}</p>
+                                                                    </div>
+                                                                </div>
+                                                                <div className="col-md-4">
+                                                                    <div className="row">
+                                                                        <label>PARLABEL2 :</label>
+                                                                        <p className="pl-3">{e.parlabel2}</p>
+                                                                    </div>
+                                                                </div>
+                                                                <div className="col-md-4">
+                                                                    <div className="row">
+                                                                        <label>PARLABEL3 :</label>
+                                                                        <p className="pl-3">{e.parlabel3}</p>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+
+                                                            <div className="row">
+                                                                <div className="col-md-4">
+                                                                    <div className="row">
+                                                                        <label>PARLABEL4 :</label>
+                                                                        <p className="pl-3">{e.parlabel4}</p>
+                                                                    </div>
+                                                                </div>
+                                                                <div className="col-md-4">
+                                                                    <div className="row">
+                                                                        <label>PARLABEL5 :</label>
+                                                                        <p className="pl-3">{e.parlabel5}</p>
+                                                                    </div>
+                                                                </div>
+                                                                <div className="col-md-4">
+                                                                    <button className="btn" onClick={() => editShapefileSearch(e, i)}><EditFilled /></button>
+                                                                    <Switch size="small" checked={e.checked} onChange={(value) => switchGeom(value, e, i)} />
+                                                                    {e.checked ?
+                                                                        <button className="btn" onClick={() => goTolayer(e.index, "search")}>
+                                                                            <ExpandOutlined />
+                                                                        </button> : null}
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+
                                                     </div>
+
                                                 </div>
-                                                <div className="col-md-4">
-                                                    <div className="row">
-                                                        <label>PARLABEL3 :</label>
-                                                        <p className="pl-3">{e.parlabel3}</p>
-                                                    </div>
-                                                </div>
+                                                <hr />
                                             </div>
-
-                                            <div className="row">
-                                                <div className="col-md-4">
-                                                    <div className="row">
-                                                        <label>PARLABEL4 :</label>
-                                                        <p className="pl-3">{e.parlabel4}</p>
-                                                    </div>
-                                                </div>
-                                                <div className="col-md-4">
-                                                    <div className="row">
-                                                        <label>PARLABEL5 :</label>
-                                                        <p className="pl-3">{e.parlabel5}</p>
-                                                    </div>
-                                                </div>
-                                                <div className="col-md-4">
-                                                    <button className="btn" onClick={() => editShapefileSearch(e, i)}><EditFilled /></button>
-                                                    <Switch size="small" checked={e.checked} onChange={(value) => switchGeom(value, e, i)} />
-                                                    {e.checked ?
-                                                        <button className="btn" onClick={() => goTolayer(e.index, "search")}>
-                                                            <ExpandOutlined />
-                                                        </button> : null}
-                                                </div>
-                                            </div>
-                                        </div>
-
-
+                                        ))
+                                    }
+                                    <div style={{ textAlign: "center" }}>
+                                        {/* {amount >= sumData ? <button className="btn btn-primary" onClick={pushSearchData}>โหลดเพิ่มเติม</button> : null} */}
+                                        <Pagination current={pageDetailSearch} total={amount} onChange={paginationSearchData} />
                                     </div>
-
-                                </div>
-                                <hr />
-                            </div>
-                        ))
-                    }
-                    <div style={{ textAlign: "center" }}>
-                        {amount >= sumData ? <button className="btn btn-primary" onClick={pushSearchData}>โหลดเพิ่มเติม</button> : null}
-                    </div>
+                                </div> :
+                                modeSearch === "Table" ?
+                                    <div>
+                                        <Table dataSource={searchAllList} columns={columnsSearch} rowKey={(row) => row.id} scroll={{ x: "100%", y: "100%" }} pagination={{
+                                            current: pageSearch,
+                                            total: totalSearch,
+                                            pageSize: limitSearch,
+                                            showTotal: (total, range) => `ข้อมูล ${range[0]} - ${range[1]} ทั้งหมด ${total.toLocaleString()} รายการ`,
+                                            onChange: async (e, _limit) => {
+                                                setPageSearch(e)
+                                                if (limitSearch !== _limit) setLimitSearch(_limit)
+                                            }
+                                        }} />
+                                    </div>
+                                    : null}
+                    </>
 
                 </div>
             </Drawer>
@@ -2834,7 +2977,7 @@ const mapPage = () => {
             -webkit-flex-grow: 1;
             -moz-box-flex: 1;
             flex-grow: 1;
-            padding: 24px;
+            padding: 24px 40px 24px 24px;
             overflow: auto;
             font-size: 14px;
             line-height: 1.5715;
@@ -2883,6 +3026,9 @@ const mapPage = () => {
             border-color: #000;
         }
 
+        .ant-pagination-item-active a {
+            color: #1890ff !important;
+        }
 
          {/* .ant-tabs-card > .ant-tabs-nav .ant-
              padding: 8px 16px;
