@@ -261,7 +261,7 @@ const index = () => {
 
     };
 
-    const reload = async (search = null) => {
+    const reload = async (search = "") => {
         try {
             const respData = await Api.get(`streetview/getAllDatStreetView?search=${search}`);
             let tempDataArray = [];

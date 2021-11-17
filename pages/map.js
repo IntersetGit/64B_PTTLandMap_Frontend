@@ -995,7 +995,7 @@ const mapPage = () => {
 
         polygon.labels.push(centerLabel);
 
-        centerLabel.set("position", bounds.getCenter());
+        centerLabel.set("position", boundsCenter);
         centerLabel.set("text", (parseFloat(area)).toLocaleString('en-US') + " ตร.ม");
         if (path.getLength() < 2) return;
         for (var i = 0; i < polygon.getPath().getLength(); i++) {
@@ -1012,6 +1012,7 @@ const mapPage = () => {
             sideLabel.set("position", sideCenter);
             sideLabel.set("text", (parseFloat(sideLength.toFixed(2))).toLocaleString('en-US') + " ม");
             polygon.labels.push(sideLabel);
+
         }
     }
     function removePolygonInfoWindow(labels) {
@@ -1027,12 +1028,12 @@ const mapPage = () => {
             drawingControl: false,
             drawingMode: google.maps.drawing.OverlayType.POLYGON,
             polygonOptions: {
-                // strokeWeight: 1,
+                strokeWeight: 1,
                 fillOpacity: 0.3,
                 editable: true,
-                draggable: true,
+                draggable: false,
                 fillColor: "#44ff7c",
-
+                zIndex: 0,
             },
             // map: map
         });

@@ -37,7 +37,7 @@ function MapLabel(opt_options) {
     this.set('strokeColor', '#ffffff');
     this.set('align', 'center');
 
-    this.set('zIndex', 1e3);
+    this.set('zIndex', 1);
 
     this.setValues(opt_options);
 }
@@ -80,7 +80,6 @@ MapLabel.prototype.drawCanvas_ = function () {
     ctx.strokeStyle = this.get('strokeColor');
     ctx.fillStyle = this.get('fontColor');
     ctx.font = this.get('fontSize') + 'px ' + this.get('fontFamily');
-
     var strokeWeight = Number(this.get('strokeWeight'));
 
     var text = this.get('text');
