@@ -544,7 +544,6 @@ const mapPage = () => {
                     fillOpacity: option_layer.fillOpacity ?? inputValueOpacityColor, //Opacity
                     strokeWeight: option_layer.strokeWeight ?? inputValueStrokColor,  //ความหนาขอบ
                     strokeColor: option_layer.strokeColor ? option_layer.strokeColor.hex : colorFrame.hex, //เส้นขอบ
-                    // clickable: false,
                     icon,
                 }
             });
