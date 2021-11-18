@@ -481,7 +481,7 @@ const mapPage = () => {
                     fillOpacity: option_layer.fillOpacity ?? inputValueOpacityColor, //Opacity
                     strokeWeight: option_layer.strokeWeight ?? inputValueStrokColor,  //ความหนาขอบ
                     strokeColor: option_layer.strokeColor ? option_layer.strokeColor.hex : colorFrame.hex, //เส้นขอบ
-                    clickable: false,
+                    // clickable: false,
                 }
             });
         }
@@ -571,15 +571,27 @@ const mapPage = () => {
             console.log('errr :>> ', error);
         }
     };
-    function setInfoWindowWA(feature) {
-        var infowindow = new google.maps.InfoWindow();
-        let key = Object.keys(feature.feature.h);
-        var content = "<div id='infoBox'><center><strong>รายละเอียดข้อมูล</strong></center><br />";
-        key.forEach((a, i) => {
-            // console.log('a :>> ', a);
-            content += a + ": " + feature.feature.h[a] + "<br />";
-        });
-        content += "</div>";
+    const setInfoWindowWA = (feature) => {
+        const infowindow = new google.maps.InfoWindow();
+        // let key = Object.keys(feature.feature.h);
+        // let content = "<div id='infoBox'><center><strong>รายละเอียดข้อมูล</strong></center><br />";
+        // key.forEach((a, i) => {
+        //     // console.log('a :>> ', a);
+        //     content += a + ": " + feature.feature.h[a] + "<br />";
+        // });
+        // content += "</div>";
+
+        const item = feature.feature.h;
+        const content = `<div id='infoBox'><center><strong>รายละเอียดข้อมูล</strong></center><br />
+        <p>Project : ${item.project_na}</p>
+        <p>PARTYPE : ${item.partype}</p>
+        <p>ลำดับแปลงที่ดิน (OBJECT_ID) : ${item.objectid}</p>
+        <p>PARLABEL1 : ${item.parlabel1}</p>
+        <p>PARLABEL2 : ${item.parlabel2}</p>
+        <p>PARLABEL3 : ${item.parlabel3}</p>
+        <p>PARLABEL4 : ${item.parlabel4}</p>
+        <p>PARLABEL5 : ${item.parlabel5}</p>
+        `
         infowindow.setContent(content);
         infowindow.setPosition(feature.latLng);
         infowindow.open(map);
@@ -1350,7 +1362,7 @@ const mapPage = () => {
                 fillOpacity: option_layer.fillOpacity ?? inputValueOpacityColor, //Opacity
                 strokeWeight: option_layer.strokeWeight ?? inputValueStrokColor,  //ความหนาขอบ
                 strokeColor: option_layer.strokeColor ? option_layer.strokeColor.hex : colorFrame.hex, //เส้นขอบ
-                clickable: false,
+                // clickable: false,
             });
             layer.setMap(map);
 
@@ -1725,47 +1737,50 @@ const mapPage = () => {
                 <title>PTT Land Map</title>
             </Head>
             <Timeslide onChange={(e) => OnPlaytimeslide(e)} data={datatimeslider} onDateChange={GetTimslide} onClose={() => setSlidemapshow(false)} visible={slidemapshow} />
-            <div className="tools-group-layer">
-                <Tooltip placement="right" title={"GIS Layers"}>
-                    <button className="btn btn-light btn-sm" onClick={() => {
-                        setVisibleShapeFile(!visibleShapeFile)
-                        setVisibleDashboard(false)
-                        setVisibleSearch(false)
-                    }}>
-                        {/* <i className="fa fa-window-restore" /> */}
-                        <img width="100%" src="/assets/images/fa-window-restore.png" alt="" />
-                    </button>
-                </Tooltip>
-            </div>
-            <div className="tools-dashboard">
-                <Tooltip placement="right" title={"Dashboard"}>
-                    <button
-                        className="btn btn-light btn-sm"
-                        onClick={() => {
-                            setVisibleShapeFile(false)
-                            setVisibleDashboard(!visibleDashboard)
-                            setVisibleSearch(false)
-                            apiDashboardData({ project_name: "project_na" })
-                        }}
-                    >
-                        {/* <i className="fa fa-dashboard" /> */}
-                        <img width="100%" src="/assets/images/fa-dashboard.png" alt="" />
-                    </button>
-                </Tooltip>
-            </div>
-            <div className="tools-dashboard" style={{ top: 215 }}>
-                <Tooltip placement="right" title={"ShowStreetView"}>
-                    <button
-                        className="btn btn-light btn-sm"
-                        onClick={() => {
-                            StreetViewVisible()
-                        }}
-                    >
-                        <img width="100%" src="/assets/images/icons8-street-view-80.png" alt="" />
-                    </button>
-                </Tooltip>
-            </div>
-
+            {!changmap ? (
+                <>
+                    <div className="tools-group-layer">
+                        <Tooltip placement="right" title={"GIS Layers"}>
+                            <button className="btn btn-light btn-sm" onClick={() => {
+                                setVisibleShapeFile(!visibleShapeFile)
+                                setVisibleDashboard(false)
+                                setVisibleSearch(false)
+                            }}>
+                                {/* <i className="fa fa-window-restore" /> */}
+                                <img width="100%" src="/assets/images/fa-window-restore.png" alt="" />
+                            </button>
+                        </Tooltip>
+                    </div>
+                    <div className="tools-dashboard">
+                        <Tooltip placement="right" title={"Dashboard"}>
+                            <button
+                                className="btn btn-light btn-sm"
+                                onClick={() => {
+                                    setVisibleShapeFile(false)
+                                    setVisibleDashboard(!visibleDashboard)
+                                    setVisibleSearch(false)
+                                    apiDashboardData({ project_name: "project_na" })
+                                }}
+                            >
+                                {/* <i className="fa fa-dashboard" /> */}
+                                <img width="100%" src="/assets/images/fa-dashboard.png" alt="" />
+                            </button>
+                        </Tooltip>
+                    </div>
+                    <div className="tools-dashboard" style={{ top: 215 }}>
+                        <Tooltip placement="right" title={"ShowStreetView"}>
+                            <button
+                                className="btn btn-light btn-sm"
+                                onClick={() => {
+                                    StreetViewVisible()
+                                }}
+                            >
+                                <img width="100%" src="/assets/images/icons8-street-view-80.png" alt="" />
+                            </button>
+                        </Tooltip>
+                    </div>
+                </>
+            ) : null}
             <div className="map-info-area">
                 <div className="map-info-detail">
                     <span>
