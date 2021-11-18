@@ -346,3 +346,31 @@ body {
 .NameHighlightsHover #changeMap {
   display:block;
 }
+
+.symbol_point{
+  display: grid;
+  grid-template-columns: auto auto auto;
+    position:absolute;
+    width: 14em;
+    top:-10.3em;
+    left:70px;
+    z-index:1000;
+    background-color: #DDD;
+    border:1px black solid;
+    border-radius: 4px;
+}
+.symbol_point>div{
+  background-color: #f1f1f1;
+  width: 45px;
+  height: 45px;
+  margin: 10px;
+  text-align: center;
+  font-size: 13px;
+  cursor: pointer;
+  font-weight:bold;
+  
+  img{
+    width: 40px;
+    height: 40px;
+  }
+}
