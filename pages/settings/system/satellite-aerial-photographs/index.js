@@ -430,7 +430,7 @@ const index = () => {
               maxCount={1}
               defaultFileList={[{
                 name: "default.jpeg",
-                url: `${process.env.NEXT_PUBLIC_SERVICE}/uploads/satellite-aerial-photographs/ecd3f348-482d-470c-b3bf-77f982241241.jpg`
+                url: `${process.env.NEXT_PUBLIC_SERVICE}/uploads/default/satellite.jpg`
               }]}
             >
               <Button icon={<UploadOutlined />}>Select File</Button>
