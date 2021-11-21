@@ -332,7 +332,7 @@ function WmsMapType(name, url, params, options, type = "geoserver") {
         if (url != null && url != "") {
             var data = {};
             data.url = url;
-            fetch("http://imis.md.go.th/IMIS_Service/api/Map/GetWmsBoundary",
+            fetch("https://imis.md.go.th/IMIS_Service/api/Map/GetWmsBoundary",
                 {
                     headers: {
                         'Accept': 'application/json',
