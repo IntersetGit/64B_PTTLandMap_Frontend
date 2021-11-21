@@ -167,23 +167,30 @@ const index = () => {
       url: value.url,
       date: value["date"].format("YYYY-MM-DD"),
     };
-    let fd = new FormData();
-    fd.append("file0", value.upload[0].originFileObj);
+
     Api.post("/masterdata/datLayers", data)
       .then(async (data) => {
         setIsModalVisible({ create: false, edit: false });
         reload();
         setLoading(false);
         formCreate.resetFields();
-        const upload = await axios.post(
-          `${process.env.NEXT_PUBLIC_SERVICE}/upload?Path=satellite-aerial-photographs&Length=1&Name=${data.data.items.id}&SetType=jpg`,
-          fd,
-          {
-            headers: {
-              "Content-Type": "multipart/form-data",
-            },
-          }
-        );
+        if (!value.upload) {
+          const upload = await axios.post(`${process.env.NEXT_PUBLIC_SERVICE}/upload/defaultSatellite`,
+            { id: data.data.items.id }
+          )
+        } else {
+          let fd = new FormData();
+          fd.append("file0", value.upload[0].originFileObj);
+          const upload = await axios.post(
+            `${process.env.NEXT_PUBLIC_SERVICE}/upload?Path=satellite-aerial-photographs&Length=1&Name=${data.data.items.id}&SetType=jpg`,
+            fd,
+            {
+              headers: {
+                "Content-Type": "multipart/form-data",
+              },
+            }
+          );
+        }
         await Swal.fire("", "บันทึกข้อมูลเรียบร้อย", "success");
         window.location.reload();
       })
@@ -415,11 +422,17 @@ const index = () => {
           <Form.Item
             name="upload"
             label="Upload"
-            rules={[{ required: true }]}
+            // rules={[{ required: true }]}
             extra="ขนาดที่ recommend 80x80 pixcel"
             getValueFromEvent={normFile}
           >
-            <Upload maxCount={1}>
+            <Upload
+              maxCount={1}
+              defaultFileList={[{
+                name: "default.jpeg",
+                url: `${process.env.NEXT_PUBLIC_SERVICE}/uploads/default/satellite.jpg`
+              }]}
+            >
               <Button icon={<UploadOutlined />}>Select File</Button>
             </Upload>
           </Form.Item>
