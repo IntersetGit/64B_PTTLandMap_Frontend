@@ -1219,7 +1219,7 @@ const mapPage = () => {
             width: 100,
             render: (text, record, index) => {
                 index += ((pageSearch - 1) * limitSearch)
-                return index + 1
+                return (index + 1).toLocaleString()
             },
         },
         {
@@ -1240,8 +1240,8 @@ const mapPage = () => {
         },
         {
             title: 'PARID',
-            dataIndex: 'PARID',
-            key: 'PARID',
+            dataIndex: 'parid',
+            key: 'parid',
             width: 150,
             align: "center",
             render: (text, record) => text ?? "-",
