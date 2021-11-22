@@ -32,7 +32,7 @@ export default class MyDocument extends Document {
 
           <script src="/assets/js/wmsmaptype.js" async defer></script>
           <script src="/assets/js/wms-capabilities.js"></script>
-          <script src="http://imis.md.go.th/lib/arcgislink.js" async defer></script>
+          <script src="/assets/js/arcgislink.js" async defer></script>
 
         </body>
       </html>

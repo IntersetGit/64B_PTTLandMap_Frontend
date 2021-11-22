@@ -2246,23 +2246,27 @@ const mapPage = () => {
                                                 <Button onClick={() => $(".symbol_point").fadeToggle()}>Symbol</Button>
                                                 <div className="symbol_point" style={{ display: "none" }}>
                                                     <div>
-                                                        <img src="assets/images/symbol_point/attention-png-5a38115be571a6.2447209915136238999398.jpg" alt="" />
-                                                        ssss
+                                                        <img src="assets/images/symbol_point/IMG_0467.PNG" alt="" />
+                                                        1
                                                     </div>
                                                     <div>
-                                                        <img src="assets/images/symbol_point/pngtree-vector-location-icon-png-image_956422.jpg" alt="" />
-                                                        ssssss
+                                                        <img src="assets/images/symbol_point/IMG_0467.PNG" alt="" />
+                                                        2
                                                     </div>
                                                     <div>
+                                                        <img src="assets/images/symbol_point/IMG_0467.PNG" alt="" />
                                                         3
                                                     </div>
                                                     <div>
+                                                        <img src="assets/images/symbol_point/IMG_0467.PNG" alt="" />
                                                         4
                                                     </div>
                                                     <div>
+                                                        <img src="assets/images/symbol_point/IMG_0467.PNG" alt="" />
                                                         5
                                                     </div>
                                                     <div>
+                                                        <img src="assets/images/symbol_point/IMG_0467.PNG" alt="" />
                                                         6
                                                     </div>
                                                 </div>
