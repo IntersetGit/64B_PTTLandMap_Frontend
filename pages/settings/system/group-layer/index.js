@@ -41,7 +41,6 @@ const GroupLayerSystemPage = () => {
   const [loding, setLoding] = useState(false)
   const [form] = Form.useForm();
   const user = useSelector(({ user }) => user.user);
-  console.log(`user`, user)
 
   const handleOk = () => {
     form.submit();
@@ -61,7 +60,7 @@ const GroupLayerSystemPage = () => {
   };
 
   const onFinish = async (value) => {
-    console.log(value);
+    // console.log(value);
     let fd = new FormData();
     console.log(value.symbol[0].originFileObj)
     fd.append("file0", value.symbol[0].originFileObj);
@@ -101,7 +100,7 @@ const GroupLayerSystemPage = () => {
             },
           ];
         });
-        console.log(`tempDataArray`, tempDataArray)
+        // console.log(`tempDataArray`, tempDataArray)
         setData(tempDataArray);
         setLoading(false);
       })
@@ -111,7 +110,7 @@ const GroupLayerSystemPage = () => {
       });
   };
   const normFile = (e) => {
-    console.log("Upload event:", e);
+    // console.log("Upload event:", e);
     if (Array.isArray(e)) {
       return e;
     }
@@ -204,6 +203,13 @@ const GroupLayerSystemPage = () => {
   const handleEdit = async (show) => {
     setIsModalVisible2(true)
     console.log(`show`, show)
+
+    show.Symbol = [{
+      uid: show.id,
+      name: show.id,
+      url: show.symbol,
+    }]
+
     form.setFieldsValue(show);
   }
 
@@ -376,7 +382,7 @@ const GroupLayerSystemPage = () => {
             extra="ขนาดรูปภาพไม่เกิน 50*50 pixcel"
           >
             {/* <ImgCrop rotate> */}
-            <Upload name="logo" action="/upload.do" listType="picture">
+            <Upload name="logo" action={`${process.env.NEXT_PUBLIC_SERVICE}/demo/resTrue`} listType="picture">
               <Button icon={<UploadOutlined />}>Select File</Button>
             </Upload>
             {/* </ImgCrop> */}
@@ -421,18 +427,11 @@ const GroupLayerSystemPage = () => {
             extra="ขนาดรูปภาพไม่เกิน 50*50 pixcel"
           >
             {/* <ImgCrop rotate> */}
-            <Upload name="logo" action="/upload.do" listType="picture"
+            <Upload
+              name="logo"
+              listType="picture"
+              action={`${process.env.NEXT_PUBLIC_SERVICE}/demo/resTrue`}
               maxCount={1}
-              defaultFileList={[
-                {
-                  uid: '-1',
-                  name: `${form.getFieldValue().id}.jpg`,
-                  status: 'done',
-                  url: `${process.env.NEXT_PUBLIC_SERVICE}/upload?Path=symbol_group&Length=1&Name=${form.getFieldValue().id}&SetType=jpg`,
-                  thumbUrl: `${process.env.NEXT_PUBLIC_SERVICE}/upload?Path=symbol_group&Length=1&Name=${form.getFieldValue().id}&SetType=jpg`,
-
-                },
-              ]}
             >
               <Button icon={<UploadOutlined />}>Select File</Button>
             </Upload>
