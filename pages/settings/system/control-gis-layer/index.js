@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import Head from "next/head";
 import System from "../../../../components/_App/System";
 import Api from "../../../../util/Api";
-import moment from "moment";
 import Swal from "sweetalert2";
 import { MoreOutlined, RedoOutlined, UploadOutlined } from "@ant-design/icons";
 import { Cookies } from "react-cookie";
@@ -118,9 +117,11 @@ const usersSystemPage = () => {
                 <Menu.Item key="2" onClick={() => handleDelete(id)}>
                   ลบ
                 </Menu.Item>
-                <Menu.Item key="2" onClick={() => handleExport(id)}>
-                  Export
-                </Menu.Item>
+                {show.type === 'wms' ? null :
+                  <Menu.Item key="2" onClick={() => handleExport(id)}>
+                    Export
+                  </Menu.Item>
+                }
               </Menu>
             }
             placement="bottomLeft"
@@ -301,12 +302,23 @@ const usersSystemPage = () => {
     setModalexport({ id: id, visible: true });
   }
   const onFinishExport = (val) => {
-    console.log('val :>> ', val, modalexport.id);
-
-
+    console.log('val :>> ', val.Export, modalexport.id);
+    axios.get(`${process.env.NEXT_PUBLIC_SERVICE}/shp/convertGeoToShp?id=${modalexport.id}&type=${val.Export}`)
+      .then(async data => {
+        const link = document.createElement('a');
+        if (val.Export === 'shape file') {
+          link.href = data.data.items;
+          link.setAttribute('download', 'shapefile.zip');
+          document.body.appendChild(link);
+          link.click();
+        } else {
+          link.href = data.data.items;
+          link.setAttribute('download', `${val.Export}.${val.Export.toLowerCase()}`);
+          document.body.appendChild(link);
+          link.click();
+        }
+      })
   }
-
-
   const onFinishEdit = async (data) => {
     try {
       Swal.fire({
@@ -724,6 +736,7 @@ const usersSystemPage = () => {
               <Option value="KML">KML</Option>
               <Option value="CSV">CSV</Option>
               <Option value="XLS">XLS</Option>
+              <Option value="shape file">SHAPE FILE</Option>
             </Select>
           </Form.Item>
           <Form.Item>

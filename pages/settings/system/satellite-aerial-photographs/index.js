@@ -429,7 +429,7 @@ const index = () => {
             <Upload
               maxCount={1}
               defaultFileList={[{
-                name: "default.jpeg",
+                name: "default.jpg",
                 url: `${process.env.NEXT_PUBLIC_SERVICE}/uploads/default/satellite.jpg`
               }]}
             >
