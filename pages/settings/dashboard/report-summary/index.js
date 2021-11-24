@@ -8,6 +8,8 @@ import ReactHTMLTable from 'react-html-table-to-excel'
 import { DownCircleOutlined } from "@ant-design/icons";
 const { Option } = Select;
 const index = () => {
+    const [dataApiAll, setDataApiAll] = useState([])
+    const [dataTableHead, setDataTableHead] = useState([])
     const [dataTable, setDataTable] = useState([])
     const [dataProvider, setDataProvider] = useState([]) //จังหวัด
     const [dataAmp, setDataAmp] = useState([]) //อำเภอ
@@ -89,17 +91,17 @@ const index = () => {
     }
     const modifyApi = (data) => {
         let newData = []
-        data.PATM.forEach(item_prov => {
+        data.data.all.forEach(item_prov => {
             item_prov.relationship = 1
             newData.push(item_prov)
-            if (item_prov.amp.length) {//ถ้ามีอำเภอให้เข้า IF
-                item_prov.amp.forEach(item_amp => {
+            if (item_prov.amp_list.length) {//ถ้ามีอำเภอให้เข้า IF
+                item_prov.amp_list.forEach(item_amp => {
                     item_amp.prov_name = item_amp.amp_name
                     item_amp.parent = item_prov.prov_name
                     item_amp.relationship = 2
                     newData.push(item_amp)
-                    if (item_amp.tam.length) { //ถ้ามีตำบลให้เข้าIF
-                        item_amp.tam.forEach(item_tam => {
+                    if (item_amp.tam_list.length) { //ถ้ามีตำบลให้เข้าIF
+                        item_amp.tam_list.forEach(item_tam => {
                             item_tam.parent = item_amp.amp_name
                             item_tam.prov_name = item_tam.tam_name
                             item_tam.relationship = 3
@@ -111,10 +113,50 @@ const index = () => {
                 })
             }
         })
+        for (let index = 0; index < data.table.length; index++) {
+            let count = index + 1
+            let name = "status_" + count
+            let polt = "polt" + count
+            let distance = "distance" + count
+            newData.forEach((data_newData, index_newData) => {
+                data.data[name].forEach(data_data => {
+                    if (data_newData.prov_name === data_data.prov_name) {
+                        newData[index_newData] = {
+                            ...newData[index_newData], [polt]: data_data.plot, [distance]: data_data.distance
+                        }
+                    } else if (data_newData.amp_name) {
+                        data_data.amp_list.forEach(data_amp => {
+                            if (data_newData.amp_name === data_amp.amp_name) {
+                                newData[index_newData] = {
+                                    ...newData[index_newData], [polt]: data_amp.plot, [distance]: data_amp.distance
+                                }
+                            }
+                        })
+                    } else if (data_newData.tam_name) {
+                        data_data.amp_list.forEach(data_amp => {
+                            data_amp.tam_list.forEach(data_tam => {
+                                if (data_newData.tam_name === data_tam.tam_name) {
+                                    newData[index_newData] = {
+                                        ...newData[index_newData], [polt]: data_tam.plot, [distance]: data_tam.distance
+                                    }
+                                }
+                            })
+                        })
+                    }
+
+                })
+            })
+        }
+
+
+
         console.log(data)
+        console.log(newData)
+        setDataApiAll(data.data)
+        setDataTableHead(data.table)
         setDataTable(newData)
     }
-    const showHideTable = (prov_name, relationship) => {
+    const showHideTable = (prov_name) => {
         $(`.sub${prov_name}`).hide()
         $(`.${prov_name}`).toggle()
     }
@@ -212,20 +254,26 @@ const index = () => {
                                 <colgroup span="2"></colgroup>
                                 <tr align="center" >
                                     <td rowspan="2"></td>
-                                    <th colspan="2" scope="colgroup" style={{ backgroundColor: "#adaaa9" }}>ทั้งหมด</th>
-                                    <th colspan="2" scope="colgroup" style={{ backgroundColor: "#a8d08d" }}>ได้รับอนุมัติให้ดำเนินการใหม่</th>
-                                    <th colspan="2" scope="colgroup" style={{ backgroundColor: "#ff98cb" }}>อยู่ระหว่างดำเนินการ</th>
-                                    <th colspan="2" scope="colgroup" style={{ backgroundColor: "#fe9a00" }}>ดำเนินการเรียบร้อยแล้ว</th>
+                                    <th colspan="2" scope="colgroup" style={{ backgroundColor: "#adaaa9" }} onClick={() => console.log(dataTable)}>ทั้งหมด</th>
+                                    {
+                                        dataTableHead.map(data => {
+                                            return <th colspan="2" scope="colgroup" style={{ backgroundColor: data.color }}>{data.status}</th>
+                                        })
+                                    }
                                 </tr>
                                 <tr align="center">
                                     <th scope="col" style={{ backgroundColor: "#adaaa9" }}>แปลง</th>
                                     <th scope="col" style={{ backgroundColor: "#adaaa9" }}>ระยะทาง</th>
-                                    <th scope="col" style={{ backgroundColor: "#a8d08d" }}>แปลง</th>
-                                    <th scope="col" style={{ backgroundColor: "#a8d08d" }}>ระยะทาง</th>
-                                    <th scope="col" style={{ backgroundColor: "#ff98cb" }}>แปลง</th>
-                                    <th scope="col" style={{ backgroundColor: "#ff98cb" }}>ระยะทาง</th>
-                                    <th scope="col" style={{ backgroundColor: "#fe9a00" }}>แปลง</th>
-                                    <th scope="col" style={{ backgroundColor: "#fe9a00" }}>ระยะทาง</th>
+                                    {
+                                        dataTableHead.map(data => {
+                                            return (
+                                                <>
+                                                    <th scope="col" style={{ backgroundColor: data.color }}>แปลง</th>
+                                                    <th scope="col" style={{ backgroundColor: data.color }}>ระยะทาง</th>
+                                                </>
+                                            )
+                                        })
+                                    }
                                 </tr>
                                 {
                                     dataTable.map(data =>
@@ -241,19 +289,51 @@ const index = () => {
                                                     </h4>
                                                 }
                                             </th>
-                                            <td style={{ backgroundColor: "#e6e6e6" }} align="center">{data.sum_pot.toFixed(0)}</td>
-                                            <td style={{ backgroundColor: "#e6e6e6" }} align="center">{data.sum_area.toFixed(0)}</td>
-                                            <td style={{ backgroundColor: "#c3e0b4" }} align="center">{data.Pot_status_1.toFixed(0)}</td>
-                                            <td style={{ backgroundColor: "#c3e0b4" }} align="center">{data.Area_status_1.toFixed(0)}</td>
-                                            <td style={{ backgroundColor: "#fce4d6" }} align="center">{data.Pot_status_2.toFixed(0)}</td>
-                                            <td style={{ backgroundColor: "#fce4d6" }} align="center">{data.Area_status_2.toFixed(0)}</td>
-                                            <td style={{ backgroundColor: "#fce5d7" }} align="center">{data.Pot_status_3.toFixed(0)}</td>
-                                            <td style={{ backgroundColor: "#fce5d7" }} align="center">{data.Area_status_3.toFixed(0)}</td>
+                                            <td style={{ backgroundColor: "#e6e6e6" }} align="center">
+
+                                            </td>
+                                            <td style={{ backgroundColor: "#e6e6e6" }} align="center">{ }</td>
+                                            {/* {
+                                                dataTableHead.map((dataa, index) => {
+                                                    let count = index + 1
+                                                    let name = "status_" + count
+                                                    return <>
+                                                        <td style={{ backgroundColor: dataa.color }} align="center">
+                                                            {
+                                                                dataApiAll[name].map(prov => {
+                                                                    if (prov.prov_name === data.prov_name) {
+                                                                        return prov.plot
+                                                                    }
+                                                                })
+                                                            }
+                                                        </td>
+                                                        <td style={{ backgroundColor: dataa.color }} align="center">
+                                                            {
+                                                                dataApiAll[name].map(eiei => {
+                                                                    if (eiei.prov_name === data.prov_name) {
+                                                                        return eiei.distance
+                                                                    }
+                                                                })
+                                                            }
+                                                        </td>
+                                                    </>
+                                                })
+                                            } */}
+                                            {
+                                                dataTableHead.map((dataa, index) => {
+                                                    let count = index + 1
+                                                    let plottt = "plot" + count
+                                                    let distanceee = "distance" + count
+                                                    return <>
+                                                        <td style={{ backgroundColor: dataa.color }} align="center">{data[plottt] ?? 0}</td>
+                                                        <td style={{ backgroundColor: dataa.color }} align="center">{data[distanceee] ?? 0}</td>
+                                                    </>
+                                                })
+                                            }
                                         </tr>
                                     )
                                 }
                             </table>
-
                         </div>
                     </Col>
                 </Row>
