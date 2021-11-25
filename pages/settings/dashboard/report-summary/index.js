@@ -8,7 +8,6 @@ import ReactHTMLTable from 'react-html-table-to-excel'
 import { DownCircleOutlined } from "@ant-design/icons";
 const { Option } = Select;
 const index = () => {
-    const [dataApiAll, setDataApiAll] = useState([])
     const [dataTableHead, setDataTableHead] = useState([])
     const [dataTable, setDataTable] = useState([])
     const [dataProvider, setDataProvider] = useState([]) //จังหวัด
@@ -148,11 +147,23 @@ const index = () => {
             })
         }
 
-
+        newData.forEach((data_newData, index) => {
+            let sumPlot = 0
+            let sumDistance = 0
+            for (let indexx = 0; indexx < data.table.length; indexx++) {
+                let count = indexx + 1
+                let plot = "polt" + count
+                let distance = "distance" + count
+                sumDistance += data_newData[distance] ?? 0
+                sumPlot += data_newData[plot] ?? 0
+            }
+            newData[index] = {
+                ...newData[index], sumPlot, sumDistance
+            }
+        })
 
         console.log(data)
         console.log(newData)
-        setDataApiAll(data.data)
         setDataTableHead(data.table)
         setDataTable(newData)
     }
@@ -249,7 +260,7 @@ const index = () => {
                     </Col>
                     <Col span={24}>
                         <div className="table-responsive">
-                            <table className="table table-bordered" id="dashboard_table" >
+                            <table className="table table-bordered table-hover " id="dashboard_table" >
                                 <colgroup span="2"></colgroup>
                                 <colgroup span="2"></colgroup>
                                 <tr align="center" >
@@ -275,64 +286,42 @@ const index = () => {
                                         })
                                     }
                                 </tr>
-                                {
-                                    dataTable.map(data =>
-                                        <tr style={{ display: !data.parent || "none" }} className={`
+                                <tbody>
+                                    {
+                                        dataTable.map(data =>
+                                            <tr style={{ display: !data.parent || "none" }} className={`
                                         ${data.relationship != 1 ? data.parent : null}
                                         ${data.super_parent ? "sub" + data.super_parent : null}
                                         `}>
-                                            <th scope="row">
+                                                <th scope="row">
+                                                    {
+                                                        <span style={{ marginLeft: data.amp_name ? "30px" : data.tam_name ? "60px" : null }}>
+                                                            {data.prov_name}
+                                                            {data.supersub ? null : <DownCircleOutlined style={{ marginLeft: "10px" }} onClick={() => showHideTable(data.prov_name)} />}
+                                                        </span>
+                                                    }
+                                                </th>
+                                                <td style={{ backgroundColor: "#e6e6e6" }} align="center">
+                                                    {data.sumPlot.toFixed(2)}
+                                                </td>
+                                                <td style={{ backgroundColor: "#e6e6e6" }} align="center">
+                                                    {data.sumDistance.toFixed(2)}
+                                                </td>
                                                 {
-                                                    <h4 style={{ marginLeft: data.amp_name ? "20px" : data.tam_name ? "40px" : null }}>
-                                                        {data.prov_name}
-                                                        {data.supersub ? null : <DownCircleOutlined style={{ marginLeft: "10px" }} onClick={() => showHideTable(data.prov_name)} />}
-                                                    </h4>
+                                                    dataTableHead.map((dataa, index) => {
+                                                        let count = index + 1
+                                                        let plottt = "polt" + count
+                                                        let distanceee = "distance" + count
+                                                        return <>
+                                                            <td style={{ backgroundColor: dataa.color }} align="center">{data[plottt] ?? 0}</td>
+                                                            <td style={{ backgroundColor: dataa.color }} align="center">{data[distanceee] ?? 0}</td>
+                                                        </>
+                                                    })
                                                 }
-                                            </th>
-                                            <td style={{ backgroundColor: "#e6e6e6" }} align="center">
-
-                                            </td>
-                                            <td style={{ backgroundColor: "#e6e6e6" }} align="center">{ }</td>
-                                            {/* {
-                                                dataTableHead.map((dataa, index) => {
-                                                    let count = index + 1
-                                                    let name = "status_" + count
-                                                    return <>
-                                                        <td style={{ backgroundColor: dataa.color }} align="center">
-                                                            {
-                                                                dataApiAll[name].map(prov => {
-                                                                    if (prov.prov_name === data.prov_name) {
-                                                                        return prov.plot
-                                                                    }
-                                                                })
-                                                            }
-                                                        </td>
-                                                        <td style={{ backgroundColor: dataa.color }} align="center">
-                                                            {
-                                                                dataApiAll[name].map(eiei => {
-                                                                    if (eiei.prov_name === data.prov_name) {
-                                                                        return eiei.distance
-                                                                    }
-                                                                })
-                                                            }
-                                                        </td>
-                                                    </>
-                                                })
-                                            } */}
-                                            {
-                                                dataTableHead.map((dataa, index) => {
-                                                    let count = index + 1
-                                                    let plottt = "plot" + count
-                                                    let distanceee = "distance" + count
-                                                    return <>
-                                                        <td style={{ backgroundColor: dataa.color }} align="center">{data[plottt] ?? 0}</td>
-                                                        <td style={{ backgroundColor: dataa.color }} align="center">{data[distanceee] ?? 0}</td>
-                                                    </>
-                                                })
-                                            }
-                                        </tr>
-                                    )
-                                }
+                                            </tr>
+                                        )
+                                    }
+                                </tbody>
                             </table>
                         </div>
                     </Col>
