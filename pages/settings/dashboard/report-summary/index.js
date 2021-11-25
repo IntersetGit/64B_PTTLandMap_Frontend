@@ -5,7 +5,7 @@ import { } from 'antd/'
 import Api from "../../../../util/Api"
 import { useEffect, useState } from 'react';
 import ReactHTMLTable from 'react-html-table-to-excel'
-import { DownCircleOutlined } from "@ant-design/icons";
+import { DownCircleOutlined, RedoOutlined } from "@ant-design/icons";
 const { Option } = Select;
 const index = () => {
     const [dataTableHead, setDataTableHead] = useState([])
@@ -89,6 +89,8 @@ const index = () => {
         modifyApi(result.data.items)
     }
     const modifyApi = (data) => {
+
+        // modifyInfo
         let newData = []
         data.data.all.forEach(item_prov => {
             item_prov.relationship = 1
@@ -144,9 +146,11 @@ const index = () => {
                     }
 
                 })
+
             })
         }
 
+        //ผลรวมของ แปลง และระยะทาง
         newData.forEach((data_newData, index) => {
             let sumPlot = 0
             let sumDistance = 0
@@ -162,8 +166,6 @@ const index = () => {
             }
         })
 
-        console.log(data)
-        console.log(newData)
         setDataTableHead(data.table)
         setDataTable(newData)
     }
@@ -199,8 +201,8 @@ const index = () => {
                                     <div hidden={true}>
                                         <ReactHTMLTable className="export_excel" table="dashboard_table" filename="dashboard" buttonText="Export To Excel" />
                                     </div>
-                                    <Button className="btn-success " style={{ borderRadius: "2px", color: "white", marginLeft: "2px", float: "right" }} onClick={() => $(".export_excel").click()}>Export To Excel</Button>
-                                    <Button type="primary" style={{ marginLeft: "2px", float: "right" }} htmlType="submit">Report</Button>
+                                    <Button className="btn-success " style={{ borderRadius: "3px", color: "white", marginLeft: "5px", float: "right" }} onClick={() => $(".export_excel").click()}>Export To Excel</Button>
+                                    <Button type="primary" style={{ marginLeft: "5px", float: "right" }} htmlType="submit">Report</Button>
                                 </div>
                                 <div className="col-md-2 ">
                                     <Form.Item name="search">
