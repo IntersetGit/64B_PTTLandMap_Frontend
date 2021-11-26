@@ -305,6 +305,7 @@ const usersSystemPage = () => {
     console.log('val :>> ', val.Export, modalexport.id);
     axios.get(`${process.env.NEXT_PUBLIC_SERVICE}/shp/convertGeoToShp?id=${modalexport.id}&type=${val.Export}`)
       .then(async data => {
+        console.log(data.config.url)
         const link = document.createElement('a');
         if (val.Export === 'shape file') {
           link.href = data.data.items;
@@ -312,7 +313,7 @@ const usersSystemPage = () => {
           document.body.appendChild(link);
           link.click();
         } else {
-          link.href = data.data.items;
+          link.href = data.config.url;
           link.setAttribute('download', `${val.Export}.${val.Export.toLowerCase()}`);
           document.body.appendChild(link);
           link.click();
