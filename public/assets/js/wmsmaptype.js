@@ -147,7 +147,13 @@ function WmsMapType(name, url, params, options, type = "geoserver") {
             // console.log("opacityset");
         }
     }
-
+    this.zoomwmsnew = (map) => {
+        if (this.type == "geoserver" || this.type == null) {
+            this.zoomToWms(map);
+        } else {
+            this.ZoomToArcgis(map);
+        }
+    }
     this.zoomToWms = function (map) {
 
         if (!this.params['layers'].length) {
@@ -278,23 +284,66 @@ function WmsMapType(name, url, params, options, type = "geoserver") {
 
     this.Arcgiswms = async function (map) {/*------------------------------------Arcgis wms addnew---------------------------*/
         // var url = this.url+this.params.layers+"/MapServer";
+
         var url = this.url;
+
+        // var svc = new gmaps.ags.MapService(url);
+        // console.log('svc :>> ', svc);
+        // google.maps.event.addListenerOnce(svc, 'load', function () {
+        //     try {
+        //         var tileLayer = new gmaps.ags.TileLayer(svc);
+        //         console.log('tileLayer :>> ', tileLayer);
+
+        //         var agsType = new gmaps.ags.MapType([tileLayer], {
+        //             name: 'StatePlane'
+        //         });
+        //         var bnds = svc.getInitialBounds();
+
+        //         map.overlayMapTypes.insertAt(0, agsType);
+        //     } catch (e) {
+        //         alert(e);
+        //     }
+        // });
+
+
+
         var agsType = await new gmaps.ags.MapType(url, {
             name: this.name,
             opacity: 1,
         });
+        console.log('agsType :>> ', agsType);
         this.arcgis = agsType;
         map.overlayMapTypes.insertAt(0, agsType);
 
 
+
+
     }
     this.ZoomToArcgis = function (map) {/*------------------------------------Arcgis wms addnew---------------------------*/
-        /*   var svc = new gmaps.ags.MapService(`${url}`);
-          console.log(svc) */
-        // console.log(agsType.getTileLayers()[0].getMapService())
-        // var url = this.url+this.params.layers+"/MapServer";
+
         var url = this.url;
         $.getJSON(`${url}/info/iteminfo?f=pjson`, function (result) {
+            // $.getJSON(`${url}/queryBoundary?outSR=4326&f=pjson`, function (result) {
+            //     console.log('result :>> ', result);
+            //     let lat = result.shape.ymin;
+            //     let lng = result.shape.xmin;
+            //     let lat2 = result.shape.ymax;
+            //     let lng2 = result.shape.xmax;
+            //     var bounds = new google.maps.LatLngBounds();
+            //     var points = [
+            //         new google.maps.LatLng(lat, lng),
+            //         new google.maps.LatLng(lat2, lng2)
+            //     ];
+            //     // Extend bounds with each point
+            //     for (var i = 0; i < points.length; i++) {
+            //         bounds.extend(points[i]);
+            //         //new google.maps.Marker({ position: points[i], map: map });
+            //     }
+            //     /*  var pt = new google.maps.LatLng(lat,lng);
+            //      bounds.extend(pt); */
+            //     map.fitBounds(bounds);
+
+
             let lat = result.extent[0][1];
             let lng = result.extent[0][0];
             let lat2 = result.extent[1][1];
