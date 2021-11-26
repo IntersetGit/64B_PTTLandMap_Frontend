@@ -285,7 +285,7 @@ const index = () => {
   const changeTypeServer = (e) => {
     const type = e.target.value;
     setMenuItem([]);
-    if (type !== "arcgisserver") {
+    if (type == "geoserver") {
       setMenuItem(
         <>
           <Form.Item
@@ -448,6 +448,7 @@ const index = () => {
               }}
             >
               <Radio value="arcgisserver">ArcGIS Server</Radio>
+              <Radio value="arcgisimageserver">ArcgisImageServer</Radio>
               <Radio value="geoserver">Geoserver</Radio>
             </Radio.Group>
           </Form.Item>
@@ -540,6 +541,7 @@ const index = () => {
               <Radio value="arcgisserver" id="arcgisserver">
                 ArcGIS Server
               </Radio>
+              <Radio value="arcgisimageserver" id="arcgisimageserver">ArcgisImageServer</Radio>
               <Radio value="geoserver" id="geoserver">
                 Geoserver
               </Radio>
