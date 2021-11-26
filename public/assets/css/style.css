@@ -316,8 +316,8 @@ table.dataTable {
 }
 
 .table-hover tbody tr:hover {
-    background-color: #f7f7f7;
-    color: #212529;
+    background-color: #4744441c;
+    color: rgb(236, 48, 48);
 }
 
 table.dataTable thead>tr>th.sorting_asc,
