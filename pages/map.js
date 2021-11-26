@@ -1023,16 +1023,7 @@ const mapPage = () => {
         }
 
         var boundsCenter = bounds.getCenter();
-        // var centerLabel = new MapLabel({
-        //     map: map,
-        //     fontSize: 13,
-        //     align: "center",
-        //     zIndex: 98
 
-        // });
-        // polygon.labels.push(centerLabel);
-        // centerLabel.set("position", boundsCenter);
-        // centerLabel.set("text", (parseFloat(area)).toLocaleString('en-US') + " ตร.ม");
         let markerwa1 = new google.maps.Marker({
             map: map,
             animation: google.maps.Animation.DROP,
@@ -1047,7 +1038,7 @@ const mapPage = () => {
             },
             label: {
                 text: (parseFloat(area)).toLocaleString('en-US') + " ตร.ม",
-                color: "#eb3a3a",
+                color: "#f17500",
                 fontSize: "13px",
                 fontWeight: "bold",
 
@@ -1062,15 +1053,7 @@ const mapPage = () => {
             var end = polygon.getPath().getAt(i < polygon.getPath().getLength() - 1 ? i + 1 : 0);
             var sideLength = google.maps.geometry.spherical.computeDistanceBetween(start, end);
             var sideCenter = google.maps.geometry.spherical.interpolate(start, end, 0.5);
-            // var sideLabel = new MapLabel({
-            //     map: map,
-            //     fontSize: 13,
-            //     align: "center",
-            // });
 
-            // sideLabel.set("position", sideCenter);
-            // sideLabel.set("text", (parseFloat(sideLength.toFixed(2))).toLocaleString('en-US') + " ม.");
-            // polygon.labels.push(sideLabel);
 
             let markerwa2 = new google.maps.Marker({
                 map: map,
@@ -1085,7 +1068,7 @@ const mapPage = () => {
                 },
                 label: {
                     text: (parseFloat(sideLength.toFixed(2))).toLocaleString('en-US') + " ม.",
-                    color: "#eb3a3a",
+                    color: "#f17500",
                     fontSize: "13px",
                     fontWeight: "bold"
                 },
@@ -1608,19 +1591,26 @@ const mapPage = () => {
             }
             setDatatimeslider(items);
         }).catch((error) => {
-            console.log('error :>> ', error);
+            // console.log('error :>> ', error);
         })
     }
     const OnPlaytimeslide = (e) => {
         if (e) {
-            WMSTIMESLIDE.forEach((item) => item.name == e.id ? item.setOpacity(1) : item.setOpacity(0));
+            WMSTIMESLIDE.forEach((item) => {
+                if (item.name == e.id) {
+                    item.setOpacity(1);
+                    item.zoomwmsnew(map);
+                } else {
+                    item.setOpacity(0);
+                }
+            });
         } else {
             WMSTIMESLIDE.forEach((item) => item.setOpacity(0));
         }
     }
     const ontimeslider = () => {
         if (slidemapshow) {
-            console.log('close :>> ');
+            // console.log('close :>> ');
             WMSTIMESLIDE.forEach((item) => item.removeFromMap(map));
             setWMSTIMESLIDE([]);
             setDatatimeslider([]);
