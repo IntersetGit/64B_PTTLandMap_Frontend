@@ -305,8 +305,6 @@ function WmsMapType(name, url, params, options, type = "geoserver") {
         //     }
         // });
 
-
-
         var agsType = await new gmaps.ags.MapType(url, {
             name: this.name,
             opacity: 1,
