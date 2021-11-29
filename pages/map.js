@@ -75,7 +75,6 @@ const mapPage = () => {
     const [districtList, setDistrictList] = useState([])
     const [subDistrictList, setSubDistrictList] = useState([])
     const [statusProject, setStatusProject] = useState([])
-
     useEffect(() => {
         const loader = new Loader({
             apiKey: process.env.NEXT_PUBLIC_GOOGLE_API_KEY,
@@ -102,13 +101,6 @@ const mapPage = () => {
 
 
         getMasStatusProject()
-
-
-        window.clickContent = (item) => {
-            console.log('item :>> ', item);
-
-
-        }
 
     }, []);
     useEffect(() => {
@@ -429,7 +421,7 @@ const mapPage = () => {
         if (arr[index1].children[index2].type == "wms") {
             const setwms = []
             const items = arr[index1].children[index2]
-            console.log('items :>> ', items);
+            // console.log('items :>> ', items);
             // "https://services.arcgisonline.com/arcgis/rest/services/Reference/World_Reference_Overlay/MapServer/"
             let maptype = new WmsMapType(
                 items.id,
@@ -531,7 +523,6 @@ const mapPage = () => {
             const GeoJson = data.items.shape;
             const bounds = new google.maps.LatLngBounds();
             const layer = new google.maps.Data();
-
             layer.addGeoJson(GeoJson)
             option_layer = option_layer ?? {}
             let icon = null
@@ -547,7 +538,6 @@ const mapPage = () => {
 
             // console.log('option_layer :>> ', option_layer);
             layer.setStyle((e) => {
-
                 return {
                     fillColor: e.h.status_color ?? color,
                     fillOpacity: option_layer.fillOpacity ?? inputValueOpacityColor, //Opacity
@@ -560,7 +550,6 @@ const mapPage = () => {
 
             layer.setMap(map);
             layer.addListener('click', (e) => {
-                console.log('e :>> ', e);
                 setInfoWindowWA(e);
             })
 
@@ -578,6 +567,7 @@ const mapPage = () => {
             console.log('errr :>> ', error);
         }
     };
+
     const setInfoWindowWA = (feature) => {
         const infowindow = new google.maps.InfoWindow();
         // let key = Object.keys(feature.feature.h);
@@ -587,19 +577,83 @@ const mapPage = () => {
         //     content += a + ": " + feature.feature.h[a] + "<br />";
         // });
         // content += "</div>";
-
         const item = feature.feature.h;
-        console.log('item :>> ', item);
-        const content = `<div id='infoBox'><center><strong>รายละเอียดข้อมูล</strong></center><br />
-        <p>Project : ${item.project_na}</p>
-        <p>PARTYPE : ${item.partype}</p>
-        <p>ลำดับแปลงที่ดิน (OBJECT_ID) : ${item.objectid}</p>
-        <p>PARLABEL1 : ${item.parlabel1}</p>
-        <p>PARLABEL2 : ${item.parlabel2}</p>
-        <p>PARLABEL3 : ${item.parlabel3}</p>
-        <p>PARLABEL4 : ${item.parlabel4}</p>
-        <p>PARLABEL5 : ${item.parlabel5}</p>
-        <span><a style="cursor: pointer;" onclick="clickContent('${item}')">รายละเอียดเพิ่มเติม</button></span>
+        window.clickEdit = () => {
+            console.log('item edit :>> ', item);
+            setModeInfoSearch("edit")
+            editShapefileSearch(item)
+        }
+        window.clickView = () => {
+            console.log('item view :>> ', item);
+            setModeInfoSearch("view")
+            editShapefileSearch(item)
+        }
+
+        // console.log('item -----------------:>> ', item);
+        // const content = `<div id='infoBox'><center><strong>รายละเอียดข้อมูล</strong></center><br />
+        // <p>Project : ${item.project_na}</p>
+        // <p>PARTYPE : ${item.partype}</p>
+        // <p>ลำดับแปลงที่ดิน (OBJECT_ID) : ${item.objectid}</p>
+        // <p>PARLABEL1 : ${item.parlabel1}</p>
+        // <p>PARLABEL2 : ${item.parlabel2}</p>
+        // <p>PARLABEL3 : ${item.parlabel3}</p>
+        // <p>PARLABEL4 : ${item.parlabel4}</p>
+        // <p>PARLABEL5 : ${item.parlabel5}</p>
+        // <div style="text-align: end;">
+        //     <a style="cursor: pointer;" onclick="clickEdit()"><img style="width: 25px;" src="https://nonpttlma.pttplc.com/service/icon/icon-edit.png"></a>
+        //     <a style="cursor: pointer;" onclick="clickView()"><img style="width: 25px;" src="https://nonpttlma.pttplc.com/service/icon/icon-view.png"></a>
+        // </div>
+
+        // `
+
+        // 
+        const content = `
+        <div id='infoBox'><center><strong>รายละเอียดข้อมูล</strong></center><br />
+        <table style="width: 350px;" class="table table-striped">
+            <tbody>
+                <tr>
+                    <td>ประเภทที่ดิน</td>
+                    <td>${item.partype}</td>
+                </tr>
+                <tr>
+                    <td>เลขที่ดิน</td>
+                    <td>${item.parlabel1}</td>
+                </tr>
+                <tr>
+                    <td>เลขโฉนด</td>
+                    <td>${item.parlabel2}</td>
+                </tr>
+                <tr>
+                    <td>หน้าสำรวจ</td>
+                    <td>${item.parlabel3}</td>
+                </tr>
+                <tr>
+                    <td>ตำบล</td>
+                    <td>${item.tam}</td>
+                </tr>
+                <tr>
+                    <td>อำเภอ</td>
+                    <td>${item.amp}</td>
+                </tr>
+                <tr>
+                    <td>จังหวัด</td>
+                    <td>${item.prov}</td>
+                </tr>
+                <tr>
+                    <td>บาท_ตจว</td>
+                    <td>${item.partype}</td>
+                </tr>
+                <tr>
+                    <td>ระยะจาก_ROW</td>
+                    <td>${item.row_distan}</td>
+                </tr>
+            </tbody>
+        </table>
+        <div style="text-align: end;">
+            <a style="cursor: pointer;" onclick="clickEdit()"><img style="width: 25px;" src="https://nonpttlma.pttplc.com/service/icon/icon-edit.png"></a>
+            <a style="cursor: pointer;" onclick="clickView()"><img style="width: 25px;" src="https://nonpttlma.pttplc.com/service/icon/icon-view.png"></a>
+        </div>
+        
         `
         infowindow.setContent(content);
         infowindow.setPosition(feature.latLng);
@@ -1201,6 +1255,7 @@ const mapPage = () => {
 
     /* table */
     const [modeSearch, setModeSearch] = useState("Detail");
+    const [modeInfoSearch, setModeInfoSearch] = useState(null);
     const [pageSearch, setPageSearch] = useState(1)
     const [totalSearch, setTotalSearch] = useState(0)
     const [limitSearch, setLimitSearch] = useState(10)
@@ -1309,9 +1364,21 @@ const mapPage = () => {
             })
             setSearchList(_arr)
             setSearchAllList(data.items.data)
+            getSearchDataDashboard()
 
         } catch (error) {
             console.log('error :>> ', error);
+            // message.error("มีบางอย่างผิดพลาด !");
+        }
+    }
+
+    const getSearchDataDashboard = async (layer_group = "") => {
+        try {
+            let url = `/shp/getSearchDataDashboard?temp=1`
+            if (layer_group) url += `&layer_group=${layer_group}`
+            const { data } = await API.get(url)
+            console.log('data :>> ', data);
+        } catch (error) {
             // message.error("มีบางอย่างผิดพลาด !");
         }
     }
@@ -1398,6 +1465,7 @@ const mapPage = () => {
         const formData = []
         const setFieldsValue = {}
 
+        delete item.status_color;
         const disabled = ["gid", "table_name"],
             required = ["project_na", "status"],
             hide = ["index", "color", "checked"],
@@ -2537,13 +2605,13 @@ const mapPage = () => {
                             <div className="col-md-3">
                                 <Form.Item
                                     label=""
-                                    name="project_name2"
+                                    name="select_search"
                                 >
                                     <Select
                                         placeholder="เลือกจาก"
                                         allowClear
                                     >
-                                        <Option value="project_na">ลำดับแปลงที่ดิน</Option>
+                                        <Option value="parid">ลำดับแปลงที่ดิน</Option>
                                         <Option value="parlabel1">เลขที่เอกสารสิทธิ์</Option>
                                     </Select>
                                 </Form.Item>
@@ -2552,7 +2620,7 @@ const mapPage = () => {
                             <div className="col-md-3">
                                 <Form.Item
                                     label=""
-                                    name="project_name3"
+                                    name="document_name"
                                 >
                                     <Select
                                         placeholder="ประเภทเอกสารสิทธิ์"
@@ -2803,6 +2871,7 @@ const mapPage = () => {
                                     <Select
                                         placeholder={e.label}
                                         allowClear
+                                        disabled={e.disabled || modeInfoSearch === "view" ? true : false}
                                     >
                                         {e.list.map((x, index) => <Option key={`select-${e.name}-${index}`} value={x[e.value]}>{x[e.text]}</Option>)}
                                     </Select>
@@ -2814,7 +2883,7 @@ const mapPage = () => {
                                     name={e.name}
                                     rules={[{ required: e.required, message: e.message }]}
                                 >
-                                    <Input disabled={e.disabled} />
+                                    <Input disabled={e.disabled || modeInfoSearch === "view" ? true : false} />
                                 </Form.Item>
                             )}
                         </>
@@ -3180,7 +3249,8 @@ const mapPage = () => {
              border: 1px solid #999999;
              -webkit-transition: all 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
              transition: all 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
-         }tabs-tab, .ant-tabs-card > div > .ant-tabs-nav .ant-tabs-tab {
+         }
+         tabs-tab, .ant-tabs-card > div > .ant-tabs-nav .ant-tabs-tab {
              margin: 0; */}
 
              .col-lg-1, .col-lg-10, .col-lg-11, .col-lg-12, .col-lg-2, .col-lg-3, .col-lg-4, .col-lg-5, .col-lg-6, .col-lg-7, .col-lg-8, .col-lg-9, .col-lg-auto, .col-md, .col-md-1, .col-md-10, .col-md-11, .col-md-12, .col-md-2, .col-md-3, .col-md-4, .col-md-5, .col-md-6, .col-md-7, .col-md-8, .col-md-9, .col-md-auto, .col-sm, .col-sm-1, .col-sm-10, .col-sm-11, .col-sm-12, .col-sm-2, .col-sm-3, .col-sm-4, .col-sm-5, .col-sm-6, .col-sm-7, .col-sm-8, .col-sm-9, .col-sm-auto, .col-xl, .col-xl-1, .col-xl-10, .col-xl-11, .col-xl-12, .col-xl-2, .col-xl-3, .col-xl-4, .col-xl-5, .col-xl-6, .col-xl-7, .col-xl-8, .col-xl-9, .col-xl-auto {
@@ -3189,6 +3259,10 @@ const mapPage = () => {
                 padding-right: 5px;
                 padding-left: 5px;
             }
+
+            .table-striped tbody tr:nth-of-type(odd) {
+                background-color: #d4e4f3;
+              }
         `}
             </style>
         </Layout >
