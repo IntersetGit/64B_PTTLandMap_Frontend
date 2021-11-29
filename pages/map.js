@@ -436,6 +436,7 @@ const mapPage = () => {
                 items.url, {
                 layers: items.layer_name,
                 wmsProjectKey: items.id,
+                type: items.type_server
             }, {
                 opacity: 100 / 100
             }, items.type_server
@@ -1591,6 +1592,7 @@ const mapPage = () => {
                         items[i].url, {
                         layers: items[i].layer_name,
                         wmsProjectKey: items[i].id,
+                        type: items[i].type_server
                     }, {
                         opacity: 0
                     }, items[i].type_server
@@ -1643,6 +1645,7 @@ const mapPage = () => {
             items.url, {
             layers: items.layer_name,
             wmsProjectKey: items.id,
+            type: items.type_server
         }, {
             opacity: wmsopacity / 100
         }, items.type_server
