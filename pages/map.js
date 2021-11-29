@@ -105,6 +105,12 @@ const mapPage = () => {
         getMasStatusProject()
 
 
+        window.clickContent = (item) => {
+            console.log('item :>> ', item);
+
+
+        }
+
     }, []);
     useEffect(() => {
         GetStreetView()
@@ -343,7 +349,7 @@ const mapPage = () => {
                 message.error("กรุณาเลือกไฟล์!");
             }
         } catch (error) {
-            message.error("มีบางอย่างผิดพลาด !");
+            // message.error("มีบางอย่างผิดพลาด !");
         }
     };
 
@@ -368,7 +374,7 @@ const mapPage = () => {
     }
 
     const onFinishFailedUpload = (error) => {
-        message.error("มีบางอย่างผิดพลาด !");
+        // message.error("มีบางอย่างผิดพลาด !");
     };
 
     const loadShapeFile = async () => {
@@ -401,7 +407,7 @@ const mapPage = () => {
             if (find) setLayerList(find.children)
 
         } catch (error) {
-            message.error("มีบางอย่างผิดพลาด !");
+            // message.error("มีบางอย่างผิดพลาด !");
         }
     }
 
@@ -584,6 +590,7 @@ const mapPage = () => {
         // content += "</div>";
 
         const item = feature.feature.h;
+        console.log('item :>> ', item);
         const content = `<div id='infoBox'><center><strong>รายละเอียดข้อมูล</strong></center><br />
         <p>Project : ${item.project_na}</p>
         <p>PARTYPE : ${item.partype}</p>
@@ -593,12 +600,15 @@ const mapPage = () => {
         <p>PARLABEL3 : ${item.parlabel3}</p>
         <p>PARLABEL4 : ${item.parlabel4}</p>
         <p>PARLABEL5 : ${item.parlabel5}</p>
+        <span><a style="cursor: pointer;" onclick="clickContent('${item}')">รายละเอียดเพิ่มเติม</button></span>
         `
         infowindow.setContent(content);
         infowindow.setPosition(feature.latLng);
         infowindow.open(map);
 
     }
+
+
 
     const openColor = (index1, index2) => {
         const arr = [...groupLayerList];
@@ -623,7 +633,7 @@ const mapPage = () => {
 
             openColor(index1, index2)
         } catch (error) {
-            message.error("มีบางอย่างผิดพลาด !");
+            // message.error("มีบางอย่างผิดพลาด !");
         }
     };
 
@@ -1199,6 +1209,7 @@ const mapPage = () => {
     const [amount, setAmount] = useState(0)
     const [searchAllList, setSearchAllList] = useState([])
     const [firstSearc, setFirstSearc] = useState(true)
+    const [placeholderSearch, setPlaceholderSearch] = useState("กรอกหมายเลขแปลง หรือเลขที่เอกสารสิทธิ์")
 
     /* Detail */
     const [pageDetailSearch, setPageDetailSearch] = useState(1)
@@ -1316,7 +1327,7 @@ const mapPage = () => {
 
         } catch (error) {
             console.log('error :>> ', error);
-            message.error("มีบางอย่างผิดพลาด !");
+            // message.error("มีบางอย่างผิดพลาด !");
         }
     }
 
@@ -1463,7 +1474,7 @@ const mapPage = () => {
             setVisibleModalSearch(false)
         } catch (error) {
             console.log('error :>> ', error);
-            message.error("มีบางอย่างผิดพลาด !");
+            // message.error("มีบางอย่างผิดพลาด !");
         }
     }
 
@@ -2573,15 +2584,44 @@ const mapPage = () => {
                         layout="vertical"
                         autoComplete="off"
                     >
+
+                        {/* Row 1 */}
                         <div className="row">
-                            <div className="col-md-4">
+                            <div className="col-md-10">
                                 <Form.Item
                                     label=""
                                     name="search"
                                 >
-                                    <Input placeholder="Search" />
+                                    <Input placeholder={placeholderSearch} />
                                 </Form.Item>
                             </div>
+                            <div className="col-md-2">
+                                {width > 650 ?
+                                    <Form.Item>
+                                        <Button type="primary" htmlType="submit" style={{ width: "100%" }}>
+                                            ค้นหา
+                                        </Button>
+                                    </Form.Item>
+                                    : null}
+                            </div>
+                        </div>
+
+                        {/* Row 2 */}
+                        <div className="row">
+                            <div className="col-md-3">
+                                <Form.Item
+                                    label=""
+                                    name="layer_group"
+                                >
+                                    <Select
+                                        placeholder="ชั้นข้อมูล"
+                                        allowClear
+                                    >
+                                        {layerList.map(e => <Option key={`name-layer-${e.id}`} value={e.id}>{e.name_layer}</Option>)}
+                                    </Select>
+                                </Form.Item>
+                            </div>
+
                             <div className="col-md-3">
                                 <Form.Item
                                     label=""
@@ -2597,32 +2637,39 @@ const mapPage = () => {
                                     </Select>
                                 </Form.Item>
                             </div>
+
                             <div className="col-md-3">
                                 <Form.Item
                                     label=""
-                                    name="layer_group"
+                                    name="project_name2"
                                 >
                                     <Select
-                                        placeholder="ชั้นข้อมูล"
+                                        placeholder="เลือกจาก"
                                         allowClear
                                     >
-                                        {layerList.map(e => <Option key={`name-layer-${e.id}`} value={e.id}>{e.name_layer}</Option>)}
+                                        <Option value="project_na">ลำดับแปลงที่ดิน</Option>
+                                        <Option value="parlabel1">เลขที่เอกสารสิทธิ์</Option>
                                     </Select>
                                 </Form.Item>
                             </div>
-                            <div className="col-md-2">
 
-                                {width > 650 ?
-                                    <Form.Item>
-                                        <Button type="primary" htmlType="submit">
-                                            ค้นหา
-                                        </Button>
-                                    </Form.Item>
-                                    : null}
-
+                            <div className="col-md-3">
+                                <Form.Item
+                                    label=""
+                                    name="project_name3"
+                                >
+                                    <Select
+                                        placeholder="ประเภทเอกสารสิทธิ์"
+                                        allowClear
+                                    >
+                                        <Option value="project_na">โฉนดที่ดิน</Option>
+                                        <Option value="parlabel1">น.ส.3</Option>
+                                    </Select>
+                                </Form.Item>
                             </div>
                         </div>
 
+                        {/* Row 3 */}
                         <div className="row">
                             <div className="col-md-4">
                                 <Form.Item
@@ -2685,7 +2732,7 @@ const mapPage = () => {
                 <div>
                     <Row>
                         <Col span={12}>
-                            <h4 className="pb-3">พบข้อมูลจำนวน <span className="text-red">{amount.toLocaleString()}</span> Records</h4>
+                            <h4 className="pb-3">พบข้อมูลจำนวน <span className="text-red">{amount.toLocaleString()}</span> Record(s)</h4>
                         </Col>
                         <Col span={12} style={{ textAlign: "end" }}>
                             <Tooltip placement="bottom" title={"Details"}>
@@ -2699,114 +2746,129 @@ const mapPage = () => {
                     </Row>
                     <>
                         {
-                            modeSearch === "Detail" ?
-                                <div>
-                                    {
-                                        searchList.map((e, i) => (
-                                            <div key={`SearchList-${i}`}>
-                                                {e.index.toLocaleString()})
-                                                <div className="row pt-2">
-                                                    <div className="col-md-1">
-                                                        <div
-                                                            style={{
-                                                                width: "25px",
-                                                                height: "25px",
-                                                                borderRadius: "2px",
-                                                                background: e.color,
-                                                                border: "1px solid black",
-                                                            }}
-                                                        />
-                                                    </div>
-                                                    <div className="col-md-11">
-
-                                                        <div className="row">
-                                                            <label>PROJECT_NAME :</label>
-                                                            <p className="pl-3">{e.project_na}</p>
-                                                        </div>
-
-                                                        <div className="row">
-                                                            <label>PARTYPE :</label>
-                                                            <p className="pl-3">{e.partype}</p>
-                                                        </div>
-
-                                                        <div className="row">
-                                                            <label>ลำดับแปลงที่ดิน (OBJECT_ID) :</label>
-                                                            <p className="pl-3">{e.objectid}</p>
-                                                        </div>
-
-                                                        <div className="pl-2">
-                                                            <div className="row">
-                                                                <div className="col-md-4">
-                                                                    <div className="row">
-                                                                        <label>PARLABEL1 :</label>
-                                                                        <p className="pl-3">{e.parlabel1}</p>
-                                                                    </div>
-                                                                </div>
-                                                                <div className="col-md-4">
-                                                                    <div className="row">
-                                                                        <label>PARLABEL2 :</label>
-                                                                        <p className="pl-3">{e.parlabel2}</p>
-                                                                    </div>
-                                                                </div>
-                                                                <div className="col-md-4">
-                                                                    <div className="row">
-                                                                        <label>PARLABEL3 :</label>
-                                                                        <p className="pl-3">{e.parlabel3}</p>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-
-                                                            <div className="row">
-                                                                <div className="col-md-4">
-                                                                    <div className="row">
-                                                                        <label>PARLABEL4 :</label>
-                                                                        <p className="pl-3">{e.parlabel4}</p>
-                                                                    </div>
-                                                                </div>
-                                                                <div className="col-md-4">
-                                                                    <div className="row">
-                                                                        <label>PARLABEL5 :</label>
-                                                                        <p className="pl-3">{e.parlabel5}</p>
-                                                                    </div>
-                                                                </div>
-                                                                <div className="col-md-4">
-                                                                    <button className="btn" onClick={() => editShapefileSearch(e, i)}><EditFilled /></button>
-                                                                    <Switch size="small" checked={e.checked} onChange={(value) => switchGeom(value, e, i)} />
-                                                                    {e.checked ?
-                                                                        <button className="btn" onClick={() => goTolayer(e.index, "search")}>
-                                                                            <ExpandOutlined />
-                                                                        </button> : null}
-                                                                </div>
-                                                            </div>
-                                                        </div>
-
-
-                                                    </div>
-
-                                                </div>
-                                                <hr />
-                                            </div>
-                                        ))
-                                    }
-                                    <div style={{ textAlign: "center" }}>
-                                        {/* {amount >= sumData ? <button className="btn btn-primary" onClick={pushSearchData}>โหลดเพิ่มเติม</button> : null} */}
-                                        <Pagination current={pageDetailSearch} total={amount} onChange={paginationSearchData} />
-                                    </div>
-                                </div> :
-                                modeSearch === "Table" ?
+                            searchList.length > 0 ?
+                                modeSearch === "Detail" ?
                                     <div>
-                                        <Table dataSource={searchAllList} columns={columnsSearch} rowKey={(row) => row.id} scroll={{ x: "100%", y: "100%" }} pagination={{
-                                            current: pageSearch,
-                                            total: totalSearch,
-                                            pageSize: limitSearch,
-                                            showTotal: (total, range) => `ข้อมูล ${range[0]} - ${range[1]} ทั้งหมด ${total.toLocaleString()} รายการ`,
-                                            onChange: async (e, _limit) => {
-                                                setPageSearch(e)
-                                                if (limitSearch !== _limit) setLimitSearch(_limit)
-                                            }
-                                        }} />
-                                    </div>
-                                    : null}
+                                        {
+                                            searchList.map((e, i) => (
+                                                <div key={`SearchList-${i}`}>
+                                                    {e.index.toLocaleString()})
+                                                    <div className="row pt-2">
+                                                        <div className="col-md-1">
+                                                            <div
+                                                                style={{
+                                                                    width: "25px",
+                                                                    height: "25px",
+                                                                    borderRadius: "2px",
+                                                                    background: e.color,
+                                                                    border: "1px solid black",
+                                                                }}
+                                                            />
+                                                        </div>
+                                                        <div className="col-md-11">
+
+                                                            <div className="row">
+                                                                <label>Project Name :</label>
+                                                                <p className="pl-3">{e.project_na}</p>
+                                                            </div>
+
+                                                            <div className="row">
+                                                                <label>ประเภทเอกสารสิทธิ์ :</label>
+                                                                <p className="pl-3">{e.partype}</p>
+                                                            </div>
+
+                                                            <div className="row">
+                                                                <label>ลำดับแปลงที่ดิน :</label>
+                                                                <p className="pl-3">{e.objectid}</p>
+                                                            </div>
+
+                                                            <div className="pl-2">
+                                                                <div className="row">
+                                                                    <div className="col-md-4">
+                                                                        <div className="row">
+                                                                            <label>เลขที่เอกสารสิทธิ์ :</label>
+                                                                            <p className="pl-3">{e.parlabel1}</p>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div className="col-md-4">
+                                                                        <div className="row">
+                                                                            <label>หน้าสำรวจ/หน้า :</label>
+                                                                            <p className="pl-3">{e.parlabel2}</p>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div className="col-md-4">
+                                                                        <div className="row">
+                                                                            <label>เลขที่ดิน/เล่ม :</label>
+                                                                            <p className="pl-3">{e.parlabel3}</p>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+
+                                                                <div className="row">
+                                                                    <div className="col-md-5">
+                                                                        <div className="row">
+                                                                            <label>ระวาง/เลขที่/หมู่ที่ :</label>
+                                                                            <p className="pl-3">{e.parlabel4}</p>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div className="col-md-5">
+                                                                        <div className="row">
+                                                                            <label>ระวาง(น.ส.3ก) :</label>
+                                                                            <p className="pl-3">{e.parlabel5}</p>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div className="col-md-2">
+                                                                        {(user && (user.roles_id === "8a97ac7b-01dc-4e06-81c2-8422dffa0ca2" || user.roles_id === "cec6617f-b593-4ebc-9604-3059dfee0ac4")) ?
+                                                                            <button className="btn" onClick={() => editShapefileSearch(e, i)}><EditFilled /></button> : null}
+                                                                        <Switch size="small" checked={e.checked} onChange={(value) => switchGeom(value, e, i)} />
+                                                                        {e.checked ?
+                                                                            <button className="btn" onClick={() => goTolayer(e.index, "search")}>
+                                                                                <ExpandOutlined />
+                                                                            </button> : null}
+                                                                    </div>
+                                                                </div>
+
+                                                                {e.hyperlink ?
+                                                                    <div className="row">
+                                                                        <div className="col-md-12">
+                                                                            <div className="row">
+                                                                                <label>Hyperlink :</label>
+                                                                                <a className="pl-3" href={e.hyperlink} style={{ color: "#007bff" }}>{e.hyperlink}</a>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                    : null}
+                                                            </div>
+
+
+                                                        </div>
+
+                                                    </div>
+                                                    <hr />
+                                                </div>
+                                            ))
+                                        }
+                                        <div style={{ textAlign: "center" }}>
+                                            {/* {amount >= sumData ? <button className="btn btn-primary" onClick={pushSearchData}>โหลดเพิ่มเติม</button> : null} */}
+                                            <Pagination current={pageDetailSearch} total={amount} onChange={paginationSearchData} />
+                                        </div>
+                                    </div> :
+                                    modeSearch === "Table" ?
+                                        <div>
+                                            <Table dataSource={searchAllList} columns={columnsSearch} rowKey={(row) => row.id} scroll={{ x: "100%", y: "100%" }} pagination={{
+                                                current: pageSearch,
+                                                total: totalSearch,
+                                                pageSize: limitSearch,
+                                                showTotal: (total, range) => `ข้อมูล ${range[0]} - ${range[1]} ทั้งหมด ${total.toLocaleString()} รายการ`,
+                                                onChange: async (e, _limit) => {
+                                                    setPageSearch(e)
+                                                    if (limitSearch !== _limit) setLimitSearch(_limit)
+                                                }
+                                            }} />
+                                        </div>
+                                        : null
+                                : <h3 style={{ color: "red", textAlign: "center" }}>ไม่พบข้อมูลคำค้นหา</h3>
+                        }
                     </>
 
                 </div>
@@ -3225,7 +3287,12 @@ const mapPage = () => {
          }tabs-tab, .ant-tabs-card > div > .ant-tabs-nav .ant-tabs-tab {
              margin: 0; */}
 
-
+             .col-lg-1, .col-lg-10, .col-lg-11, .col-lg-12, .col-lg-2, .col-lg-3, .col-lg-4, .col-lg-5, .col-lg-6, .col-lg-7, .col-lg-8, .col-lg-9, .col-lg-auto, .col-md, .col-md-1, .col-md-10, .col-md-11, .col-md-12, .col-md-2, .col-md-3, .col-md-4, .col-md-5, .col-md-6, .col-md-7, .col-md-8, .col-md-9, .col-md-auto, .col-sm, .col-sm-1, .col-sm-10, .col-sm-11, .col-sm-12, .col-sm-2, .col-sm-3, .col-sm-4, .col-sm-5, .col-sm-6, .col-sm-7, .col-sm-8, .col-sm-9, .col-sm-auto, .col-xl, .col-xl-1, .col-xl-10, .col-xl-11, .col-xl-12, .col-xl-2, .col-xl-3, .col-xl-4, .col-xl-5, .col-xl-6, .col-xl-7, .col-xl-8, .col-xl-9, .col-xl-auto {
+                position: relative;
+                width: 100%;
+                padding-right: 5px;
+                padding-left: 5px;
+            }
         `}
             </style>
         </Layout >
