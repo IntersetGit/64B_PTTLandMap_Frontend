@@ -642,7 +642,7 @@ const mapPage = () => {
                 </tr>
                 <tr>
                     <td>บาท_ตจว</td>
-                    <td>${item.partype}</td>
+                    <td>${item.area_rai}</td>
                 </tr>
                 <tr>
                     <td>ระยะจาก_ROW</td>
@@ -1274,6 +1274,8 @@ const mapPage = () => {
     const [pageSearch, setPageSearch] = useState(1)
     const [totalSearch, setTotalSearch] = useState(0)
     const [limitSearch, setLimitSearch] = useState(10)
+    const [projectNameListSearch, setProjectNameListSearch] = useState([])
+    const [documentNameListSearch, setDocumentNameListSearch] = useState([])
 
     const columnsSearch = [
         {
@@ -1353,11 +1355,13 @@ const mapPage = () => {
         console.log('error :>> ', error);
     }
 
-    const apiSearchData = async ({ layer_group = "", project_name = "", prov = "", search = "", tam = "", amp = "" }) => {
+    const apiSearchData = async ({ layer_group = "", project_name = "", select_search = "", document_name = "", prov = "", search = "", tam = "", amp = "" }) => {
         try {
             let url = `/shp/getSearchData?temp=1`
             if (layer_group) url += `&layer_group=${layer_group}`
             if (project_name) url += `&project_name=${project_name}`
+            if (select_search) url += `&select_search=${select_search}`
+            if (document_name) url += `&document_name=${document_name}`
             if (prov) url += `&prov=${prov}`
             if (search) url += `&search=${search}`
             if (tam) url += `&tam=${tam}`
@@ -1379,7 +1383,7 @@ const mapPage = () => {
             })
             setSearchList(_arr)
             setSearchAllList(data.items.data)
-            getSearchDataDashboard()
+            getDataNameProject()
 
         } catch (error) {
             console.log('error :>> ', error);
@@ -1387,12 +1391,15 @@ const mapPage = () => {
         }
     }
 
-    const getSearchDataDashboard = async (layer_group = "") => {
+    const getDataNameProject = async (layer_group = "") => {
         try {
-            let url = `/shp/getSearchDataDashboard?temp=1`
+            let url = `/shp/getDataNameProject?temp=1`
             if (layer_group) url += `&layer_group=${layer_group}`
             const { data } = await API.get(url)
-            console.log('data :>> ', data);
+            console.log('data :>> ', data.items);
+            const { document_name, project_name } = data.items
+            setProjectNameListSearch(project_name)
+            setDocumentNameListSearch(document_name)
         } catch (error) {
             // message.error("มีบางอย่างผิดพลาด !");
         }
@@ -1901,7 +1908,7 @@ const mapPage = () => {
                                 className="btn btn-light btn-sm"
                                 onClick={() => {
                                     if (firstSearc) {
-                                        apiSearchData({ project_name: "project_na" })
+                                        apiSearchData({})
                                         setFirstSearc(false)
                                     }
 
@@ -2644,9 +2651,6 @@ const mapPage = () => {
                 <div style={{ backgroundColor: "#4b5159", padding: "22px 22px 0px 22px" }}>
                     <Form
                         form={formSearch}
-                        initialValues={{
-                            project_name: "project_na"
-                        }}
                         onFinish={onFinishSearch}
                         onFinishFailed={onFinishFailedSearch}
                         layout="vertical"
@@ -2684,6 +2688,7 @@ const mapPage = () => {
                                     <Select
                                         placeholder="ชั้นข้อมูล"
                                         allowClear
+                                        onChange={(value) => getDataNameProject(value)}
                                     >
                                         {layerList.map(e => <Option key={`name-layer-${e.id}`} value={e.id}>{e.name_layer}</Option>)}
                                     </Select>
@@ -2699,9 +2704,7 @@ const mapPage = () => {
                                         placeholder="ชื่อโครงการ"
                                         allowClear
                                     >
-                                        <Option value="project_na">ชื่อโครงการ</Option>
-                                        <Option value="parlabel1">เลขที่โฉนด</Option>
-                                        <Option value="objectid">ลำดับแปลงที่ดิน</Option>
+                                        {projectNameListSearch.map((e, i) => <Option key={`project-name-${i}`} value={e}>{e}</Option>)}
                                     </Select>
                                 </Form.Item>
                             </div>
@@ -2730,8 +2733,7 @@ const mapPage = () => {
                                         placeholder="ประเภทเอกสารสิทธิ์"
                                         allowClear
                                     >
-                                        <Option value="project_na">โฉนดที่ดิน</Option>
-                                        <Option value="parlabel1">น.ส.3</Option>
+                                        {documentNameListSearch.map((e, i) => <Option key={`document-name-${i}`} value={e}>{e}</Option>)}
                                     </Select>
                                 </Form.Item>
                             </div>
@@ -3367,6 +3369,14 @@ const mapPage = () => {
             .table-striped tbody tr:nth-of-type(odd) {
                 background-color: #d4e4f3;
               }
+
+              .ant-input[disabled] {
+                color: #000;
+            }
+
+            .ant-select-disabled.ant-select:not(.ant-select-customize-input) .ant-select-selector {
+                color: rgb(0 0 0);
+            }
         `}
             </style>
         </Layout >
