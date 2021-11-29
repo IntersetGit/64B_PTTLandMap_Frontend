@@ -21,7 +21,8 @@ import {
     Tooltip,
     InputNumber,
     Table,
-    Pagination
+    Pagination,
+    Radio
 } from "antd";
 import Head from "next/head";
 import { useSelector } from "react-redux";
@@ -1173,6 +1174,20 @@ const mapPage = () => {
 
         }
     }
+
+    // select upload image  from user or default
+    const pointDefault = (info) => {
+        console.log(info)
+    }
+    const [radioPoint, setRadioPoint] = useState("กำหนดเอง")
+    const onChangeDefaultPoint = (e) => {
+        $(".uploadUser").toggle()
+        $(".defaultPoint").toggle()
+        if (e.target.value === 'Default') {
+
+        }
+        setRadioPoint(e.target.value)
+    }
     /* -------------------------------------------------------------------------------------- */
 
     /* Search */
@@ -1723,7 +1738,6 @@ const mapPage = () => {
         }
         setVisiblestreetview(!visiblestreetview);
     }
-
     return (
         <Layout isMap={true} navbarHide={hideNavbar}>
             <Head>
@@ -2219,9 +2233,18 @@ const mapPage = () => {
                                     {FileType === "Point" ? (
                                         <>
                                             <Form.Item
+                                                label="Upload"
+                                            >
+                                                <Radio.Group value="กำหนดเอง" onChange={onChangeDefaultPoint} value={radioPoint}>
+                                                    <Radio value={"กำหนดเอง"}>กำหนดเอง</Radio>
+                                                    <Radio value={"Default"}>Default</Radio>
+                                                </Radio.Group>
+                                            </Form.Item>
+                                            <Form.Item
                                                 label="Symbol"
                                                 rules={[{ required: true, message: "กรุณาเลือกไฟล์!" }]}
                                                 extra="ขนาดแนะนำ 25X35"
+                                                className="uploadUser"
                                             >
                                                 <Upload
                                                     onChange={handleChangeSymbol}
@@ -2240,30 +2263,111 @@ const mapPage = () => {
                                                 <div className="symbol_point" style={{ display: "none" }}>
                                                     <div>
                                                         <img src="assets/images/symbol_point/IMG_0467.PNG" alt="" />
-                                                        1
+                                                        Circle 3
                                                     </div>
                                                     <div>
                                                         <img src="assets/images/symbol_point/IMG_0467.PNG" alt="" />
-                                                        2
+                                                        Circle (40%)
                                                     </div>
                                                     <div>
                                                         <img src="assets/images/symbol_point/IMG_0467.PNG" alt="" />
-                                                        3
+                                                        Cicrcle 4
                                                     </div>
                                                     <div>
                                                         <img src="assets/images/symbol_point/IMG_0467.PNG" alt="" />
-                                                        4
+                                                        Cicrcle 5
                                                     </div>
                                                     <div>
                                                         <img src="assets/images/symbol_point/IMG_0467.PNG" alt="" />
-                                                        5
+                                                        Cicrcle 6
                                                     </div>
                                                     <div>
                                                         <img src="assets/images/symbol_point/IMG_0467.PNG" alt="" />
-                                                        6
+                                                        Square 1
                                                     </div>
                                                 </div>
                                             </Form.Item> */}
+                                            <Form.Item
+                                                label="Default"
+                                                style={{ display: "none" }}
+                                                className="defaultPoint"
+                                            >
+                                                <Button onClick={() => $(".flex_point").fadeToggle()}>Symbol</Button>
+                                                <div className="flexbox flex_point" style={{ display: "none", float: "right" }}>
+                                                    <div className="item">
+                                                        <div className="content">
+                                                            <img src="assets/images/symbol_point/IMG_0467.PNG" alt="" onClick={() => pointDefault("Circle3")} />
+                                                            <p>Circle3</p>
+                                                        </div>
+                                                    </div>
+                                                    <div className="item">
+                                                        <div className="content">
+                                                            <img src="assets/images/symbol_point/IMG_0468.PNG" alt="" onClick={() => pointDefault("Circle (40%)")} />
+                                                            <p>Circle (40%)</p>
+                                                        </div>
+                                                    </div>
+                                                    <div className="item">
+                                                        <div className="content">
+                                                            <img src="assets/images/symbol_point/IMG_0469.PNG" alt="" onClick={() => pointDefault("Circle4")} />
+                                                            <p>Circle4</p>
+                                                        </div>
+                                                    </div>
+                                                    <div className="item">
+                                                        <div className="content">
+                                                            <img src="assets/images/symbol_point/IMG_0470.PNG" alt="" onClick={() => pointDefault("Circle5")} />
+                                                            <p>Circle5</p>
+                                                        </div>
+                                                    </div>
+                                                    <div className="item">
+                                                        <div className="content">
+                                                            <img src="assets/images/symbol_point/IMG_0471.PNG" alt="" onClick={() => pointDefault("Circle6")} />
+                                                            <p>Circle6</p>
+                                                        </div>
+                                                    </div>
+                                                    <div className="item">
+                                                        <div className="content">
+                                                            <img src="assets/images/symbol_point/IMG_0472.PNG" alt="" onClick={() => pointDefault("Square1")} />
+                                                            <p>Square1</p>
+                                                        </div>
+                                                    </div>
+                                                    <div className="item">
+                                                        <div className="content">
+                                                            <img src="assets/images/symbol_point/IMG_0477.PNG" alt="" onClick={() => pointDefault("Square3 (40%)")} />
+                                                            <p>Square3 (40%)</p>
+                                                        </div>
+                                                    </div>
+                                                    <div className="item">
+                                                        <div className="content">
+                                                            <img src="assets/images/symbol_point/IMG_0478.PNG" alt="" onClick={() => pointDefault("Square4")} />
+                                                            <p>Square4</p>
+                                                        </div>
+                                                    </div>
+                                                    <div className="item">
+                                                        <div className="content">
+                                                            <img src="assets/images/symbol_point/IMG_0479.JPG" alt="" onClick={() => pointDefault("Square5")} />
+                                                            <p>Square5</p>
+                                                        </div>
+                                                    </div>
+                                                    <div className="item">
+                                                        <div className="content">
+                                                            <img src="assets/images/symbol_point/IMG_0480.PNG" alt="" onClick={() => pointDefault("Square6")} />
+                                                            <p>Square6</p>
+                                                        </div>
+                                                    </div>
+                                                    <div className="item">
+                                                        <div className="content">
+                                                            <img src="assets/images/symbol_point/IMG_0481.JPG" alt="" onClick={() => pointDefault("Triangle1")} />
+                                                            <p>Triangle1</p>
+                                                        </div>
+                                                    </div>
+                                                    <div className="item">
+                                                        <div className="content">
+                                                            <img src="assets/images/symbol_point/IMG_0482.PNG" alt="" onClick={() => pointDefault("Triangle1 (40%)")} />
+                                                            <p>Triangle1 (40%)</p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </Form.Item>
                                         </>
                                     ) : null}
 
