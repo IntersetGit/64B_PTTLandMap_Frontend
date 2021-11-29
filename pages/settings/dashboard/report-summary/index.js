@@ -88,8 +88,11 @@ const index = () => {
         let result = await Api.get("shp/getFromReportBackOffice");
         modifyApi(result.data.items)
     }
-    const modifyApi = (data) => {
-
+    const [test, setTest] = useState([])
+    const modifyApi = async (data) => {
+        let result = await Api.get("shp/getFromReportBackOffice");
+        console.log(result.data.items)
+        setTest(result.data.items.table)
         // modifyInfo
         let newData = []
         data.data.all.forEach(item_prov => {
@@ -114,13 +117,13 @@ const index = () => {
                 })
             }
         })
-        for (let index = 0; index < data.table.length; index++) {
+        for (let index = 0; index < result.data.items.table.length; index++) {
             let count = index + 1
             let name = "status_" + count
             let polt = "polt" + count
             let distance = "distance" + count
             newData.forEach((data_newData, index_newData) => {
-                data.data[name].forEach(data_data => {
+                result.data.items.data[name].forEach(data_data => {
                     if (data_newData.prov_name === data_data.prov_name) {
                         newData[index_newData] = {
                             ...newData[index_newData], [polt]: data_data.plot, [distance]: data_data.distance
@@ -154,7 +157,7 @@ const index = () => {
         newData.forEach((data_newData, index) => {
             let sumPlot = 0
             let sumDistance = 0
-            for (let indexx = 0; indexx < data.table.length; indexx++) {
+            for (let indexx = 0; indexx < result.data.items.table.length; indexx++) {
                 let count = indexx + 1
                 let plot = "polt" + count
                 let distance = "distance" + count
@@ -166,6 +169,7 @@ const index = () => {
             }
         })
 
+        console.log(newData)
         setDataTableHead(data.table)
         setDataTable(newData)
     }
@@ -267,9 +271,9 @@ const index = () => {
                                 <colgroup span="2"></colgroup>
                                 <tr align="center" >
                                     <td rowspan="2"></td>
-                                    <th colspan="2" scope="colgroup" style={{ backgroundColor: "#adaaa9" }} onClick={() => console.log(dataTable)}>ทั้งหมด</th>
+                                    <th colspan="2" scope="colgroup" style={{ backgroundColor: "#adaaa9" }} >ทั้งหมด</th>
                                     {
-                                        dataTableHead.map(data => {
+                                        test.map(data => {
                                             return <th colspan="2" scope="colgroup" style={{ backgroundColor: data.color }}>{data.status}</th>
                                         })
                                     }
@@ -278,7 +282,7 @@ const index = () => {
                                     <th scope="col" style={{ backgroundColor: "#adaaa9" }}>แปลง</th>
                                     <th scope="col" style={{ backgroundColor: "#adaaa9" }}>ระยะทาง</th>
                                     {
-                                        dataTableHead.map(data => {
+                                        test.map(data => {
                                             return (
                                                 <>
                                                     <th scope="col" style={{ backgroundColor: data.color }}>แปลง</th>
@@ -297,26 +301,26 @@ const index = () => {
                                         `}>
                                                 <th scope="row">
                                                     {
-                                                        <span style={{ marginLeft: data.amp_name ? "30px" : data.tam_name ? "60px" : null }}>
+                                                        <h5 className={data.amp_name ? "text-muted" : data.tam_name ? "text-black-50" : "text-dark"} style={{ marginLeft: data.amp_name ? "30px" : data.tam_name ? "60px" : null, fontSize: data.tam_name ? "12px" : null }}>
                                                             {data.prov_name}
                                                             {data.supersub ? null : <DownCircleOutlined style={{ marginLeft: "10px" }} onClick={() => showHideTable(data.prov_name)} />}
-                                                        </span>
+                                                        </h5>
                                                     }
                                                 </th>
                                                 <td style={{ backgroundColor: "#e6e6e6" }} align="center">
-                                                    {data.sumPlot.toFixed(2)}
+                                                    <h5>{data.sumPlot.toFixed(2)}</h5>
                                                 </td>
                                                 <td style={{ backgroundColor: "#e6e6e6" }} align="center">
-                                                    {data.sumDistance.toFixed(2)}
+                                                    <h5>{data.sumDistance.toFixed(2)}</h5>
                                                 </td>
                                                 {
-                                                    dataTableHead.map((dataa, index) => {
+                                                    test.map((dataa, index) => {
                                                         let count = index + 1
                                                         let plottt = "polt" + count
                                                         let distanceee = "distance" + count
                                                         return <>
-                                                            <td style={{ backgroundColor: dataa.color }} align="center">{data[plottt] ?? 0}</td>
-                                                            <td style={{ backgroundColor: dataa.color }} align="center">{data[distanceee] ?? 0}</td>
+                                                            <td style={{ backgroundColor: dataa.color }} align="center"><h5>{data[plottt] ?? 0}</h5></td>
+                                                            <td style={{ backgroundColor: dataa.color }} align="center"><h5>{data[distanceee] ?? 0}</h5></td>
                                                         </>
                                                     })
                                                 }
