@@ -374,3 +374,41 @@ body {
     height: 40px;
   }
 }
+
+
+.flex_point{
+  background-color: #DDD;
+    border:1px black solid;
+    border-radius: 4px;
+    padding: 10px;
+    display: flex;
+    position:absolute;
+    left:63px;
+    top:-16em;
+    width: 16em;
+    height: 16em;
+    overflow: scroll;
+    flex-wrap: wrap;
+    z-index: 10;
+    .item{
+      display: block;
+      box-sizing: border-box;
+      width: 33.33%;
+      padding-left: 2px;
+      padding-right: 2px;
+      cursor: pointer;
+    }
+    .content{
+    }
+}
+
+.flex_point>div>div{
+  img{
+    width: 40px;
+    height: 40px;
+    margin-left: 10px;
+  }
+  p{
+    text-align: center;
+  }
+}
