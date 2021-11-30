@@ -2,6 +2,7 @@ import Layout from "../components/_App/Layout";
 import { useEffect, useRef, useState } from "react";
 import { Loader } from "@googlemaps/js-api-loader";
 import { Doughnut } from "react-chartjs-2";
+import getTextThaiObjShape from '../util/GetTextThaiObjShape'
 import {
     Drawer,
     Tabs,
@@ -613,46 +614,47 @@ const mapPage = () => {
         <table style="width: 350px;" class="table table-striped">
             <tbody>
                 <tr>
-                    <td>ประเภทที่ดิน</td>
+                    <td>${getTextThaiObjShape("partype")} </td>
                     <td>${item.partype}</td>
                 </tr>
                 <tr>
-                    <td>เลขที่ดิน</td>
+                    <td>${getTextThaiObjShape("parlabel1")}</td>
                     <td>${item.parlabel1}</td>
                 </tr>
                 <tr>
-                    <td>เลขโฉนด</td>
+                    <td>${getTextThaiObjShape("parlabel2")}</td>
                     <td>${item.parlabel2}</td>
                 </tr>
                 <tr>
-                    <td>หน้าสำรวจ</td>
+                    <td>${getTextThaiObjShape("parlabel3")}</td>
                     <td>${item.parlabel3}</td>
                 </tr>
                 <tr>
-                    <td>ตำบล</td>
+                    <td>${getTextThaiObjShape("tam")}</td>
                     <td>${item.tam}</td>
                 </tr>
                 <tr>
-                    <td>อำเภอ</td>
+                    <td>${getTextThaiObjShape("amp")}</td>
                     <td>${item.amp}</td>
                 </tr>
                 <tr>
-                    <td>จังหวัด</td>
+                    <td>${getTextThaiObjShape("prov")}</td>
                     <td>${item.prov}</td>
                 </tr>
                 <tr>
-                    <td>บาท_ตจว</td>
+                    <td>${getTextThaiObjShape("area_rai")}</td>
                     <td>${item.area_rai}</td>
                 </tr>
                 <tr>
-                    <td>ระยะจาก_ROW</td>
+                    <td>${getTextThaiObjShape("row_distan")}</td>
                     <td>${item.row_distan}</td>
                 </tr>
             </tbody>
         </table>
         <div style="text-align: end;">
-            <a style="cursor: pointer;" onclick="clickEdit()"><img style="width: 25px;" src="https://nonpttlma.pttplc.com/service/icon/icon-edit.png"></a>
-            <a style="cursor: pointer;" onclick="clickView()"><img style="width: 25px;" src="https://nonpttlma.pttplc.com/service/icon/icon-view.png"></a>
+        ${(user && (user.roles_id === "8a97ac7b-01dc-4e06-81c2-8422dffa0ca2" || user.roles_id === "cec6617f-b593-4ebc-9604-3059dfee0ac4")) ? ` 
+        <a style="cursor: pointer;" onclick="clickEdit()"><img style="width: 25px;" src="https://nonpttlma.pttplc.com/service/icon/icon-edit.png"></a>` :
+                `<a style="cursor: pointer;" onclick="clickView()"><img style="width: 25px;" src="https://nonpttlma.pttplc.com/service/icon/icon-view.png"></a>`} 
         </div>
         
         `
@@ -2838,17 +2840,17 @@ const mapPage = () => {
                                                         <div className="col-md-11">
 
                                                             <div className="row">
-                                                                <label>Project Name :</label>
+                                                                <label>{getTextThaiObjShape("project_name")} :</label>
                                                                 <p className="pl-3">{e.project_na}</p>
                                                             </div>
 
                                                             <div className="row">
-                                                                <label>ประเภทเอกสารสิทธิ์ :</label>
+                                                                <label>{getTextThaiObjShape("objectid")} :</label>
                                                                 <p className="pl-3">{e.partype}</p>
                                                             </div>
 
                                                             <div className="row">
-                                                                <label>ลำดับแปลงที่ดิน :</label>
+                                                                <label>{getTextThaiObjShape("objectid")} :</label>
                                                                 <p className="pl-3">{e.objectid}</p>
                                                             </div>
 
@@ -2856,19 +2858,19 @@ const mapPage = () => {
                                                                 <div className="row">
                                                                     <div className="col-md-4">
                                                                         <div className="row">
-                                                                            <label>เลขที่เอกสารสิทธิ์ :</label>
+                                                                            <label>{getTextThaiObjShape("parlabel1")} :</label>
                                                                             <p className="pl-3">{e.parlabel1}</p>
                                                                         </div>
                                                                     </div>
                                                                     <div className="col-md-4">
                                                                         <div className="row">
-                                                                            <label>หน้าสำรวจ/หน้า :</label>
+                                                                            <label>{getTextThaiObjShape("parlabel2")} :</label>
                                                                             <p className="pl-3">{e.parlabel2}</p>
                                                                         </div>
                                                                     </div>
                                                                     <div className="col-md-4">
                                                                         <div className="row">
-                                                                            <label>เลขที่ดิน/เล่ม :</label>
+                                                                            <label>{getTextThaiObjShape("parlabel3")} :</label>
                                                                             <p className="pl-3">{e.parlabel3}</p>
                                                                         </div>
                                                                     </div>
@@ -2877,13 +2879,13 @@ const mapPage = () => {
                                                                 <div className="row">
                                                                     <div className="col-md-5">
                                                                         <div className="row">
-                                                                            <label>ระวาง/เลขที่/หมู่ที่ :</label>
+                                                                            <label>{getTextThaiObjShape("parlabel4")} :</label>
                                                                             <p className="pl-3">{e.parlabel4}</p>
                                                                         </div>
                                                                     </div>
                                                                     <div className="col-md-5">
                                                                         <div className="row">
-                                                                            <label>ระวาง(น.ส.3ก) :</label>
+                                                                            <label>{getTextThaiObjShape("parlabel5")} :</label>
                                                                             <p className="pl-3">{e.parlabel5}</p>
                                                                         </div>
                                                                     </div>
@@ -2970,7 +2972,7 @@ const mapPage = () => {
                             {e.type === "select" ? (
                                 <Form.Item
                                     key={`form-modal-search-${i}`}
-                                    label={e.label}
+                                    label={getTextThaiObjShape(e.label)}
                                     name={e.name}
                                     rules={[{ required: e.required, message: e.message }]}
                                 >
@@ -2985,7 +2987,7 @@ const mapPage = () => {
                             ) : (
                                 <Form.Item
                                     key={`form-modal-search-${i}`}
-                                    label={e.label}
+                                    label={getTextThaiObjShape(e.label)}
                                     name={e.name}
                                     rules={[{ required: e.required, message: e.message }]}
                                 >
