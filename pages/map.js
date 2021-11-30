@@ -295,7 +295,7 @@ const mapPage = () => {
                         message.error("กรุณาเลือก Symbol!");
                         return false
                     }
-                    const data = await axios.post(`${process.env.NEXT_PUBLIC_SERVICE}/upload/uploadPointDefault`, { img: nameImgDefault })
+                    const data = await API.post(`${process.env.NEXT_PUBLIC_SERVICE}/upload/uploadPointDefault`, { img: nameImgDefault })
                     Symbol = data.items
                 }
             }
@@ -2362,7 +2362,7 @@ const mapPage = () => {
                                                 className="defaultPoint"
                                             >
                                                 <div className="testt">
-                                                    <Button onClick={() => $(".flex_point").fadeToggle()}>Symbol</Button>
+                                                    <Button >Symbol</Button>
                                                     <p className="text-muted">{textImgDefault}</p>
                                                     <div className="flexbox flex_point" >
                                                         <div className="item">
