@@ -353,8 +353,8 @@ body {
     padding: 10px;
     display: flex;
     position:absolute;
-    left:63px;
-    top:-16em;
+    left:58px;
+    top:-15em;
     width: 16em;
     height: 16em;
     overflow: scroll;
@@ -381,4 +381,16 @@ body {
   p{
     text-align: center;
   }
+}
+
+.testt{
+  position: relative;
+  width: 62px;
+  height: 26;
+}
+.flexbox{
+  display: none;
+}
+.testt:hover .flex_point{
+  display: flex;
 }

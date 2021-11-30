@@ -2361,79 +2361,81 @@ const mapPage = () => {
                                                 style={{ display: "none" }}
                                                 className="defaultPoint"
                                             >
-                                                <Button onClick={() => $(".flex_point").fadeToggle()}>Symbol</Button>
-                                                <p className="text-muted">{textImgDefault}</p>
-                                                <div className="flexbox flex_point" style={{ display: "none", float: "right" }}>
-                                                    <div className="item">
-                                                        <div className="content ">
-                                                            <img className="Circle3 defalutImage" src="assets/images/symbol_point/IMG_0467.PNG" alt="" onClick={() => onSelectImageDefault("IMG_0467.png", "Circle3", "Circle3")} />
-                                                            <p>Circle3</p>
+                                                <div className="testt">
+                                                    <Button onClick={() => $(".flex_point").fadeToggle()}>Symbol</Button>
+                                                    <p className="text-muted">{textImgDefault}</p>
+                                                    <div className="flexbox flex_point" >
+                                                        <div className="item">
+                                                            <div className="content ">
+                                                                <img className="Circle3 defalutImage" src="assets/images/symbol_point/IMG_0467.PNG" alt="" onClick={() => onSelectImageDefault("IMG_0467.png", "Circle3", "Circle3")} />
+                                                                <p>Circle3</p>
+                                                            </div>
                                                         </div>
-                                                    </div>
-                                                    <div className="item">
-                                                        <div className="content">
-                                                            <img className="Circle40 defalutImage" src="assets/images/symbol_point/IMG_0468.PNG" alt="" onClick={() => onSelectImageDefault("IMG_0468.png", "Circle40", "Circle (40%)")} />
-                                                            <p>Circle (40%)</p>
+                                                        <div className="item">
+                                                            <div className="content">
+                                                                <img className="Circle40 defalutImage" src="assets/images/symbol_point/IMG_0468.PNG" alt="" onClick={() => onSelectImageDefault("IMG_0468.png", "Circle40", "Circle (40%)")} />
+                                                                <p>Circle (40%)</p>
+                                                            </div>
                                                         </div>
-                                                    </div>
-                                                    <div className="item">
-                                                        <div className="content ">
-                                                            <img className="Circle4 defalutImage" src="assets/images/symbol_point/IMG_0469.PNG" alt="" onClick={() => onSelectImageDefault("IMG_0469.png", "Circle4", "Circle4")} />
-                                                            <p>Circle4</p>
+                                                        <div className="item">
+                                                            <div className="content ">
+                                                                <img className="Circle4 defalutImage" src="assets/images/symbol_point/IMG_0469.PNG" alt="" onClick={() => onSelectImageDefault("IMG_0469.png", "Circle4", "Circle4")} />
+                                                                <p>Circle4</p>
+                                                            </div>
                                                         </div>
-                                                    </div>
-                                                    <div className="item">
-                                                        <div className="content ">
-                                                            <img className=" Circle5 defalutImage" src="assets/images/symbol_point/IMG_0470.PNG" alt="" onClick={() => onSelectImageDefault("IMG_0470.png", "Circle5", "Circle5")} />
-                                                            <p>Circle5</p>
+                                                        <div className="item">
+                                                            <div className="content ">
+                                                                <img className=" Circle5 defalutImage" src="assets/images/symbol_point/IMG_0470.PNG" alt="" onClick={() => onSelectImageDefault("IMG_0470.png", "Circle5", "Circle5")} />
+                                                                <p>Circle5</p>
+                                                            </div>
                                                         </div>
-                                                    </div>
-                                                    <div className="item">
-                                                        <div className="content">
-                                                            <img className="defalutImage Circle6" src="assets/images/symbol_point/IMG_0471.PNG" alt="" onClick={() => onSelectImageDefault("IMG_0471.png", "Circle6", "Circle6")} />
-                                                            <p>Circle6</p>
+                                                        <div className="item">
+                                                            <div className="content">
+                                                                <img className="defalutImage Circle6" src="assets/images/symbol_point/IMG_0471.PNG" alt="" onClick={() => onSelectImageDefault("IMG_0471.png", "Circle6", "Circle6")} />
+                                                                <p>Circle6</p>
+                                                            </div>
                                                         </div>
-                                                    </div>
-                                                    <div className="item">
-                                                        <div className="content">
-                                                            <img className="defalutImage Square1" src="assets/images/symbol_point/IMG_0472.PNG" alt="" onClick={() => onSelectImageDefault("IMG_0472.png", "Square1", "Square1")} />
-                                                            <p>Square1</p>
+                                                        <div className="item">
+                                                            <div className="content">
+                                                                <img className="defalutImage Square1" src="assets/images/symbol_point/IMG_0472.PNG" alt="" onClick={() => onSelectImageDefault("IMG_0472.png", "Square1", "Square1")} />
+                                                                <p>Square1</p>
+                                                            </div>
                                                         </div>
-                                                    </div>
-                                                    <div className="item">
-                                                        <div className="content">
-                                                            <img className="defalutImage Square340" src="assets/images/symbol_point/IMG_0477.PNG" alt="" onClick={() => onSelectImageDefault("IMG_0477.png", "Square340", "Square3 (40%)")} />
-                                                            <p>Square3 (40%)</p>
+                                                        <div className="item">
+                                                            <div className="content">
+                                                                <img className="defalutImage Square340" src="assets/images/symbol_point/IMG_0477.PNG" alt="" onClick={() => onSelectImageDefault("IMG_0477.png", "Square340", "Square3 (40%)")} />
+                                                                <p>Square3 (40%)</p>
+                                                            </div>
                                                         </div>
-                                                    </div>
-                                                    <div className="item">
-                                                        <div className="content">
-                                                            <img className="defalutImage Square4" src="assets/images/symbol_point/IMG_0478.PNG" alt="" onClick={() => onSelectImageDefault("IMG_0478.png", "Square4", "Square4")} />
-                                                            <p>Square4</p>
+                                                        <div className="item">
+                                                            <div className="content">
+                                                                <img className="defalutImage Square4" src="assets/images/symbol_point/IMG_0478.PNG" alt="" onClick={() => onSelectImageDefault("IMG_0478.png", "Square4", "Square4")} />
+                                                                <p>Square4</p>
+                                                            </div>
                                                         </div>
-                                                    </div>
-                                                    <div className="item">
-                                                        <div className="content">
-                                                            <img className="defalutImage Square5" src="assets/images/symbol_point/IMG_0479.JPG" alt="" onClick={() => onSelectImageDefault("IMG_0479.jpg", "Square5", "Square5")} />
-                                                            <p>Square5</p>
+                                                        <div className="item">
+                                                            <div className="content">
+                                                                <img className="defalutImage Square5" src="assets/images/symbol_point/IMG_0479.JPG" alt="" onClick={() => onSelectImageDefault("IMG_0479.jpg", "Square5", "Square5")} />
+                                                                <p>Square5</p>
+                                                            </div>
                                                         </div>
-                                                    </div>
-                                                    <div className="item">
-                                                        <div className="content">
-                                                            <img className="defalutImage Square6" src="assets/images/symbol_point/IMG_0480.PNG" alt="" onClick={() => onSelectImageDefault("IMG_0480.png", "Square6", "Square6")} />
-                                                            <p>Square6</p>
+                                                        <div className="item">
+                                                            <div className="content">
+                                                                <img className="defalutImage Square6" src="assets/images/symbol_point/IMG_0480.PNG" alt="" onClick={() => onSelectImageDefault("IMG_0480.png", "Square6", "Square6")} />
+                                                                <p>Square6</p>
+                                                            </div>
                                                         </div>
-                                                    </div>
-                                                    <div className="item">
-                                                        <div className="content">
-                                                            <img className="defalutImage Triangle1" src="assets/images/symbol_point/IMG_0481.JPG" alt="" onClick={() => onSelectImageDefault("IMG_0481.jpg", "Triangle1", "Triangle1")} />
-                                                            <p>Triangle1</p>
+                                                        <div className="item">
+                                                            <div className="content">
+                                                                <img className="defalutImage Triangle1" src="assets/images/symbol_point/IMG_0481.JPG" alt="" onClick={() => onSelectImageDefault("IMG_0481.jpg", "Triangle1", "Triangle1")} />
+                                                                <p>Triangle1</p>
+                                                            </div>
                                                         </div>
-                                                    </div>
-                                                    <div className="item">
-                                                        <div className="content">
-                                                            <img className="defalutImage Triangle140" src="assets/images/symbol_point/IMG_0482.PNG" alt="" onClick={() => onSelectImageDefault("IMG_0482.png", "Triangle140", "Triangle1 (40%)")} />
-                                                            <p>Triangle1 (40%)</p>
+                                                        <div className="item">
+                                                            <div className="content">
+                                                                <img className="defalutImage Triangle140" src="assets/images/symbol_point/IMG_0482.PNG" alt="" onClick={() => onSelectImageDefault("IMG_0482.png", "Triangle140", "Triangle1 (40%)")} />
+                                                                <p>Triangle1 (40%)</p>
+                                                            </div>
                                                         </div>
                                                     </div>
                                                 </div>
