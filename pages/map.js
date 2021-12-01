@@ -335,6 +335,8 @@ const mapPage = () => {
                     setFileUpload(null);
                     setFileType(null);
                     setOpenColorUpload(false);
+                    setNameImgDefault(null)
+                    setTextImgDefault(null)
                     setColorUpload({
                         hex: "red",
                         rgb: { r: 255, g: 0, b: 0, a: 1 },
@@ -1263,10 +1265,12 @@ const mapPage = () => {
         $(".defaultPoint").toggle()
         if (e.target.value === 'กำหนดเอง') {
             setNameImgDefault(null)
+            $(`.defalutImage`).css("border", "none")
         }
         if (e.target.value === 'Default') {
             setFileUploadSymbol(null)
             setFileListSymbol(null)
+            setTextImgDefault(null)
         }
         setRadioPoint(e.target.value)
     }
