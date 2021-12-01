@@ -331,6 +331,7 @@ const mapPage = () => {
                     });
                     await loadShapeFile();
                     setFileList([]);
+                    setFileListSymbol(null)
                     setFileUpload(null);
                     setFileType(null);
                     setOpenColorUpload(false);
@@ -1265,6 +1266,7 @@ const mapPage = () => {
         }
         if (e.target.value === 'Default') {
             setFileUploadSymbol(null)
+            setFileListSymbol(null)
         }
         setRadioPoint(e.target.value)
     }
