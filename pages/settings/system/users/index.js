@@ -18,6 +18,7 @@ import {
 } from "antd";
 const { Search } = Input;
 const { Option } = Select;
+
 const usersSystemPage = () => {
   const [loading, setLoading] = useState(true);
   const [roles, setRoles] = useState([]);
@@ -68,7 +69,7 @@ const usersSystemPage = () => {
     },
     {
       key: "5",
-      title: <br>กลุ่มผู้ใช้งาน</br>,
+      title: <b>กลุ่มผู้ใช้งาน</b>,
       dataIndex: "roles_name",
       sorter: (record1, record2) => {
         return record1.roles_name > record2.roles_name;
