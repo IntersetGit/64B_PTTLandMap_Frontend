@@ -327,9 +327,6 @@ body {
   }
 }
 
-
-
-
 .NameHighlights {
   position:relative;
 }
@@ -368,8 +365,6 @@ body {
       padding-right: 2px;
       cursor: pointer;
     }
-    .content{
-    }
 }
 
 .flex_point>div>div{
@@ -383,7 +378,7 @@ body {
   }
 }
 
-.testt{
+.dropdownDefaultPoint{
   position: relative;
   width: 62px;
   height: 26;
@@ -391,6 +386,6 @@ body {
 .flexbox{
   display: none;
 }
-.testt:hover .flex_point{
+.dropdownDefaultPoint:hover .flex_point{
   display: flex;
 }

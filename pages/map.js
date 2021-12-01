@@ -2369,7 +2369,7 @@ const mapPage = () => {
                                                 style={{ display: "none" }}
                                                 className="defaultPoint"
                                             >
-                                                <div className="testt">
+                                                <div className="dropdownDefaultPoint">
                                                     <Button >Symbol</Button>
                                                     <p className="text-muted">{textImgDefault}</p>
                                                     <div className="flexbox flex_point" >
