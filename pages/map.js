@@ -296,7 +296,7 @@ const mapPage = () => {
                         return false
                     }
                     const data = await API.post(`${process.env.NEXT_PUBLIC_SERVICE}/upload/uploadPointDefault`, { img: nameImgDefault })
-                    Symbol = data.items
+                    Symbol = data.data.items
                 }
             }
 
@@ -339,7 +339,9 @@ const mapPage = () => {
                         rgb: { r: 255, g: 0, b: 0, a: 1 },
                     });
                     formUpload.resetFields();
-
+                    $(".uploadUser").toggle()
+                    $(".defaultPoint").toggle()
+                    setRadioPoint("กำหนดเอง")
                     message.success("บันทึกสำเร็จ");
                 }
             } else {
@@ -2829,7 +2831,7 @@ const mapPage = () => {
                                                             </div>
 
                                                             <div className="row">
-                                                                <label>{getTextThaiObjShape("partype")} :</label>
+                                                                <label>{getTextThaiObjShape("objectid")} :</label>
                                                                 <p className="pl-3">{e.partype}</p>
                                                             </div>
 
