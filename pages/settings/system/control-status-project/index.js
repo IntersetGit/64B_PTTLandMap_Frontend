@@ -40,7 +40,7 @@ const index = () => {
   const columns = [
     {
       key: "1",
-      title: "ลำดับ",
+      title: <b>ลำดับ</b>,
       dataIndex: "number",
       width: '3%',
       sorter: (record1, record2) => {
@@ -50,7 +50,7 @@ const index = () => {
     },
     {
       key: "2",
-      title: "Status code",
+      title: <b>Status code</b>,
       dataIndex: "status_code",
       width: '15%',
       sorter: (record1, record2) => {
@@ -59,7 +59,7 @@ const index = () => {
     },
     {
       key: "3",
-      title: "ชื่อสถานะโครงการ",
+      title: <b>ชื่อสถานะโครงการ</b>,
       dataIndex: "name",
       width: '20%',
       sorter: (record1, record2) => {
@@ -67,8 +67,8 @@ const index = () => {
       },
     },
     {
-      key: "3",
-      title: "สีสถานะ",
+      key: "4",
+      title: <b>สีสถานะ</b>,
       dataIndex: "status_color",
       width: '15%',
       render: (color) => {
@@ -86,7 +86,7 @@ const index = () => {
       },
     },
     {
-      key: "4",
+      key: "5",
       title: "จัดการ",
       dataIndex: "id",
       width: '2%',

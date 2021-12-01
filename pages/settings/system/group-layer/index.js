@@ -139,7 +139,7 @@ const GroupLayerSystemPage = () => {
 
   const columns = [
     {
-      title: "ลำดับ",
+      title: <b>ลำดับ</b>,
       dataIndex: "number",
       width: 100,
       sorter: (record1, record2) => {
@@ -147,7 +147,7 @@ const GroupLayerSystemPage = () => {
       },
     },
     {
-      title: "symbol",
+      title: <b>symbol</b>,
       dataIndex: "symbol",
       render: (id) => {
         // return <MoreOutlined />
@@ -161,14 +161,14 @@ const GroupLayerSystemPage = () => {
       },
     },
     {
-      title: "ชื่อ group",
+      title: <b>ชื่อ group</b>,
       dataIndex: "group_name",
       sorter: (record1, record2) => {
         return record1.group_name > record2.group_name;
       },
     },
     {
-      title: "จัดการ",
+      title: <b>จัดการ</b>,
       dataIndex: "id",
       width: 150,
       align: "center",

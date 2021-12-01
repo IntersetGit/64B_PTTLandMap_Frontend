@@ -36,7 +36,7 @@ const usersSystemPage = () => {
   const columns = [
     {
       key: "1",
-      title: "ลำดับ",
+      title: <b>ลำดับ</b>,
       dataIndex: "number",
       sorter: (record1, record2) => {
         return record1.number > record2.number;
@@ -44,7 +44,7 @@ const usersSystemPage = () => {
     },
     {
       key: "2",
-      title: "ชื่อเข้าใช้ระบบ",
+      title: <b>ชื่อเข้าใช้ระบบ</b>,
       dataIndex: "user_name",
       sorter: (record1, record2) => {
         return record1.user_name > record2.user_name;
@@ -52,7 +52,7 @@ const usersSystemPage = () => {
     },
     {
       key: "3",
-      title: "ชื่อ-นามสกุล",
+      title: <b>ชื่อ-นามสกุล</b>,
       dataIndex: "firstlast",
       sorter: (record1, record2) => {
         return record1.firstlast > record2.firstlast;
@@ -60,7 +60,7 @@ const usersSystemPage = () => {
     },
     {
       key: "4",
-      title: "อีเมล",
+      title: <b>อีเมล</b>,
       dataIndex: "e_mail",
       sorter: (record1, record2) => {
         return record1.e_mail > record2.e_mail;
@@ -68,7 +68,7 @@ const usersSystemPage = () => {
     },
     {
       key: "5",
-      title: "กลุ่มผู้ใช้งาน",
+      title: <br>กลุ่มผู้ใช้งาน</br>,
       dataIndex: "roles_name",
       sorter: (record1, record2) => {
         return record1.roles_name > record2.roles_name;
@@ -76,7 +76,7 @@ const usersSystemPage = () => {
     },
     {
       key: "6",
-      title: "จัดการ",
+      title: <b>จัดการ</b>,
       dataIndex: "id",
       render: (id) => {
         return (
