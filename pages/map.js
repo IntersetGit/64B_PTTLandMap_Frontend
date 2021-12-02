@@ -2412,6 +2412,24 @@ const mapPage = () => {
                                                         </div>
                                                         <div className="item">
                                                             <div className="content">
+                                                                <img className="defalutImage Square140" src="assets/images/symbol_point/IMG_0473.PNG" alt="" onClick={() => onSelectImageDefault("IMG_0473.png", "Square140", "Square1 (40%)")} />
+                                                                <p>Square1 (40%)</p>
+                                                            </div>
+                                                        </div>
+                                                        <div className="item">
+                                                            <div className="content">
+                                                                <img className="defalutImage Square2" src="assets/images/symbol_point/IMG_0475.PNG" alt="" onClick={() => onSelectImageDefault("IMG_0475.png", "Square2", "Square2")} />
+                                                                <p>Square2</p>
+                                                            </div>
+                                                        </div>
+                                                        <div className="item">
+                                                            <div className="content">
+                                                                <img className="defalutImage Square3" src="assets/images/symbol_point/IMG_0476.PNG" alt="" onClick={() => onSelectImageDefault("IMG_0476.png", "Square3", "Square3")} />
+                                                                <p>Square3</p>
+                                                            </div>
+                                                        </div>
+                                                        <div className="item">
+                                                            <div className="content">
                                                                 <img className="defalutImage Square340" src="assets/images/symbol_point/IMG_0477.PNG" alt="" onClick={() => onSelectImageDefault("IMG_0477.png", "Square340", "Square3 (40%)")} />
                                                                 <p>Square3 (40%)</p>
                                                             </div>
@@ -2424,7 +2442,7 @@ const mapPage = () => {
                                                         </div>
                                                         <div className="item">
                                                             <div className="content">
-                                                                <img className="defalutImage Square5" src="assets/images/symbol_point/IMG_0479.JPG" alt="" onClick={() => onSelectImageDefault("IMG_0479.jpg", "Square5", "Square5")} />
+                                                                <img className="defalutImage Square5" src="assets/images/symbol_point/IMG_0479.png" alt="" onClick={() => onSelectImageDefault("IMG_0479.png", "Square5", "Square5")} />
                                                                 <p>Square5</p>
                                                             </div>
                                                         </div>
@@ -2436,7 +2454,7 @@ const mapPage = () => {
                                                         </div>
                                                         <div className="item">
                                                             <div className="content">
-                                                                <img className="defalutImage Triangle1" src="assets/images/symbol_point/IMG_0481.JPG" alt="" onClick={() => onSelectImageDefault("IMG_0481.jpg", "Triangle1", "Triangle1")} />
+                                                                <img className="defalutImage Triangle1" src="assets/images/symbol_point/IMG_0481.png" alt="" onClick={() => onSelectImageDefault("IMG_0481.png", "Triangle1", "Triangle1")} />
                                                                 <p>Triangle1</p>
                                                             </div>
                                                         </div>
@@ -2444,6 +2462,24 @@ const mapPage = () => {
                                                             <div className="content">
                                                                 <img className="defalutImage Triangle140" src="assets/images/symbol_point/IMG_0482.PNG" alt="" onClick={() => onSelectImageDefault("IMG_0482.png", "Triangle140", "Triangle1 (40%)")} />
                                                                 <p>Triangle1 (40%)</p>
+                                                            </div>
+                                                        </div>
+                                                        <div className="item">
+                                                            <div className="content">
+                                                                <img className="defalutImage Triangle2" src="assets/images/symbol_point/IMG_0483.PNG" alt="" onClick={() => onSelectImageDefault("IMG_0483.png", "Triangle2", "Triangle2")} />
+                                                                <p>Triangle2</p>
+                                                            </div>
+                                                        </div>
+                                                        <div className="item">
+                                                            <div className="content">
+                                                                <img className="defalutImage Triangle3" src="assets/images/symbol_point/IMG_0484.PNG" alt="" onClick={() => onSelectImageDefault("IMG_0484.png", "Triangle3", "Triangle3")} />
+                                                                <p>Triangle3</p>
+                                                            </div>
+                                                        </div>
+                                                        <div className="item">
+                                                            <div className="content">
+                                                                <img className="defalutImage Triangle340" src="assets/images/symbol_point/IMG_0485.PNG" alt="" onClick={() => onSelectImageDefault("IMG_0485.png", "Triangle340", "Triangle3 (40%)")} />
+                                                                <p>Triangle3 (40%)</p>
                                                             </div>
                                                         </div>
                                                     </div>
