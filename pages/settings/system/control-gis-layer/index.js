@@ -27,6 +27,7 @@ import {
 } from "antd";
 import { SketchPicker } from "react-color";
 import Color from "../../../../components/Color";
+import moment from "moment";
 const { Search } = Input;
 const { Option } = Select;
 const cookies = new Cookies();
@@ -39,6 +40,7 @@ const usersSystemPage = () => {
   const [pageSize, setPageSize] = useState(5);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [isModalVisible2, setIsModalVisible2] = useState(false);
+  const [isModalVisible3, setIsModalVisible3] = useState(false);
   const [statusValidation, setStatusValidation] = useState([]);
   const [menuItem, setMenuItem] = useState([]);
   const [listGroup, setListGroup] = useState([]);
@@ -56,6 +58,7 @@ const usersSystemPage = () => {
   const [form] = Form.useForm();
   const [formCreate] = Form.useForm();
   const [formEdit] = Form.useForm();
+  const [form2] = Form.useForm();
 
   const [FileListSymbol, setFileListSymbol] = useState([]);
   const [FileUploadSymbol, setFileUploadSymbol] = useState(null);
@@ -100,6 +103,12 @@ const usersSystemPage = () => {
     },
     {
       key: "5",
+      title: <b>ประเภทข้อมูล GEOM</b>,
+      dataIndex: "type_geo",
+      render: (id, record) => (record.type_geo ?? "-")
+    },
+    {
+      key: "6",
       title: <b>จัดการ</b>,
       // width: 200,
       dataIndex: "id",
@@ -108,12 +117,20 @@ const usersSystemPage = () => {
           <Dropdown
             overlay={
               <Menu>
-                <Menu.Item
-                  key="1"
-                  onClick={() => handleEdit(show)}
-                >
-                  แก้ไข
-                </Menu.Item>
+                {show.type === 'wms' ?
+                  <Menu.Item
+                    key="1"
+                    onClick={() => (handleEditWMS(show))}
+                  >
+                    แก้ไข WMS
+                  </Menu.Item> :
+                  <Menu.Item
+                    key="1"
+                    onClick={() => handleEdit(show)}
+                  >
+                    แก้ไข
+                  </Menu.Item>
+                }
                 <Menu.Item key="2" onClick={() => handleDelete(id)}>
                   ลบ
                 </Menu.Item>
@@ -298,6 +315,12 @@ const usersSystemPage = () => {
 
     form.setFieldsValue(data.items);
   }
+  const handleEditWMS = async (show) => {
+    const { data: { items } } = await Api.get(`masterdata/masLayersShape/${show.id}`);
+    setEditId(show.id)
+    setIsModalVisible3(true);
+    form2.setFieldsValue({ ...items, date: moment(items.date) });
+  }
   const handleExport = (id) => {
     setModalexport({ id: id, visible: true });
   }
@@ -332,7 +355,7 @@ const usersSystemPage = () => {
         cancelButtonText: "ยกเลิก",
       }).then(async (result) => {
         if (result.isConfirmed) {
-          edit(data)
+          edit(data);
         }
       });
     } catch (error) {
@@ -343,7 +366,7 @@ const usersSystemPage = () => {
 
   const edit = async (value) => {
     try {
-      console.log('value :>> ', value);
+      // console.log('value :>> ', value);
       let Symbol = null;
       if (FileUploadSymbol) {
         const formDataSymbol = new FormData();
@@ -366,15 +389,15 @@ const usersSystemPage = () => {
         strokeColor: colorFrame,
         symbol: Symbol ?? FileListSymbol[0],
       }
-
-      let resp = await Api.post("masterdata/masLayersShape", {
+      const editGis = {
         ...value,
         color_layer: JSON.stringify(colorUpload.color_layer),
         option_layer,
         config_color: configColor,
         id: editId,
-      });
-      console.log('resp :>> ', resp);
+      }
+      let resp = await Api.post("masterdata/masLayersShape", editGis);
+      // console.log('resp :>> ', resp);
       setInputValueOpacityColor(0.5)
       setInputValueStrokColor(1)
       setColorUpload({
@@ -389,6 +412,7 @@ const usersSystemPage = () => {
       await Swal.fire("", "แก้ไขข้อมูลเรียบร้อยแล้ว", "success");
       reload();
       handleCancel();
+      handleCancel3();
     } catch (error) {
       console.log('error :>> ', error);
     }
@@ -412,6 +436,10 @@ const usersSystemPage = () => {
     }
   };
 
+  const handleOk3 = () => {
+    form2.submit()
+  };
+
   const handleCancel2 = () => {
     setIsModalVisible2(false);
     form.resetFields();
@@ -419,6 +447,10 @@ const usersSystemPage = () => {
   const handleCancel = () => {
     setIsModalVisible(false);
     form.resetFields();
+  };
+  const handleCancel3 = () => {
+    setIsModalVisible3(false);
+    form2.resetFields();
   };
 
 
@@ -606,7 +638,7 @@ const usersSystemPage = () => {
             name="name_layer"
             label="ชื่อ"
             rules={[{ required: true }]}
-            {...statusValidation}
+          // {...statusValidation}
           >
             <Input />
           </Form.Item>
@@ -715,6 +747,70 @@ const usersSystemPage = () => {
             </Upload>
           </Form.Item>
 
+        </Form>
+      </Modal>
+      <Modal
+        title="แก้ไขข้อมูล WMS"
+        visible={isModalVisible3}
+        onOk={handleOk3}
+        onCancel={handleCancel3}
+        style={{ top: 45 }}
+      >
+        <Form
+          form={form2}
+          labelCol={{ span: 7 }}
+          wrapperCol={{ span: 14 }}
+          onFinish={onFinishEdit}
+        >
+          <Form.Item
+            name="name_layer"
+            label="ชื่อ GIS Layer"
+            rules={[{ required: true }]}
+          >
+            <Input />
+          </Form.Item>
+          <Form.Item
+            name="group_layer_id"
+            label="Group Layer"
+            rules={[
+              { required: true, message: "กรุณากรอกข้อมูล กลุ่มผู้ใช้งาน" },
+            ]}
+          >
+            <Select placeholder="กลุ่มผู้ใช้งาน">
+              {select && select.map((data, index) => (
+                <Option key={index} value={data.id}>
+                  {data.group_name}
+                </Option>
+              ))}
+            </Select>
+          </Form.Item>
+          <Form.Item
+            name="url"
+            label="url"
+            rules={[{ required: true }]}
+          >
+            <Input />
+          </Form.Item>
+          {menuItem}
+          <Form.Item
+            name="type_server"
+            label="GIS Server Type"
+            wrapperCol={{ span: 10 }}
+
+            rules={[{ required: true }]}
+          >
+            <Radio.Group
+              onChange={(e) => {
+                changeTypeServer(e);
+              }}
+            >
+              <Radio value="arcgisserver">ArcGIS Server</Radio>
+              <Radio value="geoserver">GEO Server</Radio>
+            </Radio.Group>
+          </Form.Item>
+          <Form.Item name="date" label="Date" rules={[{ required: true }]}>
+            <DatePicker format="YYYY-MM-DD" />
+          </Form.Item>
         </Form>
       </Modal>
       <Modal onCancel={() => setModalexport({ ...modalexport, visible: false })} title={<b>Export To</b>} visible={modalexport.visible} footer={false} >
