@@ -579,8 +579,9 @@ const mapPage = () => {
         }
     };
 
+    const [infoWindowMap, setInfoWindowMap] = useState([])
     const setInfoWindowWA = (feature) => {
-        const infowindow = new google.maps.InfoWindow();
+
         // let key = Object.keys(feature.feature.h);
         // let content = "<div id='infoBox'><center><strong>รายละเอียดข้อมูล</strong></center><br />";
         // key.forEach((a, i) => {
@@ -589,84 +590,93 @@ const mapPage = () => {
         // });
         // content += "</div>";
         const item = feature.feature.h;
+
         window.clickEdit = () => {
-            console.log('item edit :>> ', item);
             setModeInfoSearch("edit")
             editShapefileSearch(item)
         }
         window.clickView = () => {
-            console.log('item view :>> ', item);
             setModeInfoSearch("view")
             editShapefileSearch(item)
         }
 
-        // console.log('item -----------------:>> ', item);
-        // const content = `<div id='infoBox'><center><strong>รายละเอียดข้อมูล</strong></center><br />
-        // <p>Project : ${item.project_na}</p>
-        // <p>PARTYPE : ${item.partype}</p>
-        // <p>ลำดับแปลงที่ดิน (OBJECT_ID) : ${item.objectid}</p>
-        // <p>PARLABEL1 : ${item.parlabel1}</p>
-        // <p>PARLABEL2 : ${item.parlabel2}</p>
-        // <p>PARLABEL3 : ${item.parlabel3}</p>
-        // <p>PARLABEL4 : ${item.parlabel4}</p>
-        // <p>PARLABEL5 : ${item.parlabel5}</p>
-        // <div style="text-align: end;">
-        //     <a style="cursor: pointer;" onclick="clickEdit()"><img style="width: 25px;" src="https://nonpttlma.pttplc.com/service/icon/icon-edit.png"></a>
-        //     <a style="cursor: pointer;" onclick="clickView()"><img style="width: 25px;" src="https://nonpttlma.pttplc.com/service/icon/icon-view.png"></a>
-        // </div>
+        console.log('item -----------------:>> ', item);
 
-        // `
-
-        // 
-        const content = `
+        let content = `
         <div id='infoBox'><center><strong>รายละเอียดข้อมูล</strong></center><br />
-        <table style="width: 350px;" class="table table-striped">
+        <table style="width: 350px;" class="table table-striped"> `
+
+        if (item.from_model) {
+            content += `
             <tbody>
                 <tr>
                     <td>${getTextThaiObjShape("partype")} </td>
-                    <td>${item.partype}</td>
+                    <td>${item.partype ?? "-"}</td>
                 </tr>
                 <tr>
                     <td>${getTextThaiObjShape("parlabel1")}</td>
-                    <td>${item.parlabel1}</td>
+                    <td>${item.parlabel1 ?? "-"}</td>
                 </tr>
                 <tr>
                     <td>${getTextThaiObjShape("parlabel2")}</td>
-                    <td>${item.parlabel2}</td>
+                    <td>${item.parlabel2 ?? "-"}</td>
                 </tr>
                 <tr>
                     <td>${getTextThaiObjShape("parlabel3")}</td>
-                    <td>${item.parlabel3}</td>
+                    <td>${item.parlabel3 ?? "-"}</td>
                 </tr>
                 <tr>
                     <td>${getTextThaiObjShape("tam")}</td>
-                    <td>${item.tam}</td>
+                    <td>${item.tam ?? "-"}</td>
                 </tr>
                 <tr>
                     <td>${getTextThaiObjShape("amp")}</td>
-                    <td>${item.amp}</td>
+                    <td>${item.amp ?? "-"}</td>
                 </tr>
                 <tr>
                     <td>${getTextThaiObjShape("prov")}</td>
-                    <td>${item.prov}</td>
+                    <td>${item.prov ?? "-"}</td>
                 </tr>
                 <tr>
                     <td>${getTextThaiObjShape("area_rai")}</td>
-                    <td>${item.area_rai}</td>
+                    <td>${item.area_rai ?? "-"}</td>
                 </tr>
                 <tr>
                     <td>${getTextThaiObjShape("row_distan")}</td>
-                    <td>${item.row_distan}</td>
+                    <td>${item.row_distan ?? "-"}</td>
                 </tr>
-            </tbody>
+            </tbody>`
+        } else {
+            const key = Object.keys(item);
+            key.forEach((a, i) => {
+                // a + ": " + item[a] + "<br />";
+                content += `
+                <tr>
+                    <td>${getTextThaiObjShape(a)}</td>
+                    <td>${item[a] ?? "-"}</td>
+                </tr>`
+            });
+        }
+
+        content += `
         </table>
         <div style="text-align: end;">
-        ${(user && (user.roles_id === "8a97ac7b-01dc-4e06-81c2-8422dffa0ca2" || user.roles_id === "cec6617f-b593-4ebc-9604-3059dfee0ac4")) ? ` 
+        ${(item.from_model && user && (user.roles_id === "8a97ac7b-01dc-4e06-81c2-8422dffa0ca2" || user.roles_id === "cec6617f-b593-4ebc-9604-3059dfee0ac4")) ? ` 
         <a style="cursor: pointer;" onclick="clickEdit()"><img style="width: 25px;" src="https://nonpttlma.pttplc.com/service/icon/icon-edit.png"></a>` :
                 `<a style="cursor: pointer;" onclick="clickView()"><img style="width: 25px;" src="https://nonpttlma.pttplc.com/service/icon/icon-view.png"></a>`} 
-        </div>
-        
-        `
+        </div>`
+
+
+        const infowindow = new google.maps.InfoWindow({
+            id: item.gid,
+            content
+        });
+        const arr = infoWindowMap
+        infoWindowMap.forEach(j => j.close());
+        arr.push(infowindow)
+        setInfoWindowMap(arr)
+
+
         infowindow.setContent(content);
         infowindow.setPosition(feature.latLng);
         infowindow.open(map);
