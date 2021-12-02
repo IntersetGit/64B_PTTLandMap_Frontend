@@ -880,6 +880,7 @@ const mapPage = () => {
             zoom: map.getZoom(),
         });
         setMap(clearMap)
+        clickMapShowLatLag(clearMap)
         setSlidemapshow(false)
     }
     /* เปิดปิดสวิทเมพ */
@@ -2365,12 +2366,12 @@ const mapPage = () => {
 
                                             </Form.Item>
                                             <Form.Item
-                                                label="Default"
+                                                label="Symbol"
                                                 style={{ display: "none" }}
                                                 className="defaultPoint"
                                             >
                                                 <div className="dropdownDefaultPoint">
-                                                    <Button >Symbol</Button>
+                                                    <Button >Default</Button>
                                                     <p className="text-muted">{textImgDefault}</p>
                                                     <div className="flexbox flex_point" >
                                                         <div className="item">

@@ -344,9 +344,10 @@ body {
   display:block;
 }
 .flex_point{
-  background-color: #DDD;
-    border:1px black solid;
-    border-radius: 4px;
+    background-color: #DDD;
+    border:1px #9f9f9f solid;
+    box-shadow: rgba(60, 64, 67, 0.3) 0px 1px 2px 0px, rgba(60, 64, 67, 0.15) 0px 1px 3px 1px;
+    border-radius: 11px;
     padding: 10px;
     display: flex;
     position:absolute;
