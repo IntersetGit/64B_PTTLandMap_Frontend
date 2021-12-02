@@ -2874,13 +2874,13 @@ const mapPage = () => {
                                                             </div>
 
                                                             <div className="row">
-                                                                <label>{getTextThaiObjShape("objectid")} :</label>
+                                                                <label>{getTextThaiObjShape("partype")} :</label>
                                                                 <p className="pl-3">{e.partype}</p>
                                                             </div>
 
                                                             <div className="row">
-                                                                <label>{getTextThaiObjShape("objectid")} :</label>
-                                                                <p className="pl-3">{e.objectid}</p>
+                                                                <label>{getTextThaiObjShape("parid")} :</label>
+                                                                <p className="pl-3">{e.parid}</p>
                                                             </div>
 
                                                             <div className="pl-2">
