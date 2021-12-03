@@ -26,21 +26,16 @@ const Navbar = ({ isMap, setslideNav, slideNav, navbarHide }) => {
     const changePassword = async (sumbit) => {
         try {
             console.log("sumbit: >>>>>>> ", sumbit);
-            const { newPassword, confirmPassword, password } = sumbit
-            if (newPassword === confirmPassword) {
-                // Api.post('',)
-                await Swal.fire({
-                    icon: 'success',
-                    text: "เปลี่ยนรหัสผ่านสำเร็จ!!"
-                });
-                formChangePassword.resetFields();
-                setIsModalVisible(false);
-            } else {
-                await Swal.fire({
-                    icon: 'warning',
-                    text: "รหัสผ่านไม่ตรงกัน!!"
-                });
-            }
+            const data = { ...sumbit }
+
+            await Api.post('provider/editpassword', data);
+            await Swal.fire({
+                icon: 'success',
+                text: "เปลี่ยนรหัสผ่านสำเร็จ!!"
+            });
+            formChangePassword.resetFields();
+            setIsModalVisible(false);
+
         } catch (error) {
             Swal.fire({
                 icon: 'error',
@@ -211,7 +206,7 @@ const Navbar = ({ isMap, setslideNav, slideNav, navbarHide }) => {
                         onFinish={changePassword}
                     >
                         <Form.Item
-                            name="password"
+                            name="currentPassword"
                             label="รหัสผ่านปัจจุบัน"
                             rules={[
                                 { required: true, message: "กรุณารหัสผ่านปัจจุบัน" },
@@ -227,16 +222,26 @@ const Navbar = ({ isMap, setslideNav, slideNav, navbarHide }) => {
                                 { required: true, message: "กรุณารหัสผ่านใหม่" },
                                 { min: 8, message: 'รหัสผ่านมีความยาวอย่างน้อย 8 ตัวอักษร' },
                             ]}
+                            hasFeedback
                         >
                             <Input.Password type="password" />
                         </Form.Item>
                         <Form.Item
                             name="confirmPassword"
                             label="ยืนยันรหัสผ่าน"
+                            dependencies={['newPassword']}
                             rules={[
                                 { required: true, message: "กรุณายืนยันรหัสผ่าน" },
-                                { min: 8, message: 'รหัสผ่านมีความยาวอย่างน้อย 8 ตัวอักษร' },
+                                ({ getFieldValue }) => ({
+                                    validator(_, value) {
+                                        if (!value || getFieldValue('newPassword') === value) {
+                                            return Promise.resolve();
+                                        }
+                                        return Promise.reject(new Error('ยืนยันรหัสผ่านไม่ตรงกัน!!'))
+                                    }
+                                })
                             ]}
+                            hasFeedback
                         >
                             <Input.Password type="password" />
                         </Form.Item>
