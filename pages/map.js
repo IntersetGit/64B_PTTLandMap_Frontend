@@ -2,6 +2,7 @@ import Layout from "../components/_App/Layout";
 import { useEffect, useRef, useState } from "react";
 import { Loader } from "@googlemaps/js-api-loader";
 import { Doughnut } from "react-chartjs-2";
+import getTextThaiObjShape from '../util/GetTextThaiObjShape'
 import {
     Drawer,
     Tabs,
@@ -21,7 +22,8 @@ import {
     Tooltip,
     InputNumber,
     Table,
-    Pagination
+    Pagination,
+    Radio
 } from "antd";
 import Head from "next/head";
 import { useSelector } from "react-redux";
@@ -75,7 +77,6 @@ const mapPage = () => {
     const [districtList, setDistrictList] = useState([])
     const [subDistrictList, setSubDistrictList] = useState([])
     const [statusProject, setStatusProject] = useState([])
-
     useEffect(() => {
         const loader = new Loader({
             apiKey: process.env.NEXT_PUBLIC_GOOGLE_API_KEY,
@@ -102,7 +103,6 @@ const mapPage = () => {
 
 
         getMasStatusProject()
-
 
     }, []);
     useEffect(() => {
@@ -291,8 +291,12 @@ const mapPage = () => {
                     });
                     Symbol = data.items[0]
                 } else {
-                    message.error("กรุณาเลือก Symbol!");
-                    return false
+                    if (nameImgDefault === null) {
+                        message.error("กรุณาเลือก Symbol!");
+                        return false
+                    }
+                    const data = await API.post(`${process.env.NEXT_PUBLIC_SERVICE}/upload/uploadPointDefault`, { img: nameImgDefault })
+                    Symbol = data.data.items
                 }
             }
 
@@ -327,22 +331,27 @@ const mapPage = () => {
                     });
                     await loadShapeFile();
                     setFileList([]);
+                    setFileListSymbol(null)
                     setFileUpload(null);
                     setFileType(null);
                     setOpenColorUpload(false);
+                    setNameImgDefault(null)
+                    setTextImgDefault(null)
                     setColorUpload({
                         hex: "red",
                         rgb: { r: 255, g: 0, b: 0, a: 1 },
                     });
                     formUpload.resetFields();
-
+                    $(".uploadUser").toggle()
+                    $(".defaultPoint").toggle()
+                    setRadioPoint("กำหนดเอง")
                     message.success("บันทึกสำเร็จ");
                 }
             } else {
                 message.error("กรุณาเลือกไฟล์!");
             }
         } catch (error) {
-            message.error("มีบางอย่างผิดพลาด !");
+            // message.error("มีบางอย่างผิดพลาด !");
         }
     };
 
@@ -367,7 +376,7 @@ const mapPage = () => {
     }
 
     const onFinishFailedUpload = (error) => {
-        message.error("มีบางอย่างผิดพลาด !");
+        // message.error("มีบางอย่างผิดพลาด !");
     };
 
     const loadShapeFile = async () => {
@@ -400,7 +409,7 @@ const mapPage = () => {
             if (find) setLayerList(find.children)
 
         } catch (error) {
-            message.error("มีบางอย่างผิดพลาด !");
+            // message.error("มีบางอย่างผิดพลาด !");
         }
     }
 
@@ -423,7 +432,7 @@ const mapPage = () => {
         if (arr[index1].children[index2].type == "wms") {
             const setwms = []
             const items = arr[index1].children[index2]
-            console.log('items :>> ', items);
+            // console.log('items :>> ', items);
             // "https://services.arcgisonline.com/arcgis/rest/services/Reference/World_Reference_Overlay/MapServer/"
             let maptype = new WmsMapType(
                 items.id,
@@ -525,7 +534,6 @@ const mapPage = () => {
             const GeoJson = data.items.shape;
             const bounds = new google.maps.LatLngBounds();
             const layer = new google.maps.Data();
-
             layer.addGeoJson(GeoJson)
             option_layer = option_layer ?? {}
             let icon = null
@@ -541,7 +549,6 @@ const mapPage = () => {
 
             // console.log('option_layer :>> ', option_layer);
             layer.setStyle((e) => {
-
                 return {
                     fillColor: e.h.status_color ?? color,
                     fillOpacity: option_layer.fillOpacity ?? inputValueOpacityColor, //Opacity
@@ -554,7 +561,6 @@ const mapPage = () => {
 
             layer.setMap(map);
             layer.addListener('click', (e) => {
-                console.log('e :>> ', e);
                 setInfoWindowWA(e);
             })
 
@@ -572,8 +578,10 @@ const mapPage = () => {
             console.log('errr :>> ', error);
         }
     };
+
+    const [infoWindowMap, setInfoWindowMap] = useState([])
     const setInfoWindowWA = (feature) => {
-        const infowindow = new google.maps.InfoWindow();
+
         // let key = Object.keys(feature.feature.h);
         // let content = "<div id='infoBox'><center><strong>รายละเอียดข้อมูล</strong></center><br />";
         // key.forEach((a, i) => {
@@ -581,23 +589,101 @@ const mapPage = () => {
         //     content += a + ": " + feature.feature.h[a] + "<br />";
         // });
         // content += "</div>";
-
         const item = feature.feature.h;
-        const content = `<div id='infoBox'><center><strong>รายละเอียดข้อมูล</strong></center><br />
-        <p>Project : ${item.project_na}</p>
-        <p>PARTYPE : ${item.partype}</p>
-        <p>ลำดับแปลงที่ดิน (OBJECT_ID) : ${item.objectid}</p>
-        <p>PARLABEL1 : ${item.parlabel1}</p>
-        <p>PARLABEL2 : ${item.parlabel2}</p>
-        <p>PARLABEL3 : ${item.parlabel3}</p>
-        <p>PARLABEL4 : ${item.parlabel4}</p>
-        <p>PARLABEL5 : ${item.parlabel5}</p>
-        `
+
+        window.clickEdit = () => {
+            setModeInfoSearch("edit")
+            editShapefileSearch(item)
+        }
+        window.clickView = () => {
+            setModeInfoSearch("view")
+            editShapefileSearch(item)
+        }
+
+        console.log('item -----------------:>> ', item);
+
+        let content = `
+        <div id='infoBox'><center><strong>รายละเอียดข้อมูล</strong></center><br />
+        <table style="width: 350px;" class="table table-striped"> `
+
+        if (item.from_model) {
+            content += `
+            <tbody>
+                <tr>
+                    <td>${getTextThaiObjShape("partype")} </td>
+                    <td>${item.partype ?? "-"}</td>
+                </tr>
+                <tr>
+                    <td>${getTextThaiObjShape("parlabel1")}</td>
+                    <td>${item.parlabel1 ?? "-"}</td>
+                </tr>
+                <tr>
+                    <td>${getTextThaiObjShape("parlabel2")}</td>
+                    <td>${item.parlabel2 ?? "-"}</td>
+                </tr>
+                <tr>
+                    <td>${getTextThaiObjShape("parlabel3")}</td>
+                    <td>${item.parlabel3 ?? "-"}</td>
+                </tr>
+                <tr>
+                    <td>${getTextThaiObjShape("tam")}</td>
+                    <td>${item.tam ?? "-"}</td>
+                </tr>
+                <tr>
+                    <td>${getTextThaiObjShape("amp")}</td>
+                    <td>${item.amp ?? "-"}</td>
+                </tr>
+                <tr>
+                    <td>${getTextThaiObjShape("prov")}</td>
+                    <td>${item.prov ?? "-"}</td>
+                </tr>
+                <tr>
+                    <td>${getTextThaiObjShape("area_rai")}</td>
+                    <td>${item.area_rai ?? "-"}</td>
+                </tr>
+                <tr>
+                    <td>${getTextThaiObjShape("row_distan")}</td>
+                    <td>${item.row_distan ?? "-"}</td>
+                </tr>
+            </tbody>`
+        } else {
+            const key = Object.keys(item);
+            key.forEach((a, i) => {
+                // a + ": " + item[a] + "<br />";
+                content += `
+                <tr>
+                    <td>${getTextThaiObjShape(a)}</td>
+                    <td>${item[a] ?? "-"}</td>
+                </tr>`
+            });
+        }
+
+        content += `
+        </table>
+        <div style="text-align: end;">
+        ${(item.from_model && user && (user.roles_id === "8a97ac7b-01dc-4e06-81c2-8422dffa0ca2" || user.roles_id === "cec6617f-b593-4ebc-9604-3059dfee0ac4")) ? ` 
+        <a style="cursor: pointer;" onclick="clickEdit()"><img style="width: 25px;" src="https://nonpttlma.pttplc.com/service/icon/icon-edit.png"></a>` :
+                `<a style="cursor: pointer;" onclick="clickView()"><img style="width: 25px;" src="https://nonpttlma.pttplc.com/service/icon/icon-view.png"></a>`} 
+        </div>`
+
+
+        const infowindow = new google.maps.InfoWindow({
+            id: item.gid,
+            content
+        });
+        const arr = infoWindowMap
+        infoWindowMap.forEach(j => j.close());
+        arr.push(infowindow)
+        setInfoWindowMap(arr)
+
+
         infowindow.setContent(content);
         infowindow.setPosition(feature.latLng);
         infowindow.open(map);
 
     }
+
+
 
     const openColor = (index1, index2) => {
         const arr = [...groupLayerList];
@@ -622,7 +708,7 @@ const mapPage = () => {
 
             openColor(index1, index2)
         } catch (error) {
-            message.error("มีบางอย่างผิดพลาด !");
+            // message.error("มีบางอย่างผิดพลาด !");
         }
     };
 
@@ -804,6 +890,7 @@ const mapPage = () => {
             zoom: map.getZoom(),
         });
         setMap(clearMap)
+        clickMapShowLatLag(clearMap)
         setSlidemapshow(false)
     }
     /* เปิดปิดสวิทเมพ */
@@ -1173,6 +1260,31 @@ const mapPage = () => {
 
         }
     }
+
+    // select upload image  from user or default
+    const [textImgDefault, setTextImgDefault] = useState()
+    const [nameImgDefault, setNameImgDefault] = useState(null)
+    const onSelectImageDefault = (img, classes, name) => {
+        $(`.defalutImage`).css("border", "none")
+        $(`.${classes}`).css("border", "1px black solid")
+        setTextImgDefault(name)
+        setNameImgDefault(img)
+    }
+    const [radioPoint, setRadioPoint] = useState("กำหนดเอง")
+    const onChangeDefaultPoint = (e) => {
+        $(".uploadUser").toggle()
+        $(".defaultPoint").toggle()
+        if (e.target.value === 'กำหนดเอง') {
+            setNameImgDefault(null)
+            $(`.defalutImage`).css("border", "none")
+        }
+        if (e.target.value === 'Default') {
+            setFileUploadSymbol(null)
+            setFileListSymbol(null)
+            setTextImgDefault(null)
+        }
+        setRadioPoint(e.target.value)
+    }
     /* -------------------------------------------------------------------------------------- */
 
     /* Search */
@@ -1184,15 +1296,19 @@ const mapPage = () => {
     const [amount, setAmount] = useState(0)
     const [searchAllList, setSearchAllList] = useState([])
     const [firstSearc, setFirstSearc] = useState(true)
+    const [placeholderSearch, setPlaceholderSearch] = useState("กรอกหมายเลขแปลง หรือเลขที่เอกสารสิทธิ์")
 
     /* Detail */
     const [pageDetailSearch, setPageDetailSearch] = useState(1)
 
     /* table */
     const [modeSearch, setModeSearch] = useState("Detail");
+    const [modeInfoSearch, setModeInfoSearch] = useState(null);
     const [pageSearch, setPageSearch] = useState(1)
     const [totalSearch, setTotalSearch] = useState(0)
     const [limitSearch, setLimitSearch] = useState(10)
+    const [projectNameListSearch, setProjectNameListSearch] = useState([])
+    const [documentNameListSearch, setDocumentNameListSearch] = useState([])
 
     const columnsSearch = [
         {
@@ -1272,11 +1388,13 @@ const mapPage = () => {
         console.log('error :>> ', error);
     }
 
-    const apiSearchData = async ({ layer_group = "", project_name = "", prov = "", search = "", tam = "", amp = "" }) => {
+    const apiSearchData = async ({ layer_group = "", project_name = "", select_search = "", document_name = "", prov = "", search = "", tam = "", amp = "" }) => {
         try {
             let url = `/shp/getSearchData?temp=1`
             if (layer_group) url += `&layer_group=${layer_group}`
             if (project_name) url += `&project_name=${project_name}`
+            if (select_search) url += `&select_search=${select_search}`
+            if (document_name) url += `&document_name=${document_name}`
             if (prov) url += `&prov=${prov}`
             if (search) url += `&search=${search}`
             if (tam) url += `&tam=${tam}`
@@ -1298,10 +1416,25 @@ const mapPage = () => {
             })
             setSearchList(_arr)
             setSearchAllList(data.items.data)
+            getDataNameProject()
 
         } catch (error) {
             console.log('error :>> ', error);
-            message.error("มีบางอย่างผิดพลาด !");
+            // message.error("มีบางอย่างผิดพลาด !");
+        }
+    }
+
+    const getDataNameProject = async (layer_group = "") => {
+        try {
+            let url = `/shp/getDataNameProject?temp=1`
+            if (layer_group) url += `&layer_group=${layer_group}`
+            const { data } = await API.get(url)
+            console.log('data :>> ', data.items);
+            const { document_name, project_name } = data.items
+            setProjectNameListSearch(project_name)
+            setDocumentNameListSearch(document_name)
+        } catch (error) {
+            // message.error("มีบางอย่างผิดพลาด !");
         }
     }
 
@@ -1387,6 +1520,7 @@ const mapPage = () => {
         const formData = []
         const setFieldsValue = {}
 
+        delete item.status_color;
         const disabled = ["gid", "table_name"],
             required = ["project_na", "status"],
             hide = ["index", "color", "checked"],
@@ -1448,7 +1582,7 @@ const mapPage = () => {
             setVisibleModalSearch(false)
         } catch (error) {
             console.log('error :>> ', error);
-            message.error("มีบางอย่างผิดพลาด !");
+            // message.error("มีบางอย่างผิดพลาด !");
         }
     }
 
@@ -1723,7 +1857,6 @@ const mapPage = () => {
         }
         setVisiblestreetview(!visiblestreetview);
     }
-
     return (
         <Layout isMap={true} navbarHide={hideNavbar}>
             <Head>
@@ -1808,7 +1941,7 @@ const mapPage = () => {
                                 className="btn btn-light btn-sm"
                                 onClick={() => {
                                     if (firstSearc) {
-                                        apiSearchData({ project_name: "project_na" })
+                                        apiSearchData({})
                                         setFirstSearc(false)
                                     }
 
@@ -2219,9 +2352,18 @@ const mapPage = () => {
                                     {FileType === "Point" ? (
                                         <>
                                             <Form.Item
+                                                label="Upload"
+                                            >
+                                                <Radio.Group value="กำหนดเอง" onChange={onChangeDefaultPoint} value={radioPoint}>
+                                                    <Radio value={"กำหนดเอง"}>กำหนดเอง</Radio>
+                                                    <Radio value={"Default"}>Default</Radio>
+                                                </Radio.Group>
+                                            </Form.Item>
+                                            <Form.Item
                                                 label="Symbol"
-                                                rules={[{ required: true, message: "กรุณาเลือกไฟล์!" }]}
+                                                // rules={[{ required: true, message: "กรุณาเลือกไฟล์!" }]}
                                                 extra="ขนาดแนะนำ 25X35"
+                                                className="uploadUser"
                                             >
                                                 <Upload
                                                     onChange={handleChangeSymbol}
@@ -2233,37 +2375,126 @@ const mapPage = () => {
                                                 </Upload>
 
                                             </Form.Item>
-                                            {/* <Form.Item
-                                                label="Default Symbol"
+                                            <Form.Item
+                                                label="Symbol"
+                                                style={{ display: "none" }}
+                                                className="defaultPoint"
                                             >
-                                                <Button onClick={() => $(".symbol_point").fadeToggle()}>Symbol</Button>
-                                                <div className="symbol_point" style={{ display: "none" }}>
-                                                    <div>
-                                                        <img src="assets/images/symbol_point/IMG_0467.PNG" alt="" />
-                                                        1
-                                                    </div>
-                                                    <div>
-                                                        <img src="assets/images/symbol_point/IMG_0467.PNG" alt="" />
-                                                        2
-                                                    </div>
-                                                    <div>
-                                                        <img src="assets/images/symbol_point/IMG_0467.PNG" alt="" />
-                                                        3
-                                                    </div>
-                                                    <div>
-                                                        <img src="assets/images/symbol_point/IMG_0467.PNG" alt="" />
-                                                        4
-                                                    </div>
-                                                    <div>
-                                                        <img src="assets/images/symbol_point/IMG_0467.PNG" alt="" />
-                                                        5
-                                                    </div>
-                                                    <div>
-                                                        <img src="assets/images/symbol_point/IMG_0467.PNG" alt="" />
-                                                        6
+                                                <div className="dropdownDefaultPoint">
+                                                    <Button >Default</Button>
+                                                    <p className="text-muted">{textImgDefault}</p>
+                                                    <div className="flexbox flex_point" >
+                                                        <div className="item">
+                                                            <div className="content ">
+                                                                <img className="Circle3 defalutImage" src="assets/images/symbol_point/IMG_0467.PNG" alt="" onClick={() => onSelectImageDefault("IMG_0467.png", "Circle3", "Circle3")} />
+                                                                <p>Circle3</p>
+                                                            </div>
+                                                        </div>
+                                                        <div className="item">
+                                                            <div className="content">
+                                                                <img className="Circle40 defalutImage" src="assets/images/symbol_point/IMG_0468.PNG" alt="" onClick={() => onSelectImageDefault("IMG_0468.png", "Circle40", "Circle (40%)")} />
+                                                                <p>Circle (40%)</p>
+                                                            </div>
+                                                        </div>
+                                                        <div className="item">
+                                                            <div className="content ">
+                                                                <img className="Circle4 defalutImage" src="assets/images/symbol_point/IMG_0469.PNG" alt="" onClick={() => onSelectImageDefault("IMG_0469.png", "Circle4", "Circle4")} />
+                                                                <p>Circle4</p>
+                                                            </div>
+                                                        </div>
+                                                        <div className="item">
+                                                            <div className="content ">
+                                                                <img className=" Circle5 defalutImage" src="assets/images/symbol_point/IMG_0470.PNG" alt="" onClick={() => onSelectImageDefault("IMG_0470.png", "Circle5", "Circle5")} />
+                                                                <p>Circle5</p>
+                                                            </div>
+                                                        </div>
+                                                        <div className="item">
+                                                            <div className="content">
+                                                                <img className="defalutImage Circle6" src="assets/images/symbol_point/IMG_0471.PNG" alt="" onClick={() => onSelectImageDefault("IMG_0471.png", "Circle6", "Circle6")} />
+                                                                <p>Circle6</p>
+                                                            </div>
+                                                        </div>
+                                                        <div className="item">
+                                                            <div className="content">
+                                                                <img className="defalutImage Square1" src="assets/images/symbol_point/IMG_0472.PNG" alt="" onClick={() => onSelectImageDefault("IMG_0472.png", "Square1", "Square1")} />
+                                                                <p>Square1</p>
+                                                            </div>
+                                                        </div>
+                                                        <div className="item">
+                                                            <div className="content">
+                                                                <img className="defalutImage Square140" src="assets/images/symbol_point/IMG_0473.PNG" alt="" onClick={() => onSelectImageDefault("IMG_0473.png", "Square140", "Square1 (40%)")} />
+                                                                <p>Square1 (40%)</p>
+                                                            </div>
+                                                        </div>
+                                                        <div className="item">
+                                                            <div className="content">
+                                                                <img className="defalutImage Square2" src="assets/images/symbol_point/IMG_0475.PNG" alt="" onClick={() => onSelectImageDefault("IMG_0475.png", "Square2", "Square2")} />
+                                                                <p>Square2</p>
+                                                            </div>
+                                                        </div>
+                                                        <div className="item">
+                                                            <div className="content">
+                                                                <img className="defalutImage Square3" src="assets/images/symbol_point/IMG_0476.PNG" alt="" onClick={() => onSelectImageDefault("IMG_0476.png", "Square3", "Square3")} />
+                                                                <p>Square3</p>
+                                                            </div>
+                                                        </div>
+                                                        <div className="item">
+                                                            <div className="content">
+                                                                <img className="defalutImage Square340" src="assets/images/symbol_point/IMG_0477.PNG" alt="" onClick={() => onSelectImageDefault("IMG_0477.png", "Square340", "Square3 (40%)")} />
+                                                                <p>Square3 (40%)</p>
+                                                            </div>
+                                                        </div>
+                                                        <div className="item">
+                                                            <div className="content">
+                                                                <img className="defalutImage Square4" src="assets/images/symbol_point/IMG_0478.PNG" alt="" onClick={() => onSelectImageDefault("IMG_0478.png", "Square4", "Square4")} />
+                                                                <p>Square4</p>
+                                                            </div>
+                                                        </div>
+                                                        <div className="item">
+                                                            <div className="content">
+                                                                <img className="defalutImage Square5" src="assets/images/symbol_point/IMG_0479.png" alt="" onClick={() => onSelectImageDefault("IMG_0479.png", "Square5", "Square5")} />
+                                                                <p>Square5</p>
+                                                            </div>
+                                                        </div>
+                                                        <div className="item">
+                                                            <div className="content">
+                                                                <img className="defalutImage Square6" src="assets/images/symbol_point/IMG_0480.PNG" alt="" onClick={() => onSelectImageDefault("IMG_0480.png", "Square6", "Square6")} />
+                                                                <p>Square6</p>
+                                                            </div>
+                                                        </div>
+                                                        <div className="item">
+                                                            <div className="content">
+                                                                <img className="defalutImage Triangle1" src="assets/images/symbol_point/IMG_0481.png" alt="" onClick={() => onSelectImageDefault("IMG_0481.png", "Triangle1", "Triangle1")} />
+                                                                <p>Triangle1</p>
+                                                            </div>
+                                                        </div>
+                                                        <div className="item">
+                                                            <div className="content">
+                                                                <img className="defalutImage Triangle140" src="assets/images/symbol_point/IMG_0482.PNG" alt="" onClick={() => onSelectImageDefault("IMG_0482.png", "Triangle140", "Triangle1 (40%)")} />
+                                                                <p>Triangle1 (40%)</p>
+                                                            </div>
+                                                        </div>
+                                                        <div className="item">
+                                                            <div className="content">
+                                                                <img className="defalutImage Triangle2" src="assets/images/symbol_point/IMG_0483.PNG" alt="" onClick={() => onSelectImageDefault("IMG_0483.png", "Triangle2", "Triangle2")} />
+                                                                <p>Triangle2</p>
+                                                            </div>
+                                                        </div>
+                                                        <div className="item">
+                                                            <div className="content">
+                                                                <img className="defalutImage Triangle3" src="assets/images/symbol_point/IMG_0484.PNG" alt="" onClick={() => onSelectImageDefault("IMG_0484.png", "Triangle3", "Triangle3")} />
+                                                                <p>Triangle3</p>
+                                                            </div>
+                                                        </div>
+                                                        <div className="item">
+                                                            <div className="content">
+                                                                <img className="defalutImage Triangle340" src="assets/images/symbol_point/IMG_0485.PNG" alt="" onClick={() => onSelectImageDefault("IMG_0485.png", "Triangle340", "Triangle3 (40%)")} />
+                                                                <p>Triangle3 (40%)</p>
+                                                            </div>
+                                                        </div>
                                                     </div>
                                                 </div>
-                                            </Form.Item> */}
+                                            </Form.Item>
                                         </>
                                     ) : null}
 
@@ -2461,23 +2692,50 @@ const mapPage = () => {
                 <div style={{ backgroundColor: "#4b5159", padding: "22px 22px 0px 22px" }}>
                     <Form
                         form={formSearch}
-                        initialValues={{
-                            project_name: "project_na"
-                        }}
                         onFinish={onFinishSearch}
                         onFinishFailed={onFinishFailedSearch}
                         layout="vertical"
                         autoComplete="off"
                     >
+
+                        {/* Row 1 */}
                         <div className="row">
-                            <div className="col-md-4">
+                            <div className="col-md-10">
                                 <Form.Item
                                     label=""
                                     name="search"
                                 >
-                                    <Input placeholder="Search" />
+                                    <Input placeholder={placeholderSearch} />
                                 </Form.Item>
                             </div>
+                            <div className="col-md-2">
+                                {width > 650 ?
+                                    <Form.Item>
+                                        <Button type="primary" htmlType="submit" style={{ width: "100%" }}>
+                                            ค้นหา
+                                        </Button>
+                                    </Form.Item>
+                                    : null}
+                            </div>
+                        </div>
+
+                        {/* Row 2 */}
+                        <div className="row">
+                            <div className="col-md-3">
+                                <Form.Item
+                                    label=""
+                                    name="layer_group"
+                                >
+                                    <Select
+                                        placeholder="ชั้นข้อมูล"
+                                        allowClear
+                                        onChange={(value) => getDataNameProject(value)}
+                                    >
+                                        {layerList.map(e => <Option key={`name-layer-${e.id}`} value={e.id}>{e.name_layer}</Option>)}
+                                    </Select>
+                                </Form.Item>
+                            </div>
+
                             <div className="col-md-3">
                                 <Form.Item
                                     label=""
@@ -2487,38 +2745,42 @@ const mapPage = () => {
                                         placeholder="ชื่อโครงการ"
                                         allowClear
                                     >
-                                        <Option value="project_na">ชื่อโครงการ</Option>
-                                        <Option value="parlabel1">เลขที่โฉนด</Option>
-                                        <Option value="objectid">ลำดับแปลงที่ดิน</Option>
+                                        {projectNameListSearch.map((e, i) => <Option key={`project-name-${i}`} value={e}>{e}</Option>)}
                                     </Select>
                                 </Form.Item>
                             </div>
+
                             <div className="col-md-3">
                                 <Form.Item
                                     label=""
-                                    name="layer_group"
+                                    name="select_search"
                                 >
                                     <Select
-                                        placeholder="ชั้นข้อมูล"
+                                        placeholder="เลือกจาก"
                                         allowClear
                                     >
-                                        {layerList.map(e => <Option key={`name-layer-${e.id}`} value={e.id}>{e.name_layer}</Option>)}
+                                        <Option value="parid">ลำดับแปลงที่ดิน</Option>
+                                        <Option value="parlabel1">เลขที่เอกสารสิทธิ์</Option>
                                     </Select>
                                 </Form.Item>
                             </div>
-                            <div className="col-md-2">
 
-                                {width > 650 ?
-                                    <Form.Item>
-                                        <Button type="primary" htmlType="submit">
-                                            ค้นหา
-                                        </Button>
-                                    </Form.Item>
-                                    : null}
-
+                            <div className="col-md-3">
+                                <Form.Item
+                                    label=""
+                                    name="document_name"
+                                >
+                                    <Select
+                                        placeholder="ประเภทเอกสารสิทธิ์"
+                                        allowClear
+                                    >
+                                        {documentNameListSearch.map((e, i) => <Option key={`document-name-${i}`} value={e}>{e}</Option>)}
+                                    </Select>
+                                </Form.Item>
                             </div>
                         </div>
 
+                        {/* Row 3 */}
                         <div className="row">
                             <div className="col-md-4">
                                 <Form.Item
@@ -2581,7 +2843,7 @@ const mapPage = () => {
                 <div>
                     <Row>
                         <Col span={12}>
-                            <h4 className="pb-3">พบข้อมูลจำนวน <span className="text-red">{amount.toLocaleString()}</span> Records</h4>
+                            <h4 className="pb-3">พบข้อมูลจำนวน <span className="text-red">{amount.toLocaleString()}</span> Record(s)</h4>
                         </Col>
                         <Col span={12} style={{ textAlign: "end" }}>
                             <Tooltip placement="bottom" title={"Details"}>
@@ -2595,114 +2857,129 @@ const mapPage = () => {
                     </Row>
                     <>
                         {
-                            modeSearch === "Detail" ?
-                                <div>
-                                    {
-                                        searchList.map((e, i) => (
-                                            <div key={`SearchList-${i}`}>
-                                                {e.index.toLocaleString()})
-                                                <div className="row pt-2">
-                                                    <div className="col-md-1">
-                                                        <div
-                                                            style={{
-                                                                width: "25px",
-                                                                height: "25px",
-                                                                borderRadius: "2px",
-                                                                background: e.color,
-                                                                border: "1px solid black",
-                                                            }}
-                                                        />
-                                                    </div>
-                                                    <div className="col-md-11">
-
-                                                        <div className="row">
-                                                            <label>PROJECT_NAME :</label>
-                                                            <p className="pl-3">{e.project_na}</p>
-                                                        </div>
-
-                                                        <div className="row">
-                                                            <label>PARTYPE :</label>
-                                                            <p className="pl-3">{e.partype}</p>
-                                                        </div>
-
-                                                        <div className="row">
-                                                            <label>ลำดับแปลงที่ดิน (OBJECT_ID) :</label>
-                                                            <p className="pl-3">{e.objectid}</p>
-                                                        </div>
-
-                                                        <div className="pl-2">
-                                                            <div className="row">
-                                                                <div className="col-md-4">
-                                                                    <div className="row">
-                                                                        <label>PARLABEL1 :</label>
-                                                                        <p className="pl-3">{e.parlabel1}</p>
-                                                                    </div>
-                                                                </div>
-                                                                <div className="col-md-4">
-                                                                    <div className="row">
-                                                                        <label>PARLABEL2 :</label>
-                                                                        <p className="pl-3">{e.parlabel2}</p>
-                                                                    </div>
-                                                                </div>
-                                                                <div className="col-md-4">
-                                                                    <div className="row">
-                                                                        <label>PARLABEL3 :</label>
-                                                                        <p className="pl-3">{e.parlabel3}</p>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-
-                                                            <div className="row">
-                                                                <div className="col-md-4">
-                                                                    <div className="row">
-                                                                        <label>PARLABEL4 :</label>
-                                                                        <p className="pl-3">{e.parlabel4}</p>
-                                                                    </div>
-                                                                </div>
-                                                                <div className="col-md-4">
-                                                                    <div className="row">
-                                                                        <label>PARLABEL5 :</label>
-                                                                        <p className="pl-3">{e.parlabel5}</p>
-                                                                    </div>
-                                                                </div>
-                                                                <div className="col-md-4">
-                                                                    <button className="btn" onClick={() => editShapefileSearch(e, i)}><EditFilled /></button>
-                                                                    <Switch size="small" checked={e.checked} onChange={(value) => switchGeom(value, e, i)} />
-                                                                    {e.checked ?
-                                                                        <button className="btn" onClick={() => goTolayer(e.index, "search")}>
-                                                                            <ExpandOutlined />
-                                                                        </button> : null}
-                                                                </div>
-                                                            </div>
-                                                        </div>
-
-
-                                                    </div>
-
-                                                </div>
-                                                <hr />
-                                            </div>
-                                        ))
-                                    }
-                                    <div style={{ textAlign: "center" }}>
-                                        {/* {amount >= sumData ? <button className="btn btn-primary" onClick={pushSearchData}>โหลดเพิ่มเติม</button> : null} */}
-                                        <Pagination current={pageDetailSearch} total={amount} onChange={paginationSearchData} />
-                                    </div>
-                                </div> :
-                                modeSearch === "Table" ?
+                            searchList.length > 0 ?
+                                modeSearch === "Detail" ?
                                     <div>
-                                        <Table dataSource={searchAllList} columns={columnsSearch} rowKey={(row) => row.id} scroll={{ x: "100%", y: "100%" }} pagination={{
-                                            current: pageSearch,
-                                            total: totalSearch,
-                                            pageSize: limitSearch,
-                                            showTotal: (total, range) => `ข้อมูล ${range[0]} - ${range[1]} ทั้งหมด ${total.toLocaleString()} รายการ`,
-                                            onChange: async (e, _limit) => {
-                                                setPageSearch(e)
-                                                if (limitSearch !== _limit) setLimitSearch(_limit)
-                                            }
-                                        }} />
-                                    </div>
-                                    : null}
+                                        {
+                                            searchList.map((e, i) => (
+                                                <div key={`SearchList-${i}`}>
+                                                    {e.index.toLocaleString()})
+                                                    <div className="row pt-2">
+                                                        <div className="col-md-1">
+                                                            <div
+                                                                style={{
+                                                                    width: "25px",
+                                                                    height: "25px",
+                                                                    borderRadius: "2px",
+                                                                    background: e.color,
+                                                                    border: "1px solid black",
+                                                                }}
+                                                            />
+                                                        </div>
+                                                        <div className="col-md-11">
+
+                                                            <div className="row">
+                                                                <label>{getTextThaiObjShape("project_name")} :</label>
+                                                                <p className="pl-3">{e.project_na}</p>
+                                                            </div>
+
+                                                            <div className="row">
+                                                                <label>{getTextThaiObjShape("partype")} :</label>
+                                                                <p className="pl-3">{e.partype}</p>
+                                                            </div>
+
+                                                            <div className="row">
+                                                                <label>{getTextThaiObjShape("parid")} :</label>
+                                                                <p className="pl-3">{e.parid}</p>
+                                                            </div>
+
+                                                            <div className="pl-2">
+                                                                <div className="row">
+                                                                    <div className="col-md-4">
+                                                                        <div className="row">
+                                                                            <label>{getTextThaiObjShape("parlabel1")} :</label>
+                                                                            <p className="pl-3">{e.parlabel1}</p>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div className="col-md-4">
+                                                                        <div className="row">
+                                                                            <label>{getTextThaiObjShape("parlabel2")} :</label>
+                                                                            <p className="pl-3">{e.parlabel2}</p>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div className="col-md-4">
+                                                                        <div className="row">
+                                                                            <label>{getTextThaiObjShape("parlabel3")} :</label>
+                                                                            <p className="pl-3">{e.parlabel3}</p>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+
+                                                                <div className="row">
+                                                                    <div className="col-md-5">
+                                                                        <div className="row">
+                                                                            <label>{getTextThaiObjShape("parlabel4")} :</label>
+                                                                            <p className="pl-3">{e.parlabel4}</p>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div className="col-md-5">
+                                                                        <div className="row">
+                                                                            <label>{getTextThaiObjShape("parlabel5")} :</label>
+                                                                            <p className="pl-3">{e.parlabel5}</p>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div className="col-md-2">
+                                                                        {(user && (user.roles_id === "8a97ac7b-01dc-4e06-81c2-8422dffa0ca2" || user.roles_id === "cec6617f-b593-4ebc-9604-3059dfee0ac4")) ?
+                                                                            <button className="btn" onClick={() => editShapefileSearch(e, i)}><EditFilled /></button> : null}
+                                                                        <Switch size="small" checked={e.checked} onChange={(value) => switchGeom(value, e, i)} />
+                                                                        {e.checked ?
+                                                                            <button className="btn" onClick={() => goTolayer(e.index, "search")}>
+                                                                                <ExpandOutlined />
+                                                                            </button> : null}
+                                                                    </div>
+                                                                </div>
+
+                                                                {e.hyperlink ?
+                                                                    <div className="row">
+                                                                        <div className="col-md-12">
+                                                                            <div className="row">
+                                                                                <label>Hyperlink :</label>
+                                                                                <a className="pl-3" href={e.hyperlink} style={{ color: "#007bff" }}>{e.hyperlink}</a>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                    : null}
+                                                            </div>
+
+
+                                                        </div>
+
+                                                    </div>
+                                                    <hr />
+                                                </div>
+                                            ))
+                                        }
+                                        <div style={{ textAlign: "center" }}>
+                                            {/* {amount >= sumData ? <button className="btn btn-primary" onClick={pushSearchData}>โหลดเพิ่มเติม</button> : null} */}
+                                            <Pagination current={pageDetailSearch} total={amount} onChange={paginationSearchData} />
+                                        </div>
+                                    </div> :
+                                    modeSearch === "Table" ?
+                                        <div>
+                                            <Table dataSource={searchAllList} columns={columnsSearch} rowKey={(row) => row.id} scroll={{ x: "100%", y: "100%" }} pagination={{
+                                                current: pageSearch,
+                                                total: totalSearch,
+                                                pageSize: limitSearch,
+                                                showTotal: (total, range) => `ข้อมูล ${range[0]} - ${range[1]} ทั้งหมด ${total.toLocaleString()} รายการ`,
+                                                onChange: async (e, _limit) => {
+                                                    setPageSearch(e)
+                                                    if (limitSearch !== _limit) setLimitSearch(_limit)
+                                                }
+                                            }} />
+                                        </div>
+                                        : null
+                                : <h3 style={{ color: "red", textAlign: "center" }}>ไม่พบข้อมูลคำค้นหา</h3>
+                        }
                     </>
 
                 </div>
@@ -2734,13 +3011,14 @@ const mapPage = () => {
                             {e.type === "select" ? (
                                 <Form.Item
                                     key={`form-modal-search-${i}`}
-                                    label={e.label}
+                                    label={getTextThaiObjShape(e.label)}
                                     name={e.name}
                                     rules={[{ required: e.required, message: e.message }]}
                                 >
                                     <Select
                                         placeholder={e.label}
                                         allowClear
+                                        disabled={e.disabled || modeInfoSearch === "view" ? true : false}
                                     >
                                         {e.list.map((x, index) => <Option key={`select-${e.name}-${index}`} value={x[e.value]}>{x[e.text]}</Option>)}
                                     </Select>
@@ -2748,11 +3026,11 @@ const mapPage = () => {
                             ) : (
                                 <Form.Item
                                     key={`form-modal-search-${i}`}
-                                    label={e.label}
+                                    label={getTextThaiObjShape(e.label)}
                                     name={e.name}
                                     rules={[{ required: e.required, message: e.message }]}
                                 >
-                                    <Input disabled={e.disabled} />
+                                    <Input disabled={e.disabled || modeInfoSearch === "view" ? true : false} />
                                 </Form.Item>
                             )}
                         </>
@@ -3118,10 +3396,28 @@ const mapPage = () => {
              border: 1px solid #999999;
              -webkit-transition: all 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
              transition: all 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
-         }tabs-tab, .ant-tabs-card > div > .ant-tabs-nav .ant-tabs-tab {
+         }
+         tabs-tab, .ant-tabs-card > div > .ant-tabs-nav .ant-tabs-tab {
              margin: 0; */}
 
+             .col-lg-1, .col-lg-10, .col-lg-11, .col-lg-12, .col-lg-2, .col-lg-3, .col-lg-4, .col-lg-5, .col-lg-6, .col-lg-7, .col-lg-8, .col-lg-9, .col-lg-auto, .col-md, .col-md-1, .col-md-10, .col-md-11, .col-md-12, .col-md-2, .col-md-3, .col-md-4, .col-md-5, .col-md-6, .col-md-7, .col-md-8, .col-md-9, .col-md-auto, .col-sm, .col-sm-1, .col-sm-10, .col-sm-11, .col-sm-12, .col-sm-2, .col-sm-3, .col-sm-4, .col-sm-5, .col-sm-6, .col-sm-7, .col-sm-8, .col-sm-9, .col-sm-auto, .col-xl, .col-xl-1, .col-xl-10, .col-xl-11, .col-xl-12, .col-xl-2, .col-xl-3, .col-xl-4, .col-xl-5, .col-xl-6, .col-xl-7, .col-xl-8, .col-xl-9, .col-xl-auto {
+                position: relative;
+                width: 100%;
+                padding-right: 5px;
+                padding-left: 5px;
+            }
 
+            .table-striped tbody tr:nth-of-type(odd) {
+                background-color: #d4e4f3;
+              }
+
+              .ant-input[disabled] {
+                color: #000;
+            }
+
+            .ant-select-disabled.ant-select:not(.ant-select-customize-input) .ant-select-selector {
+                color: rgb(0 0 0);
+            }
         `}
             </style>
         </Layout >

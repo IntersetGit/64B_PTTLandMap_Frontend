@@ -41,7 +41,7 @@ const index = () => {
   const columns = [
     {
       key: "1",
-      title: "ลำดับ",
+      title: <b>ลำดับ</b>,
       dataIndex: "number",
       sorter: (record1, record2) => {
         return record1.number > record2.number;
@@ -49,7 +49,7 @@ const index = () => {
     },
     {
       key: "2",
-      title: "รูปภาพ",
+      title: <b>รูปภาพ</b>,
       dataIndex: "id",
       render: (id) => {
         return (
@@ -64,7 +64,7 @@ const index = () => {
     },
     {
       key: "3",
-      title: "Layer Name",
+      title: <b>Layer Name</b>,
       dataIndex: "layer_name",
       sorter: (record1, record2) => {
         return record1.layer_name > record2.layer_name;
@@ -72,15 +72,15 @@ const index = () => {
     },
     {
       key: "4",
-      title: "ชื่อข้อมูล (WMS)",
+      title: <b>ชื่อข้อมูล (WMS)</b>,
       dataIndex: "wms",
       sorter: (record1, record2) => {
         return record1.wms > record2.wms;
       },
     },
     {
-      key: "ถ",
-      title: "Type Server",
+      key: "5",
+      title: <b>Type Server</b>,
       dataIndex: "type_server",
       sorter: (record1, record2) => {
         return record1.type_server > record2.type_server;
@@ -88,7 +88,7 @@ const index = () => {
     },
     {
       key: "6",
-      title: "Date",
+      title: <b>Date</b>,
       dataIndex: "date",
       sorter: (record1, record2) => {
         return record1.date > record2.date;
@@ -96,7 +96,7 @@ const index = () => {
     },
     {
       key: "7",
-      title: "จัดการ",
+      title: <b>จัดการ</b>,
       dataIndex: "id",
       render: (id) => {
         return (
