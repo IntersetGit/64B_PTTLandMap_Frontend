@@ -443,7 +443,7 @@ const mapPage = () => {
                 maptype.removeFromMap(map);
             } else {
                 setListWms([...listWms, maptype]);
-                maptype.addToMap(map, false);
+                maptype.addToMap(map);
                 setwms.push(maptype);
             }
 

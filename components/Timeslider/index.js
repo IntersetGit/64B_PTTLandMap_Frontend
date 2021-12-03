@@ -63,7 +63,7 @@ function Timeslide({ data = testdata, onChange = (e) => { }, onDateChange = (e) 
         setMarks({ ...ob })
         dragElement(document.getElementById("mydiv"));
         dragElement(document.getElementById("datepicker"));
-
+        console.clear();
     }, [data]);
 
     useEffect(() => {
