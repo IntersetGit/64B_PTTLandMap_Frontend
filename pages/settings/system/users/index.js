@@ -30,6 +30,7 @@ const usersSystemPage = () => {
     create: false,
     edit: false,
   });
+
   const [buttonCreate, setButtonCreate] = useState(true); //สถานะเปิดปิดsubmit ตอนmodal create
   const [statusValidation, setStatusValidation] = useState([]);
   const [formCreate] = Form.useForm();
@@ -77,6 +78,12 @@ const usersSystemPage = () => {
     },
     {
       key: "6",
+      title: <b>แหล่งทที่มาจากผู้ใช้</b>,
+      dataIndex: "is_ad",
+      render: (item1, item2) => item1 ? "AD" : <span style={{ color: "red" }}>Non AD</span>
+    },
+    {
+      key: "7",
       title: <b>จัดการ</b>,
       dataIndex: "id",
       render: (id) => {
@@ -269,6 +276,64 @@ const usersSystemPage = () => {
       Swal.fire("", "มีบางอย่างผิดพลาด", "error");
     }
   };
+
+
+  /**
+   * โหมด add , edit , view
+   * @type {String} mode
+   */
+  const [mode, setMode] = useState("add")
+
+  /**
+   * เปิดปิด Modal AD
+   * @type {Boolean} isModalVisibleAD
+   */
+  const [isModalVisibleAD, setIsModalVisibleAS] = useState(false);
+
+  /**
+   * form ของ AD
+   */
+  const [formAD] = Form.useForm();
+
+  /**
+   * กดตกลง modal AD
+   */
+  const handleOkAD = () => {
+    formAD.submit()
+  };
+
+  /**
+   * กดยกเลิก modal AD
+   */
+  const handleCancelAD = () => {
+    formAD.resetFields()
+    setIsModalVisibleAS(false)
+  };
+
+
+  /**
+  * Submit Form
+  * @param {{username: String, roles_id: String, first_name: String, last_name: String, e_mail: String}} value
+  */
+  const onFinishAD = async (value) => {
+    try {
+      // console.log('value :>> ', value);
+      value.is_ad = false;
+      const { data } = await Api.post("/system/addUserAD", value);
+      Swal.fire("", "บันทึกข้อมูลเรียบร้อย", "success");
+      handleCancelAD()
+      reload();
+    } catch (error) {
+      Swal.fire("", "มีบางอย่างผิดพลาด หรือมีผู้ใช้ในระบบแล้ว", "error");
+    }
+  };
+
+  const onFinishFailedAD = (error) => {
+    console.log('error :>> ', error);
+  };
+
+
+
   return (
     <>
       <Head>
@@ -305,13 +370,26 @@ const usersSystemPage = () => {
             </Button>
           </Col>
           <Col xs={8} sm={8} md={8} lg={8} xl={8} xxl={8}>
-            <Button
-              type="primary"
-              onClick={() => showModal("create")}
-              style={{ float: "right" }}
-            >
-              + เพิ่มผู้ใช้ระบบ
-            </Button>
+            <Row>
+              <Col span={4} />
+              <Col span={10} >
+                <Button
+                  onClick={() => setIsModalVisibleAS(true)}
+                  style={{ float: "right" }}
+                >
+                  + เพิ่มผู้ใช้ระบบนอก AD
+                </Button>
+              </Col>
+              <Col span={10} >
+                <Button
+                  type="primary"
+                  onClick={() => showModal("create")}
+                  style={{ float: "right" }}
+                >
+                  + เพิ่มผู้ใช้ระบบจาก AD
+                </Button>
+              </Col>
+            </Row>
           </Col>
           <Col span={24}>
             <div >
@@ -333,6 +411,7 @@ const usersSystemPage = () => {
           </Col>
         </Row>
       </System>
+
       <Modal
         title="เพิ่มผู้ใช้ระบบ"
         visible={isModalVisible.create}
@@ -345,9 +424,6 @@ const usersSystemPage = () => {
           labelCol={{ span: 7 }}
           wrapperCol={{ span: 14 }}
           onFinish={onFinishCreate}
-          initialValues={{
-            roles_id: "Editor",
-          }}
         >
           <Form.Item
             name="username"
@@ -416,6 +492,76 @@ const usersSystemPage = () => {
               ))}
             </Select>
           </Form.Item>
+        </Form>
+      </Modal>
+
+
+      {/*  */}
+      <Modal
+        title={`${mode == "add" ? "เพิ่ม" : mode == "edit" ? "แก้ไข" : "ดู"} ข้อมูลผู้ใช้ระบบนอก AD`}
+        visible={isModalVisibleAD}
+        onOk={handleOkAD}
+        onCancel={handleCancelAD}
+      >
+        <Form
+          form={formAD}
+          labelCol={{ span: 7 }}
+          wrapperCol={{ span: 14 }}
+          onFinish={onFinishAD}
+          onFinishFailed={onFinishFailedAD}
+          autoComplete="off"
+        >
+          <Form.Item
+            label="ชื้อผู้ใช้"
+            name="username"
+            rules={[
+              { required: true, message: "กรุณากรอกข้อมูล" },
+            ]}>
+            <Input disabled={mode == "view"} />
+          </Form.Item>
+
+          <Form.Item
+            label="ชื่อจริง"
+            name="first_name"
+            rules={[
+              { required: true, message: "กรุณากรอกข้อมูล" },
+            ]}
+          >
+            <Input disabled={mode == "view"} />
+          </Form.Item>
+
+          <Form.Item
+            label="นามสกุล"
+            name="last_name"
+          >
+            <Input disabled={mode == "view"} />
+          </Form.Item>
+
+          <Form.Item
+            label="Email"
+            name="e_mail"
+          >
+            <Input disabled={mode == "view"} />
+          </Form.Item>
+
+          <Form.Item
+            name="roles_id"
+            label="กลุ่มผู้ใช้งาน"
+            rules={[
+              { required: true, message: "กรุณาเลือกข้อมูล" },
+            ]}
+          >
+            <Select
+              placeholder="กลุ่มผู้ใช้งาน"
+            >
+              {roles.map((data, index) => (
+                <Option key={index} value={data.id}>
+                  {data.roles_name}
+                </Option>
+              ))}
+            </Select>
+          </Form.Item>
+
         </Form>
       </Modal>
     </>
