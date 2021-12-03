@@ -196,6 +196,7 @@ const Navbar = ({ isMap, setslideNav, slideNav, navbarHide }) => {
 
                 }
             </style>
+            {/* โมเดล เปลี่ยนรหัสผ่าน */}
             <div>
                 <Modal
                     title="เปลี่ยนรหัสผ่าน"
