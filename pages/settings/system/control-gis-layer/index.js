@@ -166,12 +166,16 @@ const usersSystemPage = () => {
   }
 
   const onSearch = async (value) => {
-    Api.get(`masterdata/masLayersShape?search=${value}`).then((data) => {
-      setData(data.data.items);
-    })
-      .catch((error) => {
-        console.log(error);
-      });
+    try {
+      const { data } = await Api.get(`masterdata/masLayersShape?search=${value}`)
+      const items = data.items
+      console.log("items >>>>>>> ", [...items]);
+      setData([...items, { number: items.length + 1 }])
+
+    } catch (error) {
+
+    }
+
   };
 
   const [id, setId] = useState(null)
@@ -197,12 +201,11 @@ const usersSystemPage = () => {
 
   };
 
-  const reload = (search = null) => {
+  const reload = (search = ``) => {
     setLoading(true);
-    Api.get("masterdata/masLayersShape", search != null ? { search: search } : {})
+    Api.get(`masterdata/masLayersShape?search=${search}`)
       .then(({ data: { items } }) => {
         let tempDataArray = [];
-        console.log(`data`, data)
         items.forEach((data, i) => {
           tempDataArray = [
             ...tempDataArray,
@@ -509,7 +512,7 @@ const usersSystemPage = () => {
           </Col>
           <Col xs={8} sm={8} md={8} lg={8} xl={8} xxl={5}>
             <Search placeholder="input search text"
-              onSearch={onSearch}
+              onSearch={reload}
             />
           </Col>
           <Col xs={8} sm={8} md={8} lg={8} xl={8} xxl={11}>
@@ -638,7 +641,7 @@ const usersSystemPage = () => {
             name="name_layer"
             label="ชื่อ"
             rules={[{ required: true }]}
-          // {...statusValidation}
+            {...statusValidation}
           >
             <Input />
           </Form.Item>
