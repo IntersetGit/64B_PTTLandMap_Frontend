@@ -94,9 +94,8 @@ const usersSystemPage = () => {
                 <Menu.Item
                   key="1"
                   onClick={async () => {
-                    await handleEdit(id),
-                      await handleCancel(),
-                      await handleEdit(id);
+                    await handleCancel();
+                    await handleEdit(id);
                   }}
                 >
                   แก้ไข
@@ -249,8 +248,17 @@ const usersSystemPage = () => {
   };
   const handleEdit = async (id) => {
     let filterData = await data.find((data) => data.id === id);
-    setDataEdit(filterData);
-    showModal("edit");
+    setIdUser(id)
+    if (filterData.is_ad) {
+      setDataEdit(filterData);
+      showModal("edit");
+    } else {
+      setMode("edit")
+      setIsModalVisibleAS(true)
+      filterData.username = filterData.user_name
+      formAD.setFieldsValue(filterData)
+    }
+
   };
   const handleDelete = async (id) => {
     try {
@@ -283,6 +291,7 @@ const usersSystemPage = () => {
    * @type {String} mode
    */
   const [mode, setMode] = useState("add")
+  const [idUser, setIdUser] = useState(null)
 
   /**
    * เปิดปิด Modal AD
@@ -308,6 +317,7 @@ const usersSystemPage = () => {
   const handleCancelAD = () => {
     formAD.resetFields()
     setIsModalVisibleAS(false)
+    setIdUser(null)
   };
 
 
@@ -319,7 +329,12 @@ const usersSystemPage = () => {
     try {
       // console.log('value :>> ', value);
       value.is_ad = false;
-      const { data } = await Api.post("/system/addUserAD", value);
+      if (mode == "edit") {
+        value.id = idUser
+        await Api.put("/system/editUser", value);
+      } else {
+        await Api.post("/system/addUserAD", value);
+      }
       Swal.fire("", "บันทึกข้อมูลเรียบร้อย", "success");
       handleCancelAD()
       reload();
@@ -373,22 +388,12 @@ const usersSystemPage = () => {
             <Row>
               <Col span={4} />
               <Col span={10} >
-                <Button
-                  onClick={() => setIsModalVisibleAS(true)}
-                  style={{ float: "right" }}
-                >
-                  + เพิ่มผู้ใช้ระบบนอก AD
-                </Button>
+                <button className="btn btn-primary" style={{ float: "start" }} onClick={() => setIsModalVisibleAS(true)}>+ เพิ่มผู้ใช้ระบบนอก AD</button>
               </Col>
               <Col span={10} >
-                <Button
-                  type="primary"
-                  onClick={() => showModal("create")}
-                  style={{ float: "right" }}
-                >
-                  + เพิ่มผู้ใช้ระบบจาก AD
-                </Button>
+                <button className="btn btn-primary" style={{ float: "right" }} onClick={() => showModal("create")}>+ เพิ่มผู้ใช้ระบบจาก AD</button>
               </Col>
+
             </Row>
           </Col>
           <Col span={24}>
@@ -517,7 +522,7 @@ const usersSystemPage = () => {
             rules={[
               { required: true, message: "กรุณากรอกข้อมูล" },
             ]}>
-            <Input disabled={mode == "view"} />
+            <Input disabled={mode != "add"} />
           </Form.Item>
 
           <Form.Item
