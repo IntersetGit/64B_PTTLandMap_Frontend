@@ -2118,7 +2118,7 @@ const mapPage = () => {
                                         collapsible={!e.children || e.children.length <= 0 ? "disabled" : "vertical"}
                                         expandIcon={({ isActive }) => e.symbol ? <img src={e.symbol} width={20} /> : <CaretRightOutlined rotate={isActive ? 90 : 0} />}
                                     >
-                                        <Panel header={e.group_name} key={i}>
+                                        <Panel header={<span style={{ fontFamily: "Prompt, sans-serif" }}>{e.group_name}</span>} key={i}>
                                             {e.children
                                                 ? e.children.map((x, index) =>
                                                     Object.assign(
@@ -3299,16 +3299,12 @@ const mapPage = () => {
             -webkit-font-feature-settings: 'tnum', "tnum";
             -moz-font-feature-settings: 'tnum', "tnum";
             font-feature-settings: 'tnum', "tnum";
-            background-color: #ececec;
-            border: 2px solid #979797;
-            border-bottom: 0;
+            background-color: #fff;
+            box-shadow: 0 .125rem .25rem rgba(0,0,0,.075)!important;
+            border: 1px solid #b6bdbd;
             border-radius: 5px;
+            margin-bottom: 5px
         }
-
-        .ant-collapse > .ant-collapse-item {
-            border-bottom: 2px solid #9f9f9f;
-        }
-
         .ant-card {
             -webkit-box-sizing: border-box;
             -moz-box-sizing: border-box;
@@ -3324,12 +3320,11 @@ const mapPage = () => {
             -moz-font-feature-settings: 'tnum', "tnum";
             font-feature-settings: 'tnum', "tnum";
             position: relative;
-            background: #ededed;
-            border-radius: 2px;
+            border-radius: 5px;;
         }
 
         .ant-card-bordered {
-            border: 2px solid #9f9f9f;
+            border: 2px solid #b6bdbd;
             border-radius: 10px;
         }
 
@@ -3343,6 +3338,7 @@ const mapPage = () => {
             line-height: 1.5715;
             word-wrap: break-word;
             margin-top: 10%;
+            background-color:#fff;
         }
 
         .ant-drawer-header-no-title .ant-drawer-close {
@@ -3383,7 +3379,7 @@ const mapPage = () => {
 
         .ant-tabs-card.ant-tabs-top > .ant-tabs-nav .ant-tabs-tab, .ant-tabs-card.ant-tabs-top > div > .ant-tabs-nav .ant-tabs-tab {
             border-radius: 2px 2px 0 0;
-            border-color: #000;
+            border-color: rgb(201 180 180 / 45%);
         }
 
         .ant-pagination-item-active a {

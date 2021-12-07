@@ -390,3 +390,10 @@ body {
 .dropdownDefaultPoint:hover .flex_point{
   display: flex;
 }
+.ant-collapse-header:hover{
+  
+  span{
+  color:#007bff;
+  transition: all 0.3s;
+  }
+}
