@@ -661,9 +661,9 @@ const mapPage = () => {
         content += `
         </table>
         <div style="text-align: end;">
-        ${(item.from_model && user && (user.roles_id === "8a97ac7b-01dc-4e06-81c2-8422dffa0ca2" || user.roles_id === "cec6617f-b593-4ebc-9604-3059dfee0ac4")) ? ` 
+        ${(item.from_model && user && (user.roles_id === "8a97ac7b-01dc-4e06-81c2-8422dffa0ca2" || user.roles_id === "cec6617f-b593-4ebc-9604-3059dfee0ac4")) ? `
         <a style="cursor: pointer;" onclick="clickEdit()"><img style="width: 25px;" src="https://nonpttlma.pttplc.com/service/icon/icon-edit.png"></a>` :
-                `<a style="cursor: pointer;" onclick="clickView()"><img style="width: 25px;" src="https://nonpttlma.pttplc.com/service/icon/icon-view.png"></a>`} 
+                `<a style="cursor: pointer;" onclick="clickView()"><img style="width: 25px;" src="https://nonpttlma.pttplc.com/service/icon/icon-view.png"></a>`}
         </div>`
 
 
@@ -1862,7 +1862,6 @@ const mapPage = () => {
             <Head>
                 <title>PTT Land Map</title>
             </Head>
-            <Timeslide onChange={(e) => OnPlaytimeslide(e)} data={datatimeslider} onDateChange={GetTimslide} onClose={() => setSlidemapshow(false)} visible={slidemapshow} />
             {!changmap ? (
                 <>
                     <div className="tools-group-layer">
@@ -2099,6 +2098,8 @@ const mapPage = () => {
                     <div id="map-right" className="map" ref={googlemapRight}></div>
                 </div>
             </div>
+            <Timeslide onChange={(e) => OnPlaytimeslide(e)} data={datatimeslider} onDateChange={GetTimslide} onClose={() => setSlidemapshow(false)} visible={slidemapshow} />
+
             {/* -----------------------------------------------------------------------------------  */}
             {/* Shape File */}
             <Drawer
