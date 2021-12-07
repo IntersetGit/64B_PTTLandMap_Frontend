@@ -112,13 +112,22 @@ const Navbar = ({ isMap, setslideNav, slideNav, navbarHide }) => {
                 </Tooltip>
 
                 <Tooltip placement="bottom" title={"Manual"}>
-                    <li className="nav-item dropdown">
+                    {
+                        isMap ? <li className="nav-item dropdown">
 
-                        <a className="dropdown-toggle nav-link" href={`/Manual/คู่มือการใช้งานระบบ_PTT_Land_Map_Application.pdf`} target="_blank">
-                            <i className="fa fa-book" style={!isMap ? { background: "linear-gradient(141deg, #0fb8ad 0%, #1fc8db 51%, #2cb5e8 75%)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" } : null} />
-                        </a>
+                            <a className="dropdown-toggle nav-link" href={`/Manual/คู่มือการใช้งานระบบ_PTT_Land_Map_Application.pdf`} target="_blank">
+                                <i className="fa fa-book" style={!isMap ? { background: "linear-gradient(141deg, #0fb8ad 0%, #1fc8db 51%, #2cb5e8 75%)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" } : null} />
+                            </a>
 
-                    </li>
+                        </li> :
+                            <li className="nav-item dropdown">
+
+                                <a className="dropdown-toggle nav-link" href={`/Manual/คู่มือการใช้งานระบบ_Viewer_PTT_Land_Map_Application.pdf`} target="_blank">
+                                    <i className="fa fa-book" style={!isMap ? { background: "linear-gradient(141deg, #0fb8ad 0%, #1fc8db 51%, #2cb5e8 75%)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" } : null} />
+                                </a>
+
+                            </li>
+                    }
                 </Tooltip>
 
                 {/* ระบบหลังบ้าน */}
@@ -160,7 +169,11 @@ const Navbar = ({ isMap, setslideNav, slideNav, navbarHide }) => {
                                     <a className="dropdown-item">แผนที่</a>
                                 </Link>
 
-                                <a className="dropdown-item" href={`/Manual/คู่มือการใช้งานระบบ_PTT_Land_Map_Application.pdf`} target="_blank">คู่มือการใช้งาน</a>
+                                {
+                                    isMap ?
+                                        <a className="dropdown-item" href={`/Manual/คู่มือการใช้งานระบบ_PTT_Land_Map_Application.pdf`} target="_blank">คู่มือการใช้งาน</a>
+                                        : <a className="dropdown-item" href={`/Manual/คู่มือการใช้งานระบบ_Viewer_PTT_Land_Map_Application.pdf`} target="_blank">คู่มือการใช้งาน</a>
+                                }
 
                                 <Link href={`/settings/dashboard/report-summary/`} >
                                     <a className="dropdown-item">ระบบหลังบ้าน</a>
