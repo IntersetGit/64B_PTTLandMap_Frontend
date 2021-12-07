@@ -173,6 +173,7 @@ function Timeslide({ data = testdata, onChange = (e) => { }, onDateChange = (e) 
                         ]}
                     >
                         <RangePickerCustom
+                            style={{ position: 'relative' }}
                             value={hackValue || datevalue}
                             // disabledDate={disabledDate}
                             onCalendarChange={val => setDates(val)}
@@ -216,7 +217,41 @@ function Timeslide({ data = testdata, onChange = (e) => { }, onDateChange = (e) 
                     </div>
                 </div>
 
-                <style global jsx>{`
+            </div>
+            <div id="MB" >
+                <div className={[styles.timeslidebodyMB]}>
+                    <div className={styles.date} onClick={() => setShowdatetime(!showdatetime)}>
+                        <span style={{ color: "white", fontWeight: "bold" }}>DATE</span>
+                        <Image preview={false} src="/assets/images/Calender.PNG" width={35} height={35} />
+                    </div>
+                    <div className={styles.player}>
+                        <div className="btnplay" style={{ width: "10%", display: 'flex', justifyContent: "center" }}>
+                            {isRunning ?
+                                <PauseCircleOutlined onClick={() => setIsRunning(!isRunning)} style={{ fontSize: "35px ", color: "#FFF" }} />
+                                :
+                                <PlayCircleOutlined onClick={() => setIsRunning(!isRunning)} style={{ fontSize: "35px ", color: "#FFF" }} />
+                            }
+                        </div>
+                        <div className="btnleft" style={{ width: "5%", textAlign: "center" }}>
+                            <LeftCircleOutlined onClick={Previewstep} style={{ fontSize: "25px ", color: "#FFF", }} />
+                        </div>
+                        <div style={{ width: "80%", flexDirection: "column", }}>
+                            <span style={{ color: "white", fontWeight: "bold", padding: "0 5px" }}>Time Slider</span>
+                            <span style={{ color: "white", fontWeight: "bold", padding: "0 5px" }}>{marks && marks[value]?.label ? marks[value]?.label : ""}</span>
+                            <SliderCustom onChange={e => setValue(e)} value={value} tipFormatter={(e) => marks[e]?.label || marks[e]?.date} step={10} max={max} marks={marks} defaultValue={0} trackStyle={{ backgroundColor: "#BC9945", }} />
+                        </div>
+                        <div className="btnright" style={{ width: "5%", textAlign: "center" }}>
+                            <RightCircleOutlined onClick={Nextstep} style={{ fontSize: "25px ", color: "#FFF" }} />
+                        </div>
+                    </div>
+                    <div className={styles.close} onClick={onClose} >
+                        <span style={{ fontSize: "30px", color: "#FFF" }}>x</span>
+                    </div>
+                </div>
+            </div>
+
+            {/* ------------------------------------------------------------------------------------------- */}
+            <style global jsx>{`
             #mydiv {
             position: absolute;
             z-index: 9;
@@ -225,8 +260,12 @@ function Timeslide({ data = testdata, onChange = (e) => { }, onDateChange = (e) 
             transform: translate(-50%, -50%);
             margin: 0 auto;
             }
+            .ant-calendar-picker {
+            width: auto !important;
+            }
             .ant-picker-panel-container{
                 background-color: #383A38;
+                width: auto !important;
             }
             .ant-picker-cell .ant-picker-cell-inner{
                 color:white;
@@ -237,8 +276,23 @@ function Timeslide({ data = testdata, onChange = (e) => { }, onDateChange = (e) 
             .ant-picker-header button{
                 color: rgb(255 255 255 / 100%);
             }
+            @media only screen and (max-width: 600px) {
+                #mydiv {
+                display:none;
+                }
+                #MB{
+                    display:block;
+                }
+            }
+            @media only screen and (min-width: 600px) {
+                #mydiv {
+                display:block;
+                }
+                #MB{
+                    display:none;
+                }
+            }
                  `}</style>
-            </div>
         </div>
     )
 }

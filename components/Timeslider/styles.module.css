@@ -6,7 +6,7 @@
     flex-direction: row;
     border-radius: 10px;
     overflow: hidden;
-    min-width: 450px;
+    min-width: 300px;
     cursor: all-scroll;
 }
 
@@ -17,6 +17,7 @@
     justify-content: center;
     align-items: center;
     cursor: pointer;
+    padding: 20px;
 }
 
 .player {
@@ -24,7 +25,7 @@
     width: 85%;
     border-right: 1px solid rgb(116, 116, 116);
     border-left: 1px solid rgb(116, 116, 116);
-    padding: 0 5px 0 5px;
+    padding: 0 10px 0 10px;
     align-items: center;
 }
 
@@ -50,5 +51,16 @@
     border-radius: 10px;
     height: 130px;
     cursor: all-scroll;
-    z-index: 9;
+    z-index: 99;
+}
+
+.timeslidebodyMB {
+    background-color: #383A38;
+    height: 100px;
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    overflow: hidden;
+    min-width: 300px;
+    cursor: all-scroll;
 }
