@@ -3,17 +3,66 @@ import { delToken } from '../../redux/actions/userActions'
 import { useRouter } from 'next/dist/client/router';
 import { Tooltip } from 'antd';
 import Link from 'next/link';
+import Api from "../../util/Api";
+import { Modal, Button, Input, Form } from 'antd';
+import Swal from "sweetalert2";
 import { useEffect, useState } from "react";
 
 const Navbar = ({ isMap, setslideNav, slideNav, navbarHide }) => {
     const { user } = useSelector(({ user }) => user);
     const dispatch = useDispatch();
     const route = useRouter()
+    const [isModalVisible, setIsModalVisible] = useState(false);
+    const [formChangePassword] = Form.useForm();
 
     const logout = () => {
         dispatch(delToken())
         route.push("/login")
     }
+    /**
+     * 
+     * @param {*} sumbit 
+     */
+    const changePassword = async (sumbit) => {
+        try {
+            console.log("sumbit: >>>>>>> ", sumbit);
+            const data = { ...sumbit }
+
+            await Api.post('provider/editpassword', data);
+            await Swal.fire({
+                icon: 'success',
+                text: "เปลี่ยนรหัสผ่านสำเร็จ!!"
+            });
+            formChangePassword.resetFields();
+            setIsModalVisible(false);
+
+        } catch (error) {
+            Swal.fire({
+                icon: 'error',
+                title: 'ผิดพลาด',
+                text: error,
+            });
+        }
+    }
+    /**
+     * ฟังก์ปุ่มตกลง popup
+     */
+    const handleOk = () => {
+        formChangePassword.submit();
+    };
+    /**
+     * ฟังกปุ่มยกเลิก popup
+     */
+    const handleCancel = () => {
+        formChangePassword.resetFields();
+        setIsModalVisible(false);
+    };
+    /**
+     * ฟังก์กดโชว์ popup
+     */
+    const showModal = () => {
+        setIsModalVisible(true);
+    };
 
     return (
 
@@ -92,11 +141,13 @@ const Navbar = ({ isMap, setslideNav, slideNav, navbarHide }) => {
                         <span><i className="la la-user" /> {user ? `${user.first_name} (${user.roles_name}) ` : "-"}</span>
                     </a>
                     <div className="dropdown-menu">
+                        {(user && user.is_ad ? null :
+                            <a className="dropdown-item" onClick={showModal}>
+                                เปลี่ยนรหัสผ่าน
+                            </a>)}
                         <a className="dropdown-item" onClick={logout}>ออกจากระบบ</a>
                     </div>
                 </li>
-
-
             </ul>
 
             <div className="dropdown mobile-user-menu">
@@ -140,6 +191,63 @@ const Navbar = ({ isMap, setslideNav, slideNav, navbarHide }) => {
 
                 }
             </style>
+            {/* โมเดล เปลี่ยนรหัสผ่าน */}
+            <div>
+                <Modal
+                    title="เปลี่ยนรหัสผ่าน"
+                    visible={isModalVisible}
+                    onOk={handleOk}
+                    onCancel={handleCancel}
+                >
+                    <Form
+                        form={formChangePassword}
+                        labelCol={{ span: 8 }}
+                        wrapperCol={{ span: 10 }}
+                        onFinish={changePassword}
+                    >
+                        <Form.Item
+                            name="currentPassword"
+                            label="รหัสผ่านปัจจุบัน"
+                            rules={[
+                                { required: true, message: "กรุณารหัสผ่านปัจจุบัน" },
+                                { min: 8, message: 'รหัสผ่านมีความยาวอย่างน้อย 8 ตัวอักษร' },
+                            ]}
+                        >
+                            <Input.Password type="password" />
+                        </Form.Item>
+                        <Form.Item
+                            name="newPassword"
+                            label="รหัสผ่านใหม่"
+                            rules={[
+                                { required: true, message: "กรุณารหัสผ่านใหม่" },
+                                { min: 8, message: 'รหัสผ่านมีความยาวอย่างน้อย 8 ตัวอักษร' },
+                            ]}
+                            hasFeedback
+                        >
+                            <Input.Password type="password" />
+                        </Form.Item>
+                        <Form.Item
+                            name="confirmPassword"
+                            label="ยืนยันรหัสผ่าน"
+                            dependencies={['newPassword']}
+                            rules={[
+                                { required: true, message: "กรุณายืนยันรหัสผ่าน" },
+                                ({ getFieldValue }) => ({
+                                    validator(_, value) {
+                                        if (!value || getFieldValue('newPassword') === value) {
+                                            return Promise.resolve();
+                                        }
+                                        return Promise.reject(new Error('ยืนยันรหัสผ่านไม่ตรงกัน!!'))
+                                    }
+                                })
+                            ]}
+                            hasFeedback
+                        >
+                            <Input.Password type="password" />
+                        </Form.Item>
+                    </Form>
+                </Modal>
+            </div>
         </div >
     )
 }

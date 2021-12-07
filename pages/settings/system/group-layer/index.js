@@ -84,9 +84,9 @@ const GroupLayerSystemPage = () => {
       });
     form.resetFields();
   };
-  const reload = () => {
+  const reload = (search) => {
     setLoding(true)
-    Api.post("/masterdata/getmasLayers")
+    Api.post("/masterdata/getmasLayers", { search })
       .then(({ data: { items } }) => {
         setLoding(false)
         let tempDataArray = [];
@@ -309,7 +309,7 @@ const GroupLayerSystemPage = () => {
           </Col>
 
           <Col xs={8} sm={8} md={8} lg={8} xl={8} xxl={5}>
-            <Search placeholder="input search text" onSearch={search} />
+            <Search placeholder="input search text" onSearch={reload} />
           </Col>
           <Col xs={8} sm={8} md={8} lg={8} xl={8} xxl={11}>
             <Button
