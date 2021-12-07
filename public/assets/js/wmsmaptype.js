@@ -95,25 +95,26 @@ function WmsMapType(name, url, params, options, type = "geoserver") {
      * Add this MapType to a map at the given index, or on top of other layers
      * if index is omitted.
      */
-    this.addToMap = async function (map, zoom = true, index) {
+    this.addToMap = async function (map, zoom = true, index = 1) {
         // console.log(this)
-        if (index !== undefined) {
-            map.overlayMapTypes.insertAt(Math.min(index, map.overlayMapTypes.getLength()), this);
-        } else {
-            if (this.type == "geoserver" || this.type == "arcgisimageserver" || this.type == null) {
-                await map.overlayMapTypes.push(this);
-                if (zoom) {
-                    this.zoomToWms(map);
-                }
-            } else {
-                this.Arcgiswms(map);
-                if (zoom) {
-                    this.ZoomToArcgis(map);
-                }
+        // if (index !== undefined) {
+        //     map.overlayMapTypes.insertAt(Math.min(index, map.overlayMapTypes.getLength()), this);
+        // } else {
+        if (this.type == "geoserver" || this.type == "arcgisimageserver" || this.type == null) {
+            // await map.overlayMapTypes.push(this);
+            await map.overlayMapTypes.insertAt(map.overlayMapTypes.getLength(), this);
+            if (zoom) {
+                this.zoomToWms(map);
             }
-
-            //this.zoomToWms(map);
+        } else {
+            this.Arcgiswms(map, index);
+            if (zoom) {
+                this.ZoomToArcgis(map);
+            }
         }
+
+        //this.zoomToWms(map);
+        //}
     };
     /*
      * Remove this MapType from a map.
@@ -288,7 +289,7 @@ function WmsMapType(name, url, params, options, type = "geoserver") {
     }
 
 
-    this.Arcgiswms = async function (map) {/*------------------------------------Arcgis wms addnew---------------------------*/
+    this.Arcgiswms = async function (map, index) {/*------------------------------------Arcgis wms addnew---------------------------*/
         // var url = this.url+this.params.layers+"/MapServer";
         var url = this.url;
         var agsType = await new gmaps.ags.MapType(url, {
@@ -297,7 +298,7 @@ function WmsMapType(name, url, params, options, type = "geoserver") {
         });
         console.log('agsType :>> ', agsType);
         this.arcgis = agsType;
-        map.overlayMapTypes.insertAt(0, agsType);
+        map.overlayMapTypes.insertAt(map.overlayMapTypes.getLength(), agsType);
     }
     this.ZoomToArcgis = function (map) {/*------------------------------------Arcgis wms addnew---------------------------*/
 

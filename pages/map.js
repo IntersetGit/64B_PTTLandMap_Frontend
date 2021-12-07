@@ -555,6 +555,7 @@ const mapPage = () => {
                     strokeWeight: option_layer.strokeWeight ?? inputValueStrokColor,  //ความหนาขอบ
                     strokeColor: option_layer.strokeColor ? option_layer.strokeColor.hex : colorFrame.hex, //เส้นขอบ
                     icon,
+
                 }
             });
 
