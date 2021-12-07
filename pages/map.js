@@ -28,7 +28,7 @@ import {
 import Head from "next/head";
 import { useSelector } from "react-redux";
 import { SketchPicker } from "react-color";
-import { CaretRightOutlined, UploadOutlined, EditFilled, ExpandOutlined, EyeFilled, UnorderedListOutlined, TableOutlined } from "@ant-design/icons";
+import { CaretRightOutlined, UploadOutlined, EditFilled, ExpandOutlined, EyeFilled, UnorderedListOutlined, TableOutlined, CaretDownOutlined, CaretUpOutlined } from "@ant-design/icons";
 import API from "../util/Api";
 import RefreshToken from "../util/RefreshToken";
 import axios from "axios";
@@ -1285,6 +1285,11 @@ const mapPage = () => {
         }
         setRadioPoint(e.target.value)
     }
+    // ดรอปดาวเมนู ในTap Shape File 
+    const iconOpenOfClose = (key) => {
+        $(`.icon-open${key}`).toggle()
+        $(`.icon-close${key}`).toggle()
+    }
     /* -------------------------------------------------------------------------------------- */
 
     /* Search */
@@ -2114,12 +2119,23 @@ const mapPage = () => {
                     <TabPane tab="ชั้นข้อมูล" key="1">
                         {groupLayerList.map((e, i) =>
                             Object.assign(
-                                <div className="pt-2" key={`maps-${e.id}`}>
+                                <div className="pt-2" key={`maps-${e.id}`} onClick={() => iconOpenOfClose(i)}>
                                     <Collapse
                                         collapsible={!e.children || e.children.length <= 0 ? "disabled" : "vertical"}
                                         expandIcon={({ isActive }) => e.symbol ? <img src={e.symbol} width={20} /> : <CaretRightOutlined rotate={isActive ? 90 : 0} />}
                                     >
-                                        <Panel header={<span style={{ fontFamily: "Prompt, sans-serif" }}>{e.group_name}</span>} key={i}>
+                                        <Panel header={
+                                            <>
+                                                <span style={{ fontFamily: "Prompt, sans-serif" }}>{e.group_name}</span>
+                                                {
+                                                    e.children.length === 0 ? null :
+                                                        <>
+                                                            <span style={{ float: "right" }} className={`icon-open${i}`} > <CaretDownOutlined /></span>
+                                                            <span style={{ float: "right", display: "none" }} className={`icon-close${i}`}> <CaretUpOutlined /></span>
+                                                        </>
+                                                }
+                                            </>
+                                        } key={i}>
                                             {e.children
                                                 ? e.children.map((x, index) =>
                                                     Object.assign(
@@ -3137,7 +3153,7 @@ const mapPage = () => {
                                 ) : null
                             }
                         </Row>
-                        <div style={{ position: "absolute", bottom: "0px", height: "70px", width: "300px", backgroundColor: "#f1eded", padding: "5px" }}>
+                        <div style={{ position: "absolute", bottom: "0px", height: "70px", width: "300px", backgroundColor: "#fff", padding: "5px" }}>
                             <span><b>Transparent</b></span>
                             <div style={{ display: "flex", flexDirection: "row", justifyContent: "center", alignItems: "baseline" }}>
                                 <span>🌘</span>
