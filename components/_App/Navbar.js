@@ -87,7 +87,7 @@ const Navbar = ({ isMap, setslideNav, slideNav, navbarHide }) => {
             {!isMap ? <a id="toggle_btn" href="javascript:void(0);">
                 <div className="page-title-box">
                     <Link href={`/`} >
-                        <a><h3><b>PTT Land Map</b></h3></a>
+                        <a><h3><b>PTT Land Map Application</b></h3></a>
                     </Link>
                 </div>
             </a> : null}
