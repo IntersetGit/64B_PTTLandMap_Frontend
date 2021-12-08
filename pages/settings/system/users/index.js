@@ -517,12 +517,43 @@ const usersSystemPage = () => {
           autoComplete="off"
         >
           <Form.Item
-            label="ชื้อผู้ใช้"
+            label="ชื่อผู้ใช้"
             name="username"
             rules={[
               { required: true, message: "กรุณากรอกข้อมูล" },
             ]}>
             <Input disabled={mode != "add"} />
+          </Form.Item>
+
+          <Form.Item
+            label="รหัสผ่าน"
+            name="password"
+            rules={[
+              { required: true, message: "กรุณากรอกรหัสผ่าน" },
+              { min: 8, message: 'รหัสผ่านมีความยาวอย่างน้อย 8 ตัวอักษร' }
+            ]}
+            hasFeedback
+          >
+            <Input.Password disabled={mode == "view"} />
+          </Form.Item>
+
+          <Form.Item
+            label="ยืนยันรหัสผ่าน"
+            name="confirm_password"
+            rules={[
+              { required: true, message: "กรุณากรอกยืนยันรหัสผ่าน" },
+              ({ getFieldValue }) => ({
+                validator(_, value) {
+                  if (!value || getFieldValue('password') === value) {
+                    return Promise.resolve();
+                  }
+                  return Promise.reject(new Error('ยืนยันรหัสผ่านไม่ตรงกัน!!'))
+                }
+              })
+            ]}
+            hasFeedback
+          >
+            <Input.Password disabled={mode == "view"} />
           </Form.Item>
 
           <Form.Item
