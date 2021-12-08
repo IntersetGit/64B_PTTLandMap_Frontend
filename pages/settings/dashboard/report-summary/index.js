@@ -8,7 +8,6 @@ import ReactHTMLTable from 'react-html-table-to-excel'
 import { DownCircleOutlined, RedoOutlined } from "@ant-design/icons";
 const { Option } = Select;
 const index = () => {
-    const [dataTableHead, setDataTableHead] = useState([])
     const [dataTable, setDataTable] = useState([])
     const [dataProvider, setDataProvider] = useState([]) //จังหวัด
     const [dataAmp, setDataAmp] = useState([]) //อำเภอ
@@ -170,7 +169,6 @@ const index = () => {
         })
 
         console.log(newData)
-        setDataTableHead(data.table)
         setDataTable(newData)
     }
     const showHideTable = (prov_name) => {
