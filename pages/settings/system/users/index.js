@@ -167,6 +167,7 @@ const usersSystemPage = () => {
     formCreate.resetFields();
     formEdit.resetFields();
     setButtonCreate(true);
+    setLoading(false);
   };
   const onFinishCreate = async (value) => {
     let filterRoles = await roles.find(
@@ -231,12 +232,14 @@ const usersSystemPage = () => {
     setStatusValidation({
       help: `กำลังโหลดข้อมูล...`,
     });
+    setLoading(true);
     Api.get(`/system/findUserAD?username=${value}`)
       .then((data) => {
         setStatusValidation({
           help: `${data.data.items.displayName}`,
         });
         setButtonCreate(false);
+        setLoading(false);
       })
       .catch((error) => {
         console.log(error);
@@ -245,6 +248,7 @@ const usersSystemPage = () => {
           validateStatus: "error",
           help: "ไม่พบรหัสผู้ใช้ใน AD ",
         });
+        setLoading(false);
       });
   };
   const handleEdit = async (id) => {
