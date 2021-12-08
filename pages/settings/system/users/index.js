@@ -450,7 +450,7 @@ const usersSystemPage = () => {
               { required: true, message: "กรุณากรอกข้อมูล กลุ่มผู้ใช้งาน" },
             ]}
           >
-            <Select placeholder="กลุ่มผู้ใช้งาน" defaultValue="Editor">
+            <Select placeholder="กลุ่มผู้ใช้งาน" >
               {roles.map((data, index) => (
                 <Option key={index} value={data.roles_name}>
                   {data.roles_name}
