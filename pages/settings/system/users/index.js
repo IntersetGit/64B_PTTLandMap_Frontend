@@ -176,6 +176,7 @@ const usersSystemPage = () => {
     Api.post("/system/addUserAD", {
       username: value.username,
       roles_id: filterRoles.id,
+      is_ad: true
     })
       .then((data) => {
         Swal.fire("", "บันทึกข้อมูลเรียบร้อย", "success");
