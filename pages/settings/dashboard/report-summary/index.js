@@ -306,7 +306,7 @@ const index = () => {
                                                     }
                                                 </th>
                                                 <td style={{ backgroundColor: "#e6e6e6" }} align="center">
-                                                    <h5>{data.sumPlot.toFixed(2)}</h5>
+                                                    <h5>{data.sumPlot.toFixed(0)}</h5>
                                                 </td>
                                                 <td style={{ backgroundColor: "#e6e6e6" }} align="center">
                                                     <h5>{data.sumDistance.toFixed(2)}</h5>

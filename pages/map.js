@@ -23,7 +23,9 @@ import {
     InputNumber,
     Table,
     Pagination,
-    Radio
+    Radio,
+    Spin,
+    Space
 } from "antd";
 import Head from "next/head";
 import { useSelector } from "react-redux";
@@ -1291,6 +1293,9 @@ const mapPage = () => {
         $(`.icon-open${key}`).toggle()
         $(`.icon-close${key}`).toggle()
     }
+
+    //loading search
+    const [loadingSearch, setLoadingSearch] = useState(true);
     /* -------------------------------------------------------------------------------------- */
 
     /* Search */
@@ -1387,6 +1392,7 @@ const mapPage = () => {
     ]
 
     const onFinishSearch = (value) => {
+        setLoadingSearch(true)
         apiSearchData({ ...value })
     }
 
@@ -1421,6 +1427,7 @@ const mapPage = () => {
                 if (i < 10) _arr.push(e)
             })
             setSearchList(_arr)
+            setLoadingSearch(false)
             setSearchAllList(data.items.data)
             getDataNameProject()
 
@@ -1450,7 +1457,6 @@ const mapPage = () => {
         const _searchList = [...searchList]
         _searchList[i] = item
         setSearchList([..._searchList])
-
         if (!value) {
             const arr = [...layerSearchData]
             const index = arr.findIndex(e => e.id == item.index)
@@ -2875,128 +2881,131 @@ const mapPage = () => {
                     </Row>
                     <>
                         {
-                            searchList.length > 0 ?
-                                modeSearch === "Detail" ?
-                                    <div>
-                                        {
-                                            searchList.map((e, i) => (
-                                                <div key={`SearchList-${i}`}>
-                                                    {e.index.toLocaleString()})
-                                                    <div className="row pt-2">
-                                                        <div className="col-md-1">
-                                                            <div
-                                                                style={{
-                                                                    width: "25px",
-                                                                    height: "25px",
-                                                                    borderRadius: "2px",
-                                                                    background: e.color,
-                                                                    border: "1px solid black",
-                                                                }}
-                                                            />
-                                                        </div>
-                                                        <div className="col-md-11">
-
-                                                            <div className="row">
-                                                                <label>{getTextThaiObjShape("project_name")} :</label>
-                                                                <p className="pl-3">{e.project_na}</p>
+                            loadingSearch ?
+                                <Spin size="large" className="mx-auto" style={{ width: "100%" }} />
+                                :
+                                searchList.length > 0 ?
+                                    modeSearch === "Detail" ?
+                                        <div>
+                                            {
+                                                searchList.map((e, i) => (
+                                                    <div key={`SearchList-${i}`}>
+                                                        {e.index.toLocaleString()})
+                                                        <div className="row pt-2">
+                                                            <div className="col-md-1">
+                                                                <div
+                                                                    style={{
+                                                                        width: "25px",
+                                                                        height: "25px",
+                                                                        borderRadius: "2px",
+                                                                        background: e.color,
+                                                                        border: "1px solid black",
+                                                                    }}
+                                                                />
                                                             </div>
+                                                            <div className="col-md-11">
 
-                                                            <div className="row">
-                                                                <label>{getTextThaiObjShape("partype")} :</label>
-                                                                <p className="pl-3">{e.partype}</p>
-                                                            </div>
-
-                                                            <div className="row">
-                                                                <label>{getTextThaiObjShape("parid")} :</label>
-                                                                <p className="pl-3">{e.parid}</p>
-                                                            </div>
-
-                                                            <div className="pl-2">
                                                                 <div className="row">
-                                                                    <div className="col-md-4">
-                                                                        <div className="row">
-                                                                            <label>{getTextThaiObjShape("parlabel1")} :</label>
-                                                                            <p className="pl-3">{e.parlabel1}</p>
-                                                                        </div>
-                                                                    </div>
-                                                                    <div className="col-md-4">
-                                                                        <div className="row">
-                                                                            <label>{getTextThaiObjShape("parlabel2")} :</label>
-                                                                            <p className="pl-3">{e.parlabel2}</p>
-                                                                        </div>
-                                                                    </div>
-                                                                    <div className="col-md-4">
-                                                                        <div className="row">
-                                                                            <label>{getTextThaiObjShape("parlabel3")} :</label>
-                                                                            <p className="pl-3">{e.parlabel3}</p>
-                                                                        </div>
-                                                                    </div>
+                                                                    <label>{getTextThaiObjShape("project_name")} :</label>
+                                                                    <p className="pl-3">{e.project_na}</p>
                                                                 </div>
 
                                                                 <div className="row">
-                                                                    <div className="col-md-5">
-                                                                        <div className="row">
-                                                                            <label>{getTextThaiObjShape("parlabel4")} :</label>
-                                                                            <p className="pl-3">{e.parlabel4}</p>
-                                                                        </div>
-                                                                    </div>
-                                                                    <div className="col-md-5">
-                                                                        <div className="row">
-                                                                            <label>{getTextThaiObjShape("parlabel5")} :</label>
-                                                                            <p className="pl-3">{e.parlabel5}</p>
-                                                                        </div>
-                                                                    </div>
-                                                                    <div className="col-md-2">
-                                                                        {(user && (user.roles_id === "8a97ac7b-01dc-4e06-81c2-8422dffa0ca2" || user.roles_id === "cec6617f-b593-4ebc-9604-3059dfee0ac4")) ?
-                                                                            <button className="btn" onClick={() => editShapefileSearch(e, i)}><EditFilled /></button> : null}
-                                                                        <Switch size="small" checked={e.checked} onChange={(value) => switchGeom(value, e, i)} />
-                                                                        {e.checked ?
-                                                                            <button className="btn" onClick={() => goTolayer(e.index, "search")}>
-                                                                                <ExpandOutlined />
-                                                                            </button> : null}
-                                                                    </div>
+                                                                    <label>{getTextThaiObjShape("partype")} :</label>
+                                                                    <p className="pl-3">{e.partype}</p>
                                                                 </div>
 
-                                                                {e.hyperlink ?
+                                                                <div className="row">
+                                                                    <label>{getTextThaiObjShape("parid")} :</label>
+                                                                    <p className="pl-3">{e.parid}</p>
+                                                                </div>
+
+                                                                <div className="pl-2">
                                                                     <div className="row">
-                                                                        <div className="col-md-12">
+                                                                        <div className="col-md-4">
                                                                             <div className="row">
-                                                                                <label>Hyperlink :</label>
-                                                                                <a className="pl-3" href={e.hyperlink} style={{ color: "#007bff" }}>{e.hyperlink}</a>
+                                                                                <label>{getTextThaiObjShape("parlabel1")} :</label>
+                                                                                <p className="pl-3">{e.parlabel1}</p>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div className="col-md-4">
+                                                                            <div className="row">
+                                                                                <label>{getTextThaiObjShape("parlabel2")} :</label>
+                                                                                <p className="pl-3">{e.parlabel2}</p>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div className="col-md-4">
+                                                                            <div className="row">
+                                                                                <label>{getTextThaiObjShape("parlabel3")} :</label>
+                                                                                <p className="pl-3">{e.parlabel3}</p>
                                                                             </div>
                                                                         </div>
                                                                     </div>
-                                                                    : null}
+
+                                                                    <div className="row">
+                                                                        <div className="col-md-5">
+                                                                            <div className="row">
+                                                                                <label>{getTextThaiObjShape("parlabel4")} :</label>
+                                                                                <p className="pl-3">{e.parlabel4}</p>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div className="col-md-5">
+                                                                            <div className="row">
+                                                                                <label>{getTextThaiObjShape("parlabel5")} :</label>
+                                                                                <p className="pl-3">{e.parlabel5}</p>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div className="col-md-2">
+                                                                            {(user && (user.roles_id === "8a97ac7b-01dc-4e06-81c2-8422dffa0ca2" || user.roles_id === "cec6617f-b593-4ebc-9604-3059dfee0ac4")) ?
+                                                                                <button className="btn" onClick={() => editShapefileSearch(e, i)}><EditFilled /></button> : null}
+                                                                            <Switch size="small" checked={e.checked} onChange={(value) => switchGeom(value, e, i)} />
+                                                                            {e.checked ?
+                                                                                <button className="btn" onClick={() => goTolayer(e.index, "search")}>
+                                                                                    <ExpandOutlined />
+                                                                                </button> : null}
+                                                                        </div>
+                                                                    </div>
+
+                                                                    {e.hyperlink ?
+                                                                        <div className="row">
+                                                                            <div className="col-md-12">
+                                                                                <div className="row">
+                                                                                    <label>Hyperlink :</label>
+                                                                                    <a className="pl-3" href={e.hyperlink} style={{ color: "#007bff" }}>{e.hyperlink}</a>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                        : null}
+                                                                </div>
+
+
                                                             </div>
 
-
                                                         </div>
-
+                                                        <hr />
                                                     </div>
-                                                    <hr />
-                                                </div>
-                                            ))
-                                        }
-                                        <div style={{ textAlign: "center" }}>
-                                            {/* {amount >= sumData ? <button className="btn btn-primary" onClick={pushSearchData}>โหลดเพิ่มเติม</button> : null} */}
-                                            <Pagination current={pageDetailSearch} total={amount} onChange={paginationSearchData} />
-                                        </div>
-                                    </div> :
-                                    modeSearch === "Table" ?
-                                        <div>
-                                            <Table dataSource={searchAllList} columns={columnsSearch} rowKey={(row) => row.id} scroll={{ x: "100%", y: "100%" }} pagination={{
-                                                current: pageSearch,
-                                                total: totalSearch,
-                                                pageSize: limitSearch,
-                                                showTotal: (total, range) => `ข้อมูล ${range[0]} - ${range[1]} ทั้งหมด ${total.toLocaleString()} รายการ`,
-                                                onChange: async (e, _limit) => {
-                                                    setPageSearch(e)
-                                                    if (limitSearch !== _limit) setLimitSearch(_limit)
-                                                }
-                                            }} />
-                                        </div>
-                                        : null
-                                : <h3 style={{ color: "red", textAlign: "center" }}>ไม่พบข้อมูลคำค้นหา</h3>
+                                                ))
+                                            }
+                                            <div style={{ textAlign: "center" }}>
+                                                {/* {amount >= sumData ? <button className="btn btn-primary" onClick={pushSearchData}>โหลดเพิ่มเติม</button> : null} */}
+                                                <Pagination current={pageDetailSearch} total={amount} onChange={paginationSearchData} />
+                                            </div>
+                                        </div> :
+                                        modeSearch === "Table" ?
+                                            <div>
+                                                <Table dataSource={searchAllList} columns={columnsSearch} rowKey={(row) => row.id} scroll={{ x: "100%", y: "100%" }} pagination={{
+                                                    current: pageSearch,
+                                                    total: totalSearch,
+                                                    pageSize: limitSearch,
+                                                    showTotal: (total, range) => `ข้อมูล ${range[0]} - ${range[1]} ทั้งหมด ${total.toLocaleString()} รายการ`,
+                                                    onChange: async (e, _limit) => {
+                                                        setPageSearch(e)
+                                                        if (limitSearch !== _limit) setLimitSearch(_limit)
+                                                    }
+                                                }} />
+                                            </div>
+                                            : null
+                                    : <h3 style={{ color: "red", textAlign: "center" }}>ไม่พบข้อมูลคำค้นหา</h3>
                         }
                     </>
 
