@@ -655,7 +655,7 @@ const mapPage = () => {
                 // a + ": " + item[a] + "<br />";
                 content += `
                 <tr>
-                    <td>${getTextThaiObjShape(a)}</td>
+                    <td>${a}</td>
                     <td>${item[a] ?? "-"}</td>
                 </tr>`
             });

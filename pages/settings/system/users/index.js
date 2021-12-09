@@ -532,8 +532,8 @@ const usersSystemPage = () => {
             <Input disabled={mode != "add"} />
           </Form.Item>
 
-          <Form.Item>
-            <Checkbox onChange={(e) => console.log(e)}>เปลี่ยน Password</Checkbox>
+          <Form.Item label="เปลี่ยน Password">
+            <Checkbox onChange={(e) => setCheckboxPassword(e.target.checked)} />
           </Form.Item>
 
           {mode === "add" || checkboxPassword ?
