@@ -18,6 +18,8 @@ const LoginPage = () => {
   const dispatch = useDispatch();
   const [isBlock, setisBlock] = useState(false)
   const [dateText, setDateText] = useState(null)
+  const [loading, setLoading] = useState(false)
+  const [pointLoading, setPointLoading] = useState(".")
   const [events, setEvents] = useState([
     "load",
     "mousemove",
@@ -73,6 +75,12 @@ const LoginPage = () => {
     const { username, password, remember } = values;
 
     const token = Encrypt({ username, password });
+    let point = pointLoading
+    setLoading(true)
+    var time = setInterval(function () {
+      point += `.`
+      setPointLoading(point)
+    }, 1000);
     API.post(`/provider/login`, { token })
       .then(
         ({
@@ -80,6 +88,9 @@ const LoginPage = () => {
             items: { access_token, refresh_token },
           },
         }) => {
+          setLoading(false)
+          setPointLoading(`.`)
+          clearInterval(time);
           if (remember) {
             cookies.set("remember", Encrypt({ username }), { path: "/" });
           } else {
@@ -94,6 +105,9 @@ const LoginPage = () => {
       .catch((error) => {
         // console.log('error :>> ', error.response.status);
         // console.log('error :>> ', error.response.data);
+        setLoading(false)
+        setPointLoading(`.`)
+        clearInterval(time);
         message.error(
           error.response.data || error.response.status == 400 ? error.response.data.error.message : "มีบางอย่างผิดพลาด !"
         );
@@ -156,7 +170,7 @@ const LoginPage = () => {
               <Input
                 prefix={<UserOutlined className="site-form-item-icon" />}
                 placeholder="Username"
-                disabled={isBlock}
+                disabled={isBlock || loading}
               />
             </Form.Item>
 
@@ -173,13 +187,13 @@ const LoginPage = () => {
                 prefix={<LockOutlined className="site-form-item-icon" />}
                 type="password"
                 placeholder="Password"
-                disabled={isBlock}
+                disabled={isBlock || loading}
               />
             </Form.Item>
 
             <Form.Item>
               <Form.Item name="remember" valuePropName="checked" noStyle>
-                <Checkbox disabled={isBlock}>Remember me</Checkbox>
+                <Checkbox loading={loading} disabled={isBlock || loading}>Remember me</Checkbox>
               </Form.Item>
             </Form.Item>
 
@@ -189,13 +203,14 @@ const LoginPage = () => {
                 htmlType="submit"
                 className="login-form-button"
                 style={{ width: "100%" }}
-                disabled={isBlock}
+                loading={loading} disabled={isBlock || loading}
               >
                 Log in
               </Button>
             </Form.Item>
 
             {isBlock ? <h5 className="text-center text-red">ไม่สามารถใช้งานได้ถึง {dateText}</h5> : null}
+            {loading ? <h5 className="text-center text-red">กำลังโหลดข้อมูล{pointLoading}</h5> : null}
           </Form>
         </Col>
       </Row>
