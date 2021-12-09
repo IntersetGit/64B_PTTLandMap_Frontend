@@ -123,7 +123,7 @@ const usersSystemPage = () => {
     )
       .then((data) => {
         let tempDataArray = [];
-        data.data.forEach((data, key) => {
+        data.data.items.forEach((data, key) => {
           tempDataArray = [
             ...tempDataArray,
             {
