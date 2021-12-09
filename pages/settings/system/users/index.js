@@ -14,6 +14,7 @@ import {
   Form,
   Select,
   Menu,
+  Checkbox,
   Dropdown,
 } from "antd";
 const { Search } = Input;
@@ -297,6 +298,7 @@ const usersSystemPage = () => {
    */
   const [mode, setMode] = useState("add")
   const [idUser, setIdUser] = useState(null)
+  const [checkboxPassword, setCheckboxPassword] = useState(false)
 
   /**
    * เปิดปิด Modal AD
@@ -530,37 +532,43 @@ const usersSystemPage = () => {
             <Input disabled={mode != "add"} />
           </Form.Item>
 
-          <Form.Item
-            label="รหัสผ่าน"
-            name="password"
-            rules={[
-              { required: true, message: "กรุณากรอกรหัสผ่าน" },
-              { min: 8, message: 'รหัสผ่านมีความยาวอย่างน้อย 8 ตัวอักษร' }
-            ]}
-            hasFeedback
-          >
-            <Input.Password disabled={mode == "view"} />
+          <Form.Item>
+            <Checkbox onChange={(e) => console.log(e)}>เปลี่ยน Password</Checkbox>
           </Form.Item>
 
-          <Form.Item
-            label="ยืนยันรหัสผ่าน"
-            name="confirm_password"
-            rules={[
-              { required: true, message: "กรุณากรอกยืนยันรหัสผ่าน" },
-              ({ getFieldValue }) => ({
-                validator(_, value) {
-                  if (!value || getFieldValue('password') === value) {
-                    return Promise.resolve();
-                  }
-                  return Promise.reject(new Error('ยืนยันรหัสผ่านไม่ตรงกัน!!'))
-                }
-              })
-            ]}
-            hasFeedback
-          >
-            <Input.Password disabled={mode == "view"} />
-          </Form.Item>
+          {mode === "add" || checkboxPassword ?
+            <>
+              <Form.Item
+                label="รหัสผ่าน"
+                name="password"
+                rules={[
+                  { required: true, message: "กรุณากรอกรหัสผ่าน" },
+                  { min: 8, message: 'รหัสผ่านมีความยาวอย่างน้อย 8 ตัวอักษร' }
+                ]}
+                hasFeedback
+              >
+                <Input.Password disabled={mode == "view"} />
+              </Form.Item>
 
+              <Form.Item
+                label="ยืนยันรหัสผ่าน"
+                name="confirm_password"
+                rules={[
+                  { required: true, message: "กรุณากรอกยืนยันรหัสผ่าน" },
+                  ({ getFieldValue }) => ({
+                    validator(_, value) {
+                      if (!value || getFieldValue('password') === value) {
+                        return Promise.resolve();
+                      }
+                      return Promise.reject(new Error('ยืนยันรหัสผ่านไม่ตรงกัน!!'))
+                    }
+                  })
+                ]}
+                hasFeedback
+              >
+                <Input.Password disabled={mode == "view"} />
+              </Form.Item>
+            </> : null}
           <Form.Item
             label="ชื่อจริง"
             name="first_name"
