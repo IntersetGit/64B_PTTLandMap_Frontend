@@ -79,7 +79,7 @@ const usersSystemPage = () => {
     },
     {
       key: "6",
-      title: <b>แหล่งทที่มาจากผู้ใช้</b>,
+      title: <b>แหล่งที่มาจากผู้ใช้</b>,
       dataIndex: "is_ad",
       render: (item1, item2) => item1 ? "AD" : <span style={{ color: "red" }}>Non AD</span>
     },
