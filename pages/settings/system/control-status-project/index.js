@@ -87,7 +87,7 @@ const index = () => {
     },
     {
       key: "5",
-      title: "จัดการ",
+      title: <b>จัดการ</b>,
       dataIndex: "id",
       width: '2%',
       align: 'center',
