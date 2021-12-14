@@ -17,7 +17,7 @@ import { delToken } from '../../redux/actions/userActions';
 function Layout({ children, isMap = false, navbarHide }) {
     const route = useRouter()
     const dispatch = useDispatch();
-    const [loader, setLoader] = useState(false);
+    const [loader, setLoader] = useState(true);
     const [slideNav, setslideNav] = useState("") //slide-nav
     const [events, setEvents] = useState([
         "load",
@@ -30,7 +30,9 @@ function Layout({ children, isMap = false, navbarHide }) {
     useEffect(() => {
         const cookies = new Cookies();
         const token = cookies.get('token');
+
         if (token) {
+            setLoader(false)
             const token_decode = jwt_decode(token);
             if ((token_decode.exp * 1000) - (10 * 60 * 1000) <= new Date().getTime()) {
                 console.log("หมดเวลาtoken");
@@ -87,7 +89,7 @@ function Layout({ children, isMap = false, navbarHide }) {
                     <Navbar isMap={isMap} navbarHide={navbarHide} />
                     <div className="page-wrapper-map">
                         <div className="content container-fluid-map">
-                            {children}
+                            {loader ? <Preloader /> : children}
                         </div>
                     </div>
 
