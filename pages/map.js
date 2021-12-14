@@ -1872,7 +1872,7 @@ const mapPage = () => {
     return (
         <Layout isMap={true} navbarHide={hideNavbar}>
             <Head>
-                <title>PTT Land Map</title>
+                <title>PTT Land Map Aplication</title>
             </Head>
             {!changmap ? (
                 <>
@@ -1904,7 +1904,7 @@ const mapPage = () => {
                             </button>
                         </Tooltip>
                     </div>
-                    <div className="tools-dashboard" style={{ top: 215 }}>
+                    <div className="show-street-view tools-dashboard" style={{ top: 215 }}>
                         <Tooltip placement="right" title={"ShowStreetView"}>
                             <button
                                 className="btn btn-light btn-sm"
