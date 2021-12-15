@@ -2071,7 +2071,7 @@ const mapPage = () => {
             </div>
             <span className="tools-map-area3 NameHighlights" hidden={changmap}   >
                 <button className="btn btn-light" onClick={() => clickChangeMap()} >
-                    <img width="90" height="90" style={{ borderRadius: "10px" }} src={imgChangeMap} alt="" />
+                    <img className="imgChangeMap" width="90" height="90" style={{ borderRadius: "10px" }} src={imgChangeMap} alt="" />
                     <span className="txtChangeMap" style={{ position: "absolute", bottom: "15px", left: "25px", textAlign: "center" }} >
                         {txtChangeMap}
                     </span>
@@ -2081,19 +2081,19 @@ const mapPage = () => {
                     <span style={{ display: "flex", justifyContent: "space-around" }} >
                         <span style={{ display: "flex", flexDirection: "column", alignItems: "center" }} >
                             <button className="btn btn-light btn-sm terrain" onClick={() => changeMap("Terrain")} >
-                                <img width="55" height="55" style={{ borderRadius: "10px" }} src="assets/images/icon-chang-map/Terrain.png" alt="" />
+                                <img className="imgTerrain" width="55" height="55" style={{ borderRadius: "10px" }} src="assets/images/icon-chang-map/Terrain.png" alt="" />
                             </button>
                             <h5 className="text-info" >Terrain</h5>
                         </span>
                         <span style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
                             <button className="btn btn-light btn-sm traffic" onClick={() => changeMap("Traffic")} >
-                                <img width="55" height="55" style={{ borderRadius: "10px" }} src="assets/images/icon-chang-map/Traffic.png" alt="" />
+                                <img className="imgTraffic" width="55" height="55" style={{ borderRadius: "10px" }} src="assets/images/icon-chang-map/Traffic.png" alt="" />
                             </button>
                             <h5 className="text-info" >Traffic</h5>
                         </span>
                         <span style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
                             <button className="btn btn-light btn-sm transit" onClick={() => changeMap("Transit")}>
-                                <img width="55" height="55" style={{ borderRadius: "10px" }} src="assets/images/icon-chang-map/Transit.png" alt="" />
+                                <img className="imgTransit" width="55" height="55" style={{ borderRadius: "10px" }} src="assets/images/icon-chang-map/Transit.png" alt="" />
                             </button>
                             <h5 className="text-info" >Transit</h5>
                         </span>
