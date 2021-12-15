@@ -83,7 +83,7 @@ const LoginPage = () => {
     }, 1000);
     API.post(`/provider/login`, { token })
       .then(
-        ({
+        async ({
           data: {
             items: { access_token, refresh_token },
           },
@@ -99,7 +99,8 @@ const LoginPage = () => {
           }
           dispatch(setToken(access_token, refresh_token));
           cookies.remove("block", { path: "/" });
-          route.push("/");
+          await route.push("/");
+          window.location.reload()
         }
       )
       .catch((error) => {
