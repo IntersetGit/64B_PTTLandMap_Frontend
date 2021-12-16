@@ -1288,11 +1288,7 @@ const mapPage = () => {
         }
         setRadioPoint(e.target.value)
     }
-    // ดรอปดาวเมนู ในTap Shape File 
-    const iconOpenOfClose = (key) => {
-        $(`.icon-open${key}`).toggle()
-        $(`.icon-close${key}`).toggle()
-    }
+
 
     //loading search
     const [loadingSearch, setLoadingSearch] = useState(true);
@@ -2126,23 +2122,21 @@ const mapPage = () => {
                     <TabPane tab="ชั้นข้อมูล" key="1">
                         {groupLayerList.map((e, i) =>
                             Object.assign(
-                                <div className="pt-2" key={`maps-${e.id}`} onClick={() => iconOpenOfClose(i)}>
+                                <div className="pt-2" key={`maps-${e.id}`}>
                                     <Collapse
                                         collapsible={!e.children || e.children.length <= 0 ? "disabled" : "vertical"}
-                                        expandIcon={({ isActive }) => e.symbol ? <img src={e.symbol} width={20} /> : <CaretRightOutlined rotate={isActive ? 90 : 0} />}
-                                    >
-                                        <Panel header={
+                                        expandIcon={({ isActive }) => e.symbol ? (
                                             <>
-                                                <span style={{ fontFamily: "Prompt, sans-serif" }}>{e.group_name}</span>
+                                                <img src={e.symbol} width={20} />
+                                                <span style={{ fontFamily: "Prompt, sans-serif", lineHeight: "1.5715", fontSize: "14px", padding: "12px 16px" }}>{e.group_name}</span>
                                                 {
-                                                    e.children.length === 0 ? null :
-                                                        <>
-                                                            <span style={{ float: "right" }} className={`icon-open${i}`} > <CaretDownOutlined /></span>
-                                                            <span style={{ float: "right", display: "none" }} className={`icon-close${i}`}> <CaretUpOutlined /></span>
-                                                        </>
+                                                    e.children.length !== 0 && <CaretRightOutlined rotate={isActive ? 90 : 0} style={{ float: "right", lineHeight: "1.5715", fontSize: "14px" }} />
                                                 }
                                             </>
-                                        } key={i}>
+                                        ) : <CaretRightOutlined rotate={isActive ? 90 : 0} />}
+                                    >
+                                        <Panel
+                                            key={i}>
                                             {e.children
                                                 ? e.children.map((x, index) =>
                                                     Object.assign(
