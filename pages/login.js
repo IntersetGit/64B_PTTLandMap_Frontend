@@ -100,7 +100,9 @@ const LoginPage = () => {
           dispatch(setToken(access_token, refresh_token));
           cookies.remove("block", { path: "/" });
           await route.push("/");
-          window.location.reload()
+          setTimeout(() => {
+            window.location.reload()
+          }, 1000)
         }
       )
       .catch((error) => {
