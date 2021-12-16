@@ -609,62 +609,76 @@ const mapPage = () => {
         <div id='infoBox'><center><strong>รายละเอียดข้อมูล</strong></center><br />
         <table style="width: 350px;" class="table table-striped"> `
 
+        // if (item.from_model) {
+        //     content += `
+        //     <tbody>
+        //         <tr>
+        //             <td>${getTextThaiObjShape("partype")} </td>
+        //             <td>${item.partype ?? "-"}</td>
+        //         </tr>
+        //         <tr>
+        //             <td>${getTextThaiObjShape("parlabel1")}</td>
+        //             <td>${item.parlabel1 ?? "-"}</td>
+        //         </tr>
+        //         <tr>
+        //             <td>${getTextThaiObjShape("parlabel2")}</td>
+        //             <td>${item.parlabel2 ?? "-"}</td>
+        //         </tr>
+        //         <tr>
+        //             <td>${getTextThaiObjShape("parlabel3")}</td>
+        //             <td>${item.parlabel3 ?? "-"}</td>
+        //         </tr>
+        //         <tr>
+        //             <td>${getTextThaiObjShape("tam")}</td>
+        //             <td>${item.tam ?? "-"}</td>
+        //         </tr>
+        //         <tr>
+        //             <td>${getTextThaiObjShape("amp")}</td>
+        //             <td>${item.amp ?? "-"}</td>
+        //         </tr>
+        //         <tr>
+        //             <td>${getTextThaiObjShape("prov")}</td>
+        //             <td>${item.prov ?? "-"}</td>
+        //         </tr>
+        //         <tr>
+        //             <td>${getTextThaiObjShape("area_rai")}</td>
+        //             <td>${item.area_rai ?? "-"}</td>
+        //         </tr>
+        //         <tr>
+        //             <td>${getTextThaiObjShape("row_distan")}</td>
+        //             <td>${item.row_distan ?? "-"}</td>
+        //         </tr>
+        //     </tbody>`
+        // } else {
+        //     const key = Object.keys(item);
+        //     key.forEach((a, i) => {
+        //         // a + ": " + item[a] + "<br />";
+        //         content += `
+        //         <tr>
+        //             <td>${a}</td>
+        //             <td>${item[a] ?? "-"}</td>
+        //         </tr>`
+        //     });
+        // }
+
         if (item.from_model) {
+            delete item.from_model
+        }
+
+        const key = Object.keys(item);
+        key.forEach((a, i) => {
+            // a + ": " + item[a] + "<br />";
             content += `
-            <tbody>
-                <tr>
-                    <td>${getTextThaiObjShape("partype")} </td>
-                    <td>${item.partype ?? "-"}</td>
-                </tr>
-                <tr>
-                    <td>${getTextThaiObjShape("parlabel1")}</td>
-                    <td>${item.parlabel1 ?? "-"}</td>
-                </tr>
-                <tr>
-                    <td>${getTextThaiObjShape("parlabel2")}</td>
-                    <td>${item.parlabel2 ?? "-"}</td>
-                </tr>
-                <tr>
-                    <td>${getTextThaiObjShape("parlabel3")}</td>
-                    <td>${item.parlabel3 ?? "-"}</td>
-                </tr>
-                <tr>
-                    <td>${getTextThaiObjShape("tam")}</td>
-                    <td>${item.tam ?? "-"}</td>
-                </tr>
-                <tr>
-                    <td>${getTextThaiObjShape("amp")}</td>
-                    <td>${item.amp ?? "-"}</td>
-                </tr>
-                <tr>
-                    <td>${getTextThaiObjShape("prov")}</td>
-                    <td>${item.prov ?? "-"}</td>
-                </tr>
-                <tr>
-                    <td>${getTextThaiObjShape("area_rai")}</td>
-                    <td>${item.area_rai ?? "-"}</td>
-                </tr>
-                <tr>
-                    <td>${getTextThaiObjShape("row_distan")}</td>
-                    <td>${item.row_distan ?? "-"}</td>
-                </tr>
-            </tbody>`
-        } else {
-            const key = Object.keys(item);
-            key.forEach((a, i) => {
-                // a + ": " + item[a] + "<br />";
-                content += `
                 <tr>
                     <td>${a}</td>
                     <td>${item[a] ?? "-"}</td>
                 </tr>`
-            });
-        }
+        });
 
         content += `
         </table>
         <div style="text-align: end;">
-        ${(item.from_model && user && (user.roles_id === "8a97ac7b-01dc-4e06-81c2-8422dffa0ca2" || user.roles_id === "cec6617f-b593-4ebc-9604-3059dfee0ac4")) ? `
+        ${(user && (user.roles_id === "8a97ac7b-01dc-4e06-81c2-8422dffa0ca2" || user.roles_id === "cec6617f-b593-4ebc-9604-3059dfee0ac4")) ? `
         <a style="cursor: pointer;" onclick="clickEdit()"><img style="width: 25px;" src="https://nonpttlma.pttplc.com/service/icon/icon-edit.png"></a>` :
                 `<a style="cursor: pointer;" onclick="clickView()"><img style="width: 25px;" src="https://nonpttlma.pttplc.com/service/icon/icon-view.png"></a>`}
         </div>`
@@ -1447,6 +1461,7 @@ const mapPage = () => {
         }
     }
 
+    const [markerLayer, setMarkerLayer] = useState(null)
     const switchGeom = async (value, item, i) => {
         // console.log('value :>> ', value);
         item.checked = value
@@ -1463,6 +1478,7 @@ const mapPage = () => {
                 });
                 arr.splice(index, 1);
                 setLayerSearchData(arr)
+                console.log('markerLayer :>> ', markerLayer);
             }
         } else {
             const { data } = await API.get(`/shp/getByIdShape?id=${item.gid}&table_name=${item.table_name}`);
@@ -1484,19 +1500,30 @@ const mapPage = () => {
             const option_layer = item.option_layer ?? {}
             layer.setStyle({
                 fillColor,
-                fillOpacity: option_layer.fillOpacity ?? inputValueOpacityColor, //Opacity
-                strokeWeight: option_layer.strokeWeight ?? inputValueStrokColor,  //ความหนาขอบ
+                fillOpacity: 1, //Opacity
+                strokeWeight: 3,  //ความหนาขอบ
                 strokeColor: option_layer.strokeColor ? option_layer.strokeColor.hex : colorFrame.hex, //เส้นขอบ
                 // clickable: false,
             });
+
             layer.setMap(map);
 
+            const layer_arr = []
             layer.forEach((feature) => {
-                // console.log('feature :>> ', feature);
                 feature.getGeometry().forEachLatLng((latlng) => {
                     bounds.extend(latlng);
+                    const lat = latlng.lat(), lng = latlng.lng();
+                    const position = { lat, lng };
+                    layer_arr.push(position)
                 });
             });
+            // console.log('layer_arr :>> ', layer_arr);
+            // const markerLayer = new google.maps.Marker({
+            //     position: layer_arr[Math.ceil(layer_arr.length / 2)],
+            //     map,
+            // });
+
+            // setMarkerLayer(markerLayer)
 
             setLayerSearchData([...layerSearchData, { id: item.index, layer }])
             map.fitBounds(bounds);
@@ -3434,6 +3461,10 @@ const mapPage = () => {
 
             .ant-select-disabled.ant-select:not(.ant-select-customize-input) .ant-select-selector {
                 color: rgb(0 0 0);
+            }
+
+            #infoBox .table td, .table th {
+                padding: 0.35rem;
             }
         `}
             </style>
