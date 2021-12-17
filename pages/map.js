@@ -3465,6 +3465,7 @@ const mapPage = () => {
 
             #infoBox .table td, .table th {
                 padding: 0.35rem;
+                width: 50%;
             }
         `}
             </style>
