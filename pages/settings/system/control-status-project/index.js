@@ -297,7 +297,7 @@ const index = () => {
   return (
     <System>
       <Head>
-        <title>จัดการ Status โครงการ</title>
+        <title>จัดการสถานะโครงการ</title>
       </Head>
       <Row
         gutter={[10, 10]}
@@ -310,7 +310,7 @@ const index = () => {
         }}
       >
         <Col span={24}>
-          <h3 className="mb-4">จัดการ Status โครงการ</h3>{dataEdit.layer_name}
+          <h3 className="mb-4">จัดการสถานะโครงการ</h3>{dataEdit.layer_name}
         </Col>
         <Col xs={8} sm={8} md={8} lg={8} xl={8} xxl={5}>
           <Search
