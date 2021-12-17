@@ -1895,7 +1895,7 @@ const mapPage = () => {
     return (
         <Layout isMap={true} navbarHide={hideNavbar}>
             <Head>
-                <title>PTT Land Map Aplication</title>
+                <title>PTT Land Map Application</title>
             </Head>
             {!changmap ? (
                 <>
