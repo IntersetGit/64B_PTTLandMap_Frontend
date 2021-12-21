@@ -1,126 +1,182 @@
 export default [
     {
         key: "project_na",
-        value: "ชื่อโครงการ"
+        value: "ชื่อโครงการ",
+        is_show_plot: false,
+        sort_plot: null,
     },
     {
         key: "project_name",
-        value: "ชื่อโครงการ"
+        value: "ชื่อโครงการ",
+        is_show_plot: false,
+        sort_plot: null,
     },
     {
         key: "objectid",
-        value: "ลำดับแปลงที่ดิน"
+        value: "ลำดับแปลงที่ดิน",
+        is_show_plot: false,
+        sort_plot: null,
     },
     {
         key: "parid",
-        value: "ลำดับแปลง"
+        value: "ลำดับแปลง",
+        is_show_plot: false,
+        sort_plot: null,
     },
     {
         key: "kp",
-        value: "KP"
+        value: "KP",
+        is_show_plot: false,
+        sort_plot: null,
     },
     {
         key: "partype",
-        value: "ประเภทเอกสารสิทธิ์"
+        value: "ประเภทเอกสารสิทธิ์",
+        is_show_plot: true,
+        sort_plot: 1,
     },
     {
         key: "parlabel1",
-        value: "เลขที่เอกสารสิทธิ์"
+        value: "เลขที่เอกสารสิทธิ์",
+        is_show_plot: true,
+        sort_plot: 2,
     },
     {
         key: "parlabel2",
-        value: "เลขที่ดิน/เล่ม"
+        value: "เลขที่ดิน/เล่ม",
+        is_show_plot: true,
+        sort_plot: 3,
     },
     {
         key: "parlabel3",
-        value: "หน้าสำรวจ/หน้า"
+        value: "หน้าสำรวจ/หน้า",
+        is_show_plot: true,
+        sort_plot: 4,
     },
     {
         key: "parlabel4",
-        value: "ระวาง/เลขที่/หมู่ที่"
+        value: "ระวาง/เลขที่/หมู่ที่",
+        is_show_plot: false,
+        sort_plot: null,
     },
     {
         key: "parlabel5",
-        value: "ระวาง/(น.ส.3ก)"
+        value: "ระวาง/(น.ส.3ก)",
+        is_show_plot: true,
+        sort_plot: 5,
     },
     {
         key: "prov",
-        value: "จังหวัด"
+        value: "จังหวัด",
+        is_show_plot: true,
+        sort_plot: 6,
     },
     {
         key: "amp",
-        value: "อำเภอ"
+        value: "อำเภอ",
+        is_show_plot: true,
+        sort_plot: 7,
     },
     {
         key: "tam",
-        value: "ตำบล"
+        value: "ตำบล",
+        is_show_plot: true,
+        sort_plot: 8,
     },
     {
         key: "area_rai",
-        value: "เนื้อที่(ไร่)"
+        value: "เนื้อที่(ไร่)",
+        is_show_plot: true,
+        sort_plot: 9,
     },
     {
         key: "area_ngan",
-        value: "เนื้อที่(งาน)"
+        value: "เนื้อที่(งาน)",
+        is_show_plot: true,
+        sort_plot: 10,
     },
     {
         key: "area_wa",
-        value: "เนื้อที่(วา)"
+        value: "เนื้อที่(วา)",
+        is_show_plot: false,
+        sort_plot: null,
     },
     {
         key: "parcel_own_id",
-        value: "เลขบัตประชาชน"
+        value: "เลขบัตประชาชน",
+        is_show_plot: false,
+        sort_plot: null,
     },
     {
         key: "parcel_own_address",
-        value: "ที่อยู่เจ้าของ"
+        value: "ที่อยู่เจ้าของ",
+        is_show_plot: true,
+        sort_plot: 12,
     },
     {
         key: "parcel_own",
-        value: "เจ้าของที่"
+        value: "เจ้าของที่",
+        is_show_plot: true,
+        sort_plot: 11,
     },
     {
         key: "parcel_o_1",
-        value: "PARCEL_O_1"
+        value: "PARCEL_O_1",
+        is_show_plot: false,
+        sort_plot: null,
     },
     {
         key: "parcel_o_2",
-        value: "PARCEL_O_2"
+        value: "PARCEL_O_2",
+        is_show_plot: false,
+        sort_plot: null,
     },
     {
         key: "row_rai",
-        value: "เนื้อที่เขตระบบ(ไร่)"
+        value: "เนื้อที่เขตระบบ(ไร่)",
+        is_show_plot: true,
+        sort_plot: 13,
     },
     {
         key: "row_ngan",
-        value: "เนื้อที่เขตระบบ(งาน)"
+        value: "เนื้อที่เขตระบบ(งาน)",
+        is_show_plot: true,
+        sort_plot: 14,
     },
     {
         key: "row_wa",
-        value: "เนื้อที่เขตระบบ(วา)"
+        value: "เนื้อที่เขตระบบ(วา)",
+        is_show_plot: true,
+        sort_plot: 15,
     },
     {
         key: "row_distan",
-        value: "ระยะจาก_ROW"
+        value: "ระยะจาก_ROW",
+        is_show_plot: false,
+        sort_plot: null,
     },
     {
         key: "status",
-        value: "STATUS"
+        value: "STATUS",
+        is_show_plot: true,
+        sort_plot: 16,
     },
     {
         key: "remark",
-        value: "REMARK"
-    },
-    {
-        key: "remark",
-        value: "REMARK"
+        value: "REMARK",
+        is_show_plot: true,
+        sort_plot: 17,
     },
     {
         key: "shape_leng",
-        value: "SHAPE_LENG"
+        value: "SHAPE_LENG",
+        is_show_plot: false,
+        sort_plot: null,
     },
     {
         key: "shape_area",
-        value: "SHAPE_AREA"
+        value: "SHAPE_AREA",
+        is_show_plot: false,
+        sort_plot: null,
     },
 ]

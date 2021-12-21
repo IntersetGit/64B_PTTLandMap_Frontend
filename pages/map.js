@@ -38,6 +38,7 @@ import { Cookies } from "react-cookie";
 import jwt_decode from "jwt-decode";
 import Timeslide from "../components/Timeslider";
 import Color from '../components/Color';
+import ShapeText from "../util/obj/ShapeText";
 
 const cookies = new Cookies();
 
@@ -610,54 +611,30 @@ const mapPage = () => {
         <table style="width: 350px;" class="table table-striped"> `
 
         if (item.from_model) {
-            // content += `
-            // <tbody>
-            //     <tr>
-            //         <td>${getTextThaiObjShape("partype")} </td>
-            //         <td>${item.partype ?? "-"}</td>
-            //     </tr>
-            //     <tr>
-            //         <td>${getTextThaiObjShape("parlabel1")}</td>
-            //         <td>${item.parlabel1 ?? "-"}</td>
-            //     </tr>
-            //     <tr>
-            //         <td>${getTextThaiObjShape("parlabel2")}</td>
-            //         <td>${item.parlabel2 ?? "-"}</td>
-            //     </tr>
-            //     <tr>
-            //         <td>${getTextThaiObjShape("parlabel3")}</td>
-            //         <td>${item.parlabel3 ?? "-"}</td>
-            //     </tr>
-            //     <tr>
-            //         <td>${getTextThaiObjShape("tam")}</td>
-            //         <td>${item.tam ?? "-"}</td>
-            //     </tr>
-            //     <tr>
-            //         <td>${getTextThaiObjShape("amp")}</td>
-            //         <td>${item.amp ?? "-"}</td>
-            //     </tr>
-            //     <tr>
-            //         <td>${getTextThaiObjShape("prov")}</td>
-            //         <td>${item.prov ?? "-"}</td>
-            //     </tr>
-            //     <tr>
-            //         <td>${getTextThaiObjShape("area_rai")}</td>
-            //         <td>${item.area_rai ?? "-"}</td>
-            //     </tr>
-            //     <tr>
-            //         <td>${getTextThaiObjShape("row_distan")}</td>
-            //         <td>${item.row_distan ?? "-"}</td>
-            //     </tr>
-            // </tbody>`
             const key = Object.keys(item);
+            const formList = []
             key.forEach((a, i) => {
                 // a + ": " + item[a] + "<br />";
+                const _find = ShapeText.find(where => where.key == a)
+
+                if (_find && _find.is_show_plot && _find.sort_plot) {
+                    formList.push({
+                        index: _find.sort_plot,
+                        text: getTextThaiObjShape(a),
+                        value: item[a] ?? "-",
+                    })
+                }
+            });
+            formList.sort((a, b) => a.index - b.index);
+            formList.forEach(e => {
                 content += `
                 <tr>
-                    <td>${getTextThaiObjShape(a)}</td>
-                    <td>${item[a] ?? "-"}</td>
+                    <td>${e.text}</td>
+                    <td>${e.value}</td>
                 </tr>`
             });
+
+
         } else {
             const key = Object.keys(item);
             key.forEach((a, i) => {
@@ -3040,10 +3017,11 @@ const mapPage = () => {
                     maxHeight: 600,
                     overflowX: "auto"
                 }}
-                title="แก้ไข"
+                title={modeInfoSearch === "view" ? "ดูข้อมูล" : "แก้ไขข้อมูล"}
                 visible={visibleModalSearch}
                 onOk={handleOkModalSearch}
                 onCancel={handleCancelModalSearch}
+                okButtonProps={{ disabled: modeInfoSearch === "view" }}
             >
                 <Form
                     form={formModalSearch}
