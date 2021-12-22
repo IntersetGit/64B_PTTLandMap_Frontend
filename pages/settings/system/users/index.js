@@ -395,7 +395,7 @@ const usersSystemPage = () => {
             <Row>
               <Col span={4} />
               <Col span={10} >
-                <button className="btn btn-primary" style={{ float: "start" }} onClick={() => setIsModalVisibleAS(true)}>+ เพิ่มผู้ใช้ระบบนอก AD</button>
+                <button className="btn btn-primary" style={{ float: "start" }} onClick={() => setIsModalVisibleAS(true, formAD.resetFields())}>+ เพิ่มผู้ใช้ระบบนอก AD</button>
               </Col>
               <Col span={10} >
                 <button className="btn btn-primary" style={{ float: "right" }} onClick={() => showModal("create")}>+ เพิ่มผู้ใช้ระบบจาก AD</button>

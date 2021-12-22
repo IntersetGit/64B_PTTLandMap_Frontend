@@ -38,6 +38,7 @@ import { Cookies } from "react-cookie";
 import jwt_decode from "jwt-decode";
 import Timeslide from "../components/Timeslider";
 import Color from '../components/Color';
+import ShapeText from "../util/obj/ShapeText";
 
 const cookies = new Cookies();
 
@@ -610,45 +611,30 @@ const mapPage = () => {
         <table style="width: 350px;" class="table table-striped"> `
 
         if (item.from_model) {
-            content += `
-            <tbody>
+            const key = Object.keys(item);
+            const formList = []
+            key.forEach((a, i) => {
+                // a + ": " + item[a] + "<br />";
+                const _find = ShapeText.find(where => where.key == a)
+
+                if (_find && _find.is_show_plot && _find.sort_plot) {
+                    formList.push({
+                        index: _find.sort_plot,
+                        text: getTextThaiObjShape(a),
+                        value: item[a] ?? "-",
+                    })
+                }
+            });
+            formList.sort((a, b) => a.index - b.index);
+            formList.forEach(e => {
+                content += `
                 <tr>
-                    <td>${getTextThaiObjShape("partype")} </td>
-                    <td>${item.partype ?? "-"}</td>
-                </tr>
-                <tr>
-                    <td>${getTextThaiObjShape("parlabel1")}</td>
-                    <td>${item.parlabel1 ?? "-"}</td>
-                </tr>
-                <tr>
-                    <td>${getTextThaiObjShape("parlabel2")}</td>
-                    <td>${item.parlabel2 ?? "-"}</td>
-                </tr>
-                <tr>
-                    <td>${getTextThaiObjShape("parlabel3")}</td>
-                    <td>${item.parlabel3 ?? "-"}</td>
-                </tr>
-                <tr>
-                    <td>${getTextThaiObjShape("tam")}</td>
-                    <td>${item.tam ?? "-"}</td>
-                </tr>
-                <tr>
-                    <td>${getTextThaiObjShape("amp")}</td>
-                    <td>${item.amp ?? "-"}</td>
-                </tr>
-                <tr>
-                    <td>${getTextThaiObjShape("prov")}</td>
-                    <td>${item.prov ?? "-"}</td>
-                </tr>
-                <tr>
-                    <td>${getTextThaiObjShape("area_rai")}</td>
-                    <td>${item.area_rai ?? "-"}</td>
-                </tr>
-                <tr>
-                    <td>${getTextThaiObjShape("row_distan")}</td>
-                    <td>${item.row_distan ?? "-"}</td>
-                </tr>
-            </tbody>`
+                    <td>${e.text}</td>
+                    <td>${e.value}</td>
+                </tr>`
+            });
+
+
         } else {
             const key = Object.keys(item);
             key.forEach((a, i) => {
@@ -661,6 +647,7 @@ const mapPage = () => {
             });
         }
 
+
         content += `
         </table>
         <div style="text-align: end;">
@@ -669,6 +656,10 @@ const mapPage = () => {
                 `<a style="cursor: pointer;" onclick="clickView()"><img style="width: 25px;" src="https://nonpttlma.pttplc.com/service/icon/icon-view.png"></a>`}
         </div>`
 
+
+        if (item.from_model) {
+            delete item.from_model
+        }
 
         const infowindow = new google.maps.InfoWindow({
             id: item.gid,
@@ -1447,6 +1438,7 @@ const mapPage = () => {
         }
     }
 
+    const [markerLayer, setMarkerLayer] = useState(null)
     const switchGeom = async (value, item, i) => {
         // console.log('value :>> ', value);
         item.checked = value
@@ -1463,6 +1455,7 @@ const mapPage = () => {
                 });
                 arr.splice(index, 1);
                 setLayerSearchData(arr)
+                console.log('markerLayer :>> ', markerLayer);
             }
         } else {
             const { data } = await API.get(`/shp/getByIdShape?id=${item.gid}&table_name=${item.table_name}`);
@@ -1484,19 +1477,30 @@ const mapPage = () => {
             const option_layer = item.option_layer ?? {}
             layer.setStyle({
                 fillColor,
-                fillOpacity: option_layer.fillOpacity ?? inputValueOpacityColor, //Opacity
-                strokeWeight: option_layer.strokeWeight ?? inputValueStrokColor,  //ความหนาขอบ
+                fillOpacity: 1, //Opacity
+                strokeWeight: 3,  //ความหนาขอบ
                 strokeColor: option_layer.strokeColor ? option_layer.strokeColor.hex : colorFrame.hex, //เส้นขอบ
                 // clickable: false,
             });
+
             layer.setMap(map);
 
+            const layer_arr = []
             layer.forEach((feature) => {
-                // console.log('feature :>> ', feature);
                 feature.getGeometry().forEachLatLng((latlng) => {
                     bounds.extend(latlng);
+                    const lat = latlng.lat(), lng = latlng.lng();
+                    const position = { lat, lng };
+                    layer_arr.push(position)
                 });
             });
+            // console.log('layer_arr :>> ', layer_arr);
+            // const markerLayer = new google.maps.Marker({
+            //     position: layer_arr[Math.ceil(layer_arr.length / 2)],
+            //     map,
+            // });
+
+            // setMarkerLayer(markerLayer)
 
             setLayerSearchData([...layerSearchData, { id: item.index, layer }])
             map.fitBounds(bounds);
@@ -1868,7 +1872,7 @@ const mapPage = () => {
     return (
         <Layout isMap={true} navbarHide={hideNavbar}>
             <Head>
-                <title>PTT Land Map Aplication</title>
+                <title>PTT Land Map Application</title>
             </Head>
             {!changmap ? (
                 <>
@@ -3013,10 +3017,11 @@ const mapPage = () => {
                     maxHeight: 600,
                     overflowX: "auto"
                 }}
-                title="แก้ไข"
+                title={modeInfoSearch === "view" ? "ดูข้อมูล" : "แก้ไขข้อมูล"}
                 visible={visibleModalSearch}
                 onOk={handleOkModalSearch}
                 onCancel={handleCancelModalSearch}
+                okButtonProps={{ disabled: modeInfoSearch === "view" }}
             >
                 <Form
                     form={formModalSearch}
@@ -3434,6 +3439,11 @@ const mapPage = () => {
 
             .ant-select-disabled.ant-select:not(.ant-select-customize-input) .ant-select-selector {
                 color: rgb(0 0 0);
+            }
+
+            #infoBox .table td, .table th {
+                padding: 0.35rem;
+                width: 50%;
             }
         `}
             </style>

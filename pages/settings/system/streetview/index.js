@@ -287,7 +287,7 @@ const index = () => {
     return (
         <System>
             <Head>
-                <title>จัดการ ภาพถ่ายStreetView</title>
+                <title>จัดการภาพถ่าย Street View</title>
             </Head>
             <Row
                 gutter={[10, 10]}
@@ -299,7 +299,7 @@ const index = () => {
                 }}
             >
                 <Col span={24}>
-                    <h3 className="mb-4">จัดการ ภาพถ่ายStreetView</h3>
+                    <h3 className="mb-4">จัดการภาพถ่าย Street View</h3>
                 </Col>
                 <Col xs={8} sm={8} md={8} lg={8} xl={8} xxl={5}>
                     <Search
