@@ -115,7 +115,7 @@ const Navbar = ({ isMap, setslideNav, slideNav, navbarHide }) => {
                     {
                         isMap ? <li className="nav-item dropdown">
 
-                            <a className="dropdown-toggle nav-link" href={`/Manual/คู่มือการใช้งานระบบ_Viewer_PTT_Land_Map_Application.pdf`} target="_blank">
+                            <a className="dropdown-toggle nav-link" href={`/Manual/คู่มือการใช้งานระบบ_Viewer_PTT_Land_Map_Application_docx.pdf`} target="_blank">
                                 <i className="fa fa-book" style={!isMap ? { background: "linear-gradient(141deg, #0fb8ad 0%, #1fc8db 51%, #2cb5e8 75%)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" } : null} />
                             </a>
 
