@@ -38,7 +38,6 @@ const type = 'DraggableBodyRow';
 const usersSystemPage = () => {
   const [editId, setEditId] = useState(null)
   const [loading, setLoading] = useState(true);
-  const [roles, setRoles] = useState([]);
   const [data, setData] = useState([]);
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(5);
@@ -47,9 +46,6 @@ const usersSystemPage = () => {
   const [isModalVisible3, setIsModalVisible3] = useState(false);
   const [statusValidation, setStatusValidation] = useState([]);
   const [menuItem, setMenuItem] = useState([]);
-  const [listGroup, setListGroup] = useState([]);
-  const [dataEdit, setDataEdit] = useState([]);
-  const [openColorUpload, setOpenColorUpload] = useState(false);
   const [colorUpload, setColorUpload] = useState({
     hex: "red",
     rgb: { r: 255, g: 0, b: 0, a: 1 },
@@ -116,11 +112,16 @@ const usersSystemPage = () => {
   const moveRow = useCallback(
     (dragIndex, hoverIndex) => {
       let countPage = (page * 5) - 5
-      // console.log(countPage)
-      const dragRow = data[countPage + dragIndex];
-      let a = countPage + dragIndex
-      let b = countPage + hoverIndex
-      console.log(dragIndex)
+      const dragRow = data[countPage + dragIndex] //ข้อมูลที่คลิก
+      const hoverRow = data[countPage + hoverIndex] //ข้อมูลที่วาง
+      const result = {
+        drag: dragRow,
+        hover: hoverRow
+      }
+      let a = countPage + dragIndex    //  ตำแหน่งอาแรย์ที่คลิก
+      let b = countPage + hoverIndex  // ตำแหน่งอาเรย์ที่ปล่อย
+      console.log(data[countPage + hoverIndex])
+      console.log()
       setData(
         update(data, {
           $splice: [
@@ -230,19 +231,6 @@ const usersSystemPage = () => {
       });
   }
 
-  const onSearch = async (value) => {
-    try {
-      const { data } = await Api.get(`masterdata/masLayersShape?search=${value}`)
-      const items = data.items
-      console.log("items >>>>>>> ", [...items]);
-      setData([...items, { number: items.length + 1 }])
-
-    } catch (error) {
-
-    }
-
-  };
-
   const [id, setId] = useState(null)
   const onFinishCreate = async (value) => {
     console.log(`value`, value)
@@ -306,12 +294,7 @@ const usersSystemPage = () => {
       );
     }
   };
-  const normFile = (e) => {
-    if (Array.isArray(e)) {
-      return e;
-    }
-    return e && e.fileList;
-  };
+
 
   useEffect(() => {
     reload();
@@ -485,9 +468,7 @@ const usersSystemPage = () => {
       console.log('error :>> ', error);
     }
   }
-  const showModal = () => {
-    setIsModalVisible(true);
-  };
+
   const showModal2 = () => {
     setIsModalVisible2(true);
   };
@@ -520,28 +501,6 @@ const usersSystemPage = () => {
     setIsModalVisible3(false);
     form2.resetFields();
   };
-
-
-
-  // const onFinish = async (value) => {
-  //   setLoading(true);
-  //   Api.post("/system/addUserAD", {
-  //     username: value.username,
-  //     roles_id: value.roles_id,
-  //   })
-  //     .then((data) => {
-  //       setIsModalVisible(false);
-  //       setLoading(false);
-  //       reload();
-  //       form.resetFields();
-  //     })
-  //     .catch((error) => {
-  //       alert("มีบางอย่างผิดพลาด หรือมีผู้ใช้ในระบบแล้ว");
-  //       setIsModalVisible(false);
-  //       setLoading(false);
-  //     });
-  //   form.resetFields();
-  // };
 
   /* Symbol */
   const handleChangeSymbol = (info) => {
