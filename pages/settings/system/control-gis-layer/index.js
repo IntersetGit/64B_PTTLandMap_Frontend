@@ -112,16 +112,16 @@ const usersSystemPage = () => {
   const moveRow = useCallback(
     (dragIndex, hoverIndex) => {
       let countPage = (page * 5) - 5
-      const dragRow = data[countPage + dragIndex] //ข้อมูลที่คลิก
-      const hoverRow = data[countPage + hoverIndex] //ข้อมูลที่วาง
+      const dragRow = data[countPage + dragIndex] //ข้อมูลที่คลิกลาก
+      const hoverRow = data[countPage + hoverIndex] //ข้อมูลที่ลากวาง
       const result = {
         drag: dragRow,
         hover: hoverRow
       }
-      let a = countPage + dragIndex    //  ตำแหน่งอาแรย์ที่คลิก
-      let b = countPage + hoverIndex  // ตำแหน่งอาเรย์ที่ปล่อย
+      let a = countPage + dragIndex    //  ตำแหน่งอาแรย์ที่คลิกลาก
+      let b = countPage + hoverIndex  // ตำแหน่งอาเรย์ที่ลากวาง
       console.log(data[countPage + hoverIndex])
-      console.log()
+      console.log(result)
       setData(
         update(data, {
           $splice: [
