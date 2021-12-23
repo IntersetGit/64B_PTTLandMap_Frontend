@@ -1,4 +1,7 @@
-import { useState, useEffect } from "react";
+import { DndProvider, useDrag, useDrop } from 'react-dnd';
+import { HTML5Backend } from 'react-dnd-html5-backend';
+import update from 'immutability-helper';
+import { useState, useEffect, useCallback, useRef } from "react";
 import Head from "next/head";
 import System from "../../../../components/_App/System";
 import Api from "../../../../util/Api";
@@ -31,6 +34,7 @@ import moment from "moment";
 const { Search } = Input;
 const { Option } = Select;
 const cookies = new Cookies();
+const type = 'DraggableBodyRow';
 const usersSystemPage = () => {
   const [editId, setEditId] = useState(null)
   const [loading, setLoading] = useState(true);
@@ -67,6 +71,67 @@ const usersSystemPage = () => {
   const [configColor, setConfigColor] = useState(false)
 
   const [modalexport, setModalexport] = useState({ id: null, visible: false });
+  const DraggableBodyRow = ({ index, moveRow, className, style, ...restProps }) => {
+    const ref = useRef();
+    const [{ isOver, dropClassName }, drop] = useDrop({
+      accept: type,
+      collect: monitor => {
+        const { index: dragIndex } = monitor.getItem() || {};
+        if (dragIndex === index) {
+          return {};
+        }
+        return {
+          isOver: monitor.isOver(),
+          dropClassName: dragIndex < index ? ' drop-over-downward' : ' drop-over-upward',
+        };
+      },
+      drop: item => {
+        moveRow(item.index, index);
+      },
+    });
+    const [, drag] = useDrag({
+      type,
+      item: { index },
+      collect: monitor => ({
+        isDragging: monitor.isDragging(),
+      }),
+    });
+    drop(drag(ref));
+
+    return (
+      <tr
+        ref={ref}
+        className={`${className}${isOver ? dropClassName : ''}`}
+        style={{ cursor: 'move', ...style }}
+        {...restProps}
+      />
+    );
+  };
+
+  const components = {
+    body: {
+      row: DraggableBodyRow,
+    },
+  };
+  const moveRow = useCallback(
+    (dragIndex, hoverIndex) => {
+      let countPage = (page * 5) - 5
+      // console.log(countPage)
+      const dragRow = data[countPage + dragIndex];
+      let a = countPage + dragIndex
+      let b = countPage + hoverIndex
+      console.log(dragIndex)
+      setData(
+        update(data, {
+          $splice: [
+            [a, 1],
+            [b, 0, dragRow],
+          ],
+        }),
+      );
+    },
+    [data],
+  );
 
   const columns = [
     {
@@ -251,7 +316,7 @@ const usersSystemPage = () => {
   useEffect(() => {
     reload();
     getgroup();
-  }, []);
+  }, [page]);
 
   const handleDelete = async (id) => {
     try {
@@ -531,7 +596,7 @@ const usersSystemPage = () => {
           </Col>
           <Col span={24}>
             <div >
-              <Table
+              {/* <Table
                 scroll={{ x: true }}
                 loading={loading}
                 columns={columns}
@@ -544,7 +609,27 @@ const usersSystemPage = () => {
                     setPageSize(pageSize);
                   },
                 }}
-              />
+              /> */}
+              <DndProvider backend={HTML5Backend}>
+                <Table
+                  columns={columns}
+                  dataSource={data}
+                  components={components}
+                  pagination={{
+                    current: page,
+                    pageSize: pageSize,
+                    onChange: (page, pageSize) => {
+                      setPage(page);
+                      setPageSize(pageSize);
+                    },
+                  }}
+                  onRow={(record, index) => ({
+                    index,
+                    moveRow,
+                  })}
+
+                />
+              </DndProvider>
             </div>
           </Col>
         </Row>
