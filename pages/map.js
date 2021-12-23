@@ -604,10 +604,10 @@ const mapPage = () => {
             editShapefileSearch(item)
         }
 
-        console.log('item -----------------:>> ', item);
+        // console.log('item -----------------:>> ', item);
 
         let content = `
-        <div id='infoBox'><center><strong>รายละเอียดข้อมูล</strong></center><br />
+        <div id='infoBox'><center><strong>${item.group_layer_id === 'f942a946-3bcb-4062-9207-d78ab437edf3' ? `แปลงที่ดินลำดับที่ ${item.parid}` : 'รายละเอียดข้อมูล'}</strong></center><br />
         <table style="width: 350px;" class="table table-striped"> `
 
         if (item.from_model) {
@@ -652,14 +652,13 @@ const mapPage = () => {
         </table>
         <div style="text-align: end;">
         ${(item.from_model && user && (user.roles_id === "8a97ac7b-01dc-4e06-81c2-8422dffa0ca2" || user.roles_id === "cec6617f-b593-4ebc-9604-3059dfee0ac4")) ? `
-        <a style="cursor: pointer;" onclick="clickEdit()"><img style="width: 25px;" src="https://nonpttlma.pttplc.com/service/icon/icon-edit.png"></a>` :
-                `<a style="cursor: pointer;" onclick="clickView()"><img style="width: 25px;" src="https://nonpttlma.pttplc.com/service/icon/icon-view.png"></a>`}
+        <a style="cursor: pointer;" onclick="clickEdit()"><img style="width: 25px;" src="${process.env.NEXT_PUBLIC_SERVICE}/icon/icon-edit.png"></a>` :
+                `<a style="cursor: pointer;" onclick="clickView()"><img style="width: 25px;" src="${process.env.NEXT_PUBLIC_SERVICE}/icon/icon-view.png"></a>`}
         </div>`
 
 
-        if (item.from_model) {
-            delete item.from_model
-        }
+        if (item.from_model) delete item.from_model
+        if (item.group_layer_id) delete item.group_layer_id
 
         const infowindow = new google.maps.InfoWindow({
             id: item.gid,
@@ -1583,7 +1582,7 @@ const mapPage = () => {
     const onFinishModalSearch = async (value) => {
         try {
             value.id = value.gid
-            // console.log('value :>> ', value);
+            console.log('value :>> ', value);
             await await API.post(`/shp/editShapeData`, value);
             const _searchList = [...searchList];
             const index = _searchList.findIndex(e => e.gid == value.gid)
