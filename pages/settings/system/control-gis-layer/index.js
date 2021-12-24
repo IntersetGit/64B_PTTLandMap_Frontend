@@ -225,8 +225,7 @@ const usersSystemPage = () => {
             <MoreOutlined />
           </Dropdown>
         );
-      },
-      responsive: ["md"],
+      }
     },
   ];
 
@@ -555,7 +554,7 @@ const usersSystemPage = () => {
               <RedoOutlined />
             </Button>
           </Col>
-          <Col xs={8} sm={8} md={8} lg={8} xl={8} xxl={8}>
+          <Col xs={24} sm={8} md={8} lg={8} xl={8} xxl={8}>
             <Button
               type="primary"
               onClick={showModal2}
@@ -564,7 +563,7 @@ const usersSystemPage = () => {
               + เพิ่ม WMS ของ GIS Layer
             </Button>
           </Col>
-          <Col xs={25} sm={24} md={24} lg={24} xl={24} xxl={24}>
+          <Col xs={24} sm={24} md={24} lg={24} xl={24} xxl={24}>
             <Select defaultValue="5" style={{ width: 100, float: "right", textAlign: "center" }} onChange={handleChangeSortTable}>
               <Option value="5">5 / page</Option>
               <Option value="10">10 / page</Option>
@@ -574,7 +573,7 @@ const usersSystemPage = () => {
             </Select>
           </Col>
           <Col span={24}>
-            <div >
+            <div className="table-responsive">
               {/* <Table
                 scroll={{ x: true }}
                 loading={loading}
