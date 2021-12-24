@@ -263,7 +263,7 @@ const index = () => {
                         </Form>
                     </Col>
                     <Col span={24}>
-                        <div className="table-responsive">
+                        <div >
                             <table className="table table-bordered table-hover " id="dashboard_table" >
                                 <colgroup span="2"></colgroup>
                                 <colgroup span="2"></colgroup>

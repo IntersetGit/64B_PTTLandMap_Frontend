@@ -22,19 +22,16 @@ import {
   Dropdown,
   InputNumber,
   Slider,
-  // Upload,
   Checkbox,
   Radio,
   DatePicker,
-  Upload
+  Upload,
 } from "antd";
-import { SketchPicker } from "react-color";
 import Color from "../../../../components/Color";
 import moment from "moment";
 const { Search } = Input;
 const { Option } = Select;
 const cookies = new Cookies();
-const type = 'DraggableBodyRow';
 const usersSystemPage = () => {
   const [editId, setEditId] = useState(null)
   const [loading, setLoading] = useState(true);
@@ -54,7 +51,6 @@ const usersSystemPage = () => {
     hex: "#000000",
     rgb: { r: 0, g: 0, b: 0, a: 1 },
   });
-  // const [buttonCreate, setButtonCreate] = useState(true); //สถานะเปิดปิดsubmit ตอนmodal create
   const [form] = Form.useForm();
   const [formCreate] = Form.useForm();
   const [formEdit] = Form.useForm();
@@ -67,6 +63,9 @@ const usersSystemPage = () => {
   const [configColor, setConfigColor] = useState(false)
 
   const [modalexport, setModalexport] = useState({ id: null, visible: false });
+
+  // Drag Drop Table -----------------------------------------------------------------
+  const type = 'DraggableBodyRow';
   const DraggableBodyRow = ({ index, moveRow, className, style, ...restProps }) => {
     const ref = useRef();
     const [{ isOver, dropClassName }, drop] = useDrop({
@@ -111,7 +110,8 @@ const usersSystemPage = () => {
   };
   const moveRow = useCallback(
     (dragIndex, hoverIndex) => {
-      let countPage = (page * 5) - 5
+      setLoading(true)
+      let countPage = (page * pageSize) - pageSize
       const dragRow = data[countPage + dragIndex] //ข้อมูลที่คลิกลาก
       const hoverRow = data[countPage + hoverIndex] //ข้อมูลที่ลากวาง
       const result = {
@@ -120,20 +120,31 @@ const usersSystemPage = () => {
       }
       let a = countPage + dragIndex    //  ตำแหน่งอาแรย์ที่คลิกลาก
       let b = countPage + hoverIndex  // ตำแหน่งอาเรย์ที่ลากวาง
-      console.log(data[countPage + hoverIndex])
-      console.log(result)
-      setData(
-        update(data, {
-          $splice: [
-            [a, 1],
-            [b, 0, dragRow],
-          ],
-        }),
-      );
+      Api.post("masterdata/orderByGisLayer", result)
+        .then(data => {
+          reload()
+        }).catch(error => {
+          console.log(error)
+        })
+      // setData(
+      //   update(data, {
+      //     $splice: [
+      //       [a, 1],
+      //       [b, 0, dragRow],
+      //     ],
+      //   }),
+      // );
     },
     [data],
   );
 
+  const handleChangeSortTable = (value) => {
+    value === 'all' ?
+      setPageSize(data.length)
+      : setPageSize(value)
+  }
+
+  // End Drag Drop Table--------------------------------------------------------------------------
   const columns = [
     {
       key: "1",
@@ -215,7 +226,7 @@ const usersSystemPage = () => {
           </Dropdown>
         );
       },
-      // responsive: ["md"],
+      responsive: ["md"],
     },
   ];
 
@@ -233,7 +244,7 @@ const usersSystemPage = () => {
 
   const [id, setId] = useState(null)
   const onFinishCreate = async (value) => {
-    console.log(`value`, value)
+    // console.log(`value`, value)
     setLoading(true);
     Api.post("masterdata/masLayersShape", { ...value, id })
       .then(async (data) => {
@@ -268,7 +279,7 @@ const usersSystemPage = () => {
             },
           ];
         });
-        console.log(`tempDataArray`, tempDataArray)
+        // console.log(`tempDataArray`, tempDataArray)
         setData(tempDataArray);
         setLoading(false);
       })
@@ -315,7 +326,7 @@ const usersSystemPage = () => {
       }).then(async (result) => {
         if (result.isConfirmed) {
           const resp = await Api.delete(`masterdata/masLayersShape?id=` + id);
-          console.log(resp);
+          // console.log(resp);
           reload();
           Swal.fire("", "ลบข้อมูลเรียบร้อยแล้ว", "success");
         }
@@ -376,10 +387,10 @@ const usersSystemPage = () => {
     setModalexport({ id: id, visible: true });
   }
   const onFinishExport = (val) => {
-    console.log('val :>> ', val.Export, modalexport.id);
+    // console.log('val :>> ', val.Export, modalexport.id);
     axios.get(`${process.env.NEXT_PUBLIC_SERVICE}/shp/convertGeoToShp?id=${modalexport.id}&type=${val.Export}`)
       .then(async data => {
-        console.log(data.config.url)
+        // console.log(data.config.url)
         const link = document.createElement('a');
         if (val.Export === 'shape file') {
           link.href = data.data.items;
@@ -510,7 +521,7 @@ const usersSystemPage = () => {
       const infoFileList = fileList[0];
       if (infoFileList.status === "done") fileList = fileList.map((file) => file);
     }
-    console.log('fileList :>> ', fileList);
+    // console.log('fileList :>> ', fileList);
     setFileListSymbol(fileList);
     if (fileList.length > 0) setFileUploadSymbol(fileList[0]);
     else setFileUploadSymbol(null);
@@ -553,6 +564,15 @@ const usersSystemPage = () => {
               + เพิ่ม WMS ของ GIS Layer
             </Button>
           </Col>
+          <Col xs={25} sm={24} md={24} lg={24} xl={24} xxl={24}>
+            <Select defaultValue="5" style={{ width: 100, float: "right", textAlign: "center" }} onChange={handleChangeSortTable}>
+              <Option value="5">5 / page</Option>
+              <Option value="10">10 / page</Option>
+              <Option value="25">25 / page</Option>
+              <Option value="50">50 / page</Option>
+              <Option value="all">Page All</Option>
+            </Select>
+          </Col>
           <Col span={24}>
             <div >
               {/* <Table
@@ -571,6 +591,7 @@ const usersSystemPage = () => {
               /> */}
               <DndProvider backend={HTML5Backend}>
                 <Table
+                  loading={loading}
                   columns={columns}
                   dataSource={data}
                   components={components}
@@ -747,7 +768,7 @@ const usersSystemPage = () => {
 
           <Form.Item label="สีกรอบ">
             <Color color={colorFrame} onChangeColor={({ rgb, hex }) => setColorFrame({ ...colorUpload, rgb, hex })} callbackSaveColor={(velue) => {
-              console.log('velue Save :>> ', velue);
+              // console.log('velue Save :>> ', velue);
             }} />
           </Form.Item>
 

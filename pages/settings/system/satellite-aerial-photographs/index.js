@@ -364,7 +364,7 @@ const index = () => {
           </Button>
         </Col>
         <Col span={24}>
-          <div>
+          <div className="table-responsive">
             <Table
               scroll={{ x: true }}
               loading={loading}
