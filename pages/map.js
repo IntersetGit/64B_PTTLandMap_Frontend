@@ -374,6 +374,10 @@ const mapPage = () => {
             setFileType(data.items.type);
             return `${process.env.NEXT_PUBLIC_SERVICE}/demo/resTrue`
         } catch (error) {
+            message.error(
+                error.response.data || error.response.status == 400 ? error.response.data.error.message : "มีบางอย่างผิดพลาด !"
+            );
+
             return `${process.env.NEXT_PUBLIC_SERVICE}/demo/resFalse`
         }
     }
