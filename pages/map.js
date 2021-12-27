@@ -661,8 +661,8 @@ const mapPage = () => {
         </div>`
 
 
-        if (item.from_model) delete item.from_model
-        if (item.group_layer_id) delete item.group_layer_id
+        // if (item.from_model) delete item.from_model
+        // if (item.group_layer_id) delete item.group_layer_id
 
         const infowindow = new google.maps.InfoWindow({
             id: item.gid,
@@ -1536,6 +1536,8 @@ const mapPage = () => {
         const setFieldsValue = {}
 
         delete item.status_color;
+        delete item.from_model
+        delete item.group_layer_id
         const disabled = ["gid", "table_name"],
             required = ["project_na", "status"],
             hide = ["index", "color", "checked"],
