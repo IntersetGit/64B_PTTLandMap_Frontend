@@ -265,7 +265,6 @@ const usersSystemPage = () => {
   };
 
   const reload = (search = ``) => {
-    setLoading(true);
     Api.get(`masterdata/masLayersShape?search=${search}`)
       .then(({ data: { items } }) => {
         let tempDataArray = [];
@@ -546,11 +545,11 @@ const usersSystemPage = () => {
           </Col>
           <Col xs={8} sm={8} md={8} lg={8} xl={8} xxl={5}>
             <Search placeholder="input search text"
-              onSearch={reload}
+              onSearch={(e) => { setLoading(true); reload(e); }}
             />
           </Col>
           <Col xs={8} sm={8} md={8} lg={8} xl={8} xxl={11}>
-            <Button onClick={() => reload()}>
+            <Button onClick={() => { setLoading(true); reload() }}>
               <RedoOutlined />
             </Button>
           </Col>
