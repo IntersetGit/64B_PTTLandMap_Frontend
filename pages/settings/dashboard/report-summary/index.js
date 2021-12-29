@@ -73,7 +73,7 @@ const index = () => {
         }
     }
     const handleReport = async ({ search = "", project_name = "", layer_group = "", prov = "", tam = "", amp = "" }) => {
-        let url = `shp/getFromReportBackOffice?project_name${project_name}`
+        let url = `shp/getFromReportBackOffice?project_name=${project_name}`
         if (layer_group) url += `&layer_group=${layer_group}`
         if (prov) url += `&prov=${prov}`
         if (search) url += `&search=${search}`
@@ -81,7 +81,7 @@ const index = () => {
         if (amp) url += `&amp=${amp}`
         let result = await Api.get(url)
         modifyApi(result.data.items)
-        console.log(dataTable)
+        // console.log(dataTable)
     }
     const loadDataTable = async () => {
         let result = await Api.get("shp/getFromReportBackOffice");
@@ -213,7 +213,7 @@ const index = () => {
                                 </div>
                                 <div className="col-md-2 ">
                                     <Form.Item name="project_name" >
-                                        <Select placeholder="ชื่อโครงการ asfsa" allowClear>
+                                        <Select placeholder="ชื่อโครงการ" allowClear>
                                             <Option value="project_na">ชื่อโครงการ</Option>
                                             <Option value="objectid">เลขที่โฉนด</Option>
                                             <Option value="parlabel1">ลำดับแปลงที่ดิน</Option>
