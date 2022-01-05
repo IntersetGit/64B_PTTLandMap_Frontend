@@ -45,8 +45,7 @@ const index = () => {
       width: '3%',
       sorter: (record1, record2) => {
         return record1.number > record2.number;
-      },
-      render: (a, b, i) => i + 1
+      }
     },
     {
       key: "2",
@@ -265,6 +264,7 @@ const index = () => {
         tempDataArray = [
           ...tempDataArray,
           {
+            number: key + 1,
             ...data,
           },
         ];
