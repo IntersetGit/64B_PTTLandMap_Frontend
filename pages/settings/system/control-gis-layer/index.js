@@ -242,6 +242,7 @@ const usersSystemPage = () => {
   }
 
   const [id, setId] = useState(null)
+
   const onFinishCreate = async (value) => {
     // console.log(`value`, value)
     setLoading(true);
@@ -255,6 +256,7 @@ const usersSystemPage = () => {
         await Swal.fire("", "บันทึกข้อมูลเรียบร้อย", "success");
         window.location.reload();
         setId(null)
+        setLoading(false);
       })
       .catch((error) => {
         console.log(error);
@@ -264,8 +266,9 @@ const usersSystemPage = () => {
 
   };
 
-  const reload = (search = ``) => {
-    Api.get(`masterdata/masLayersShape?search=${search}`)
+  const [search, setSearch] = useState("")
+  const reload = (_search = search) => {
+    Api.get(`masterdata/masLayersShape?search=${_search}`)
       .then(({ data: { items } }) => {
         let tempDataArray = [];
         items.forEach((data, i) => {
@@ -304,11 +307,12 @@ const usersSystemPage = () => {
     }
   };
 
-
   useEffect(() => {
     reload();
     getgroup();
   }, [page]);
+
+
 
   const handleDelete = async (id) => {
     try {
@@ -545,7 +549,7 @@ const usersSystemPage = () => {
           </Col>
           <Col xs={8} sm={8} md={8} lg={8} xl={8} xxl={5}>
             <Search placeholder="input search text"
-              onSearch={(e) => { setLoading(true); reload(e); }}
+              onSearch={(e) => { setLoading(true); reload(e); setSearch(e) }}
             />
           </Col>
           <Col xs={8} sm={8} md={8} lg={8} xl={8} xxl={11}>

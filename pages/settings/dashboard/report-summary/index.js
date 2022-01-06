@@ -6,6 +6,7 @@ import Api from "../../../../util/Api"
 import { useEffect, useState } from 'react';
 import ReactHTMLTable from 'react-html-table-to-excel'
 import { DownCircleOutlined, RedoOutlined } from "@ant-design/icons";
+import { isArray } from 'lodash'
 const { Option } = Select;
 const index = () => {
     const [dataTable, setDataTable] = useState([])
@@ -122,33 +123,34 @@ const index = () => {
             let polt = "polt" + count
             let distance = "distance" + count
             newData.forEach((data_newData, index_newData) => {
-                result.data.items.data[name].forEach(data_data => {
-                    if (data_newData.prov_name === data_data.prov_name) {
-                        newData[index_newData] = {
-                            ...newData[index_newData], [polt]: data_data.plot, [distance]: data_data.distance
-                        }
-                    } else if (data_newData.amp_name) {
-                        data_data.amp_list.forEach(data_amp => {
-                            if (data_newData.amp_name === data_amp.amp_name) {
-                                newData[index_newData] = {
-                                    ...newData[index_newData], [polt]: data_amp.plot, [distance]: data_amp.distance
-                                }
+                if (isArray(result.data.items.data[name])) {
+                    result.data.items.data[name].forEach(data_data => {
+                        if (data_newData.prov_name === data_data.prov_name) {
+                            newData[index_newData] = {
+                                ...newData[index_newData], [polt]: data_data.plot, [distance]: data_data.distance
                             }
-                        })
-                    } else if (data_newData.tam_name) {
-                        data_data.amp_list.forEach(data_amp => {
-                            data_amp.tam_list.forEach(data_tam => {
-                                if (data_newData.tam_name === data_tam.tam_name) {
+                        } else if (data_newData.amp_name) {
+                            data_data.amp_list.forEach(data_amp => {
+                                if (data_newData.amp_name === data_amp.amp_name) {
                                     newData[index_newData] = {
-                                        ...newData[index_newData], [polt]: data_tam.plot, [distance]: data_tam.distance
+                                        ...newData[index_newData], [polt]: data_amp.plot, [distance]: data_amp.distance
                                     }
                                 }
                             })
-                        })
-                    }
+                        } else if (data_newData.tam_name) {
+                            data_data.amp_list.forEach(data_amp => {
+                                data_amp.tam_list.forEach(data_tam => {
+                                    if (data_newData.tam_name === data_tam.tam_name) {
+                                        newData[index_newData] = {
+                                            ...newData[index_newData], [polt]: data_tam.plot, [distance]: data_tam.distance
+                                        }
+                                    }
+                                })
+                            })
+                        }
 
-                })
-
+                    })
+                }
             })
         }
 
