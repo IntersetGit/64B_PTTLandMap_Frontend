@@ -6,6 +6,11 @@ import rootReducers from './reducers/rootReducer';
 const middleware = [thunk];
 const composeEnhancers = typeof window != 'undefined' && window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
 
-const makeStore = () => createStore(rootReducers, composeEnhancers(applyMiddleware(...middleware)))
+const bindMiddlewareComposeEnhancers = middleware => {
+    if (process.env.NODE_ENV !== 'production') return composeEnhancers(middleware);
+    else return middleware;
+};
 
-export const wrapper = createWrapper(makeStore)
+const makeStore = () => createStore(rootReducers, bindMiddlewareComposeEnhancers(applyMiddleware(...middleware)));
+
+export const wrapper = createWrapper(makeStore);
