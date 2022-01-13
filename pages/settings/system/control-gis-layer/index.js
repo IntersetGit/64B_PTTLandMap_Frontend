@@ -167,7 +167,7 @@ const usersSystemPage = () => {
       title: <b>Group Layer</b>,
       dataIndex: "group_name",
       sorter: (record1, record2) => {
-        return record1.group_name > record2.group_name;
+        return record1.group_name.localeCompare(record2.group_name)
       },
     },
     {
