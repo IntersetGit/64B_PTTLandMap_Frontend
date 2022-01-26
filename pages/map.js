@@ -642,12 +642,14 @@ const mapPage = () => {
         } else {
             const key = Object.keys(item);
             key.forEach((a, i) => {
-                // a + ": " + item[a] + "<br />";
-                content += `
-                <tr>
-                    <td>${a}</td>
-                    <td>${item[a] ?? "-"}</td>
-                </tr>`
+                if (item[a] !== null && a != "from_model" && a != "gid" && a != "group_layer_id" && a != "table_name" && a != "status_color") {
+                    // a + ": " + item[a] + "<br />";
+                    content += `
+                    <tr>
+                        <td>${a}</td>
+                        <td>${item[a] ?? "-"}</td>
+                    </tr>`
+                }
             });
         }
 
