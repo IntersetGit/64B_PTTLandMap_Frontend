@@ -632,7 +632,7 @@ const mapPage = () => {
             });
             formList.sort((a, b) => a.index - b.index);
             formList.forEach(e => {
-                if (e.text.toLowerCase() == 'hyperlink') {
+                if (e.text.toLowerCase() == 'link') {
                     content += `
                     <tr>
                         <td>${e.text}</td>
@@ -651,9 +651,9 @@ const mapPage = () => {
         } else {
             const key = Object.keys(item);
             key.forEach((a, i) => {
-                if (item[a] !== null && a != "from_model" && a != "gid" && a != "group_layer_id" && a != "table_name" && a != "status_color" || a == 'hyperlink') {
+                if (item[a] !== null && a != "from_model" && a != "gid" && a != "group_layer_id" && a != "table_name" && a != "status_color" || a == 'link') {
                     // a + ": " + item[a] + "<br />";
-                    if (a == 'hyperlink') {
+                    if (a == 'link') {
                         content += `
                         <tr>
                             <td>${a}</td>
@@ -2989,12 +2989,12 @@ const mapPage = () => {
                                                                         </div>
                                                                     </div>
 
-                                                                    {e.hyperlink ?
+                                                                    {e.link ?
                                                                         <div className="row">
                                                                             <div className="col-md-12">
                                                                                 <div className="row">
-                                                                                    <label>Hyperlink :</label>
-                                                                                    <a className="pl-3" href={e.hyperlink} style={{ color: "#007bff" }}>{e.hyperlink}</a>
+                                                                                    <label>link :</label>
+                                                                                    <a className="pl-3" href={e.link} style={{ color: "#007bff" }}>{e.link}</a>
                                                                                 </div>
                                                                             </div>
                                                                         </div>

@@ -180,8 +180,8 @@ export default [
         sort_plot: null,
     },
     {
-        key: "hyperlink",
-        value: "HYPERLINK",
+        key: "link",
+        value: "LINK",
         is_show_plot: true,
         sort_plot: 17,
     },
