@@ -612,7 +612,7 @@ const mapPage = () => {
         // console.log('item -----------------:>> ', item);
 
         let content = `
-        <div id='infoBox'><center><strong>${item.group_layer_id === 'f942a946-3bcb-4062-9207-d78ab437edf3' ? `แปลงที่ดินลำดับที่ ${item.parid ?? 'ไม่มีเลขที่แปลง'}` : 'รายละเอียดข้อมูล'}</strong></center><br />
+        <div id='infoBox'><center><strong>${item.group_layer_id === 'f942a946-3bcb-4062-9207-d78ab437edf3' ? `แปลงที่ดินลำดับที่ ${item.parid ?? '-'}` : 'รายละเอียดข้อมูล'}</strong></center><br />
         <table style="width: 350px;" class="table table-striped"> `
 
         if (item.from_model) {
@@ -626,7 +626,7 @@ const mapPage = () => {
                     formList.push({
                         index: _find.sort_plot,
                         text: getTextThaiObjShape(a),
-                        value: item[a] ?? "-",
+                        value: item[a] ?? "",
                     })
                 }
             });
@@ -636,7 +636,7 @@ const mapPage = () => {
                     content += `
                     <tr>
                         <td>${e.text}</td>
-                        <td><a href="${e.value}" target="_blank" >${e.value}</a></td>
+                        <td><a href="${e.value ?? '#'}" target="_blank" >${e.value ?? ''}</a></td>
                     </tr>`
                 } else {
                     content += `
@@ -657,13 +657,13 @@ const mapPage = () => {
                         content += `
                         <tr>
                             <td>${a}</td>
-                            <td><a href="${item[a]}" target="_blank" >${item[a] ?? '-'}</a></td>
+                            <td><a href="${item[a] ?? '#'}" target="_blank" >${item[a] ?? ''}</a></td>
                         </tr>`
                     } else {
                         content += `
                         <tr>
                             <td>${a}</td>
-                            <td>${item[a] ?? '-'}</td>
+                            <td>${item[a] ?? ''}</td>
                         </tr>`
                     }
                 }
