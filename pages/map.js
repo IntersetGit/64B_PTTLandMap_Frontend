@@ -831,17 +831,17 @@ const mapPage = () => {
                     icon: symbolOne,
                     offset: "0%",
                 },
-                {
-                    icon: {
-                        path: "M 0,-1 0,1",
-                        strokeOpacity: 1,
-                        scale: 2,
-                        rotation: 90,
+                // {
+                //     icon: {
+                //         path: "M 0,-1 0,1",
+                //         strokeOpacity: 1,
+                //         scale: 2,
+                //         rotation: 90,
 
-                    },
-                    offset: "10%",
-                    repeat: "20px",
-                },
+                //     },
+                //     offset: "10%",
+                //     repeat: "20px",
+                // },
                 {
                     icon: symbolOne,
                     offset: "100%",
@@ -866,26 +866,61 @@ const mapPage = () => {
         let sum = null //เก็บผลรวมระยาทาง
         if (openLine) {
             distanceTest.setMap(map)
+            //มอบอีเว้นให้สามารถแก้ไขการวาดได้
+
+            google.maps.event.addListener(poly, "dragend", getPath);
+            google.maps.event.addListener(poly.getPath(), "insert_at", getPath);
+            google.maps.event.addListener(poly.getPath(), "remove_at", getPath);
+            google.maps.event.addListener(poly.getPath(), "set_at", getPath);
+            google.maps.event.addListener(poly, 'click', function (e) {
+                this.setEditable(true);
+            });
+
             poly.setMap(map);
-            map.setOptions({ draggableCursor: 'crosshair' });
-            map.addListener("click", async (event) => {
-                path = poly.getPath();
-                path.push(event.latLng);
-                distance.push(event.latLng.toJSON())
-                if (count > 0) {
-                    var _kCord = new google.maps.LatLng(distance[count - 1].lat, distance[count - 1].lng);
-                    var _pCord = new google.maps.LatLng(distance[count].lat, distance[count].lng);
-                    var procressDistance = google.maps.geometry.spherical
-                        .computeDistanceBetween(_kCord, _pCord)
-                    max.push(procressDistance)
-                    sum = max.reduce((a, b) => a + b, 0)
+
+            function getPath() {
+                let path = poly.getPath();
+                let len = path.getLength();
+                let sumline = [];
+
+                for (var i = 0; i < len; i++) {
+                    var one = new google.maps.LatLng(path.getAt(i).lat(), path.getAt(i).lng());
+                    var two = new google.maps.LatLng(path.getAt(path.getLength() - 1).lat(), path.getAt(path.getLength() - 1).lng());
+                    // console.log(`one`, path.getAt(i).lat(), path.getAt(i).lng())
+                    // console.log(`two`, path.getAt(path.getLength() - 1).lat(), path.getAt(path.getLength() - 1).lng())
+                    var procressDistance = google.maps.geometry.spherical.computeDistanceBetween(one, two)
+                    sumline.push(procressDistance)
+                    sum = sumline.reduce((a, b) => a + b, 0)
                     let mToCm = sum / 1000
                     setDistanct(`ระยะทาง${mToCm.toFixed(2)} กม.`);
-                    distanceTest.set("position", event.latLng);
-                    distanceTest.set("text", `                               ระยะทาง${mToCm.toFixed(2)} กม.`);
+                    distanceTest.set("position", path.getAt(path.getLength() - 1));
+                    distanceTest.set("text", `ระยะทาง${mToCm.toFixed(2)} กม.`);
                 }
-                count++ //เพิ่มจำนวนครั้งที่กด
+
+            }
+
+            map.setOptions({ draggableCursor: 'crosshair' });
+            map.addListener("click", async (event) => {
+                poly.setEditable(false);
+
+                path = poly.getPath();
+                path.push(event.latLng);
+                // distance.push(event.latLng.toJSON())
+                // if (count > 0) {
+                //     var _kCord = new google.maps.LatLng(distance[count - 1].lat, distance[count - 1].lng);
+                //     var _pCord = new google.maps.LatLng(distance[count].lat, distance[count].lng);
+                //     var procressDistance = google.maps.geometry.spherical.computeDistanceBetween(_kCord, _pCord)
+                //     max.push(procressDistance)
+                //     sum = max.reduce((a, b) => a + b, 0)
+                //     let mToCm = sum / 1000
+                //     setDistanct(`ระยะทาง${mToCm.toFixed(2)} กม.`);
+                //     distanceTest.set("position", event.latLng);
+                //     distanceTest.set("text", `                               ระยะทาง${mToCm.toFixed(2)} กม.`);
+                // }
+                // count++ //เพิ่มจำนวนครั้งที่กด
+
             })
+
         } else {
             let path = poly.getPath();
             path.forEach(i => path.pop())
