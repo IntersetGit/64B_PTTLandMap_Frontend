@@ -632,12 +632,14 @@ const mapPage = () => {
             });
             formList.sort((a, b) => a.index - b.index);
             formList.forEach(e => {
-                if (e.text.toLowerCase() == 'link') {
+                if (e.text.toLowerCase() == 'link'.toLowerCase()) {
                     content += `
-                    <tr>
-                        <td>${e.text}</td>
-                        <td><a href="${e.value ?? '#'}" target="_blank" >${e.value ?? ''}</a></td>
-                    </tr>`
+                        <tr>
+                        <td>${e.text}</td> `
+                    if (e.value) content += ` <td><a href="${e.value}" target="_blank" >${e.value}</a></td>`
+                    else content += ` <td>-</td>`
+                    content += `
+                        </tr>`
                 } else {
                     content += `
                     <tr>
@@ -656,9 +658,10 @@ const mapPage = () => {
                     if (a == 'link') {
                         content += `
                         <tr>
-                            <td>${a}</td>
-                            <td><a href="${item[a] ?? '#'}" target="_blank" >${item[a] ?? ''}</a></td>
-                        </tr>`
+                            <td>${a}</td> `
+                        if (!item[a]) content += ` <td>-</td> `
+                        else content += ` <td><a href="${item[a]}" target="_blank" >${item[a]}</a></td> `
+                        content += ` </tr> `
                     } else {
                         content += `
                         <tr>
