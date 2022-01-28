@@ -81,7 +81,7 @@ function WmsMapType(name, url, params, options, type = "geoserver") {
         }
 
         var div = ownerDocument.createElement('div');
-        div.innerHTML = '<img src="' + url + '"/>';
+        div.innerHTML = '<img  src="' + url + '"/>';
         div.style.width = this.tileSize.width + 'px';
         div.style.height = this.tileSize.height + 'px';
         div.style.opacity = this.options['opacity'];
@@ -103,6 +103,7 @@ function WmsMapType(name, url, params, options, type = "geoserver") {
         if (this.type == "geoserver" || this.type == "arcgisimageserver" || this.type == null) {
             // await map.overlayMapTypes.push(this);
             await map.overlayMapTypes.insertAt(map.overlayMapTypes.getLength(), this);
+
             if (zoom) {
                 this.zoomToWms(map);
             }
@@ -112,9 +113,11 @@ function WmsMapType(name, url, params, options, type = "geoserver") {
                 this.ZoomToArcgis(map);
             }
         }
-
-        //this.zoomToWms(map);
-        //}
+        map.addListener("click", (e) => {
+            this.GetfeatureData(e, map)
+            // var url = getFeatureInfoURL(e.latLng)
+            // fetch(url).then(res => res.json()).then(data => console.log(data))
+        });
     };
     /*
      * Remove this MapType from a map.
@@ -144,6 +147,7 @@ function WmsMapType(name, url, params, options, type = "geoserver") {
         if (this.type == "geoserver" || this.type == "arcgisimageserver" || this.type == null) {
             for (var i in this.tiles) {
                 this.tiles[i].style.opacity = opacity;
+
             }
         } else {
             this.arcgis.setOpacity(opacity);
@@ -195,52 +199,7 @@ function WmsMapType(name, url, params, options, type = "geoserver") {
         url = encodeURIComponent(url);
 
         GetWmsBoundary(url, this.params['layers'], map);
-        // angular.element('#ang-controller').scope().GetWmsBoundary(url, this.params['layers']);
-        //console.log(angular.element('#ang-controller').scope())
-        //console.log(url, this.params['layers'])
-        //$('#map-left').scope().GetWmsBoundary(url, this.params['layers']);
 
-        /*
-        data.url = url;
-
-        var settings = {
-            "url": "http://localhost:58328/api/Map/GetWmsBoundary",
-            "method": "GET",
-            "headers": {
-                "Content-Type": "application/json"
-            },
-            "data": data,
-        };
-
-        $.ajax(settings).success(function (html) {
-            if (html != "" & html != null && html.indexOf('version') > -1) {
-                var wmsData = new WMSCapabilities().parse(html);
-
-                if (wmsData != null && wmsData.Capability != null && wmsData.Capability.Layer != null && wmsData.Capability.Layer.Layer != null) {
-                    var layerList = wmsData.Capability.Layer.Layer;
-
-                    for (var i = 0; i < layerList.length; ++i) {
-                        if (layerList[i].Name == thisWms.params['layers']) {
-                            if (layerList[i].LatLonBoundingBox != null) {
-                                //return layerList[i].LatLonBoundingBox;
-                                var bounds = new google.maps.LatLngBounds(
-                                    new google.maps.LatLng(layerList[i].LatLonBoundingBox[0], layerList[i].LatLonBoundingBox[1]),
-                                    new google.maps.LatLng(layerList[i].LatLonBoundingBox[2], layerList[i].LatLonBoundingBox[3])
-                                );
-
-                                var center = bounds.getCenter();
-
-                                map.fitBounds(bounds);
-                                return;
-                            }
-                            else {
-                                console.log('boundaryError');
-                            }
-                        }
-                    }
-                }
-            }
-        });*/
     };
 
     this.zoomToWmsSwipe = function (map) { /*-------------------- Zooomtowms ชองหน้า Swipe map----------------*/
@@ -299,6 +258,89 @@ function WmsMapType(name, url, params, options, type = "geoserver") {
         console.log('agsType :>> ', agsType);
         this.arcgis = agsType;
         map.overlayMapTypes.insertAt(map.overlayMapTypes.getLength(), agsType);
+        // map.overlayMapTypes.getLength()
+
+
+
+
+
+    }
+    this.GetfeatureData = async function (event, map) {
+        function latLonToXY(lat, lon, zoom) {
+            // Convert to radians
+            lat = lat * Math.PI / 180;
+            lon = lon * Math.PI / 180;
+
+            var circumference = 256 * Math.pow(2, zoom);
+            var falseEasting = circumference / 2.0;
+            var falseNorthing = circumference / 2.0;
+            var radius = circumference / (2 * Math.PI);
+
+            var point = {
+                y: radius / 2.0 * Math.log((1.0 + Math.sin(lat)) / (1.0 - Math.sin(lat))),
+                x: radius * lon
+            };
+
+            point.x = falseEasting + point.x;
+            point.y = falseNorthing - point.y;
+
+            return point;
+        }
+        function getTileCoordinates(lat, lon, zoom) {
+            var self = this;
+            var point = latLonToXY(lat, lon, zoom);
+
+            var tileXY = {
+                x: Math.floor(point.x / 256),
+                y: Math.floor(point.y / 256)
+            };
+
+            return tileXY;
+        }
+        function latLonToTileXYOffset(lat, lon, zoom) {
+            var point = latLonToXY(lat, lon, zoom);
+
+            var tileOffset = {
+                x: point.x % 256,
+                y: point.y % 256
+            };
+
+            return tileOffset;
+        }
+        function getTileBoundingBox(map, tileCoords) {
+            var projection = map.getProjection();
+            var zpow = Math.pow(2, map.getZoom());
+
+            var ul = new google.maps.Point(tileCoords.x * 256.0 / zpow, (tileCoords.y + 1) * 256.0 / zpow);
+            var lr = new google.maps.Point((tileCoords.x + 1) * 256.0 / zpow, (tileCoords.y) * 256.0 / zpow);
+            var ulw = projection.fromPointToLatLng(ul);
+            var lrw = projection.fromPointToLatLng(lr);
+            var bbox = ulw.lat() + "," + ulw.lng() + "," + lrw.lat() + "," + lrw.lng();
+
+            var bbox = {
+                latMin: ulw.lat(),
+                latMax: lrw.lat(),
+                lonMin: ulw.lng(),
+                lonMax: lrw.lng()
+            };
+
+            return bbox;
+        }
+        var tileCoords = getTileCoordinates(event.latLng.lat(), event.latLng.lng(), map.getZoom());
+        var tileBounds = getTileBoundingBox(map, tileCoords)
+        var tileXYOffset = latLonToTileXYOffset(event.latLng.lat(), event.latLng.lng(), map.getZoom())
+
+        var getFeatureInfoUrl = "http://nowcoast.noaa.gov/arcgis/services/nowcoast/wwa_meteoceanhydro_longduration_hazards_time/MapServer/WMSServer?service=WMS&version=1.3.0&request=GetFeatureInfo&CRS=EPSG:4326&INFO_FORMAT=text/html&QUERY_LAYERS=1,2,4,5,7,8,10,11,13,14,17,18,20,21,24,25,27,28,31,32,34,35,38,39,41,42";
+        getFeatureInfoUrl += "&BBOX=" + tileBounds.latMin + "," + tileBounds.lonMin + "," + tileBounds.latMax + "," + tileBounds.lonMax;
+        getFeatureInfoUrl += "&I=" + tileXYOffset.x + "&J=" + tileXYOffset.y + "&WIDTH=256&HEIGHT=256";
+        // console.log(getFeatureInfoUrl);
+        console.log(tileXYOffset);
+        for (var i = 0; i < map.overlayMapTypes.getLength(); i++) {
+            var element = map.overlayMapTypes.getAt(i);
+            console.log('element :>> ', element);
+
+        }
+
     }
     this.ZoomToArcgis = function (map) {/*------------------------------------Arcgis wms addnew---------------------------*/
 

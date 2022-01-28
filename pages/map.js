@@ -1800,6 +1800,8 @@ const mapPage = () => {
                 setSelectwms([...selectwms, maptype]);
                 maptype.addToMap(Map);
             }
+
+
         } else {
             if (selectwmsright.some((item) => item.name == maptype.name)) {
                 let cut = selectwmsright.filter((item) => item.name !== maptype.name)
