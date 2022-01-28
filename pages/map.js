@@ -39,6 +39,7 @@ import jwt_decode from "jwt-decode";
 import Timeslide from "../components/Timeslider";
 import Color from '../components/Color';
 import ShapeText from "../util/obj/ShapeText";
+import ShapeShow from "../util/obj/ShapeShow";
 
 const cookies = new Cookies();
 
@@ -611,7 +612,7 @@ const mapPage = () => {
         // console.log('item -----------------:>> ', item);
 
         let content = `
-        <div id='infoBox'><center><strong>${item.group_layer_id === 'f942a946-3bcb-4062-9207-d78ab437edf3' ? `แปลงที่ดินลำดับที่ ${item.parid}` : 'รายละเอียดข้อมูล'}</strong></center><br />
+        <div id='infoBox'><center><strong>${item.group_layer_id === 'f942a946-3bcb-4062-9207-d78ab437edf3' ? `แปลงที่ดินลำดับที่ ${item.parid ?? '-'}` : 'รายละเอียดข้อมูล'}</strong></center><br />
         <table style="width: 350px;" class="table table-striped"> `
 
         if (item.from_model) {
@@ -625,29 +626,47 @@ const mapPage = () => {
                     formList.push({
                         index: _find.sort_plot,
                         text: getTextThaiObjShape(a),
-                        value: item[a] ?? "-",
+                        value: item[a] ?? "",
                     })
                 }
             });
             formList.sort((a, b) => a.index - b.index);
             formList.forEach(e => {
-                content += `
-                <tr>
-                    <td>${e.text}</td>
-                    <td>${e.value}</td>
-                </tr>`
+                if (e.text.toLowerCase() == 'link') {
+                    content += `
+                    <tr>
+                        <td>${e.text}</td>
+                        <td><a href="${e.value ?? '#'}" target="_blank" >${e.value ?? ''}</a></td>
+                    </tr>`
+                } else {
+                    content += `
+                    <tr>
+                        <td>${e.text}</td>
+                        <td>${e.value}</td>
+                    </tr>`
+                }
             });
 
 
         } else {
             const key = Object.keys(item);
             key.forEach((a, i) => {
-                // a + ": " + item[a] + "<br />";
-                content += `
-                <tr>
-                    <td>${a}</td>
-                    <td>${item[a] ?? "-"}</td>
-                </tr>`
+                if (item[a] !== null && a != "from_model" && a != "gid" && a != "group_layer_id" && a != "table_name" && a != "status_color" || a == 'link') {
+                    // a + ": " + item[a] + "<br />";
+                    if (a == 'link') {
+                        content += `
+                        <tr>
+                            <td>${a}</td>
+                            <td><a href="${item[a] ?? '#'}" target="_blank" >${item[a] ?? ''}</a></td>
+                        </tr>`
+                    } else {
+                        content += `
+                        <tr>
+                            <td>${a}</td>
+                            <td>${item[a] ?? ''}</td>
+                        </tr>`
+                    }
+                }
             });
         }
 
@@ -2972,12 +2991,12 @@ const mapPage = () => {
                                                                         </div>
                                                                     </div>
 
-                                                                    {e.hyperlink ?
+                                                                    {e.link ?
                                                                         <div className="row">
                                                                             <div className="col-md-12">
                                                                                 <div className="row">
-                                                                                    <label>Hyperlink :</label>
-                                                                                    <a className="pl-3" href={e.hyperlink} style={{ color: "#007bff" }}>{e.hyperlink}</a>
+                                                                                    <label>link :</label>
+                                                                                    <a className="pl-3" href={e.link} style={{ color: "#007bff" }}>{e.link}</a>
                                                                                 </div>
                                                                             </div>
                                                                         </div>

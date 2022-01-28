@@ -179,4 +179,10 @@ export default [
         is_show_plot: false,
         sort_plot: null,
     },
+    {
+        key: "link",
+        value: "LINK",
+        is_show_plot: true,
+        sort_plot: 17,
+    },
 ]
