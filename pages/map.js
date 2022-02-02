@@ -101,6 +101,8 @@ const mapPage = () => {
                 getLatLon(event);
             });
             clickMapShowLatLag(_map)
+
+
         });
         loadShapeFile()
         loadGetShapeProvince()
@@ -126,6 +128,33 @@ const mapPage = () => {
 
     }, [])
 
+
+    const ClickMapshowFeatureWms = (_map) => {
+        const infowindow = new google.maps.InfoWindow();
+        google.maps.event.addListener(_map, 'click', async (e) => {
+            await getfeature(e, _map, infowindow)
+        });
+    }
+    const getfeature = async (event, map, infowindow) => {
+        let contentAll = ``
+        let stat = [];
+        setListWms((e) => {
+            stat = e;
+            return e
+        });
+        for (const maptype of stat) {
+            let result = await maptype.GetfeatureData(event, map);
+            if (result) {
+                // console.log('result :>> ', result);
+                contentAll += `<br>` + result
+
+            }
+        }
+        infowindow.close()
+        infowindow.setContent(`${contentAll}`);
+        infowindow.setPosition(event.latLng);
+        infowindow.open(map)
+    }
     const getMasStatusProject = async () => {
         try {
             const { data } = await API.get(`masterdata/masStatusProject`)
@@ -458,10 +487,13 @@ const mapPage = () => {
                 let cut = listWms.filter((item) => item.name !== maptype.name)
                 setListWms(cut);
                 maptype.removeFromMap(map);
+
             } else {
                 setListWms([...listWms, maptype]);
                 maptype.addToMap(map);
                 setwms.push(maptype);
+
+
             }
 
             // listWms, setListWms
@@ -535,7 +567,7 @@ const mapPage = () => {
     }
 
     const getDeoJson = async (id, color, option_layer) => {
-        google.maps.event.clearListeners(map, 'click');
+        // google.maps.event.clearListeners(map, 'click');
 
         try {
             const { data } = await API.get(`/shp/shapeData?id=${id}`);
@@ -747,7 +779,7 @@ const mapPage = () => {
         setVisibleRaster(!visibleRaster)
         if (!visibleRaster) {
             const respRaster = await API.get("/masterdata/datLayers")
-            console.log(respRaster)
+            // console.log(respRaster)
             respRaster.data.items.map(data => {
                 if (data.image_type === "ภาพถ่ายจากดาวเทียม") {
                     dow.push(data)
@@ -800,10 +832,11 @@ const mapPage = () => {
         $("#openFullscreen").fadeToggle();
         $("#closeFullscreen").fadeToggle("slow");
     };
+
     const clickMapShowLatLag = (map) => {
         let test = new google.maps.InfoWindow()
         test.open(map);
-        google.maps.event.addListener(map, "click", (event) => {
+        google.maps.event.addListener(map, "rightclick", (event) => {
             test.close()
             test = new google.maps.InfoWindow({
                 content: `${event.latLng}`,
@@ -811,6 +844,8 @@ const mapPage = () => {
             })
             test.open(map)
         })
+
+        ClickMapshowFeatureWms(map)
     }
     /* เปิดปิดเส้นวัดระยะ */
     const [openLine, setOpenLine] = useState(true) //ปุ่มเปิดปิด Line
@@ -1835,7 +1870,7 @@ const mapPage = () => {
     const [wmsopacityright, setWmsopacityright] = useState(100);
 
     const Clickwms = (items, Map = map) => {
-        console.log('itemswms :>> ', items);
+        // console.log('itemswms :>> ', items);
 
         let maptype = new WmsMapType(
             items.id,

@@ -7,8 +7,9 @@ function WmsMapType(name, url, params, options, type = "geoserver") {
     this.type = type;
     this.name = name;
     this.url = type == "arcgisimageserver" ? url.replace("/rest", "") + '/WMSServer' : url;
+    this.urlwms = url.replace("/rest", "") + '/WMSServer';
     this.tileSize = new google.maps.Size(TILE_SIZE, TILE_SIZE); // required by API
-
+    this.eventclick = [];
     this.tiles = []; // maintain managed tiles
 
     /*
@@ -29,8 +30,10 @@ function WmsMapType(name, url, params, options, type = "geoserver") {
         height: this.tileSize.height,
 
         // Spatial Reference System
-        srs: 'EPSG:3857',
-        crs: 'EPSG:3857',
+        srs: 'EPSG:4326',
+        // srs: 'EPSG:3857',
+        crs: 'EPSG:4326',
+        // crs: 'EPSG:3857',
 
         // Style
         styles: '',
@@ -96,12 +99,21 @@ function WmsMapType(name, url, params, options, type = "geoserver") {
      * if index is omitted.
      */
     this.addToMap = async function (map, zoom = true, index = 1) {
-        // console.log(this)
+
+        // console.log("map.overlayMapTypes", map.overlayMapTypes)
+
+        // await map.overlayMapTypes.addListener("insert_at", (e) => {
+        //     console.log('"object2" :>> ', map.overlayMapTypes);
+
+        // });
+
         // if (index !== undefined) {
         //     map.overlayMapTypes.insertAt(Math.min(index, map.overlayMapTypes.getLength()), this);
         // } else {
+
         if (this.type == "geoserver" || this.type == "arcgisimageserver" || this.type == null) {
             // await map.overlayMapTypes.push(this);
+
             await map.overlayMapTypes.insertAt(map.overlayMapTypes.getLength(), this);
 
             if (zoom) {
@@ -113,22 +125,32 @@ function WmsMapType(name, url, params, options, type = "geoserver") {
                 this.ZoomToArcgis(map);
             }
         }
-        map.addListener("click", (e) => {
-            this.GetfeatureData(e, map)
-            // var url = getFeatureInfoURL(e.latLng)
-            // fetch(url).then(res => res.json()).then(data => console.log(data))
-        });
+        // const infowindow = new google.maps.InfoWindow();
+
+        // this.eventclick = new google.maps.event.addListener(map, "click", async (e) => {
+        //     let result = await this.GetfeatureData(e, map);
+        //     if (result) {
+        //         infowindow.close()
+        //         infowindow.setContent(`${result}`);
+        //         infowindow.setPosition(e.latLng);
+        //         infowindow.open(map)
+        //     }
+        // });
+
     };
+
     /*
      * Remove this MapType from a map.
      */
     this.removeFromMap = function (map) {
+
+
         var overlayTypes = map.overlayMapTypes;
 
         for (var i = 0; i < overlayTypes.getLength(); i++) {
             var element = overlayTypes.getAt(i);
-            /*       console.log("element",element.name)
-                  console.log("thisis",this.name) */
+            //   console.log("element",element.name)
+            //   console.log("thisis",this.name)
             if (element.name !== undefined && element.name === this.name) {/*ตอนแรกเช็คแค่ element อย่างเดียว*/
                 overlayTypes.removeAt(i);
                 break;
@@ -136,6 +158,8 @@ function WmsMapType(name, url, params, options, type = "geoserver") {
         }
 
         this.tiles = [];
+
+
     };
     /*
      * Change opacity on demand.
@@ -255,91 +279,246 @@ function WmsMapType(name, url, params, options, type = "geoserver") {
             name: this.name,
             opacity: 1,
         });
-        console.log('agsType :>> ', agsType);
+        // console.log('agsType :>> ', agsType);
         this.arcgis = agsType;
         map.overlayMapTypes.insertAt(map.overlayMapTypes.getLength(), agsType);
-        // map.overlayMapTypes.getLength()
+
 
 
 
 
 
     }
+    this.GetLayerWMS = async function () {
+        // console.log('this.GetCapabilities :>> ', this.urlwms + "?request=GetCapabilities&service=WMS");
+        let urlset = decodeURIComponent(this.urlwms + "?request=GetCapabilities&service=WMS")
+        let layerURL = await getHTML(urlset);
+        function getHTML(url) {
+            return new Promise(function (resolve, reject) {
+                var x = new XMLHttpRequest();
+                x.open("GET", url, true);
+                x.onreadystatechange = async function () {
+                    if (x.readyState == 4 && x.status == 200) {
+                        let html = x.response;
+                        // console.log('html :>> ', html);
+                        if (html != "" & html != null && html.indexOf('version') > -1) {
+                            var wmsData = new WMSCapabilities().parse(html);
+                            // if (wmsData != null && wmsData.Capability != null && wmsData.Capability.Layer != null && wmsData.Capability.Layer.Layer != null) {
+                            if (wmsData != null && wmsData.Capability != null && wmsData.Capability.Layer != null) {
+                                var layerList = wmsData.Capability.Layer.Layer ?? wmsData.Capability.Layer;
+                                // console.log('layerList :>> ', layerList);
+                                resolve(layerList[0])
+                            }
+                        }
+                    }
+                }
+                x.onerror = function () {
+                    reject({
+                        status: x.status,
+                        statusText: x.statusText
+                    });
+                };
+                x.send(null);
+            });
+        }
+
+
+        // console.log('layerURL :>> ', layerURL);
+        return layerURL.Name ? layerURL.Name : 0;
+    }
+
     this.GetfeatureData = async function (event, map) {
-        function latLonToXY(lat, lon, zoom) {
-            // Convert to radians
-            lat = lat * Math.PI / 180;
-            lon = lon * Math.PI / 180;
+        // function latLonToXY(lat, lon, zoom) {
+        //     // Convert to radians
+        //     lat = lat * Math.PI / 180;
+        //     lon = lon * Math.PI / 180;
 
-            var circumference = 256 * Math.pow(2, zoom);
-            var falseEasting = circumference / 2.0;
-            var falseNorthing = circumference / 2.0;
-            var radius = circumference / (2 * Math.PI);
+        //     var circumference = 256 * Math.pow(2, zoom);
+        //     var falseEasting = circumference / 2.0;
+        //     var falseNorthing = circumference / 2.0;
+        //     var radius = circumference / (2 * Math.PI);
 
-            var point = {
-                y: radius / 2.0 * Math.log((1.0 + Math.sin(lat)) / (1.0 - Math.sin(lat))),
-                x: radius * lon
-            };
+        //     var point = {
+        //         y: radius / 2.0 * Math.log((1.0 + Math.sin(lat)) / (1.0 - Math.sin(lat))),
+        //         x: radius * lon
+        //     };
 
-            point.x = falseEasting + point.x;
-            point.y = falseNorthing - point.y;
+        //     point.x = falseEasting + point.x;
+        //     point.y = falseNorthing - point.y;
 
-            return point;
+        //     return point;
+        // }
+        // function getTileCoordinates(lat, lon, zoom) {
+        //     var self = this;
+        //     var point = latLonToXY(lat, lon, zoom);
+
+        //     var tileXY = {
+        //         x: Math.floor(point.x / 256),
+        //         y: Math.floor(point.y / 256)
+        //     };
+
+        //     return tileXY;
+        // }
+        // function latLonToTileXYOffset(lat, lon, zoom) {
+        //     var point = latLonToXY(lat, lon, zoom);
+
+        //     var tileOffset = {
+        //         x: point.x % 256,
+        //         y: point.y % 256
+        //     };
+
+        //     return tileOffset;
+        // }
+        // function getTileBoundingBox(map, tileCoords) {
+        //     var projection = map.getProjection();
+        //     var zpow = Math.pow(2, map.getZoom());
+
+        //     var ul = new google.maps.Point(tileCoords.x * 256.0 / zpow, (tileCoords.y + 1) * 256.0 / zpow);
+        //     var lr = new google.maps.Point((tileCoords.x + 1) * 256.0 / zpow, (tileCoords.y) * 256.0 / zpow);
+        //     var ulw = projection.fromPointToLatLng(ul);
+        //     var lrw = projection.fromPointToLatLng(lr);
+        //     var bbox = ulw.lat() + "," + ulw.lng() + "," + lrw.lat() + "," + lrw.lng();
+
+        //     var bbox = {
+        //         latMin: ulw.lat(),
+        //         latMax: lrw.lat(),
+        //         lonMin: ulw.lng(),
+        //         lonMax: lrw.lng()
+        //     };
+
+        //     return bbox;
+        // }
+        // var tileCoords = getTileCoordinates(event.latLng.lat(), event.latLng.lng(), map.getZoom());
+        // var tileBounds = getTileBoundingBox(map, tileCoords)
+        // var tileXYOffset = latLonToTileXYOffset(event.latLng.lat(), event.latLng.lng(), map.getZoom())
+
+        // let urlwms = `${this.urlwms}?service=WMS&version=${this.params.version}&request=GetFeatureInfo&layers=0&query_layers=0&exceptions=application/vnd.ogc.se_inimage&x=128&y=128&bbox=${tileBounds.latMin + "," + tileBounds.lonMin + "," + tileBounds.latMax + "," + tileBounds.lonMax}&width=256&height=256&crs=${this.params.crs}&srs=${this.params.srs}&info_format=text/html&transparent=true&feature_count=50`
+        // var getFeatureInfoUrl = `${this.urlwms}?service=WMS&version=${this.params.version}&request=GetFeatureInfo&srs=${this.params.srs}&CRS=${this.params.crs}&INFO_FORMAT=text/html&QUERY_LAYERS=0,1,2,4,5,7,8,10,11,13,14,17,18,20,21,24,25,27,28,31,32,34,35,38,39,41,42`;
+        // getFeatureInfoUrl += "&BBOX=" + tileBounds.latMin + "," + tileBounds.lonMin + "," + tileBounds.latMax + "," + tileBounds.lonMax;
+        // getFeatureInfoUrl += "&I=" + tileXYOffset.x + "&J=" + tileXYOffset.y + "&WIDTH=256&HEIGHT=256";
+        // let urljson = `https://pttarcgisserver.pttplc.com/arcgis/rest/services/PTT_LMA/Publish_Service_LMA/MapServer/0/query?f=json&where=(1=1) AND (1=1)&returnGeometry=true&spatialRel=esriSpatialRelIntersects&geometry={"xmin":${tileBounds.latMin},"ymin":${tileBounds.lonMin},"xmax":${tileBounds.latMax},"ymax":${tileBounds.lonMax},"spatialReference":{"wkid":102100,"latestWkid":3857}}&geometryType=esriGeometryEnvelope&inSR=102100&outFields=*&outSR=102100`
+        // console.log(urljson);
+        // console.log('this :>> ', this);
+        // console.log('bbox :>> ', tileBounds.latMin + "," + tileBounds.lonMin + "," + tileBounds.latMax + "," + tileBounds.lonMax);
+
+
+        function fromLatLngToPoint(latLng, map) {
+            var topRight = map.getProjection().fromLatLngToPoint(map.getBounds().getNorthEast());
+            var bottomLeft = map.getProjection().fromLatLngToPoint(map.getBounds().getSouthWest());
+            var scale = Math.pow(2, map.getZoom());
+            var worldPoint = map.getProjection().fromLatLngToPoint(latLng);
+            return new google.maps.Point((worldPoint.x - bottomLeft.x) * scale, (worldPoint.y - topRight.y) * scale);
         }
-        function getTileCoordinates(lat, lon, zoom) {
-            var self = this;
-            var point = latLonToXY(lat, lon, zoom);
 
-            var tileXY = {
-                x: Math.floor(point.x / 256),
-                y: Math.floor(point.y / 256)
-            };
 
-            return tileXY;
+        function getRadius(zoom) {
+            var radius_px = 0.40 / 2
+            var constMetersDegress = 1000; // TODO Verifiy
+
+            //zoom <-> m/px = http://timwhitlock.info/blog/2010/04/google-maps-zoom-scales/
+            var scaled_zooms = {
+                22: 0.02,
+                21: 0.04,
+                20: 0.09,
+                19: 0.19,
+                18: 0.37,
+                17: 0.74,
+                16: 1.48,
+                15: 3,
+                14: 6,
+                13: 12,
+                12: 24,
+                11: 48,
+                10: 95,
+                9: 190,
+                8: 378,
+                7: 752,
+                6: 1485,
+                5: 2909,
+                4: 5540,
+                3: 10064,
+                2: 16355,
+                1: 21282,
+                0: 30000
+            }
+
+            var radius_meters = radius_px * scaled_zooms[zoom];
+            var radius_degrees = radius_meters / constMetersDegress;
+            return radius_degrees;
         }
-        function latLonToTileXYOffset(lat, lon, zoom) {
-            var point = latLonToXY(lat, lon, zoom);
 
-            var tileOffset = {
-                x: point.x % 256,
-                y: point.y % 256
-            };
 
-            return tileOffset;
-        }
-        function getTileBoundingBox(map, tileCoords) {
-            var projection = map.getProjection();
-            var zpow = Math.pow(2, map.getZoom());
 
-            var ul = new google.maps.Point(tileCoords.x * 256.0 / zpow, (tileCoords.y + 1) * 256.0 / zpow);
-            var lr = new google.maps.Point((tileCoords.x + 1) * 256.0 / zpow, (tileCoords.y) * 256.0 / zpow);
-            var ulw = projection.fromPointToLatLng(ul);
-            var lrw = projection.fromPointToLatLng(lr);
-            var bbox = ulw.lat() + "," + ulw.lng() + "," + lrw.lat() + "," + lrw.lng();
+        // function getFeatureInfoURL(latLng, url) {
+        var lat = parseFloat(event.latLng.lat());
+        var lng = parseFloat(event.latLng.lng());
 
-            var bbox = {
-                latMin: ulw.lat(),
-                latMax: lrw.lat(),
-                lonMin: ulw.lng(),
-                lonMax: lrw.lng()
-            };
+        //console.info('------------------------------')
+        var radius_degrees = getRadius(map.getZoom());
+        var buffer_sw_y_dd = lat - radius_degrees
+        var buffer_sw_x_dd = lng - radius_degrees
+        var buffer_ne_y_dd = lat + radius_degrees
+        var buffer_ne_x_dd = lng + radius_degrees
+        //console.info('bbox dd',buffer_sw_x_dd+','+buffer_sw_y_dd+','+buffer_ne_x_dd+','+buffer_ne_y_dd)
 
-            return bbox;
-        }
-        var tileCoords = getTileCoordinates(event.latLng.lat(), event.latLng.lng(), map.getZoom());
-        var tileBounds = getTileBoundingBox(map, tileCoords)
-        var tileXYOffset = latLonToTileXYOffset(event.latLng.lat(), event.latLng.lng(), map.getZoom())
+        var buffer_sw_dd = new google.maps.LatLng(buffer_sw_y_dd, buffer_sw_x_dd)//decimal degrees
+        var buffer_ne_dd = new google.maps.LatLng(buffer_ne_y_dd, buffer_ne_x_dd)//decimal degrees
 
-        var getFeatureInfoUrl = "http://nowcoast.noaa.gov/arcgis/services/nowcoast/wwa_meteoceanhydro_longduration_hazards_time/MapServer/WMSServer?service=WMS&version=1.3.0&request=GetFeatureInfo&CRS=EPSG:4326&INFO_FORMAT=text/html&QUERY_LAYERS=1,2,4,5,7,8,10,11,13,14,17,18,20,21,24,25,27,28,31,32,34,35,38,39,41,42";
-        getFeatureInfoUrl += "&BBOX=" + tileBounds.latMin + "," + tileBounds.lonMin + "," + tileBounds.latMax + "," + tileBounds.lonMax;
-        getFeatureInfoUrl += "&I=" + tileXYOffset.x + "&J=" + tileXYOffset.y + "&WIDTH=256&HEIGHT=256";
-        // console.log(getFeatureInfoUrl);
-        console.log(tileXYOffset);
-        for (var i = 0; i < map.overlayMapTypes.getLength(); i++) {
-            var element = map.overlayMapTypes.getAt(i);
-            console.log('element :>> ', element);
+        var buffer_sw_px = fromLatLngToPoint(buffer_sw_dd, map);//pixels
+        var buffer_ne_px = fromLatLngToPoint(buffer_ne_dd, map);//pixels
+        //console.info('buffer_sw_px',buffer_sw_px,'buffer_ne_px',buffer_ne_px)
 
-        }
+        var buffer_width_px = (Math.abs(buffer_ne_px.x - buffer_sw_px.x)).toFixed(0);
+        var buffer_height_px = (Math.abs(buffer_ne_px.y - buffer_sw_px.y)).toFixed(0);
+        //console.info('buffer_width_px',buffer_width_px, 'buffer_height_px',buffer_height_px)
+
+        var center_x_px = (buffer_width_px / 2).toFixed(0);
+        var center_y_px = (buffer_height_px / 2).toFixed(0);
+        //console.info('center_x_px',center_x_px,'center_y_px',center_y_px)
+        //console.info('------------------------------')
+
+        let layers = await this.GetLayerWMS();
+        var url = this.urlwms + '?';
+        url += '&SERVICE=WMS';
+        // url += '&VERSION=1.3.0';
+        url += '&VERSION=1.1.1';
+        url += '&REQUEST=GetFeatureInfo';
+        url += '&TRANSPARENT=true';
+        url += '&QUERY_LAYERS=' + layers;
+        url += '&STYLES';
+        url += '&LAYERS=' + layers;
+        url += '&INFO_FORMAT=text/html';
+        // url += '&INFO_FORMAT=text/javascript';
+        url += '&SRS=EPSG:6706';
+        url += '&crs=EPSG:6706';
+        url += '&WIDTH=' + buffer_width_px;
+        url += '&HEIGHT=' + buffer_height_px;
+        url += '&J=' + center_y_px;
+        url += '&I=' + center_x_px;
+        url += '&BBOX=' + buffer_sw_x_dd + ',' + buffer_sw_y_dd + ',' + buffer_ne_x_dd + ',' + buffer_ne_y_dd;
+
+        // console.log('url :>> ', url);
+        let result = await fetch(url).then(response => response.text()).then((html) => {
+            var parser = new DOMParser();
+            var doc = parser.parseFromString(html, 'text/html');
+            var feature = doc.querySelector('table');
+            if (feature) {
+                return html
+            } else {
+                return null
+            }
+            // console.log('feature :>> ', feature);
+
+        }).catch((error) => {
+            console.log('errorwmsfeature :>> ', error);
+            return null;
+        });
+
+        return result;
+        // };
+
+        // getFeatureInfoURL(event.latLng, this.urlwms)
+
 
     }
     this.ZoomToArcgis = function (map) {/*------------------------------------Arcgis wms addnew---------------------------*/
@@ -413,6 +592,7 @@ function WmsMapType(name, url, params, options, type = "geoserver") {
             x.onreadystatechange = function () {
                 if (x.readyState == 4 && x.status == 200) {
                     let html = x.response;
+                    // console.log('html :>> ', html);
                     if (html != "" & html != null && html.indexOf('version') > -1) {
                         var wmsData = new WMSCapabilities().parse(html);
                         // if (wmsData != null && wmsData.Capability != null && wmsData.Capability.Layer != null && wmsData.Capability.Layer.Layer != null) {
@@ -444,7 +624,7 @@ function WmsMapType(name, url, params, options, type = "geoserver") {
                                         let layerbox = layerList.BoundingBox;
                                         for (let i = 0; i < layerbox.length; i++) {
                                             if (layerbox[i].crs == 'EPSG:4326') {
-                                                console.log('layerbox[i] :>> ', layerbox[i]);
+                                                // console.log('layerbox[i] :>> ', layerbox[i]);
                                                 var bounds = new google.maps.LatLngBounds(
                                                     new google.maps.LatLng(layerbox[i].extent[0], layerbox[i].extent[1]),
                                                     new google.maps.LatLng(layerbox[i].extent[2], layerbox[i].extent[3])
