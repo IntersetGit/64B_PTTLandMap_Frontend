@@ -546,12 +546,12 @@ const mapPage = () => {
             option_layer = option_layer ?? {}
             let icon = null
             if (option_layer.symbol) {
-                let width = 25, height = 35
+                let width = 20, height = 20
                 icon = {
                     url: option_layer.symbol.location,
                     scaledSize: new google.maps.Size(width, height), // scaled size
                     origin: new google.maps.Point(0, 0), // origin
-                    anchor: new google.maps.Point(0, 0) // anchor
+                    anchor: new google.maps.Point(-10, 6) // anchor
                 }
             }
 
