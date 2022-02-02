@@ -101,7 +101,7 @@ const mapPage = () => {
                 getLatLon(event);
             });
             clickMapShowLatLag(_map)
-            ClickMapshowFeatureWms(_map);
+
 
         });
         loadShapeFile()
@@ -136,22 +136,24 @@ const mapPage = () => {
         });
     }
     const getfeature = async (event, map, infowindow) => {
-
+        let contentAll = ``
+        let stat = [];
         setListWms((e) => {
-            e?.forEach(async (maptype) => {
-                // console.log(`maptype`, maptype)
-                let result = await maptype.GetfeatureData(event, map);
-                if (result) {
-                    // console.log('result :>> ', result);
-                    infowindow.close()
-                    infowindow.setContent(`${result}`);
-                    infowindow.setPosition(event.latLng);
-                    infowindow.open(map)
-                }
-            })
+            stat = e;
             return e
-        })
+        });
+        for (const maptype of stat) {
+            let result = await maptype.GetfeatureData(event, map);
+            if (result) {
+                // console.log('result :>> ', result);
+                contentAll += `<br>` + result
 
+            }
+        }
+        infowindow.close()
+        infowindow.setContent(`${contentAll}`);
+        infowindow.setPosition(event.latLng);
+        infowindow.open(map)
     }
     const getMasStatusProject = async () => {
         try {
