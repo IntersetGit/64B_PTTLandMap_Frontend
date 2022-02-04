@@ -583,12 +583,12 @@ const mapPage = () => {
             option_layer = option_layer ?? {}
             let icon = null
             if (option_layer.symbol) {
-                let width = 20, height = 20
+                let width = 40, height = 20
                 icon = {
-                    url: option_layer.symbol.location,
+                    url: option_layer.symbol.location ?? createMarker(config_typoint && config_typoint.canvasType, option_layer.fillOpacity, option_layer.strokeColor, option_layer.strokeWeight),
                     scaledSize: new google.maps.Size(width, height), // scaled size
                     // origin: new google.maps.Point(0, 0), // origin
-                    anchor: new google.maps.Point(10, 10) // anchor
+                    anchor: new google.maps.Point(30, 10) // anchor
                 }
             }
 
@@ -603,7 +603,6 @@ const mapPage = () => {
 
                 }
             });
-            createMarker(config_typoint && config_typoint.canvasType, option_layer.fillOpacity, option_layer.strokeColor, option_layer.strokeWeight);
 
 
             layer.setMap(map);
