@@ -25,7 +25,8 @@ import {
     Pagination,
     Radio,
     Spin,
-    Space
+    Space,
+    Image
 } from "antd";
 import Head from "next/head";
 import { useSelector } from "react-redux";
@@ -306,7 +307,7 @@ const mapPage = () => {
 
     const onFinishUpload = async (value) => {
         try {
-            // console.log('value :>> ', value);
+            console.log('value :>> ', value);
             // console.log('FileType :>> ', FileType);
             // console.log('colorUpload :>> ', colorUpload.hex);
             let Symbol = {};
@@ -328,8 +329,8 @@ const mapPage = () => {
                         message.error("กรุณาเลือก Symbol!");
                         return false
                     }
-                    const data = await API.post(`${process.env.NEXT_PUBLIC_SERVICE}/upload/uploadPointDefault`, { img: nameImgDefault })
-                    Symbol = data.data.items
+                    // const data = await API.post(`${process.env.NEXT_PUBLIC_SERVICE}/upload/uploadPointDefault`, { img: nameImgDefault })
+                    // Symbol = data.data.items
                 }
             }
 
@@ -353,7 +354,11 @@ const mapPage = () => {
                         strokeColor: colorFrame,
                         symbol: Symbol ?? {},
                     }
+                    const config_typoint = {
+                        canvasType: textImgDefault
+                    }
                     formData.append("option_layer", JSON.stringify(option_layer));
+                    formData.append("config_typoint", JSON.stringify(config_typoint));
                     await axios({
                         method: "post",
                         url: `${process.env.NEXT_PUBLIC_SERVICE}/shp/add?name_layer=${name_layer}&type=${FileType}&group_layer_id=${group_layer_id}&color=${JSON.stringify(colorUpload.rgb)}`,
@@ -504,8 +509,8 @@ const mapPage = () => {
                 clearMapData(arr[index1].children[index2].id)
             } else {
                 const item = arr[index1].children[index2];
-                // console.log('item :>> ', item);
-                await getDeoJson(item.id, item.color_layer, item.option_layer)
+                console.log('item :>> ', item);
+                await getDeoJson(item.id, item.color_layer, item.option_layer, item.config_typoint)
             }
             setGroupLayerList(arr)
         }
@@ -566,7 +571,7 @@ const mapPage = () => {
         }
     }
 
-    const getDeoJson = async (id, color, option_layer) => {
+    const getDeoJson = async (id, color, option_layer, config_typoint) => {
         // google.maps.event.clearListeners(map, 'click');
 
         try {
@@ -582,22 +587,23 @@ const mapPage = () => {
                 icon = {
                     url: option_layer.symbol.location,
                     scaledSize: new google.maps.Size(width, height), // scaled size
-                    origin: new google.maps.Point(0, 0), // origin
-                    anchor: new google.maps.Point(-10, 6) // anchor
+                    // origin: new google.maps.Point(0, 0), // origin
+                    anchor: new google.maps.Point(10, 10) // anchor
                 }
             }
 
-            // console.log('option_layer :>> ', option_layer);
+            console.log('option_layer :>> ', option_layer);
             layer.setStyle((e) => {
                 return {
                     fillColor: e.h.status_color ?? color,
                     fillOpacity: option_layer.fillOpacity ?? inputValueOpacityColor, //Opacity
                     strokeWeight: option_layer.strokeWeight ?? inputValueStrokColor,  //ความหนาขอบ
                     strokeColor: option_layer.strokeColor ? option_layer.strokeColor.hex : colorFrame.hex, //เส้นขอบ
-                    icon,
+                    icon
 
                 }
             });
+            createMarker(config_typoint && config_typoint.canvasType, option_layer.fillOpacity, option_layer.strokeColor, option_layer.strokeWeight);
 
 
             layer.setMap(map);
@@ -1353,11 +1359,80 @@ const mapPage = () => {
     // select upload image  from user or default
     const [textImgDefault, setTextImgDefault] = useState()
     const [nameImgDefault, setNameImgDefault] = useState(null)
+    const [imgpontgen, setImgpontgen] = useState(null);
+
+    useEffect(() => {
+        setImgpontgen(createMarker());
+
+    }, [colorFrame, colorUpload, inputValueStrokColor, inputValueOpacityColor]);
+
+
+    function createMarker(name = textImgDefault, fillOpacity /* Opacity */, strokeColor /* hex and RGB*/, strokeWeight /*เส้นขอบ*/) {
+        let rgbconvert = (rgb, opacity) => {
+            return `rgba(${rgb.r},${rgb.g},${rgb.b},${opacity})`
+        }
+
+        var canvas, context;
+        canvas = document.createElement("canvas");
+        context = canvas.getContext("2d");
+
+        if (name == 'circle') {
+
+            const centerX = canvas.width / 2;
+            const centerY = canvas.height / 2;
+            const radiusc = 60;
+
+            context.beginPath();
+            context.arc(centerX, centerY, radiusc, 0, 2 * Math.PI, false);
+            context.fillStyle = rgbconvert(colorUpload.rgb ?? strokeColor.rgb, inputValueOpacityColor ?? fillOpacity);
+            context.fill();
+            context.lineWidth = inputValueStrokColor ?? strokeWeight;
+            context.strokeStyle = colorFrame.hex ?? strokeColor.hex;
+            context.stroke();
+
+            return canvas.toDataURL();
+        }
+
+        if (name == 'square') {
+
+            context.fillStyle = rgbconvert(colorUpload.rgb ?? strokeColor.rgb, inputValueOpacityColor ?? fillOpacity);
+            context.fillRect(110, 30, 100, 100);
+            context.lineWidth = inputValueStrokColor ?? strokeWeight;
+            context.strokeStyle = colorFrame.hex ?? strokeColor.hex;
+            context.strokeRect(110, 30, 100, 100);
+            context.stroke();
+            return canvas.toDataURL();
+
+        }
+
+        if (name == 'triangle') {
+            context.beginPath();
+            context.beginPath();
+            context.moveTo(200, 25);
+            context.lineTo(130, 25);
+            context.lineTo(165, 90);
+            context.closePath();
+
+            // the outline
+            context.lineWidth = inputValueStrokColor ?? strokeWeight;
+            context.strokeStyle = colorFrame.hex ?? strokeColor.hex;
+            context.stroke();
+
+            // the fill color
+            context.fillStyle = rgbconvert(colorUpload.rgb ?? strokeColor.rgb, inputValueOpacityColor ?? fillOpacity);
+            context.fill();
+            return canvas.toDataURL();
+        }
+
+    }
+
     const onSelectImageDefault = (img, classes, name) => {
         $(`.defalutImage`).css("border", "none")
         $(`.${classes}`).css("border", "1px black solid")
         setTextImgDefault(name)
         setNameImgDefault(img)
+        setImgpontgen(createMarker(name))
+
     }
     const [radioPoint, setRadioPoint] = useState("กำหนดเอง")
     const onChangeDefaultPoint = (e) => {
@@ -2366,7 +2441,7 @@ const mapPage = () => {
 
                                     {FileType ? <Form.Item label="ประเภทไฟล์">{FileType}</Form.Item> : null}
 
-                                    {FileType !== "Point" ?
+                                    {FileType !== "Point55" ?
                                         <>
                                             <Form.Item label="สีชั้นข้อมูล">
                                                 <a onClick={() => setOpenColorUpload(!openColorUpload)}>
@@ -2391,9 +2466,11 @@ const mapPage = () => {
                                                     >
                                                         <SketchPicker
                                                             color={colorUpload.rgb}
-                                                            onChange={({ rgb, hex }) =>
+                                                            onChange={({ rgb, hex }) => {
                                                                 setColorUpload({ ...colorUpload, rgb, hex })
-                                                            }
+
+
+                                                            }}
                                                         />
                                                         <footer className="footer-color">
                                                             <button
@@ -2508,23 +2585,23 @@ const mapPage = () => {
                                                     <div className="flexbox flex_point" >
                                                         <div className="item">
                                                             <div className="content ">
-                                                                <img className="Circle3 defalutImage" src="assets/images/symbol_point/IMG_0467.PNG" alt="" onClick={() => onSelectImageDefault("IMG_0467.png", "Circle3", "Circle3")} />
-                                                                <p>Circle3</p>
+                                                                <img className="Circle3 defalutImage" src="assets/images/symbol_point/IMG_0467.PNG" alt="" onClick={() => onSelectImageDefault("IMG_0467.png", "circle", "circle")} />
+                                                                <p>Circle</p>
                                                             </div>
                                                         </div>
                                                         <div className="item">
                                                             <div className="content">
-                                                                <img className="Circle40 defalutImage" src="assets/images/symbol_point/IMG_0468.PNG" alt="" onClick={() => onSelectImageDefault("IMG_0468.png", "Circle40", "Circle (40%)")} />
-                                                                <p>Circle (40%)</p>
+                                                                <img className="Circle40 defalutImage" src="assets/images/symbol_point/IMG_0476.PNG" alt="" onClick={() => onSelectImageDefault("IMG_0476.png", "square", "square")} />
+                                                                <p>Square</p>
                                                             </div>
                                                         </div>
                                                         <div className="item">
                                                             <div className="content ">
-                                                                <img className="Circle4 defalutImage" src="assets/images/symbol_point/IMG_0469.PNG" alt="" onClick={() => onSelectImageDefault("IMG_0469.png", "Circle4", "Circle4")} />
-                                                                <p>Circle4</p>
+                                                                <img className="Circle4 defalutImage" src="assets/images/symbol_point/IMG_0484.PNG" alt="" onClick={() => onSelectImageDefault("IMG_0484.png", "triangle", "triangle")} />
+                                                                <p>Triangle</p>
                                                             </div>
                                                         </div>
-                                                        <div className="item">
+                                                        {/* <div className="item">
                                                             <div className="content ">
                                                                 <img className=" Circle5 defalutImage" src="assets/images/symbol_point/IMG_0470.PNG" alt="" onClick={() => onSelectImageDefault("IMG_0470.png", "Circle5", "Circle5")} />
                                                                 <p>Circle5</p>
@@ -2613,13 +2690,16 @@ const mapPage = () => {
                                                                 <img className="defalutImage Triangle340" src="assets/images/symbol_point/IMG_0485.PNG" alt="" onClick={() => onSelectImageDefault("IMG_0485.png", "Triangle340", "Triangle3 (40%)")} />
                                                                 <p>Triangle3 (40%)</p>
                                                             </div>
-                                                        </div>
+                                                        </div> */}
                                                     </div>
                                                 </div>
                                             </Form.Item>
+                                            {
+                                                radioPoint !== "กำหนดเอง" && imgpontgen &&
+                                                <img src={imgpontgen} width="80%" height="50%" align="center" valign="center" alt="" disabled />
+                                            }
                                         </>
                                     ) : null}
-
 
                                     <Form.Item wrapperCol={{ offset: 8, span: 16 }}>
                                         <Button type="primary" htmlType="submit">
