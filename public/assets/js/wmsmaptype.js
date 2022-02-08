@@ -30,10 +30,10 @@ function WmsMapType(name, url, params, options, type = "geoserver") {
         height: this.tileSize.height,
 
         // Spatial Reference System
-        srs: 'EPSG:4326',
-        // srs: 'EPSG:3857',
-        crs: 'EPSG:4326',
-        // crs: 'EPSG:3857',
+        // srs: 'EPSG:4326',
+        srs: 'EPSG:3857',
+        // crs: 'EPSG:4326',
+        crs: 'EPSG:3857',
 
         // Style
         styles: '',
