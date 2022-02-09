@@ -329,8 +329,8 @@ const mapPage = () => {
                         message.error("กรุณาเลือก Symbol!");
                         return false
                     }
-                    // const data = await API.post(`${process.env.NEXT_PUBLIC_SERVICE}/upload/uploadPointDefault`, { img: nameImgDefault })
-                    // Symbol = data.data.items
+                    const data = await API.post(`${process.env.NEXT_PUBLIC_SERVICE}/upload/uploadPointDefault`, { img: nameImgDefault })
+                    Symbol = data.data.items
                 }
             }
 
@@ -358,7 +358,7 @@ const mapPage = () => {
                         canvasType: textImgDefault
                     }
                     formData.append("option_layer", JSON.stringify(option_layer));
-                    formData.append("config_typoint", JSON.stringify(config_typoint));
+                    // formData.append("config_typoint", JSON.stringify(config_typoint));
                     await axios({
                         method: "post",
                         url: `${process.env.NEXT_PUBLIC_SERVICE}/shp/add?name_layer=${name_layer}&type=${FileType}&group_layer_id=${group_layer_id}&color=${JSON.stringify(colorUpload.rgb)}`,
@@ -583,15 +583,15 @@ const mapPage = () => {
             option_layer = option_layer ?? {}
             let icon = null
             if (option_layer.symbol) {
-                let width = 40, height = 20
+                let width = 20, height = 20
                 icon = {
-                    url: option_layer.symbol.location ?? createMarker(config_typoint && config_typoint.canvasType, option_layer.fillOpacity, option_layer.strokeColor, option_layer.strokeWeight),
+                    url: option_layer.symbol.location,
                     scaledSize: new google.maps.Size(width, height), // scaled size
                     // origin: new google.maps.Point(0, 0), // origin
-                    anchor: new google.maps.Point(30, 10) // anchor
+                    anchor: new google.maps.Point(10, 10) // anchor
                 }
             }
-
+            // createMarker(config_typoint && config_typoint.canvasType, option_layer.fillOpacity, option_layer.strokeColor, option_layer.strokeWeight),
             console.log('option_layer :>> ', option_layer);
             layer.setStyle((e) => {
                 return {
@@ -1406,7 +1406,6 @@ const mapPage = () => {
 
         if (name == 'triangle') {
             context.beginPath();
-            context.beginPath();
             context.moveTo(200, 25);
             context.lineTo(130, 25);
             context.lineTo(165, 90);
@@ -1430,7 +1429,7 @@ const mapPage = () => {
         $(`.${classes}`).css("border", "1px black solid")
         setTextImgDefault(name)
         setNameImgDefault(img)
-        setImgpontgen(createMarker(name))
+        // setImgpontgen(createMarker(name))
 
     }
     const [radioPoint, setRadioPoint] = useState("กำหนดเอง")
@@ -2440,7 +2439,7 @@ const mapPage = () => {
 
                                     {FileType ? <Form.Item label="ประเภทไฟล์">{FileType}</Form.Item> : null}
 
-                                    {FileType !== "Point55" ?
+                                    {FileType !== "Point" ?
                                         <>
                                             <Form.Item label="สีชั้นข้อมูล">
                                                 <a onClick={() => setOpenColorUpload(!openColorUpload)}>
@@ -2582,7 +2581,7 @@ const mapPage = () => {
                                                     <Button >Default</Button>
                                                     <p className="text-muted">{textImgDefault}</p>
                                                     <div className="flexbox flex_point" >
-                                                        <div className="item">
+                                                        {/* <div className="item">
                                                             <div className="content ">
                                                                 <img className="Circle3 defalutImage" src="assets/images/symbol_point/IMG_0467.PNG" alt="" onClick={() => onSelectImageDefault("IMG_0467.png", "circle", "circle")} />
                                                                 <p>Circle</p>
@@ -2599,8 +2598,8 @@ const mapPage = () => {
                                                                 <img className="Circle4 defalutImage" src="assets/images/symbol_point/IMG_0484.PNG" alt="" onClick={() => onSelectImageDefault("IMG_0484.png", "triangle", "triangle")} />
                                                                 <p>Triangle</p>
                                                             </div>
-                                                        </div>
-                                                        {/* <div className="item">
+                                                        </div> */}
+                                                        <div className="item">
                                                             <div className="content ">
                                                                 <img className=" Circle5 defalutImage" src="assets/images/symbol_point/IMG_0470.PNG" alt="" onClick={() => onSelectImageDefault("IMG_0470.png", "Circle5", "Circle5")} />
                                                                 <p>Circle5</p>
@@ -2689,7 +2688,7 @@ const mapPage = () => {
                                                                 <img className="defalutImage Triangle340" src="assets/images/symbol_point/IMG_0485.PNG" alt="" onClick={() => onSelectImageDefault("IMG_0485.png", "Triangle340", "Triangle3 (40%)")} />
                                                                 <p>Triangle3 (40%)</p>
                                                             </div>
-                                                        </div> */}
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </Form.Item>
