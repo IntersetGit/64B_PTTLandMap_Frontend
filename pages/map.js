@@ -154,7 +154,9 @@ const mapPage = () => {
         infowindow.close()
         infowindow.setContent(`${contentAll}`);
         infowindow.setPosition(event.latLng);
-        infowindow.open(map)
+        if (contentAll !== ``) {
+            infowindow.open(map)
+        }
     }
     const getMasStatusProject = async () => {
         try {
