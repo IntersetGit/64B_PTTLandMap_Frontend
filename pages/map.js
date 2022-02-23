@@ -646,7 +646,7 @@ const mapPage = () => {
         //     content += a + ": " + feature.feature.h[a] + "<br />";
         // });
         // content += "</div>";
-        const item = feature.feature.h;
+        const item = feature.feature.j;
 
         window.clickEdit = () => {
             setModeInfoSearch("edit")
