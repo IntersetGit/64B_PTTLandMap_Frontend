@@ -146,13 +146,22 @@ const mapPage = () => {
         for (const maptype of stat) {
             let result = await maptype.GetfeatureData(event, map);
             if (result) {
-                // console.log('result :>> ', result);
+
                 contentAll += `<br>` + result
 
             }
         }
+        var parser = new DOMParser();
+        var doc = parser.parseFromString(contentAll, 'text/html');
+        let h5 = doc.querySelectorAll('h5');
+        if (h5.length) {
+            Array.from(h5).forEach((h) => {
+                h.style.fontSize = "80%";
+            })
+        }
+        let html = doc.querySelector("html")
         infowindow.close()
-        infowindow.setContent(`${contentAll}`);
+        infowindow.setContent(`${html.outerHTML}`);
         infowindow.setPosition(event.latLng);
         if (contentAll !== ``) {
             infowindow.open(map)

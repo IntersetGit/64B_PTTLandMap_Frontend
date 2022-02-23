@@ -497,7 +497,6 @@ function WmsMapType(name, url, params, options, type = "geoserver") {
         url += '&I=' + center_x_px;
         url += '&BBOX=' + buffer_sw_x_dd + ',' + buffer_sw_y_dd + ',' + buffer_ne_x_dd + ',' + buffer_ne_y_dd;
 
-        // console.log('url :>> ', url);
         let result = await fetch(url).then(response => response.text()).then((html) => {
             var parser = new DOMParser();
             var doc = parser.parseFromString(html, 'text/html');
@@ -507,13 +506,11 @@ function WmsMapType(name, url, params, options, type = "geoserver") {
             } else {
                 return null
             }
-            // console.log('feature :>> ', feature);
 
         }).catch((error) => {
             console.log('errorwmsfeature :>> ', error);
             return null;
         });
-
         return result;
         // };
 
