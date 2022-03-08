@@ -903,12 +903,12 @@ const mapPage = () => {
             ],
         });
         setPoly(poly);
-        var centerLabel = new MapLabel({
-            map: map,
-            fontSize: 13,
-            align: "center",
-        });
-        setDistanceTest(centerLabel)
+        // var centerLabel = new MapLabel({
+        //     map: map,
+        //     fontSize: 13,
+        //     align: "center",
+        // });
+        // setDistanceTest(centerLabel)
     }, []);
     const clickLine = () => {
         setOpenLine(!openLine) // สลับปุ่มเปิดปิด
@@ -1369,12 +1369,12 @@ const mapPage = () => {
     // select upload image  from user or default
     const [textImgDefault, setTextImgDefault] = useState()
     const [nameImgDefault, setNameImgDefault] = useState(null)
-    const [imgpontgen, setImgpontgen] = useState(null);
+    // const [imgpontgen, setImgpontgen] = useState(null);
 
-    useEffect(() => {
-        setImgpontgen(createMarker());
+    // useEffect(() => {
+    //     setImgpontgen(createMarker());
 
-    }, [colorFrame, colorUpload, inputValueStrokColor, inputValueOpacityColor]);
+    // }, [colorFrame, colorUpload, inputValueStrokColor, inputValueOpacityColor]);
 
 
     function createMarker(name = textImgDefault, fillOpacity /* Opacity */, strokeColor /* hex and RGB*/, strokeWeight /*เส้นขอบ*/) {
