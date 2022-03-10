@@ -756,7 +756,44 @@ const mapPage = () => {
         const arr = [...groupLayerList];
         arr[index1].children[index2].open = !arr[index1].children[index2].open;
         setGroupLayerList(arr);
+        // dragElement(document.getElementById(id))
     };
+
+    function dragElement(value, elmnt) {
+        var pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
+
+        elmnt.onmousedown = value ? dragMouseDown : closeDragElement();
+
+        function dragMouseDown(e) {
+            e = e || window.event;
+            e.preventDefault();
+            // get the mouse cursor position at startup:
+            pos3 = e.clientX;
+            pos4 = e.clientY;
+            document.onmouseup = closeDragElement;
+            // call a function whenever the cursor moves:
+            document.onmousemove = elementDrag;
+        }
+
+        function elementDrag(e) {
+            e = e || window.event;
+            e.preventDefault();
+            // calculate the new cursor position:
+            pos1 = pos3 - e.clientX;
+            pos2 = pos4 - e.clientY;
+            pos3 = e.clientX;
+            pos4 = e.clientY;
+            // set the element's new position:
+            elmnt.style.top = (elmnt.offsetTop - pos2) + "px";
+            elmnt.style.left = (elmnt.offsetLeft - pos1) + "px";
+        }
+
+        function closeDragElement() {
+            // stop moving when mouse button is released:
+            document.onmouseup = null;
+            document.onmousemove = null;
+        }
+    }
 
     const saveColor = async (index1, index2) => {
         try {
@@ -2345,7 +2382,7 @@ const mapPage = () => {
                                                                 {
                                                                     x.checked && x.type_geo != "Point" && x.type != "wms" ?
                                                                         <Col xs={3} style={{ paddingTop: 3 }}>
-                                                                            <a onClick={() => openColor(i, index)}>
+                                                                            <a onClick={() => openColor(i, index, `open-color-${index}`)}>
                                                                                 <div
                                                                                     style={{
                                                                                         width: "36px",
@@ -2356,15 +2393,21 @@ const mapPage = () => {
                                                                                     }}
                                                                                 />
                                                                             </a>
-                                                                            {x.open ? (
+                                                                            {(
+
                                                                                 <div
-                                                                                    div
+                                                                                    id={`open-color-${index}`}
                                                                                     style={{
                                                                                         position: "fixed",
                                                                                         zIndex: "2",
                                                                                         textAlign: "end",
+                                                                                        visibility: x.open ? "inherit" : "hidden"
                                                                                     }}
+
                                                                                 >
+                                                                                    <header className="header-color">
+                                                                                        move <Switch size="small" onChange={(value) => dragElement(value, document.getElementById(`open-color-${index}`))} />
+                                                                                    </header>
                                                                                     <SketchPicker
                                                                                         color={!x.rgb ? x.color_layer : x.rgb}
                                                                                         onChange={(value) =>
@@ -2380,7 +2423,7 @@ const mapPage = () => {
                                                                                         </button>
                                                                                     </footer>
                                                                                 </div>
-                                                                            ) : null}
+                                                                            )}
                                                                         </Col>
                                                                         : null
                                                                 }
