@@ -455,7 +455,7 @@ const usersSystemPage = () => {
       }
       const editGis = {
         ...value,
-        color_layer: JSON.stringify(colorUpload.color_layer),
+        color_layer: JSON.stringify(colorUpload.rgb),
         option_layer,
         config_color: configColor,
         id: editId,
@@ -732,6 +732,7 @@ const usersSystemPage = () => {
           <Form.Item name="color_layer" label="สีชั้นข้อมูล" >
             <Row>
               <Col span={6}>
+                {/* setColorUpload({ ...colorUpload, rgb, hex })} */}
                 <Color color={colorUpload} onChangeColor={({ rgb, hex }) => setColorUpload({ ...colorUpload, rgb, hex })} callbackSaveColor={(velue) => { }} />
               </Col>
               <Col span={18}>
