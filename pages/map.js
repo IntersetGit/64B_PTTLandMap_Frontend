@@ -973,8 +973,6 @@ const mapPage = () => {
                 let path = poly.getPath();
                 let len = path.getLength();
                 let sumline = [];
-                console.log('path :>> ', path.getArray());
-                // path.getArray().forEach((i) => console.log(i.toJSON()))
                 path.getArray().forEach((i, index) => {
                     if (index >= 1) {
                         var one = new google.maps.LatLng(i);
@@ -990,7 +988,7 @@ const mapPage = () => {
                 //     sumline.push(procressDistance)
 
                 // }
-                console.log('sumline', sumline)
+                // console.log('sumline', sumline)
                 sum = sumline.reduce((a, b) => a + b, 0)
                 let mToCm = sum / 1000
                 setDistanct(`ระยะทาง${mToCm.toFixed(2)} กม.`);
