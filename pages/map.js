@@ -973,20 +973,29 @@ const mapPage = () => {
                 let path = poly.getPath();
                 let len = path.getLength();
                 let sumline = [];
+                console.log('path :>> ', path.getArray());
+                // path.getArray().forEach((i) => console.log(i.toJSON()))
+                path.getArray().forEach((i, index) => {
+                    if (index >= 1) {
+                        var one = new google.maps.LatLng(i);
+                        var two = new google.maps.LatLng(path.getArray()[index - 1].lat(), path.getArray()[index - 1].lng());
+                        var procressDistance = google.maps.geometry.spherical.computeDistanceBetween(one, two)
+                        sumline.push(procressDistance)
+                    }
+                })
+                // for (var i = 0; i < len; i++) {
+                //     var one = new google.maps.LatLng(path.getAt(i).lat(), path.getAt(i).lng());
+                //     var two = new google.maps.LatLng(path.getAt(path.getLength() - 1).lat(), path.getAt(path.getLength() - 1).lng());
+                //     var procressDistance = google.maps.geometry.spherical.computeDistanceBetween(one, two)
+                //     sumline.push(procressDistance)
 
-                for (var i = 0; i < len; i++) {
-                    var one = new google.maps.LatLng(path.getAt(i).lat(), path.getAt(i).lng());
-                    var two = new google.maps.LatLng(path.getAt(path.getLength() - 1).lat(), path.getAt(path.getLength() - 1).lng());
-                    // console.log(`one`, path.getAt(i).lat(), path.getAt(i).lng())
-                    // console.log(`two`, path.getAt(path.getLength() - 1).lat(), path.getAt(path.getLength() - 1).lng())
-                    var procressDistance = google.maps.geometry.spherical.computeDistanceBetween(one, two)
-                    sumline.push(procressDistance)
-                    sum = sumline.reduce((a, b) => a + b, 0)
-                    let mToCm = sum / 1000
-                    setDistanct(`ระยะทาง${mToCm.toFixed(2)} กม.`);
-                    distanceTest.set("position", path.getAt(path.getLength() - 1));
-                    distanceTest.set("text", `ระยะทาง${mToCm.toFixed(2)} กม.`);
-                }
+                // }
+                console.log('sumline', sumline)
+                sum = sumline.reduce((a, b) => a + b, 0)
+                let mToCm = sum / 1000
+                setDistanct(`ระยะทาง${mToCm.toFixed(2)} กม.`);
+                distanceTest.set("position", path.getAt(path.getLength() - 1));
+                distanceTest.set("text", `ระยะทาง${mToCm.toFixed(2)} กม.`);
 
             }
 
