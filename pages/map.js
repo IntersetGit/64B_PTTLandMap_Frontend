@@ -472,9 +472,11 @@ const mapPage = () => {
             index2
         ].color_layer = `rgb(${rgb.r},${rgb.g},${rgb.b},${rgb.a})`;
         arr[index1].children[index2].rgb = rgb;
+        // arr[index1].children[index2].hex = hex;
+        arr[index1].children[index2].option_layer.strokeColor.hex = hex
         // console.log('rgb :>> ', rgb);
         setGroupLayerList(arr);
-        changeColor(arr[index1].children[index2].id, arr[index1].children[index2].color_layer, arr[index1].children[index2].option_layer)
+        changeColor(arr[index1].children[index2].id, arr[index1].children[index2].color_layer, arr[index1].children[index2].option_layer, arr[index1].children[index2].type_geo)
 
     };
 
@@ -520,7 +522,7 @@ const mapPage = () => {
                 clearMapData(arr[index1].children[index2].id)
             } else {
                 const item = arr[index1].children[index2];
-                console.log('item :>> ', item);
+                // console.log('item :>> ', item);
                 await getDeoJson(item.id, item.color_layer, item.option_layer, item.config_typoint)
             }
             setGroupLayerList(arr)
@@ -529,7 +531,7 @@ const mapPage = () => {
     };
 
 
-    const changeColor = (id, color, option_layer) => {
+    const changeColor = (id, color, option_layer, type_geo) => {
         const arr = [...layerData]
         const index = arr.findIndex(e => e.id == id)
         if (index != -1) {
@@ -540,15 +542,27 @@ const mapPage = () => {
             //     strokeWeight: 1,
             //     clickable: false
             // });
+
             option_layer = option_layer ?? {}
             layer.setStyle((e) => {
-                return {
-                    fillColor: e.h.status_color ?? color,
-                    fillOpacity: option_layer.fillOpacity ?? inputValueOpacityColor, //Opacity
-                    strokeWeight: option_layer.strokeWeight ?? inputValueStrokColor,  //ความหนาขอบ
-                    strokeColor: option_layer.strokeColor ? option_layer.strokeColor.hex : colorFrame.hex, //เส้นขอบ
-                    // clickable: false,
+                let configColor = null
+                if (type_geo === 'LineString') {
+                    configColor = {
+                        fillColor: e.h.status_color ?? color,
+                        fillOpacity: option_layer.fillOpacity ?? inputValueOpacityColor, //Opacity
+                        strokeWeight: option_layer.strokeWeight ?? inputValueStrokColor,  //ความหนาขอบ
+                        strokeColor: color ? color : option_layer.strokeColor ?? option_layer.strokeColor.hex, //เส้นขอบ
+                    }
+                } else {
+                    configColor = {
+                        fillColor: e.h.status_color ?? color,
+                        fillOpacity: option_layer.fillOpacity ?? inputValueOpacityColor, //Opacity
+                        strokeWeight: option_layer.strokeWeight ?? inputValueStrokColor,  //ความหนาขอบ
+                        strokeColor: option_layer.strokeColor ? option_layer.strokeColor.hex : colorFrame.hex, //เส้นขอบ
+                        // clickable: false,
+                    }
                 }
+                return configColor
             });
         }
     }
@@ -799,14 +813,28 @@ const mapPage = () => {
         try {
             const arr = [...groupLayerList]
             const item = arr[index1].children[index2];
-            const _model = {
-                name_layer: item.name_layer,
-                table_name: item.table_name,
-                color_layer: JSON.stringify(item.rgb),
-                type: item.type,
-                group_layer_id: arr[index1].id,
-                id: item.id
+            let _model = null
+            if (item.type_geo === 'LineString') {
+                _model = {
+                    name_layer: item.name_layer,
+                    table_name: item.table_name,
+                    color_layer: JSON.stringify(item.rgb),
+                    type: item.type,
+                    group_layer_id: arr[index1].id,
+                    id: item.id,
+                    option_layer: item.option_layer
+                }
+            } else {
+                _model = {
+                    name_layer: item.name_layer,
+                    table_name: item.table_name,
+                    color_layer: JSON.stringify(item.rgb),
+                    type: item.type,
+                    group_layer_id: arr[index1].id,
+                    id: item.id
+                }
             }
+            // console.log('option_layer', option_layer)
             // console.log('_model :>> ', _model);
             await API.post(`/masterdata/masLayersShape`, _model)
 
