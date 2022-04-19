@@ -8,7 +8,7 @@ const Maps = (props) => {
 
     useEffect(() => {
         const loader = new Loader({
-            apiKey: "AIzaSyArK9veHmyKP3QdYMPW1381JzFHqUwDg9U",
+            apiKey: "AIzaSyCFI5ESCo1VI27tyX8fWdmBC-MQrKX3FEk",
             version: 'weekly',
         });
 
