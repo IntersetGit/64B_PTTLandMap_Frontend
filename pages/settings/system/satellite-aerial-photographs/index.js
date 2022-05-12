@@ -213,7 +213,7 @@ const index = () => {
         if (result.isConfirmed) {
           const data = {
             id: value.id,
-            image_type: value.image_type,
+            image_type: value.type_name,
             layer_name: value.layerName ?? null,
             type_server: value.typeserver,
             wms: value.wms,
@@ -481,6 +481,7 @@ const index = () => {
             date: moment(dataEdit.date),
             typeserver: dataEdit.type_server,
             type_name: dataEdit.image_type,
+
           }}
         >
           <Form.Item name="id" label="id" hidden>
