@@ -206,7 +206,7 @@ const index = () => {
                                         <ReactHTMLTable className="export_excel" table="dashboard_table" filename="dashboard" buttonText="Export To Excel" />
                                     </div>
                                     <Button className="btn-success " style={{ borderRadius: "3px", color: "white", marginLeft: "5px", float: "right" }} onClick={() => $(".export_excel").click()}>Export To Excel</Button>
-                                    <Button type="primary" style={{ marginLeft: "5px", float: "right" }} htmlType="submit">Report</Button>
+                                    <Button type="primary" style={{ marginLeft: "5px", float: "right" }} htmlType="submit">ค้นหา</Button>
                                 </div>
                                 <div className="col-md-2 ">
                                     <Form.Item name="search">
