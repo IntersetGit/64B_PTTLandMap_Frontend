@@ -41,6 +41,7 @@ function MapLabel(opt_options) {
 
     this.setValues(opt_options);
 }
+// MapLabel.prototype = google.maps.OverlayView;
 MapLabel.prototype = new google.maps.OverlayView;
 
 window['MapLabel'] = MapLabel;

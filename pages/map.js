@@ -968,14 +968,15 @@ const mapPage = () => {
             ],
         });
         setPoly(poly);
-        var centerLabel = new MapLabel({
-            map: map,
-            fontSize: 13,
-            align: "center",
-        });
-        setDistanceTest(centerLabel)
+        // var centerLabel = new MapLabel({
+        //     map: map,
+        //     fontSize: 13,
+        //     align: "center",
+        // });
+        // setDistanceTest(centerLabel)
     }, []);
     const clickLine = () => {
+
         setOpenLine(!openLine) // สลับปุ่มเปิดปิด
         google.maps.event.clearListeners(map, 'click');
         var count = 0 //นับจำนวนครั้งที่กด วัดระยะ
@@ -984,7 +985,7 @@ const mapPage = () => {
         let max = [] //รวมระยะทางทั้งหมด
         let sum = null //เก็บผลรวมระยาทาง
         if (openLine) {
-            distanceTest.setMap(map)
+            // distanceTest.setMap(map)
             //มอบอีเว้นให้สามารถแก้ไขการวาดได้
 
             google.maps.event.addListener(poly, "dragend", getPath);
@@ -994,8 +995,9 @@ const mapPage = () => {
             google.maps.event.addListener(poly, 'click', function (e) {
                 this.setEditable(true);
             });
-
+            poly.labels = [];
             poly.setMap(map);
+
 
             function getPath() {
                 let path = poly.getPath();
@@ -1019,9 +1021,31 @@ const mapPage = () => {
                 // console.log('sumline', sumline)
                 sum = sumline.reduce((a, b) => a + b, 0)
                 let mToCm = sum / 1000
-                setDistanct(`ระยะทาง${mToCm.toFixed(2)} กม.`);
-                distanceTest.set("position", path.getAt(path.getLength() - 1));
-                distanceTest.set("text", `ระยะทาง${mToCm.toFixed(2)} กม.`);
+                // setDistanct(`ระยะทาง${mToCm.toFixed(2)} กม.`);
+                // distanceTest.set("position", path.getAt(path.getLength() - 1));
+                // distanceTest.set("text", `ระยะทาง${mToCm.toFixed(2)} กม.`);
+                let markerwa1 = new google.maps.Marker({
+                    map: map,
+                    animation: google.maps.Animation.DROP,
+                    position: path.getAt(path.getLength() - 1),
+                    icon: {
+                        url: 'http://image.flaticon.com/icons/svg/252/252025.svg',
+                        scaledSize: new google.maps.Size(80, 80),
+                        origin: new google.maps.Point(0, 0),
+                        anchor: new google.maps.Point(32, 65),
+                        labelOrigin: new google.maps.Point(40, 33),
+
+                    },
+                    label: {
+                        text: (parseFloat(mToCm.toFixed(2))).toLocaleString('en-US') + " กม.",
+                        color: "#000",
+                        fontSize: "13px",
+                        fontWeight: "bold",
+
+                    },
+                    zIndex: 99
+                });
+                poly.labels.push(markerwa1);
 
             }
 
@@ -1050,10 +1074,14 @@ const mapPage = () => {
         } else {
             let path = poly.getPath();
             path.forEach(i => path.pop())
-            distanceTest.set("text", "");
-            distanceTest.setMap(null)
+            // distanceTest.set("text", "");
+            // distanceTest.setMap(null)
             map.setOptions({ draggableCursor: 'default' });
             google.maps.event.clearListeners(map, 'click');
+            // console.log('poly.labels :>> ', poly.labels);
+            for (var i = 0; i < poly.labels.length; i++) {
+                poly.labels[i].setMap(null);
+            }
             setDistanct(null)
             clickMapShowLatLag(map)
         }
@@ -2640,7 +2668,7 @@ const mapPage = () => {
                                             <Form.Item
                                                 label="Upload"
                                             >
-                                                <Radio.Group value="กำหนดเอง" onChange={onChangeDefaultPoint} value={radioPoint}>
+                                                <Radio.Group /*value="กำหนดเอง"*/ onChange={onChangeDefaultPoint} value={radioPoint}>
                                                     <Radio value={"กำหนดเอง"}>กำหนดเอง</Radio>
                                                     <Radio value={"Default"}>Default</Radio>
                                                 </Radio.Group>

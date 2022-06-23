@@ -15,7 +15,7 @@ export default class MyDocument extends Document {
           <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300&display=swap" rel="stylesheet" />
           <link rel="icon" type="image/png" href="/assets/images/PTT-herder.png"></link>
           {/* <script src='https://maps.google.com/maps/api/js?key=AIzaSyCFI5ESCo1VI27tyX8fWdmBC-MQrKX3FEk&libraries=drawing,places,weekly,geometry&language=th&region=TH' async defer></script> */}
-          <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCFI5ESCo1VI27tyX8fWdmBC-MQrKX3FEk&callback=initMap"></script>
+          <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCFI5ESCo1VI27tyX8fWdmBC-MQrKX3FEk&libraries=drawing,places,weekly,geometry&language=th&region=TH" async defer></script>
 
         </Head>
         <body>
