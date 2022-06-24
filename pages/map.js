@@ -851,9 +851,13 @@ const mapPage = () => {
     const [rasterDataDow1, setRasterDataDow1] = useState([]) // ข้อมูล raster ภาพถ่ายทางอากาศจากโดรน
     const [loadmore1, setLoadmore1] = useState({ dronMore: 6, dowMore: 6 })
     const [loadmore2, setLoadmore2] = useState({ dronMore: 6, dowMore: 6 })
+    const [loadmore3, setLoadmore3] = useState({ dronMore: 6, dowMore: 6 })
+    const [loadmore4, setLoadmore4] = useState({ dronMore: 6, dowMore: 6 })
     /* แสดง Loadmore ข้อมูลเพิ่มเตืม */
     const [showMoreDow, setShowMoreDow] = useState({ dow1: false, dow2: false }) //โชวLoadmore  ภาพถ่ายจากดาวเทียม
     const [showMoreDron, setShowMoreDron] = useState({ dron1: false, dron2: false }) //โชวLoadmore  ภาพถ่ายทางอากาศจากโดรน
+    const [showMoreDow2, setShowMoreDow2] = useState({ dow1: false, dow2: false }) //โชวLoadmore2  ภาพถ่ายจากดาวเทียม
+    const [showMoreDron2, setShowMoreDron2] = useState({ dron1: false, dron2: false }) //โชวLoadmore2  ภาพถ่ายทางอากาศจากโดรน
     const openCloseRaster = async () => {
         let dron = []; //ภาพถ่ายทางอากาศจากโดรน
         let dow = []; //ภาพถ่ายจากดาวเทียม
@@ -3375,7 +3379,7 @@ const mapPage = () => {
                             {
                                 rasterDataDron1.slice(0, loadmore1.dronMore).map((data, index) => {
                                     return (
-                                        <Col key={`dronMore-${index}`} span={8} key={index} >
+                                        <Col key={`dronMore-${index}`} span={8} >
                                             <Card
                                                 className={`${selectwms.some((item) => item.name == data.id) ? "cardwa" : ""}`}
                                                 bodyStyle={{ padding: "5px", }}
@@ -3398,7 +3402,7 @@ const mapPage = () => {
                             }
                             {
                                 rasterDataDron1.length > 6 ? (
-                                    <h5 style={{ cursor: "pointer", marginLeft: "230px" }} className="text-info" hidden={showMoreDron.dron1} onClick={() => { setLoadmore1({ ...loadmore1, dronMore: rasterDataDow1.length }), setShowMoreDron({ ...showMoreDron, dron1: true }) }}>
+                                    <h5 style={{ cursor: "pointer", marginLeft: "230px" }} className="text-info" hidden={showMoreDron.dron1} onClick={() => { setLoadmore1({ ...loadmore1, dronMore: rasterDataDron1.length }), setShowMoreDron({ ...showMoreDron, dron1: true }) }}>
                                         ...Load More
                                     </h5>
                                 ) : null
@@ -3428,7 +3432,7 @@ const mapPage = () => {
                                 ) : null
                             }
                             {
-                                rasterDataDow1.slice(0, loadmore1.dowMore).map((data, index) => {
+                                rasterDataDow1.slice(0, loadmore2.dowMore).map((data, index) => {
                                     return <Col span={8} key={index} >
                                         <Card
                                             className={`${selectwms.some((item) => item.name == data.id) ? "cardwa" : ""}`}
@@ -3451,7 +3455,7 @@ const mapPage = () => {
                             }
                             {
                                 rasterDataDow1.length > 6 ? (
-                                    <h5 style={{ cursor: "pointer", marginLeft: "230px" }} className="text-info" hidden={showMoreDow.dow1} onClick={() => { setLoadmore1({ ...loadmore1, dowMore: rasterDataDow1.length }), setShowMoreDow({ ...showMoreDow, dow1: true }) }}>
+                                    <h5 style={{ cursor: "pointer", marginLeft: "230px" }} className="text-info" hidden={showMoreDow.dow1} onClick={() => { setLoadmore2({ ...loadmore2, dowMore: rasterDataDow1.length }), setShowMoreDow({ ...showMoreDow, dow1: true }) }}>
                                         ...Load More
                                     </h5>
                                 ) : null
@@ -3470,7 +3474,7 @@ const mapPage = () => {
                         <b className="text-info" >ภาพถ่ายทางอากาศ </b>
                         <Row className="pt-3" gutter={[16, 5]} style={{ margin: 0 }}>
                             {
-                                rasterDataDron1.slice(0, loadmore2.dronMore).map((data, index) => {
+                                rasterDataDron1.slice(0, loadmore3.dronMore).map((data, index) => {
                                     return <Col span={8} key={index} >
                                         <Card
                                             className={`${selectwmsright.some((item) => item.name == data.id) ? "cardwa" : ""}`}
@@ -3494,7 +3498,7 @@ const mapPage = () => {
                             }
                             {
                                 rasterDataDron1.length > 6 ? (
-                                    <h5 style={{ cursor: "pointer", marginLeft: "230px" }} className="text-info" hidden={showMoreDron.dron2} onClick={() => { setLoadmore2({ ...loadmore2, dronMore: rasterDataDow1.length }), setShowMoreDron({ ...showMoreDron, dron2: true }) }}>
+                                    <h5 style={{ cursor: "pointer", marginLeft: "230px" }} className="text-info" hidden={showMoreDron2.dron2} onClick={() => { setLoadmore3({ ...loadmore3, dronMore: rasterDataDron1.length }), setShowMoreDron2({ ...showMoreDron2, dron2: true }) }}>
                                         ...Load More
                                     </h5>
                                 ) : null
@@ -3524,7 +3528,7 @@ const mapPage = () => {
                                 ) : null
                             }
                             {
-                                rasterDataDow1.slice(0, loadmore2.dowMore).map((data, index) => {
+                                rasterDataDow1.slice(0, loadmore4.dowMore).map((data, index) => {
                                     return <Col span={8} key={index} >
                                         <Card
                                             className={`${selectwmsright.some((item) => item.name == data.id) ? "cardwa" : ""}`}
@@ -3547,7 +3551,7 @@ const mapPage = () => {
                             }
                             {
                                 rasterDataDow1.length > 6 ? (
-                                    <h5 style={{ cursor: "pointer", marginLeft: "230px" }} className="text-info" hidden={showMoreDow.dow2} onClick={() => { setLoadmore2({ ...loadmore2, dowMore: rasterDataDow1.length }), setShowMoreDow({ ...showMoreDow, dow2: true }) }}>
+                                    <h5 style={{ cursor: "pointer", marginLeft: "230px" }} className="text-info" hidden={showMoreDow2.dow2} onClick={() => { setLoadmore4({ ...loadmore4, dowMore: rasterDataDow1.length }), setShowMoreDow2({ ...showMoreDow, dow2: true }) }}>
                                         ...Load More
                                     </h5>
                                 ) : null
