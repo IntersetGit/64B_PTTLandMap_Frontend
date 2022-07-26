@@ -617,10 +617,14 @@ const mapPage = () => {
                 }
             }
             // createMarker(config_typoint && config_typoint.canvasType, option_layer.fillOpacity, option_layer.strokeColor, option_layer.strokeWeight),
-            console.log('option_layer :>> ', option_layer);
+            // console.log('option_layer :>> ', option_layer);
             layer.setStyle((e) => {
+                // console.log("statusProject", statusProject);
+                let colorfind = statusProject.find((i) => i.status_code == e.j.status);
+                // console.log('colorfind :>> ', colorfind);
+
                 return {
-                    fillColor: e.h.status_color ?? color,
+                    fillColor: colorfind?.status_color ?? color,
                     fillOpacity: option_layer.fillOpacity ?? inputValueOpacityColor, //Opacity
                     strokeWeight: option_layer.strokeWeight ?? inputValueStrokColor,  //ความหนาขอบ
                     strokeColor: option_layer.strokeColor ? option_layer.strokeColor.hex : colorFrame.hex, //เส้นขอบ
@@ -628,8 +632,6 @@ const mapPage = () => {
 
                 }
             });
-
-
             layer.setMap(map);
             layer.addListener('click', (e) => {
                 setInfoWindowWA(e);
@@ -1748,7 +1750,7 @@ const mapPage = () => {
             const layer = new google.maps.Data();
             layer.addGeoJson(GeoJson)
             const fillColor = GeoJson ? GeoJson.features[0].properties.status_color : item.color
-
+            // console.log('fillColor', fillColor)
             layer.addGeoJson(GeoJson)
             // layer.setStyle({
             //     fillColor: item.color,
